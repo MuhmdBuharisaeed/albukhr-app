@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ALBUKHR</title>
+</head>
+<body>
+  <h1>ALBUKHR Investment Limited</h1>
+  <p>Official App Entry Point</p>
+</body>
+</html>
