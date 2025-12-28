@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ALBUKHR Investment Limited</title>
+  <meta name="viewport" <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ALBUKHR Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <h1>ALBUKHR</h1>
+  <span class="menu">⋮</span>
+</header>
+
+<section class="welcome">
+  <h2>Welcome 👋</h2>
+  <p>Building sustainable industries and empowering communities.</p>
+</section>
+
+<section class="stats">
+  <div class="card">
+    <h3>Total Staked</h3>
+    <p>0.00 Pi</p>
+  </div>
+  <div class="card">
+    <h3>Rewards</h3>
+    <p>0.00 Pi</p>
+  </div>
+</section>
+
+<section class="nav">
+  <a href="projects.html">Projects</a>
+  <a href="wallet.html">Wallet</a>
+  <a href="services.html">Services</a>
+</section>
+
+<footer>
+  <p>App is under development.</p>
+</footer>
+
+</body>
+</html>
