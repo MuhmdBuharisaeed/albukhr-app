@@ -114,7 +114,7 @@
   padding-left: 100%;
   color: #fff;
   font-size: 14px;
-  animation: moveText 15s linear infinite;
+  animation: moveText 5s linear infinite;
 }
 
 @keyframes moveText {
