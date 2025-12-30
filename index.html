@@ -1,123 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Albukhr App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ALBUKHR App</title>
+
+  <!-- CSS (zamu gyara daga baya) -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<header class="app-header">
-  <div class="logo-box">
-    <img src="assets/albukhr-logo.png" alt="Albukhr Logo" />
-    <span class="brand-name">Albukhr</span>
-  </div>
-</header>
 <body>
 
-  <!-- 1️⃣ HEADER -->
-  <header id="app-header">
-    <div class="logo">
-      <!-- Logo zai zo nan -->
-      <img src="assets/logo/albukhr-logo.png" alt="Albukhr Logo">
-    </div>
-    <div class="app-name">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-placeholder">LOGO</div>
       <h1>Albukhr</h1>
     </div>
   </header>
 
-<!-- 2️⃣ WELCOME TEXT (motion ready) -->
-<section id="welcome-section">
-
-  <div class="welcome-track">
-    <span class="welcome-text">
+  <!-- MOVING WELCOME TEXT -->
+  <section class="welcome-marquee">
+    <marquee behavior="scroll" direction="left">
       Welcome to Albukhr — Building sustainable industries and empowering communities
-    </span>
-
-    <img
-      src="assets/logo/albukhr-logo-small.png"
-      alt="Albukhr Logo"
-      class="welcome-logo"
-    >
-  </div>
-
-</section>
-
-  <!-- 3️⃣ STATS SUMMARY -->
-  <section id="stats-section">
-
-    <div class="stat-card" id="total-staking">
-      <h3>Total Staking</h3>
-      <p>0.00 Pi</p>
-    </div>
-
-    <div class="stat-card" id="rewards">
-      <h3>Rewards</h3>
-      <p>0.00 Pi</p>
-    </div>
-
+    </marquee>
   </section>
 
-
-  <!-- 4️⃣ CORE PROJECTS (ALBUKHR = 7) -->
-  <section id="projects-section">
-<section class="projects-section">
-  <h3 class="section-title">Albukhr Projects</h3>
-
-  <div class="projects-list">
-
-    <div class="project-item">
-      <span class="project-letter">A</span>
-      <span class="project-icon">🌱</span>
-      <span class="project-name">Agriculture</span>
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stat-box">
+      <p>Total Staking</p>
+      <h2>0.00 π</h2>
     </div>
 
-    <div class="project-item">
-      <span class="project-letter">L</span>
-      <span class="project-icon">🐄</span>
-      <span class="project-name">Livestock</span>
+    <div class="stat-box">
+      <p>Rewards</p>
+      <h2>0.00 π</h2>
     </div>
+  </section>
 
-    <div class="project-item">
-      <span class="project-letter">B</span>
-      <span class="project-icon">🍞</span>
-      <span class="project-name">Bakery</span>
-    </div>
+  <!-- PROJECTS -->
+  <section class="projects">
+    <h3>Core Projects</h3>
 
-    <div class="project-item">
-      <span class="project-letter">U</span>
-      <span class="project-icon">⚙️</span>
-      <span class="project-name">Utilities</span>
-    </div>
+    <div class="project-item">A — Agriculture</div>
+    <div class="project-item">L — Livestock</div>
+    <div class="project-item">B — Bakery</div>
+    <div class="project-item">U — Utilities</div>
+    <div class="project-item">K — Knowledge</div>
+    <div class="project-item">H — Health</div>
+    <div class="project-item">R — Raheem Pharmacy</div>
+  </section>
 
-    <div class="project-item">
-      <span class="project-letter">K</span>
-      <span class="project-icon">📘</span>
-      <span class="project-name">Knowledge</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-letter">H</span>
-      <span class="project-icon">🏥</span>
-      <span class="project-name">Health</span>
-    </div>
-
-    <div class="project-item highlight">
-      <span class="project-letter">R</span>
-      <span class="project-icon">💊</span>
-      <span class="project-name">Raheem Pharmacy</span>
-    </div>
-
-  </div>
-</section>
-
-  <!-- 5️⃣ BOTTOM NAVIGATION -->
-  <nav id="bottom-nav">
-    <ul>
-      <li>Home</li>
-      <li>Projects</li>
-      <li>Wallet</li>
-      <li>Services</li>
-      <li>Settings</li>
-    </ul>
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <span>Home</span>
+    <span>Projects</span>
+    <span>Wallet</span>
+    <span>Services</span>
+    <span>Settings</span>
   </nav>
 
 </body>
