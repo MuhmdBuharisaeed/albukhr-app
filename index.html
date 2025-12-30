@@ -1,64 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ALBUKHR App</title>
-
-  <!-- CSS (zamu gyara daga baya) -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Albukhr App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="brand">
-      <div class="logo-placeholder">LOGO</div>
-      <h1>Albukhr</h1>
-    </div>
+  <!-- Header: logo + company name -->
+  <header>
+    <img src="assets/images/albukhr-logo.png" alt="Albukhr Logo" class="logo">
+    <h1>Albukhr</h1>
   </header>
 
-  <!-- MOVING WELCOME TEXT -->
-  <section class="welcome-marquee">
-  <div class="welcome-text">
-    Welcome to Albukhr — Building sustainable industries and empowering communities
-  </div>
+  <!-- Welcome Text -->
+  <section class="welcome">
+    <p>Welcome to Albukhr — Building sustainable industries and empowering communities</p>
   </section>
 
-  <!-- STATS -->
-  <section class="stats">
-    <div class="stat-box">
-      <p>Total Staking</p>
-      <h2>0.00 π</h2>
+  <!-- Core Dashboard -->
+  <section class="dashboard">
+    <!-- Total Staking & Rewards -->
+    <div class="stats">
+      <div>Total Staking: 0.00 Pi</div>
+      <div>Rewards: 0.00 Pi</div>
     </div>
 
-    <div class="stat-box">
-      <p>Rewards</p>
-      <h2>0.00 π</h2>
+    <!-- Projects Grid -->
+    <div class="projects">
+      <div class="project">A 🌱 Agriculture</div>
+      <div class="project">L 🐄 Livestock</div>
+      <div class="project">B 🍞 Bakery</div>
+      <div class="project">U ⚙️ Utilities</div>
+      <div class="project">K 📘 Knowledge</div>
+      <div class="project">H 🏥 Health</div>
+      <div class="project">R 💊 Raheem Pharmacy</div>
     </div>
   </section>
 
-  <!-- PROJECTS -->
-  <section class="projects">
-    <h3>Core Projects</h3>
-
-    <div class="project-item">A — Agriculture</div>
-    <div class="project-item">L — Livestock</div>
-    <div class="project-item">B — Bakery</div>
-    <div class="project-item">U — Utilities</div>
-    <div class="project-item">K — Knowledge</div>
-    <div class="project-item">H — Health</div>
-    <div class="project-item">R — Raheem Pharmacy</div>
-  </section>
-
-  <!-- BOTTOM NAV -->
+  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <span>Home</span>
-    <span>Projects</span>
-    <span>Wallet</span>
-    <span>Services</span>
-    <span>Settings</span>
+    <button>Home</button>
+    <button>Projects</button>
+    <button>Wallet</button>
+    <button>Services</button>
+    <button>Settings</button>
   </nav>
 
+  <script src="script.js"></script>
 </body>
-</html>
+  </html>
