@@ -119,3 +119,30 @@ body {
 .bottom-nav .active {
   font-weight: bold;
 }
+
+/* MOVING WELCOME BAR */
+.welcome-bar {
+  background: #ffffff;
+  overflow: hidden;
+  border-bottom: 1px solid #e0e0e0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.welcome-track {
+  white-space: nowrap;
+  padding-left: 100%;
+  font-size: 14px;
+  color: #0f7a3d;
+  animation: welcomeMove 12s linear infinite;
+}
+
+@keyframes welcomeMove {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
