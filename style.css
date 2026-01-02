@@ -4,10 +4,11 @@ body {
   background: #f5f5f5;
 }
 
-header {
+.projects {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column; /* WANNAN SHI NE MABUDI */
+  gap: 12px;
+}
   padding: 10px 20px;
   background-color: green;
   color: yellow;
