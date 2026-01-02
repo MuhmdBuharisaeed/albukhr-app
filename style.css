@@ -122,10 +122,9 @@ body {
 
 /* MOVING WELCOME BAR */
 .welcome-bar {
-  background: #ffffff;
+  background: #f0f7f3;   /* light green, ba dark ba */
   overflow: hidden;
-  border-bottom: 1px solid #e0e0e0;
-  height: 36px;
+  height: 32px;          /* kada ya ƙara tsawo */
   display: flex;
   align-items: center;
 }
