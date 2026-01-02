@@ -1,69 +1,101 @@
-body {
-  font-family: Arial, sans-serif;
+* {
   margin: 0;
-  background: #f5f5f5;
-}
-.project-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: #eaffea;
-  border-radius: 10px;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
-.logo {
-  height: 40px;
+body {
+  background: #f5f7f6;
+  color: #111;
+  padding-bottom: 80px;
 }
 
-.welcome {
-  text-align: center;
+/* HEADER */
+.header {
+  background: #0f7a3d;
+  color: white;
   padding: 20px;
-  font-size: 16px;
-}
-
-.dashboard .stats {
-  display: flex;
-  justify-content: space-around;
-  padding: 15px 0;
-  font-weight: bold;
-}
-
-.projects {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  padding: 10px;
   text-align: center;
-  font-size: 14px;
+}
+
+.brand {
+  font-size: 26px;
   font-weight: bold;
 }
 
-.project {
-  padding: 10px;
-  background: #e0ffe0;
-  border-radius: 8px;
+.tagline {
+  font-size: 14px;
+  margin-top: 8px;
 }
 
-.bottom-nav {
+/* STATS */
+.stats {
   display: flex;
-  justify-content: space-around;
-  padding: 10px;
-  background: #ddd;
+  justify-content: space-between;
+  padding: 15px;
+  gap: 10px;
+}
+
+.stat-box {
+  background: white;
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-box span {
+  display: block;
+  font-size: 13px;
+  color: #555;
+}
+
+.stat-box strong {
+  font-size: 16px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* PROJECTS */
+.projects {
+  padding: 15px;
+}
+
+.projects h2 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.project-card {
+  background: #e8f5e9;
+  border-left: 5px solid #0f7a3d;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
   position: fixed;
   bottom: 0;
-  width: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #ccc;
+  padding: 10px 0;
 }
 
 .bottom-nav button {
-  background: green;
-  color: yellow;
+  background: none;
   border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
+  font-size: 14px;
+  color: #0f7a3d;
 }
 
-.bottom-nav button:hover {
-  opacity: 0.8;
+.bottom-nav .active {
+  font-weight: bold;
 }
