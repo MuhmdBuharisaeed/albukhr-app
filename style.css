@@ -12,40 +12,67 @@ body {
   padding-bottom: 80px; /* space don bottom nav */
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 .header {
   background: #0f7a3d;
   color: white;
-  padding: 20px;
-  text-align: left; /* daga center zuwa left */
+  padding: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .header img {
-  width: 40px; /* logo size */
+  width: 40px;
   height: 40px;
   object-fit: contain;
 }
 
 .brand {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: bold;
 }
 
-.tagline {
-  font-size: 14px;
-  margin-top: 4px;
-  color: #e0f2e9;
+/* ❌ babu animation a header ko brand */
+.header,
+.brand,
+.header img {
+  animation: none !important;
 }
 
-/* STATS */
+/* ================= WELCOME BAR ================= */
+.welcome-bar {
+  background: #e6f4ec; /* light green */
+  overflow: hidden;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.welcome-track {
+  white-space: nowrap;
+  padding-left: 100%;
+  font-size: 14px;
+  color: #0f7a3d;
+
+  /* ⚠️ animation yana nan kaɗai */
+  animation: welcomeMove 12s linear infinite;
+}
+
+@keyframes welcomeMove {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* ================= STATS ================= */
 .stats {
   display: flex;
-  justify-content: space-between;
-  padding: 15px;
   gap: 10px;
+  padding: 15px;
 }
 
 .stat-box {
@@ -64,20 +91,19 @@ body {
 
 .stat-box strong {
   font-size: 16px;
-  margin-top: 5px;
   display: block;
+  margin-top: 5px;
 }
 
-/* PROJECTS */
+/* ================= PROJECTS ================= */
 .projects {
   padding: 15px;
   display: flex;
   flex-direction: column; /* tsaye */
-  gap: 10px;
+  gap: 12px;
 }
 
 .projects h2 {
-  margin-bottom: 10px;
   font-size: 18px;
   font-weight: bold;
 }
@@ -86,15 +112,15 @@ body {
   background: #e8f5e9;
   border-left: 5px solid #0f7a3d;
   padding: 16px;
-  font-size: 16px;
   border-radius: 6px;
-  width: 100%; /* cika fuskar wayar */
+  font-size: 16px;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* BOTTOM NAVIGATION */
+/* ================= BOTTOM NAV ================= */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -113,35 +139,8 @@ body {
   border: none;
   font-size: 14px;
   color: #0f7a3d;
-  cursor: pointer;
 }
 
 .bottom-nav .active {
   font-weight: bold;
-}
-
-/* MOVING WELCOME BAR */
-.welcome-bar {
-  background: #f0f7f3;   /* light green, ba dark ba */
-  overflow: hidden;
-  height: 32px;          /* kada ya ƙara tsawo */
-  display: flex;
-  align-items: center;
-}
-
-.welcome-track {
-  white-space: nowrap;
-  padding-left: 100%;
-  font-size: 14px;
-  color: #0f7a3d;
-  animation: welcomeMove 12s linear infinite;
-}
-
-@keyframes welcomeMove {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
-  }
 }
