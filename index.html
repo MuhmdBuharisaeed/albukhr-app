@@ -1,49 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Albukhr App</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALBUKHR</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  
-  <div class="app-header">
-  <h1>ALBUKHR</h1>
-  </div>
 
-  <!-- Welcome Text -->
-  <section class="welcome">
-    <p>Welcome to Albukhr — Building sustainable industries and empowering communities</p>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <h1 class="brand">ALBUKHR</h1>
+    <p class="tagline">
+      Building sustainable industries and empowering communities
+    </p>
+  </header>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stat-box">
+      <span>Total Staking</span>
+      <strong>0.00 Pi</strong>
+    </div>
+    <div class="stat-box">
+      <span>Rewards</span>
+      <strong>0.00 Pi</strong>
+    </div>
   </section>
 
-  <!-- Core Dashboard -->
-  <section class="dashboard">
-    <!-- Total Staking & Rewards -->
-    <div class="stats">
-      <div>Total Staking: 0.00 Pi</div>
-      <div>Rewards: 0.00 Pi</div>
-    </div>
+  <!-- PROJECTS -->
+  <section class="projects">
+    <h2>Albukhr Projects</h2>
 
-    <div class="projects">
-  <div class="project-card">A 🌱 Agriculture</div>
-  <div class="project-card">L 🐄 Livestock</div>
-  <div class="project-card">B 🍞 Bakery</div>
-  <div class="project-card">U ⚙️ Utilities</div>
-  <div class="project-card">K 📘 Knowledge</div>
-  <div class="project-card">H 🏥 Health</div>
-  <div class="project-card">R 💊 Raheem Pharmacy</div>
-    </div>
+    <div class="project-card">A 🌱 Agriculture</div>
+    <div class="project-card">L 🐄 Livestock</div>
+    <div class="project-card">B 🍞 Bakery</div>
+    <div class="project-card">U ⚙️ Utilities</div>
+    <div class="project-card">K 📘 Knowledge</div>
+    <div class="project-card">H 🏥 Health</div>
+    <div class="project-card">R 💊 Raheem Pharmacy</div>
+  </section>
 
-  <!-- Bottom Navigation -->
+  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
-    <button>Home</button>
+    <button class="active">Home</button>
     <button>Projects</button>
     <button>Wallet</button>
     <button>Services</button>
     <button>Settings</button>
   </nav>
 
-  <script src="script.js"></script>
 </body>
 </html>
