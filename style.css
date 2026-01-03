@@ -144,3 +144,23 @@ body {
 .bottom-nav .active {
   font-weight: bold;
 }
+
+/* FORCE HEADER TEXT TO SHOW */
+.header {
+  min-height: 70px;
+}
+
+.header div {
+  display: block !important;
+}
+
+.brand {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #ffffff !important;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  z-index: 10;
+  position: relative;
+}
