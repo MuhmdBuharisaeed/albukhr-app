@@ -140,3 +140,42 @@ body {
 .bottom-nav .active {
   font-weight: bold;
 }
+
+/* ================= PROJECTS PAGE ================= */
+.projects-page {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.project-item {
+  background: #ffffff;
+  border-left: 5px solid #cfded6;
+  padding: 14px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.project-item span {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.project-item small {
+  font-size: 12px;
+  color: #777;
+}
+
+/* ACTIVE PROJECT */
+.project-item.active {
+  border-left-color: #0f7a3d;
+  background: #e8f5e9;
+}
+
+.project-item.active small {
+  color: #0f7a3d;
+  font-weight: bold;
+}
