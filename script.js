@@ -25,3 +25,13 @@ function moveHeader() {
 
 // Fara animation
 moveHeader();
+
+function openRaheem() {
+  document.getElementById("projectsList").style.display = "none";
+  document.getElementById("raheemDetails").style.display = "block";
+}
+
+function closeRaheem() {
+  document.getElementById("raheemDetails").style.display = "none";
+  document.getElementById("projectsList").style.display = "block";
+}
