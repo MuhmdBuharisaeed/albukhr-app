@@ -1,4 +1,4 @@
-/* RESET & BASE */
+/* ================= RESET ================= */
 * {
   margin: 0;
   padding: 0;
@@ -6,16 +6,25 @@
   font-family: Arial, sans-serif;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+/* ================= BODY ================= */
 body {
   background: #f5f7f6;
   color: #111;
-  padding-bottom: 80px; /* space don bottom nav */
+  min-height: 100vh;
+  width: 100%;
+  padding-bottom: 80px; /* space for bottom nav */
+  overflow-x: hidden;
 }
 
 /* ================= HEADER ================= */
 .header {
   background: #0f7a3d;
-  color: white;
+  color: #ffffff;
   padding: 16px;
   display: flex;
   align-items: center;
@@ -33,14 +42,13 @@ body {
   font-size: 24px;
   font-weight: bold;
   color: #ffffff;
-  display: block;
 }
 
 /* ================= WELCOME BAR ================= */
 .welcome-bar {
-  background: #e6f4ec; /* light green */
-  overflow: hidden;
+  background: #e6f4ec;
   height: 32px;
+  overflow: hidden;
   display: flex;
   align-items: center;
 }
@@ -50,16 +58,14 @@ body {
   padding-left: 100%;
   font-size: 14px;
   color: #0f7a3d;
-
-  /* ⚠️ animation yana nan kaɗai */
   animation: welcomeMove 12s linear infinite;
 }
 
 @keyframes welcomeMove {
-  0% {
+  from {
     transform: translateX(0);
   }
-  100% {
+  to {
     transform: translateX(-100%);
   }
 }
@@ -72,7 +78,7 @@ body {
 }
 
 .stat-box {
-  background: white;
+  background: #ffffff;
   flex: 1;
   padding: 12px;
   border-radius: 8px;
@@ -80,22 +86,25 @@ body {
 }
 
 .stat-box span {
-  display: block;
   font-size: 13px;
   color: #555;
+  display: block;
 }
 
 .stat-box strong {
   font-size: 16px;
-  display: block;
   margin-top: 5px;
+  display: block;
 }
 
-/* ================= PROJECTS ================= */
-.projects {
+/* ================= PROJECTS LIST ================= */
+.projects,
+.projects-page {
+  width: 100%;
+  min-height: calc(100vh - 176px);
   padding: 15px;
   display: flex;
-  flex-direction: column; /* tsaye */
+  flex-direction: column;
   gap: 12px;
 }
 
@@ -104,55 +113,12 @@ body {
   font-weight: bold;
 }
 
-.project-card {
-  background: #e8f5e9;
-  border-left: 5px solid #0f7a3d;
-  padding: 16px;
-  border-radius: 6px;
-  font-size: 16px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* ================= BOTTOM NAV ================= */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: white;
-  display: flex;
-  justify-content: space-around;
-  border-top: 1px solid #ccc;
-  padding: 10px 0;
-  z-index: 100;
-}
-
-.bottom-nav button {
-  background: none;
-  border: none;
-  font-size: 14px;
-  color: #0f7a3d;
-}
-
-.bottom-nav .active {
-  font-weight: bold;
-}
-
-/* ================= PROJECTS PAGE ================= */
-.projects-page {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
+/* Project item */
 .project-item {
+  width: 100%;
   background: #ffffff;
   border-left: 5px solid #cfded6;
-  padding: 14px;
+  padding: 16px;
   border-radius: 6px;
   display: flex;
   justify-content: space-between;
@@ -169,10 +135,10 @@ body {
   color: #777;
 }
 
-/* ACTIVE PROJECT */
+/* Active project */
 .project-item.active {
-  border-left-color: #0f7a3d;
   background: #e8f5e9;
+  border-left-color: #0f7a3d;
 }
 
 .project-item.active small {
@@ -180,13 +146,26 @@ body {
   font-weight: bold;
 }
 
-/* ================= PROJECT DETAILS ADVANCED ================= */
+/* ================= PROJECT DETAILS ================= */
+.project-details {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 16px;
+  display: none; /* BOYE – sai an danna */
+}
 
+/* idan an buɗe */
+.project-details.active {
+  display: block;
+}
+
+/* details header */
 .details-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .details-desc {
@@ -195,7 +174,7 @@ body {
   margin-bottom: 15px;
 }
 
-/* BADGE */
+/* badge */
 .badge {
   font-size: 12px;
   padding: 4px 8px;
@@ -208,10 +187,10 @@ body {
   color: #0f7a3d;
 }
 
-/* STATS */
+/* details stats */
 .details-stats {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
   background: #f5faf7;
   padding: 12px;
   border-radius: 8px;
@@ -219,14 +198,14 @@ body {
 }
 
 .details-stats div {
-  text-align: center;
   flex: 1;
+  text-align: center;
 }
 
 .details-stats strong {
-  display: block;
   font-size: 13px;
   color: #555;
+  display: block;
 }
 
 .details-stats span {
@@ -235,7 +214,7 @@ body {
   color: #0f7a3d;
 }
 
-/* LIST */
+/* lists */
 .details-list {
   list-style: none;
   margin-bottom: 15px;
@@ -246,26 +225,51 @@ body {
   margin-bottom: 6px;
 }
 
-/* ACTION BUTTONS */
+/* action buttons */
 .details-actions {
   display: flex;
   gap: 10px;
 }
 
+.primary-btn {
+  flex: 1;
+  background: #0f7a3d;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+}
+
 .secondary-btn {
+  flex: 1;
   background: #ffffff;
   border: 1px solid #0f7a3d;
   color: #0f7a3d;
   padding: 12px;
   border-radius: 6px;
-  flex: 1;
 }
 
-.primary-btn {
-  background: #0f7a3d;
-  color: white;
+/* ================= BOTTOM NAV ================= */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #ccc;
+  padding: 10px 0;
+  z-index: 100;
+}
+
+.bottom-nav button {
+  background: none;
   border: none;
-  padding: 12px;
-  border-radius: 6px;
-  flex: 1;
+  font-size: 14px;
+  color: #0f7a3d;
+}
+
+.bottom-nav .active {
+  font-weight: bold;
 }
