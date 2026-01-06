@@ -33,7 +33,6 @@ function closeRaheem() {
   }
 }
 
-
 // ========== ANDROID BACK SUPPORT ==========
 
 window.addEventListener('popstate', function () {
@@ -50,9 +49,62 @@ window.addEventListener('popstate', function () {
 
 });
 
-
 // ========== LOKACI DA USER YA SHIGA DETAILS A TURASU A HISTORY ==========
 
 function enterRaheemDetails() {
   history.pushState({ page: "raheem" }, "Raheem Pharmacy", "#raheem");
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Tabbatar HEADER bai motsa ba
+  const brand = document.querySelector('.brand');
+  const tagline = document.querySelector('.tagline');
+
+  if (brand) brand.style.transform = 'none';
+  if (tagline) tagline.style.transform = 'none';
+
+});
+
+
+// ====== BUƊE / RUFE DETAILS NA RAHEEM ======
+
+function openRaheem() {
+
+  const list = document.getElementById('projectsList');
+  const details = document.getElementById('raheemDetails');
+
+  if (list && details) {
+    list.style.display = 'none';
+    details.style.display = 'block';
+
+    // Don Android back ya iya dawowa
+    history.pushState({ page: 'raheem' }, '', '#raheem');
+  }
+
+}
+
+function closeRaheem() {
+
+  const list = document.getElementById('projectsList');
+  const details = document.getElementById('raheemDetails');
+
+  if (list && details) {
+    details.style.display = 'none';
+    list.style.display = 'flex';
+  }
+
+}
+
+
+// ====== SUPPORT NA BACK A PI / ANDROID ======
+
+window.addEventListener('popstate', () => {
+
+  const details = document.getElementById('raheemDetails');
+
+  if (details && details.style.display === 'block') {
+    closeRaheem();
+  }
+
+});
