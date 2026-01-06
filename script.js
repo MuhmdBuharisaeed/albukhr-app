@@ -1,37 +1,58 @@
-// Samun element ɗin welcome text da logo
-const header = document.querySelector('.header');
-const brand = document.querySelector('.brand');
-const tagline = document.querySelector('.tagline');
+// ========== A CIRE ANIMATION NA HEADER ==========
+document.addEventListener('DOMContentLoaded', function () {
 
-// Saita initial position
-let position = header.offsetWidth; // fara daga dama sosai
-const speed = 2; // pixels per frame
+  // Kashe duk motsin da ya shafi brand/header
+  const brand = document.querySelector('.brand');
+  const tagline = document.querySelector('.tagline');
 
-function moveHeader() {
-  // rage position
-  position -= speed;
+  if (brand) brand.style.transform = 'none';
+  if (tagline) tagline.style.transform = 'none';
 
-  // idan ya wuce hagu, dawo daga dama
-  if (position < -header.offsetWidth) {
-    position = window.innerWidth;
-  }
+});
 
-  // apply style
-  brand.style.transform = `translateX(${position}px)`;
-  tagline.style.transform = `translateX(${position}px)`;
 
-  requestAnimationFrame(moveHeader);
-}
-
-// Fara animation
-moveHeader();
+// ========== SHOW / HIDE RAHEEM PHARMACY DETAILS ==========
 
 function openRaheem() {
-  document.getElementById("projectsList").style.display = "none";
-  document.getElementById("raheemDetails").style.display = "block";
+  const list = document.getElementById("projectsList");
+  const details = document.getElementById("raheemDetails");
+
+  if (list && details) {
+    list.style.display = "none";
+    details.style.display = "block";
+  }
 }
 
 function closeRaheem() {
-  document.getElementById("raheemDetails").style.display = "none";
-  document.getElementById("projectsList").style.display = "block";
+  const list = document.getElementById("projectsList");
+  const details = document.getElementById("raheemDetails");
+
+  if (list && details) {
+    details.style.display = "none";
+    list.style.display = "block";
+  }
+}
+
+
+// ========== ANDROID BACK SUPPORT ==========
+
+window.addEventListener('popstate', function () {
+
+  const details = document.getElementById("raheemDetails");
+  const list = document.getElementById("projectsList");
+
+  // idan user ya danna back a wayar Android
+  if (details && details.style.display === 'block') {
+    closeRaheem();
+  } else {
+    history.back(); // normal back
+  }
+
+});
+
+
+// ========== LOKACI DA USER YA SHIGA DETAILS A TURASU A HISTORY ==========
+
+function enterRaheemDetails() {
+  history.pushState({ page: "raheem" }, "Raheem Pharmacy", "#raheem");
 }
