@@ -1,4 +1,4 @@
-/* ================= RESET ================= */
+q/* ================= RESET ================= */
 * {
   margin: 0;
   padding: 0;
@@ -193,3 +193,21 @@ body {
 .stat-card.secondary {
   border-left: 4px solid #9cccaf;
 }
+
+/* FIX PROJECT LINKS COLOR */
+.projects a,
+.project-item,
+.project-item span {
+  color: #0f7a3d; /* Albukhr green */
+  text-decoration: none;
+}
+
+/* idan an taba (tap / click) */
+.projects a:visited {
+  color: #0f7a3d;
+}
+
+/* idan ana tap */
+.projects a:active {
+  color: #0f7a3d;
+  }
