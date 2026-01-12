@@ -15,40 +15,34 @@ html, body {
 body {
   background: #f5f7f6;
   color: #111;
-  min-height: 100vh;
-  width: 100%;
-  padding-bottom: 80px; /* space for bottom nav */
   overflow-x: hidden;
+}
+
+/* ================= APP CONTAINER ================= */
+.app {
+  min-height: 100vh;              /* CIKA SCREEN */
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 70px;           /* sarari don bottom nav */
 }
 
 /* ================= HEADER ================= */
 .header {
   background: #0f7a3d;
-  color: #ffffff;
+  color: white;
   padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 64px;
-}
-
-.header img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
 }
 
 .brand {
   font-size: 24px;
   font-weight: bold;
-  color: #ffffff;
 }
 
 /* ================= WELCOME BAR ================= */
 .welcome-bar {
   background: #e6f4ec;
-  height: 32px;
   overflow: hidden;
+  height: 32px;
   display: flex;
   align-items: center;
 }
@@ -62,12 +56,8 @@ body {
 }
 
 @keyframes welcomeMove {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-100%);
-  }
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
 }
 
 /* ================= STATS ================= */
@@ -80,7 +70,7 @@ body {
 .stat-box {
   background: #ffffff;
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   border-radius: 8px;
   text-align: center;
 }
@@ -88,20 +78,17 @@ body {
 .stat-box span {
   font-size: 13px;
   color: #555;
-  display: block;
 }
 
 .stat-box strong {
-  font-size: 16px;
-  margin-top: 5px;
   display: block;
+  margin-top: 6px;
+  font-size: 16px;
 }
 
-/* ================= PROJECTS LIST ================= */
-.projects,
-.projects-page {
-  width: 100%;
-  min-height: calc(100vh - 176px);
+/* ================= PROJECTS ================= */
+.projects {
+  flex: 1;                 /* NAN NE MUHIMMI */
   padding: 15px;
   display: flex;
   flex-direction: column;
@@ -110,16 +97,14 @@ body {
 
 .projects h2 {
   font-size: 18px;
-  font-weight: bold;
+  margin-bottom: 8px;
 }
 
-/* Project item */
 .project-item {
-  width: 100%;
   background: #ffffff;
   border-left: 5px solid #cfded6;
   padding: 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -127,7 +112,6 @@ body {
 
 .project-item span {
   font-size: 16px;
-  font-weight: 500;
 }
 
 .project-item small {
@@ -135,118 +119,9 @@ body {
   color: #777;
 }
 
-/* Active project */
 .project-item.active {
-  background: #e8f5e9;
   border-left-color: #0f7a3d;
-}
-
-.project-item.active small {
-  color: #0f7a3d;
-  font-weight: bold;
-}
-
-/* ================= PROJECT DETAILS ================= */
-.project-details {
-  width: 100%;
-  min-height: 100vh;
-  background: #ffffff;
-  padding: 16px;
-  display: none; /* BOYE – sai an danna */
-}
-
-/* idan an buɗe */
-.project-details.active {
-  display: block;
-}
-
-/* details header */
-.details-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.details-desc {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 15px;
-}
-
-/* badge */
-.badge {
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-weight: bold;
-}
-
-.badge.active {
-  background: #d4f5df;
-  color: #0f7a3d;
-}
-
-/* details stats */
-.details-stats {
-  display: flex;
-  gap: 10px;
-  background: #f5faf7;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-}
-
-.details-stats div {
-  flex: 1;
-  text-align: center;
-}
-
-.details-stats strong {
-  font-size: 13px;
-  color: #555;
-  display: block;
-}
-
-.details-stats span {
-  font-size: 14px;
-  font-weight: bold;
-  color: #0f7a3d;
-}
-
-/* lists */
-.details-list {
-  list-style: none;
-  margin-bottom: 15px;
-}
-
-.details-list li {
-  font-size: 14px;
-  margin-bottom: 6px;
-}
-
-/* action buttons */
-.details-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.primary-btn {
-  flex: 1;
-  background: #0f7a3d;
-  color: #ffffff;
-  border: none;
-  padding: 12px;
-  border-radius: 6px;
-}
-
-.secondary-btn {
-  flex: 1;
-  background: #ffffff;
-  border: 1px solid #0f7a3d;
-  color: #0f7a3d;
-  padding: 12px;
-  border-radius: 6px;
+  background: #e8f5e9;
 }
 
 /* ================= BOTTOM NAV ================= */
@@ -255,11 +130,12 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
+  height: 60px;
   background: #ffffff;
   display: flex;
   justify-content: space-around;
+  align-items: center;
   border-top: 1px solid #ccc;
-  padding: 10px 0;
   z-index: 100;
 }
 
