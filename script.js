@@ -1,29 +1,31 @@
-/* ========== ALBUKHR ROUTING SYSTEM ========== */
+<script>
+  const projectsList = document.getElementById("projectsList");
+  const raheemDetails = document.getElementById("raheemDetails");
 
-function goProject(page) {
-  /* shiga folder projects */
-  window.location.href = "projects/" + page;
-}
+  function openRaheem() {
+    projectsList.style.display = "none";
+    raheemDetails.style.display = "block";
 
-/* Back na waya ya koma index idan muna project page */
-function smartBackHome() {
-  window.location.href = "../index.html";
-}
-
-/* Handle browser back button */
-window.onpopstate = function () {
-  const path = window.location.pathname;
-
-  if (path.includes("/projects/")) {
-    /* duk project page idan an yi back ya koma dashboard */
-    window.location.href = "../index.html";
+    // saka state a history
+    history.pushState({ page: "raheem" }, "", "#raheem");
   }
-};
 
-/* Generic init – kashe animation na watermark */
-document.addEventListener("DOMContentLoaded", () => {
-  const brand = document.querySelector('.brand');
-  if (brand) {
-    brand.style.animation = 'none';
+  function closeRaheem() {
+    raheemDetails.style.display = "none";
+    projectsList.style.display = "block";
+
+    // koma baya a history
+    history.pushState({ page: "projects" }, "", "#projects");
   }
-});
+
+  // 🧠 KAMA BACK NA BROWSER
+  window.onpopstate = function (event) {
+    if (event.state && event.state.page === "raheem") {
+      projectsList.style.display = "none";
+      raheemDetails.style.display = "block";
+    } else {
+      raheemDetails.style.display = "none";
+      projectsList.style.display = "block";
+    }
+  };
+</script>
