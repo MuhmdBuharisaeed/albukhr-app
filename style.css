@@ -261,3 +261,33 @@ body {
 .details-actions {
   margin-top: 20px;
 }
+
+/* ================= STATS DASHBOARD ================= */
+.stats-dashboard {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  width: 100%;
+}
+
+.stat-card {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.stat-card span {
+  font-size: 13px;
+  color: #666;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 20px;
+  color: #0f7a3d;
+  font-weight: bold;
+}
