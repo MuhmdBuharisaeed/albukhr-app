@@ -29,3 +29,11 @@
     }
   };
 </script>
+
+// GLOBAL STAKING DATA (placeholder)
+let stakingAmount = 0.00;
+let rewardAmount = 0.00;
+
+// Nuna a UI
+document.getElementById("totalStaking").innerText = stakingAmount.toFixed(2) + " Pi";
+document.getElementById("totalRewards").innerText = rewardAmount.toFixed(2) + " Pi";
