@@ -211,3 +211,53 @@ body {
 .projects a:active {
   color: #0f7a3d;
   }
+
+/* ================= PROJECT DETAILS PAGE ================= */
+
+/* tabbatar da page ya cika screen */
+.project-details {
+  min-height: 100vh;          /* cika tsayin screen */
+  width: 100%;                /* cika fadin screen */
+  padding: 16px;
+  background: #f5f7f6;
+}
+
+/* hana abubuwa su takure a tsakiya */
+.project-details h2,
+.project-details h3,
+.project-details p,
+.project-details ul {
+  width: 100%;
+}
+
+/* gyaran rubutu */
+.project-details h2 {
+  margin-bottom: 10px;
+  color: #0f7a3d;
+}
+
+.project-details h3 {
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: #0f7a3d;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  background: none;
+  border: none;
+  color: #0f7a3d;
+  font-size: 14px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+/* LIST FULL WIDTH */
+.details-list {
+  padding-left: 16px;
+}
+
+/* ACTION BUTTONS FULL WIDTH */
+.details-actions {
+  margin-top: 20px;
+}
