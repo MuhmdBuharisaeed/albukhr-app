@@ -37,3 +37,31 @@ let rewardAmount = 0.00;
 // Nuna a UI
 document.getElementById("totalStaking").innerText = stakingAmount.toFixed(2) + " Pi";
 document.getElementById("totalRewards").innerText = rewardAmount.toFixed(2) + " Pi";
+
+function openStake() {
+  document.getElementById("stakeModal").style.display = "flex";
+}
+
+function closeStake() {
+  document.getElementById("stakeModal").style.display = "none";
+}
+
+function confirmStake() {
+  const amount = document.getElementById("stakeAmount").value;
+  const duration = document.getElementById("stakeDuration").value;
+
+  if (!amount || amount <= 0) {
+    alert("Please enter a valid amount");
+    return;
+  }
+
+  alert(
+    "Stake confirmed!\nAmount: " +
+      amount +
+      " Pi\nDuration: " +
+      duration +
+      " days"
+  );
+
+  closeStake();
+}
