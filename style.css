@@ -228,3 +228,18 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+/* ===== STAKING MODAL (HIDDEN BY DEFAULT) ===== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+}
+
+.modal-overlay.active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
