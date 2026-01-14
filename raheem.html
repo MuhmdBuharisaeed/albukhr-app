@@ -3,149 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Raheem Pharmacy – ALBUKHR</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Raheem Pharmacy | ALBUKHR</title>
+
+  <!-- CSS (NOTE: koma baya sau 1) -->
+  <link rel="stylesheet" href="../style.css" />
 </head>
+<body>
 
-<body class="project-page">
+<!-- HEADER -->
+<header class="header">
+  <h1 class="brand">ALBUKHR</h1>
+</header>
 
-  <!-- HEADER -->
-  <header class="header">
-    <h1 class="brand">ALBUKHR</h1>
-  </header>
+<!-- PAGE TITLE -->
+<section class="project-details">
 
-  <!-- MAIN CONTENT -->
-  <main class="project-wrapper">
+  <!-- BACK -->
+  <button class="back-btn" onclick="history.back()">← Back</button>
 
-    <section class="project-details">
+  <!-- TITLE -->
+  <h2>💊 Raheem Pharmacy</h2>
 
-      <button class="back-btn" onclick="history.back()">← Back</button>
+  <p class="details-desc">
+    Raheem Pharmacy is a flagship Albukhr project providing affordable,
+    verified medicines and trusted pharmaceutical services to communities.
+  </p>
 
-      <div class="details-header">
-        <h2>💊 Raheem Pharmacy</h2>
-        <span class="badge active">ACTIVE</span>
-      </div>
-
-      <p class="details-desc">
-        Raheem Pharmacy is a flagship Albukhr project providing affordable,
-        verified medicines and trusted pharmaceutical services to communities.
-      </p>
-
-      <div class="details-stats">
-        <div>
-          <strong>Status</strong>
-          <span>Operational</span>
-        </div>
-        <div>
-          <strong>Category</strong>
-          <span>Healthcare</span>
-        </div>
-        <div>
-          <strong>Model</strong>
-          <span>Community Based</span>
-        </div>
-      </div>
-
-<!-- ===== USER STAKING STATS ===== -->
-<div class="user-stats">
-  <div class="stat-card">
-    <span>My Stake</span>
-    <strong id="userStake">0.00 Pi</strong>
-  </div>
-
-  <div class="stat-card">
-    <span>My Rewards</span>
-    <strong id="userRewards">0.00 Pi</strong>
-  </div>
-</div>
-      
-      <h3>Services</h3>
-      <ul class="details-list">
-        <li>✔ Retail & wholesale medicines</li>
-        <li>✔ Prescription support</li>
-        <li>✔ Community health guidance</li>
-        <li>✔ Emergency drug access</li>
-      </ul>
-
-      <h3>Roadmap</h3>
-      <ul class="details-list">
-        <li>🟢 Phase 1: Local operations (Active)</li>
-        <li>🟡 Phase 2: Digital ordering</li>
-        <li>⚪ Phase 3: Pi wallet payments</li>
-        <li>⚪ Phase 4: Nationwide reach</li>
-      </ul>
-
-      <!-- ACTION BUTTONS -->
-<div class="details-actions">
-  <button class="primary-btn action-btn" onclick="openStakeModal()">
-    Stake in Pharmacy
-  </button>
-
-  <button class="secondary-btn action-btn">
-    View Reports
-  </button>
-</div>
-
-  <!-- ================= STAKING MODAL ================= -->
-  <div class="modal-overlay" id="stakeModal">
-    <div class="modal-box">
-
-      <h3>Stake in Raheem Pharmacy</h3>
-
-      <label>Amount (Pi)</label>
-      <input type="number" id="stakeAmount" placeholder="Enter Pi amount" />
-
-      <label>Duration</label>
-      <select id="stakeDuration">
-        <option value="30">30 Days</option>
-        <option value="60">60 Days</option>
-        <option value="90">90 Days</option>
-      </select>
-
-      <div class="modal-actions">
-        <button class="primary-btn" onclick="confirmStake()">
-          Confirm Stake
-        </button>
-        <button class="secondary-btn" onclick="closeStakeModal()">
-          Cancel
-        </button>
-      </div>
-
+  <!-- STATS -->
+  <div class="details-stats">
+    <div>
+      <strong>Status</strong>
+      <span>Operational</span>
+    </div>
+    <div>
+      <strong>Category</strong>
+      <span>Healthcare</span>
+    </div>
+    <div>
+      <strong>Model</strong>
+      <span>Community Based</span>
     </div>
   </div>
 
-  <!-- ================= JS ================= -->
-  <script>
-    function openStakeModal() {
-      document.getElementById("stakeModal").style.display = "flex";
-      history.pushState({ modal: "stake" }, "");
-    }
+  <!-- SERVICES -->
+  <h3>Services</h3>
+  <ul class="details-list">
+    <li>✔ Retail & wholesale medicines</li>
+    <li>✔ Prescription support</li>
+    <li>✔ Community health guidance</li>
+    <li>✔ Emergency drug access</li>
+  </ul>
 
-    function closeStakeModal() {
-      document.getElementById("stakeModal").style.display = "none";
-      history.back();
-    }
+  <!-- ROADMAP -->
+  <h3>Roadmap</h3>
+  <ul class="details-list">
+    <li>🟢 Phase 1: Local operations (Active)</li>
+    <li>🟡 Phase 2: Digital ordering</li>
+    <li>⚪ Phase 3: Pi wallet payments</li>
+    <li>⚪ Phase 4: Nationwide reach</li>
+  </ul>
 
-    function confirmStake() {
-      const amount = document.getElementById("stakeAmount").value;
-      const duration = document.getElementById("stakeDuration").value;
+  <!-- ACTIONS -->
+  <div class="details-actions">
+    <button class="primary-btn">Enter Pharmacy</button>
+    <button class="secondary-btn">View Reports</button>
+  </div>
 
-      if (!amount || amount <= 0) {
-        alert("Please enter a valid Pi amount");
-        return;
-      }
-
-      alert(`Staking ${amount} Pi for ${duration} days (Demo mode)`);
-
-      closeStakeModal();
-    }
-
-    // Browser back button closes modal
-    window.onpopstate = function () {
-      const modal = document.getElementById("stakeModal");
-      if (modal) modal.style.display = "none";
-    };
-  </script>
+</section>
 
 </body>
 </html>
