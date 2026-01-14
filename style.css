@@ -432,13 +432,6 @@ body {
   border-radius: 12px;
 }
 
-/* Mobile – su zama column daya */
-@media (max-width: 600px) {
-  .details-actions {
-    grid-template-columns: 1fr;
-  }
-  }
-
 /* ===== USER STAKING STATS ===== */
 .user-stats {
   display: grid;
@@ -467,10 +460,3 @@ body {
   margin-top: 6px;
   display: block;
 }
-
-/* Mobile */
-@media (max-width: 600px) {
-  .user-stats {
-    grid-template-columns: 1fr;
-  }
-  }
