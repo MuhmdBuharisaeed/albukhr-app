@@ -222,3 +222,9 @@ body {
     grid-template-columns: 1fr;
   }
   }
+
+/* ===== REMOVE DEFAULT LINK STYLE ===== */
+a {
+  color: inherit;
+  text-decoration: none;
+}
