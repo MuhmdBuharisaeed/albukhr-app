@@ -1,4 +1,4 @@
-q/* ================= RESET ================= */
+/* ================= RESET ================= */
 * {
   margin: 0;
   padding: 0;
@@ -6,28 +6,20 @@ q/* ================= RESET ================= */
   font-family: Arial, sans-serif;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
 }
 
-/* ================= BODY ================= */
 body {
   background: #f5f7f6;
   color: #111;
-  overflow-x: hidden;
-}
-
-/* ================= APP CONTAINER ================= */
-.app {
-  min-height: 100vh;              /* CIKA SCREEN */
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 70px;           /* sarari don bottom nav */
 }
 
 /* ================= HEADER ================= */
 .header {
+  width: 100%;
   background: #0f7a3d;
   color: white;
   padding: 16px;
@@ -40,9 +32,10 @@ body {
 
 /* ================= WELCOME BAR ================= */
 .welcome-bar {
+  width: 100%;
+  height: 32px;
   background: #e6f4ec;
   overflow: hidden;
-  height: 32px;
   display: flex;
   align-items: center;
 }
@@ -56,62 +49,83 @@ body {
 }
 
 @keyframes welcomeMove {
-  from { transform: translateX(0); }
-  to { transform: translateX(-100%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
 }
 
-/* ================= STATS ================= */
+/* ================= PAGE WRAPPER ================= */
+.project-page,
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= MAIN CONTENT ================= */
+.project-wrapper,
+.home-wrapper {
+  flex: 1;
+  width: 100%;
+  padding: 16px;
+}
+
+/* ================= STATS (SIDE BY SIDE) ================= */
 .stats {
   display: flex;
-  gap: 10px;
-  padding: 15px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .stat-box {
-  background: #ffffff;
   flex: 1;
-  padding: 14px;
-  border-radius: 8px;
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
   text-align: center;
 }
 
 .stat-box span {
   font-size: 13px;
-  color: #555;
+  color: #666;
 }
 
 .stat-box strong {
   display: block;
   margin-top: 6px;
-  font-size: 16px;
-}
-
-/* ================= PROJECTS ================= */
-.projects {
-  flex: 1;                 /* NAN NE MUHIMMI */
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.projects h2 {
   font-size: 18px;
-  margin-bottom: 8px;
+  color: #0f7a3d;
+}
+
+/* ================= PROJECT LIST ================= */
+.projects {
+  width: 100%;
 }
 
 .project-item {
-  background: #ffffff;
-  border-left: 5px solid #cfded6;
+  width: 100%;
+  background: white;
   padding: 16px;
   border-radius: 8px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-left: 5px solid #cfded6;
+}
+
+.project-item.active {
+  background: #e8f5e9;
+  border-left-color: #0f7a3d;
 }
 
 .project-item span {
   font-size: 16px;
+  font-weight: 500;
+  color: #0f7a3d;
 }
 
 .project-item small {
@@ -119,300 +133,107 @@ body {
   color: #777;
 }
 
-.project-item.active {
-  border-left-color: #0f7a3d;
-  background: #e8f5e9;
-}
-
-/* ================= BOTTOM NAV ================= */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: #ffffff;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid #ccc;
-  z-index: 100;
-}
-
-.bottom-nav button {
-  background: none;
-  border: none;
-  font-size: 14px;
-  color: #0f7a3d;
-}
-
-.bottom-nav .active {
-  font-weight: bold;
-}
-
-/* ================= DASHBOARD STATS ================= */
-.dashboard-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 16px;
-}
-
-.stat-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 90px;
-}
-
-.stat-card .label {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 6px;
-}
-
-.stat-card .value {
-  font-size: 20px;
-  font-weight: bold;
-  color: #0f7a3d;
-}
-
-.stat-card .value small {
-  font-size: 14px;
-  font-weight: normal;
-}
-
-/* Visual priority */
-.stat-card.primary {
-  border-left: 4px solid #0f7a3d;
-}
-
-.stat-card.secondary {
-  border-left: 4px solid #9cccaf;
-}
-
-/* FIX PROJECT LINKS COLOR */
-.projects a,
-.project-item,
-.project-item span {
-  color: #0f7a3d; /* Albukhr green */
-  text-decoration: none;
-}
-
-/* idan an taba (tap / click) */
-.projects a:visited {
-  color: #0f7a3d;
-}
-
-/* idan ana tap */
-.projects a:active {
-  color: #0f7a3d;
-  }
-
-/* ================= PROJECT DETAILS PAGE ================= */
-
-/* tabbatar da page ya cika screen */
+/* ================= PROJECT DETAILS ================= */
 .project-details {
-  min-height: 100vh;          /* cika tsayin screen */
-  width: 100%;                /* cika fadin screen */
-  padding: 16px;
-  background: #f5f7f6;
-}
-
-/* hana abubuwa su takure a tsakiya */
-.project-details h2,
-.project-details h3,
-.project-details p,
-.project-details ul {
   width: 100%;
 }
 
-/* gyaran rubutu */
-.project-details h2 {
-  margin-bottom: 10px;
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.details-desc {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+/* ================= BADGE ================= */
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.badge.active {
+  background: #d4f5df;
   color: #0f7a3d;
 }
 
-.project-details h3 {
-  margin-top: 20px;
+/* ================= DETAILS STATS ================= */
+.details-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.details-stats div {
+  flex: 1;
+  background: #f5faf7;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.details-stats strong {
+  display: block;
+  font-size: 13px;
+  color: #555;
+}
+
+.details-stats span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #0f7a3d;
+}
+
+/* ================= LIST ================= */
+.details-list {
+  list-style: none;
+  margin-bottom: 20px;
+}
+
+.details-list li {
+  font-size: 14px;
   margin-bottom: 8px;
+}
+
+/* ================= ACTION BUTTONS (SIDE BY SIDE) ================= */
+.details-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.primary-btn,
+.secondary-btn {
+  flex: 1;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.primary-btn {
+  background: #0f7a3d;
+  color: white;
+  border: none;
+}
+
+.secondary-btn {
+  background: white;
+  border: 1px solid #0f7a3d;
   color: #0f7a3d;
 }
 
-/* BACK BUTTON */
+/* ================= BACK BUTTON ================= */
 .back-btn {
   background: none;
   border: none;
   color: #0f7a3d;
   font-size: 14px;
   margin-bottom: 12px;
-  cursor: pointer;
-}
-
-/* LIST FULL WIDTH */
-.details-list {
-  padding-left: 16px;
-}
-
-/* ACTION BUTTONS FULL WIDTH */
-.details-actions {
-  margin-top: 20px;
-}
-
-/* ================= STATS DASHBOARD ================= */
-.stats-dashboard {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  width: 100%;
-}
-
-.stat-card {
-  flex: 1;
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 18px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.stat-card span {
-  font-size: 13px;
-  color: #666;
-}
-
-.stat-card strong {
-  display: block;
-  margin-top: 6px;
-  font-size: 20px;
-  color: #0f7a3d;
-  font-weight: bold;
-}
-
-/* ================= PROJECT PAGE FULL SCREEN ================= */
-.project-page {
-  background: #f5f7f6;
-  min-height: 100vh;
-  width: 100%;
-}
-
-/* wrapper na page */
-.project-wrapper {
-  min-height: calc(100vh - 64px); /* cire header height */
-  padding: 16px;
-  width: 100%;
-}
-
-/* project details card */
-.project-details {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 18px;
-  width: 100%;
-}
-
-/* back button */
-.back-btn {
-  background: none;
-  border: none;
-  color: #0f7a3d;
-  font-size: 14px;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
-/* ================= STAKING MODAL ================= */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-box {
-  background: #ffffff;
-  width: 90%;
-  max-width: 360px;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.modal-box h3 {
-  margin-bottom: 15px;
-  color: #0f7a3d;
-}
-
-.modal-box label {
-  font-size: 14px;
-  display: block;
-  margin-top: 10px;
-}
-
-.modal-box input,
-.modal-box select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-/* ===== PROJECT ACTION BUTTONS ===== */
-.details-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.action-btn {
-  width: 100%;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 12px;
-}
-
-/* ===== USER STAKING STATS ===== */
-.user-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 24px 0;
-}
-
-.stat-card {
-  background: #f3fdf7;
-  border: 1px solid #cceedd;
-  border-radius: 14px;
-  padding: 16px;
-  text-align: center;
-}
-
-.stat-card span {
-  display: block;
-  font-size: 13px;
-  color: #2f7d4f;
-}
-
-.stat-card strong {
-  font-size: 18px;
-  color: #146c43;
-  margin-top: 6px;
-  display: block;
-}
+  }
