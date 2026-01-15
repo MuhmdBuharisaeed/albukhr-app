@@ -99,3 +99,80 @@ document.addEventListener("DOMContentLoaded", function () {
   
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR – Home</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#f5f7f6;padding-bottom:80px}
+.header{background:#0f7a3d;color:#fff;padding:16px}
+.stats{display:flex;gap:12px;padding:16px}
+.stat-card{flex:1;background:#fff;border-radius:12px;padding:16px;text-align:center}
+.stat-card span{font-size:13px;color:#555}
+.stat-card strong{display:block;font-size:18px;margin-top:6px}
+.section{padding:16px}
+.tx{background:#fff;padding:12px;border-radius:10px;margin-bottom:8px;font-size:14px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:#fff;display:flex;justify-content:space-around;align-items:center}
+a{text-decoration:none;color:#0f7a3d;font-weight:bold}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <h2>ALBUKHR Dashboard</h2>
+</header>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stat-card">
+    <span>Total Staking</span>
+    <strong id="homeStake">0.00 Pi</strong>
+  </div>
+  <div class="stat-card">
+    <span>Total Rewards</span>
+    <strong id="homeReward">0.00 Pi</strong>
+  </div>
+</section>
+
+<!-- TRANSACTION HISTORY -->
+<section class="section">
+  <h3>Transaction History</h3>
+  <div id="homeHistory"></div>
+</section>
+
+<nav class="bottom-nav">
+  <a href="index.html">Home</a>
+  <a href="raheem.html">Raheem Pharmacy</a>
+</nav>
+
+<script>
+const stakes = JSON.parse(localStorage.getItem("albukhr_stakes")) || [];
+
+let totalStake = 0;
+let totalReward = 0;
+
+const historyBox = document.getElementById("homeHistory");
+historyBox.innerHTML = "";
+
+stakes.forEach(s=>{
+  totalStake += s.amount;
+  totalReward += s.reward;
+
+  const div = document.createElement("div");
+  div.className = "tx";
+  div.innerText = `${s.date} | ${s.project} | ${s.amount} Pi | +${s.reward.toFixed(2)} Pi`;
+  historyBox.appendChild(div);
+});
+
+document.getElementById("homeStake").innerText = totalStake.toFixed(2)+" Pi";
+document.getElementById("homeReward").innerText = totalReward.toFixed(2)+" Pi";
+</script>
+
+</body>
+</html>
