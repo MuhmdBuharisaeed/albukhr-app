@@ -86,3 +86,16 @@
 
 </body>
 </html>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const totalStaking = Number(localStorage.getItem("totalStaking")) || 0;
+  const totalReward = Number(localStorage.getItem("totalReward")) || 0;
+
+  document.getElementById("totalStaking").textContent =
+    totalStaking.toFixed(2) + " Pi";
+
+  document.getElementById("totalReward").textContent =
+    totalReward.toFixed(2) + " Pi";
+});
+  </script>
