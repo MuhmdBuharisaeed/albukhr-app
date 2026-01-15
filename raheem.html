@@ -1,133 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raheem Pharmacy</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raheem Pharmacy – ALBUKHR</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-actions button {
+      flex: 1;
+    }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#f5f7f6;padding-bottom:80px}
-.header{background:#0f7a3d;color:#fff;padding:16px}
-.section{padding:16px}
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{flex:1;background:#fff;border-radius:12px;padding:16px;text-align:center}
-.stat-card span{font-size:13px;color:#555}
-.stat-card strong{display:block;font-size:18px;margin-top:6px}
-.btns{display:flex;gap:12px}
-.btn{flex:1;padding:14px;border-radius:10px;border:none;font-weight:bold}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-.tx{background:#fff;padding:12px;border-radius:10px;margin-bottom:8px;font-size:14px}
+    /* ===== STATS CARDS ===== */
+    .user-stats {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: #f3fdf7;
+      border: 1px solid #cceedd;
+      border-radius: 14px;
+      padding: 16px;
+      flex: 1;
+      text-align: center;
+    }
+    .stat-card span { display: block; font-size: 13px; color: #2f7d4f; }
+    .stat-card strong { display: block; font-size: 18px; color: #146c43; margin-top: 6px; }
 
-/* MODAL */
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
-.modal-box{background:#fff;width:90%;max-width:400px;padding:20px;border-radius:12px}
-input,select{width:100%;padding:10px;margin-top:6px}
-</style>
+    /* ===== BUTTONS ===== */
+    .primary-btn {
+      background: #0f7a3d;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .secondary-btn {
+      background: #fff;
+      color: #0f7a3d;
+      border: 1px solid #0f7a3d;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
 </head>
+<body class="project-page">
 
-<body>
+  <!-- HEADER -->
+  <header class="header">
+    <h1 class="brand">ALBUKHR</h1>
+  </header>
 
-<header class="header">
-  <h2>💊 Raheem Pharmacy</h2>
-</header>
+  <!-- PROJECT DETAILS WRAPPER -->
+  <main class="project-wrapper">
 
-<section class="section">
-  <p>Community based pharmacy project.</p>
+    <section class="project-details">
 
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat-card">
-      <span>Your Stake</span>
-      <strong id="rStake">0.00 Pi</strong>
-    </div>
-    <div class="stat-card">
-      <span>Your Reward</span>
-      <strong id="rReward">0.00 Pi</strong>
+      <button class="back-btn" onclick="history.back()">← Back</button>
+
+      <div class="details-header">
+        <h2>💊 Raheem Pharmacy</h2>
+        <span class="badge active">ACTIVE</span>
+      </div>
+
+      <p class="details-desc">
+        Raheem Pharmacy is a flagship Albukhr project providing affordable,
+        verified medicines and trusted pharmaceutical services to communities.
+      </p>
+
+      <div class="details-stats">
+        <div><strong>Status</strong><span>Operational</span></div>
+        <div><strong>Category</strong><span>Healthcare</span></div>
+        <div><strong>Model</strong><span>Community Based</span></div>
+      </div>
+
+      <h3>Services</h3>
+      <ul class="details-list">
+        <li>✔ Retail & wholesale medicines</li>
+        <li>✔ Prescription support</li>
+        <li>✔ Community health guidance</li>
+        <li>✔ Emergency drug access</li>
+      </ul>
+
+      <h3>Roadmap</h3>
+      <ul class="details-list">
+        <li>🟢 Phase 1: Local operations (Active)</li>
+        <li>🟡 Phase 2: Digital ordering</li>
+        <li>⚪ Phase 3: Pi wallet payments</li>
+        <li>⚪ Phase 4: Nationwide reach</li>
+      </ul>
+
+      <!-- ===== USER STAKING STATS ===== -->
+      <div class="user-stats">
+        <div class="stat-card">
+          <span>Total Staked</span>
+          <strong id="totalStaked">0 Pi</strong>
+        </div>
+        <div class="stat-card">
+          <span>Total Reward</span>
+          <strong id="totalReward">0 Pi</strong>
+        </div>
+      </div>
+
+      <!-- DETAILS ACTIONS -->
+      <div class="details-actions">
+        <button class="primary-btn" onclick="openStakeModal()">Stake in Pharmacy</button>
+        <button class="secondary-btn">View Reports</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===== STAKING MODAL ===== -->
+  <div class="modal-overlay" id="stakeModal">
+    <div class="modal-box">
+      <h3>Stake in Raheem Pharmacy</h3>
+      <label>Amount (Pi)</label>
+      <input type="number" id="stakeAmount" placeholder="Enter Pi amount" />
+      <label>Duration</label>
+      <select id="stakeDuration">
+        <option value="30">30 Days</option>
+        <option value="60">60 Days</option>
+        <option value="90">90 Days</option>
+      </select>
+      <div class="modal-actions">
+        <button class="primary-btn" onclick="stakeInRaheem()">Confirm Stake</button>
+        <button class="secondary-btn" onclick="closeStakeModal()">Cancel</button>
+      </div>
     </div>
   </div>
 
-  <!-- ACTIONS -->
-  <div class="btns">
-    <button class="btn primary" onclick="openModal()">Stake</button>
-    <button class="btn secondary" onclick="history.back()">Back</button>
-  </div>
+  <!-- ===== JS ===== -->
+  <script>
+    // Modal open & close
+    function openStakeModal() {
+      document.getElementById("stakeModal").style.display = "flex";
+    }
+    function closeStakeModal() {
+      document.getElementById("stakeModal").style.display = "none";
+      document.getElementById("stakeAmount").value = "";
+      document.getElementById("stakeDuration").value = "30";
+    }
 
-  <!-- HISTORY -->
-  <h3 style="margin-top:20px">Transaction History</h3>
-  <div id="raheemHistory"></div>
-</section>
+    // Staking logic
+    let raheemStakes = JSON.parse(localStorage.getItem("raheemStakes")) || [];
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-box">
-    <h3>Stake in Raheem</h3>
+    function updateStats() {
+      const totalStaked = raheemStakes.reduce((acc, stake) => acc + stake.amount, 0);
+      const totalReward = raheemStakes.reduce((acc, stake) => acc + stake.reward, 0);
+      document.getElementById("totalStaked").textContent = totalStaked.toFixed(2) + " Pi";
+      document.getElementById("totalReward").textContent = totalReward.toFixed(2) + " Pi";
+    }
 
-    <label>Amount (Pi)</label>
-    <input type="number" id="amount">
+    function stakeInRaheem() {
+      const amount = parseFloat(document.getElementById("stakeAmount").value);
+      const duration = parseInt(document.getElementById("stakeDuration").value);
 
-    <label>Duration</label>
-    <select id="duration">
-      <option value="30">30 Days</option>
-      <option value="60">60 Days</option>
-      <option value="90">90 Days</option>
-    </select>
+      if (!amount || amount <= 0) {
+        alert("Please enter a valid Pi amount.");
+        return;
+      }
 
-    <div class="btns" style="margin-top:16px">
-      <button class="btn primary" onclick="stake()">Confirm</button>
-      <button class="btn secondary" onclick="closeModal()">Cancel</button>
-    </div>
-  </div>
-</div>
+      let rewardRate = 0;
+      if(duration === 30) rewardRate = 0.01;
+      else if(duration === 60) rewardRate = 0.025;
+      else if(duration === 90) rewardRate = 0.05;
 
-<script>
-let stakes = JSON.parse(localStorage.getItem("albukhr_stakes")) || [];
+      const reward = amount * rewardRate;
 
-function openModal(){document.getElementById("modal").style.display="flex"}
-function closeModal(){document.getElementById("modal").style.display="none"}
+      raheemStakes.push({ amount, duration, reward, date: new Date().toISOString() });
+      localStorage.setItem("raheemStakes", JSON.stringify(raheemStakes));
 
-function stake(){
-  const amount = Number(document.getElementById("amount").value);
-  const duration = Number(document.getElementById("duration").value);
+      updateStats();
+      alert(`Successfully staked ${amount} Pi for ${duration} days. Reward: ${reward.toFixed(2)} Pi`);
 
-  if(!amount||amount<=0){alert("Invalid amount");return}
+      closeStakeModal();
+    }
 
-  let rate = duration==30?0.01:duration==60?0.025:0.05;
-  let reward = amount*rate;
-
-  stakes.push({
-    project:"Raheem",
-    amount,
-    reward,
-    duration,
-    date:new Date().toLocaleDateString()
-  });
-
-  localStorage.setItem("albukhr_stakes",JSON.stringify(stakes));
-  closeModal();
-  load();
-}
-
-function load(){
-  let s=0,r=0;
-  const box=document.getElementById("raheemHistory");
-  box.innerHTML="";
-
-  stakes.filter(x=>x.project==="Raheem").forEach(x=>{
-    s+=x.amount; r+=x.reward;
-    const d=document.createElement("div");
-    d.className="tx";
-    d.innerText=`${x.date} | ${x.amount} Pi | +${x.reward.toFixed(2)} Pi`;
-    box.appendChild(d);
-  });
-
-  document.getElementById("rStake").innerText=s.toFixed(2)+" Pi";
-  document.getElementById("rReward").innerText=r.toFixed(2)+" Pi";
-}
-
-load();
-</script>
+    // Load stats on page load
+    window.addEventListener("DOMContentLoaded", updateStats);
+  </script>
 
 </body>
-</html>
+                                                                             </html>
