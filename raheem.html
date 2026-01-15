@@ -5,8 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Raheem Pharmacy – ALBUKHR</title>
   <link rel="stylesheet" href="style.css" />
-</head>
+  <style>
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-actions button {
+      flex: 1;
+    }
 
+    /* ===== STATS CARDS ===== */
+    .user-stats {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: #f3fdf7;
+      border: 1px solid #cceedd;
+      border-radius: 14px;
+      padding: 16px;
+      flex: 1;
+      text-align: center;
+    }
+    .stat-card span { display: block; font-size: 13px; color: #2f7d4f; }
+    .stat-card strong { display: block; font-size: 18px; color: #146c43; margin-top: 6px; }
+
+    /* ===== BUTTONS ===== */
+    .primary-btn {
+      background: #0f7a3d;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .secondary-btn {
+      background: #fff;
+      color: #0f7a3d;
+      border: 1px solid #0f7a3d;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
 <body class="project-page">
 
   <!-- HEADER -->
@@ -14,7 +76,7 @@
     <h1 class="brand">ALBUKHR</h1>
   </header>
 
-  <!-- MAIN CONTENT -->
+  <!-- PROJECT DETAILS WRAPPER -->
   <main class="project-wrapper">
 
     <section class="project-details">
@@ -29,38 +91,14 @@
       <p class="details-desc">
         Raheem Pharmacy is a flagship Albukhr project providing affordable,
         verified medicines and trusted pharmaceutical services to communities.
-      
       </p>
 
       <div class="details-stats">
-        <div>
-          
-          <strong>Status</strong>
-          <span>Operational</span>
-        </div>
-        <div>
-          <strong>Category</strong>
-          <span>Healthcare</span>
-        </div>
-        <div>
-          <strong>Model</strong>
-          <span>Community Based</span>
-        </div>
+        <div><strong>Status</strong><span>Operational</span></div>
+        <div><strong>Category</strong><span>Healthcare</span></div>
+        <div><strong>Model</strong><span>Community Based</span></div>
       </div>
-      
-<!-- ===== USER STAKING STATS ===== -->
-<div class="user-stats">
-  <div class="stat-card">
-    <span>My Stake</span>
-    <strong id="userStake">0.00 Pi</strong>
-  </div>
 
-  <div class="stat-card">
-    <span>My Rewards</span>
-    <strong id="userRewards">0.00 Pi</strong>
-  </div>
-</div>
-      
       <h3>Services</h3>
       <ul class="details-list">
         <li>✔ Retail & wholesale medicines</li>
@@ -77,76 +115,96 @@
         <li>⚪ Phase 4: Nationwide reach</li>
       </ul>
 
-      <!-- ACTION BUTTONS -->
-      <div class="details-actions">
-  <button class="primary-btn action-btn" onclick="openStakeModal()">
-    Stake in Pharmacy
-  </button>
-
-  <button class="secondary-btn action-btn">
-    View Reports
-  </button>
+      <!-- ===== USER STAKING STATS ===== -->
+      <div class="user-stats">
+        <div class="stat-card">
+          <span>Total Staked</span>
+          <strong id="totalStaked">0 Pi</strong>
+        </div>
+        <div class="stat-card">
+          <span>Total Reward</span>
+          <strong id="totalReward">0 Pi</strong>
+        </div>
       </div>
 
-  <!-- ================= STAKING MODAL ================= -->
+      <!-- DETAILS ACTIONS -->
+      <div class="details-actions">
+        <button class="primary-btn" onclick="openStakeModal()">Stake in Pharmacy</button>
+        <button class="secondary-btn">View Reports</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===== STAKING MODAL ===== -->
   <div class="modal-overlay" id="stakeModal">
     <div class="modal-box">
-
       <h3>Stake in Raheem Pharmacy</h3>
-
       <label>Amount (Pi)</label>
       <input type="number" id="stakeAmount" placeholder="Enter Pi amount" />
-
       <label>Duration</label>
       <select id="stakeDuration">
         <option value="30">30 Days</option>
         <option value="60">60 Days</option>
         <option value="90">90 Days</option>
       </select>
-
       <div class="modal-actions">
-        <button class="primary-btn" onclick="confirmStake()">
-          Confirm Stake
-        </button>
-        <button class="secondary-btn" onclick="closeStakeModal()">
-          Cancel
-        </button>
+        <button class="primary-btn" onclick="stakeInRaheem()">Confirm Stake</button>
+        <button class="secondary-btn" onclick="closeStakeModal()">Cancel</button>
       </div>
-
     </div>
   </div>
 
-  <!-- ================= JS ================= -->
+  <!-- ===== JS ===== -->
   <script>
+    // Modal open & close
     function openStakeModal() {
       document.getElementById("stakeModal").style.display = "flex";
-      history.pushState({ modal: "stake" }, "");
     }
-
     function closeStakeModal() {
       document.getElementById("stakeModal").style.display = "none";
-      history.back();
+      document.getElementById("stakeAmount").value = "";
+      document.getElementById("stakeDuration").value = "30";
     }
 
-    function confirmStake() {
-      const amount = document.getElementById("stakeAmount").value;
-      const duration = document.getElementById("stakeDuration").value;
+    // Staking logic
+    let raheemStakes = JSON.parse(localStorage.getItem("raheemStakes")) || [];
+
+    function updateStats() {
+      const totalStaked = raheemStakes.reduce((acc, stake) => acc + stake.amount, 0);
+      const totalReward = raheemStakes.reduce((acc, stake) => acc + stake.reward, 0);
+      document.getElementById("totalStaked").textContent = totalStaked.toFixed(2) + " Pi";
+      document.getElementById("totalReward").textContent = totalReward.toFixed(2) + " Pi";
+    }
+
+    function stakeInRaheem() {
+      const amount = parseFloat(document.getElementById("stakeAmount").value);
+      const duration = parseInt(document.getElementById("stakeDuration").value);
 
       if (!amount || amount <= 0) {
-        alert("Please enter a valid Pi amount");
+        alert("Please enter a valid Pi amount.");
         return;
       }
 
-      alert(`Staking ${amount} Pi for ${duration} days (Demo mode)`);
+      let rewardRate = 0;
+      if(duration === 30) rewardRate = 0.01;
+      else if(duration === 60) rewardRate = 0.025;
+      else if(duration === 90) rewardRate = 0.05;
+
+      const reward = amount * rewardRate;
+
+      raheemStakes.push({ amount, duration, reward, date: new Date().toISOString() });
+      localStorage.setItem("raheemStakes", JSON.stringify(raheemStakes));
+
+      updateStats();
+      alert(`Successfully staked ${amount} Pi for ${duration} days. Reward: ${reward.toFixed(2)} Pi`);
 
       closeStakeModal();
     }
 
-    // Browser back button closes modal
-    window.onpopstate = function () {
-      const modal = document.getElementById("stakeModal");
-      if (modal) modal.style.display = "none";
-    };
+    // Load stats on page load
+    window.addEventListener("DOMContentLoaded", updateStats);
   </script>
 
 </body>
