@@ -207,5 +207,35 @@
     window.addEventListener("DOMContentLoaded", updateStats);
   </script>
 
+<script>
+function stakeNow() {
+  const amount = Number(document.getElementById("stakeAmount").value);
+
+  if (!amount || amount <= 0) {
+    alert("Shigar da adadin Pi mai inganci");
+    return;
+  }
+
+  // Karanta tsohon data
+  let totalStaking = Number(localStorage.getItem("totalStaking")) || 0;
+  let totalReward = Number(localStorage.getItem("totalReward")) || 0;
+
+  // Lissafin reward (1% fixed rate)
+  let reward = amount * 0.01;
+
+  // Sabunta
+  totalStaking += amount;
+  totalReward += reward;
+
+  // Ajiye a localStorage
+  localStorage.setItem("totalStaking", totalStaking);
+  localStorage.setItem("totalReward", totalReward);
+
+  alert("Staking ya yi nasara ✅");
+
+  // rufe modal idan kana da shi
+}
+  </script>
+
 </body>
 </html>
