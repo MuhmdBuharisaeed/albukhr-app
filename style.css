@@ -460,3 +460,49 @@ body {
   margin-top: 6px;
   display: block;
 }
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #cceedd;
+  padding: 10px 0;
+  z-index: 100;
+}
+
+/* LINKS */
+.bottom-nav a {
+  text-decoration: none;       /* cire underline */
+  color: #0f7a3d;              /* green ALBUKHR */
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+/* ICON + TEXT IN LINKS (idan kana amfani da emoji ko icon) */
+.bottom-nav a span {
+  font-size: 18px;             /* icon size */
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* HOVER STATE */
+.bottom-nav a:hover {
+  color: #146c43;              /* slightly darker green */
+}
+
+/* ACTIVE LINK */
+.bottom-nav a.active {
+  color: #0f7a3d;              /* primary green */
+}
