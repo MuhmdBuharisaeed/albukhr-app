@@ -78,3 +78,13 @@ function confirmStake() {
   });
 })();
 </script>
+
+[
+  {
+    project: "Raheem",
+    amount: 20,
+    reward: 0.2,
+    duration: 30,
+    date: "2026-01-16T14:20:00Z"
+  }
+]
