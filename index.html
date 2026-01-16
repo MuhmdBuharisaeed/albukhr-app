@@ -91,11 +91,6 @@ a{text-decoration:none;color:#0f7a3d;font-weight:bold}
   <div id="homeHistory"></div>
 </section>
 
-<nav class="bottom-nav">
-  <a href="index.html">Home</a>
-  <a href="raheem.html">Raheem Pharmacy</a>
-</nav>
-
 <script>
 const stakes = JSON.parse(localStorage.getItem("albukhr_stakes")) || [];
 
@@ -118,9 +113,6 @@ stakes.forEach(s=>{
 document.getElementById("homeStake").innerText = totalStake.toFixed(2)+" Pi";
 document.getElementById("homeReward").innerText = totalReward.toFixed(2)+" Pi";
 </script>
-
-</body>
-</html>
 
 </section>
   
