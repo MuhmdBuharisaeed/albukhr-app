@@ -40,16 +40,6 @@ input,select{width:100%;padding:10px;margin-top:6px}
 </head>
 <body class="project-page">
 
-  <!-- HEADER -->
-  <header class="header">
-    <h1 class="brand">ALBUKHR</h1>
-  </header>
-
-  <!-- PROJECT DETAILS WRAPPER -->
-  <main class="project-wrapper">
-
-    <section class="project-details">
-
       <button class="back-btn" onclick="history.back()">← Back</button>
 
       <div class="details-header">
@@ -83,113 +73,6 @@ input,select{width:100%;padding:10px;margin-top:6px}
         <li>⚪ Phase 3: Pi wallet payments</li>
         <li>⚪ Phase 4: Nationwide reach</li>
       </ul>
-
-      <!-- ===== USER STAKING STATS ===== -->
-      <div class="user-stats">
-        <div class="stat-card">
-          <span>Total Staked</span>
-          <strong id="totalStaked">0 Pi</strong>
-        </div>
-        <div class="stat-card">
-          <span>Total Reward</span>
-          <strong id="totalReward">0 Pi</strong>
-        </div>
-      </div>
-
-      <!-- DETAILS ACTIONS -->
-      <div class="details-actions">
-        <button class="primary-btn" onclick="openStakeModal()">Stake in Pharmacy</button>
-        <button class="secondary-btn">View Reports</button>
-      </div>
-
-    </section>
-
-  </main>
-
-  <!-- ===== STAKING MODAL ===== -->
-  <div class="modal-overlay" id="stakeModal">
-    <div class="modal-box">
-      <h3>Stake in Raheem Pharmacy</h3>
-      <label>Amount (Pi)</label>
-      <input type="number" id="stakeAmount" placeholder="Enter Pi amount" />
-      <label>Duration</label>
-      <select id="stakeDuration">
-        <option value="30">30 Days</option>
-        <option value="60">60 Days</option>
-        <option value="90">90 Days</option>
-      </select>
-      <div class="modal-actions">
-        <button class="primary-btn" onclick="stakeInRaheem()">Confirm Stake</button>
-        <button class="secondary-btn" onclick="closeStakeModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== JS ===== -->
-  <script>
-    // Modal open & close
-    function openStakeModal() {
-      document.getElementById("stakeModal").style.display = "flex";
-    }
-    function closeStakeModal() {
-      document.getElementById("stakeModal").style.display = "none";
-      document.getElementById("stakeAmount").value = "";
-      document.getElementById("stakeDuration").value = "30";
-    }
-
-    // Staking logic
-    let raheemStakes = JSON.parse(localStorage.getItem("raheemStakes")) || [];
-
-    function updateStats() {
-      const totalStaked = raheemStakes.reduce((acc, stake) => acc + stake.amount, 0);
-      const totalReward = raheemStakes.reduce((acc, stake) => acc + stake.reward, 0);
-      document.getElementById("totalStaked").textContent = totalStaked.toFixed(2) + " Pi";
-      document.getElementById("totalReward").textContent = totalReward.toFixed(2) + " Pi";
-    }
-
-    function stakeInRaheem() {
-      const amount = parseFloat(document.getElementById("stakeAmount").value);
-      const duration = parseInt(document.getElementById("stakeDuration").value);
-
-      if (!amount || amount <= 0) {
-        alert("Please enter a valid Pi amount.");
-        return;
-      }
-
-      let rewardRate = 0;
-      if(duration === 30) rewardRate = 0.01;
-      else if(duration === 60) rewardRate = 0.025;
-      else if(duration === 90) rewardRate = 0.05;
-
-      const reward = amount * rewardRate;
-
-      raheemStakes.push({ amount, duration, reward, date: new Date().toISOString() });
-      localStorage.setItem("raheemStakes", JSON.stringify(raheemStakes));
-
-      updateStats();
-      alert(`Successfully staked ${amount} Pi for ${duration} days. Reward: ${reward.toFixed(2)} Pi`);
-
-      closeStakeModal();
-    }
-
-    // Load stats on page load
-    window.addEventListener("DOMContentLoaded", updateStats);
-  </script>
-
-</body>
-                                                                             </html>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat-card">
-      <span>Your Stake</span>
-      <strong id="rStake">0.00 Pi</strong>
-    </div>
-    <div class="stat-card">
-      <span>Your Reward</span>
-      <strong id="rReward">0.00 Pi</strong>
-    </div>
-  </div>
 
   <!-- ACTIONS -->
   <div class="btns">
