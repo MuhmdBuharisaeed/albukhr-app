@@ -78,3 +78,12 @@ function confirmStake() {
   });
 })();
 </script>
+
+.bottom-nav a,
+.bottom-nav a:visited,
+.bottom-nav a:hover,
+.bottom-nav a:active {
+  color: #0f7a3d;
+  text-decoration: none;
+  font-weight: bold;
+  }
