@@ -65,3 +65,16 @@ function confirmStake() {
 
   closeStake();
 }
+
+<script>
+(function () {
+  const currentPage = document.body.getAttribute("data-page");
+  if (!currentPage) return;
+
+  document.querySelectorAll(".bottom-nav a").forEach(link => {
+    if (link.dataset.nav === currentPage) {
+      link.classList.add("active");
+    }
+  });
+})();
+</script>
