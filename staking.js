@@ -92,6 +92,11 @@ function addStake({ project, amount, duration }) {
   saveStakes(stakes);
   }
 
+function getMinStake(project){
+  const rules = PROJECT_RULES[project];
+  return rules ? rules.minStake : 0;
+}
+
 const PROJECT_RULES = {
   Raheem: {
     minStake: 10
