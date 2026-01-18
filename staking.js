@@ -1,30 +1,14 @@
 // ===============================
-// ALBUKHR STAKING ENGINE (FIXED)
+// ALBUKHR STAKING ENGINE
 // ===============================
 
 const STORAGE_KEY = "albukhr_stakes";
 
-// ===== PROJECT RULES =====
 const PROJECT_RULES = {
-  Raheem: {
-    minStake: 10,
-    rates: {
-      30: 0.01,
-      60: 0.025,
-      90: 0.05
-    }
-  },
-  Hauwal: {
-    minStake: 20,
-    rates: {
-      30: 0.02,
-      60: 0.04,
-      90: 0.08
-    }
-  }
+  Raheem: { minStake: 10 },
+  Hauwal: { minStake: 20 }
 };
 
-// ===== STORAGE =====
 function getStakes() {
   return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
@@ -33,26 +17,23 @@ function saveStakes(stakes) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(stakes));
 }
 
-// ===== HELPERS =====
 function getRate(project, duration) {
-  const rules = PROJECT_RULES[project];
-  if (!rules) return 0.01;
-  return rules.rates[duration] || 0.01;
-}
-
-function getMinStake(project) {
-  const rules = PROJECT_RULES[project];
-  return rules ? rules.minStake : 0;
-}
-
-// ===== CORE ACTION =====
-function addStake({ project, amount, duration }) {
-  const min = getMinStake(project);
-  if (amount < min) {
-    alert(`Minimum stake for ${project} is ${min} Pi`);
-    return false;
+  if (project === "Raheem") {
+    return duration === 30 ? 0.01 :
+           duration === 60 ? 0.025 : 0.05;
   }
+  if (project === "Hauwal") {
+    return duration === 30 ? 0.02 :
+           duration === 60 ? 0.04 : 0.08;
+  }
+  return 0.01;
+}
 
+function getMinStake(project){
+  return PROJECT_RULES[project]?.minStake || 0;
+}
+
+function addStake({ project, amount, duration }) {
   const rate = getRate(project, duration);
   const reward = amount * rate;
 
@@ -66,14 +47,23 @@ function addStake({ project, amount, duration }) {
   });
 
   saveStakes(stakes);
-  return true;
 }
 
-// ===== TOTALS =====
+function getProjectTotals(project) {
+  const stakes = getStakes().filter(s => s.project === project);
+  let stake = 0, reward = 0;
+
+  stakes.forEach(s => {
+    stake += s.amount;
+    reward += s.reward;
+  });
+
+  return { stake, reward, stakes };
+}
+
 function getTotals() {
   const stakes = getStakes();
-  let totalStake = 0;
-  let totalReward = 0;
+  let totalStake = 0, totalReward = 0;
 
   stakes.forEach(s => {
     totalStake += s.amount;
@@ -81,17 +71,4 @@ function getTotals() {
   });
 
   return { totalStake, totalReward };
-}
-
-function getProjectTotals(project) {
-  const list = getStakes().filter(s => s.project === project);
-  let stake = 0;
-  let reward = 0;
-
-  list.forEach(s => {
-    stake += s.amount;
-    reward += s.reward;
-  });
-
-  return { stake, reward, stakes: list };
 }
