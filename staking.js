@@ -1,82 +1,58 @@
 // ===============================
-// ALBUKHR STAKING ENGINE
+// ALBUKHR STAKING ENGINE (FIXED)
 // ===============================
 
 const STORAGE_KEY = "albukhr_stakes";
 
-// Karanta duk staking
+// ===== PROJECT RULES =====
+const PROJECT_RULES = {
+  Raheem: {
+    minStake: 10,
+    rates: {
+      30: 0.01,
+      60: 0.025,
+      90: 0.05
+    }
+  },
+  Hauwal: {
+    minStake: 20,
+    rates: {
+      30: 0.02,
+      60: 0.04,
+      90: 0.08
+    }
+  }
+};
+
+// ===== STORAGE =====
 function getStakes() {
   return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
 
-// Ajiye staking
 function saveStakes(stakes) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(stakes));
 }
 
-// Kara sabon staking
+// ===== HELPERS =====
 function getRate(project, duration) {
-  // Raheem Pharmacy
-  if (project === "Raheem") {
-    return duration === 30 ? 0.01 :
-           duration === 60 ? 0.025 :
-           0.05;
-  }
-
-  // Hauwal Project
-  if (project === "Hauwal") {
-    return duration === 30 ? 0.02 :
-           duration === 60 ? 0.04 :
-           0.08;
-  }
-
-  // default (future projects)
-  return 0.01;
+  const rules = PROJECT_RULES[project];
+  if (!rules) return 0.01;
+  return rules.rates[duration] || 0.01;
 }
 
-  const reward = amount * rate;
-
-  const stakes = getStakes();
-  stakes.push({
-    project,
-    amount,
-    reward,
-    duration,
-    date: new Date().toLocaleDateString()
-  });
-
-  saveStakes(stakes);
+function getMinStake(project) {
+  const rules = PROJECT_RULES[project];
+  return rules ? rules.minStake : 0;
 }
 
-// Lissafin total (duk projects)
-function getTotals() {
-  const stakes = getStakes();
-  let totalStake = 0;
-  let totalReward = 0;
-
-  stakes.forEach(s => {
-    totalStake += s.amount;
-    totalReward += s.reward;
-  });
-
-  return { totalStake, totalReward };
-}
-
-// Lissafin project ɗaya
-function getProjectTotals(project) {
-  const stakes = getStakes().filter(s => s.project === project);
-  let stake = 0;
-  let reward = 0;
-
-  stakes.forEach(s => {
-    stake += s.amount;
-    reward += s.reward;
-  });
-
-  return { stake, reward, stakes };
-}
-
+// ===== CORE ACTION =====
 function addStake({ project, amount, duration }) {
+  const min = getMinStake(project);
+  if (amount < min) {
+    alert(`Minimum stake for ${project} is ${min} Pi`);
+    return false;
+  }
+
   const rate = getRate(project, duration);
   const reward = amount * rate;
 
@@ -90,18 +66,32 @@ function addStake({ project, amount, duration }) {
   });
 
   saveStakes(stakes);
-  }
-
-function getMinStake(project){
-  const rules = PROJECT_RULES[project];
-  return rules ? rules.minStake : 0;
+  return true;
 }
 
-const PROJECT_RULES = {
-  Raheem: {
-    minStake: 10
-  },
-  Hauwal: {
-    minStake: 20
-  }
-};
+// ===== TOTALS =====
+function getTotals() {
+  const stakes = getStakes();
+  let totalStake = 0;
+  let totalReward = 0;
+
+  stakes.forEach(s => {
+    totalStake += s.amount;
+    totalReward += s.reward;
+  });
+
+  return { totalStake, totalReward };
+}
+
+function getProjectTotals(project) {
+  const list = getStakes().filter(s => s.project === project);
+  let stake = 0;
+  let reward = 0;
+
+  list.forEach(s => {
+    stake += s.amount;
+    reward += s.reward;
+  });
+
+  return { stake, reward, stakes: list };
+}
