@@ -19,6 +19,7 @@
   </div>
 </div>
 
+<!-- STATS -->
 <section class="stats">
   <div class="stat-card">
     <span>Total Staking</span>
@@ -30,6 +31,7 @@
   </div>
 </section>
 
+<!-- PROJECTS LIST -->
 <section class="projects" id="projectsList">
   <h2>Albukhr Projects</h2>
 
@@ -68,12 +70,14 @@
     <small>Coming Soon</small>
   </a>
 </section>
-  
+
+<!-- TRANSACTION HISTORY -->
 <section class="section">
   <h3>Transaction History</h3>
   <div id="homeHistory"></div>
 </section>
 
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html" class="active" data-nav="home"><span>🏠</span>Home</a>
   <a href="projects.html" data-nav="projects"><span>📁</span>Projects</a>
@@ -82,26 +86,29 @@
   <a href="settings.html" data-nav="settings"><span>⚙️</span>Settings</a>
 </nav>
 
-<script src="staking.js"></script>
+<!-- STAKING.JS -->
+<script src="js/staking.js"></script>
 <script>
+function loadHome(){
+  // Total stats
   const totals = getTotals();
-  document.getElementById("homeStake").innerText =
-    totals.totalStake.toFixed(2) + " Pi";
-  document.getElementById("homeReward").innerText =
-    totals.totalReward.toFixed(2) + " Pi";
+  document.getElementById("homeStake").innerText = totals.totalStake.toFixed(2)+" Pi";
+  document.getElementById("homeReward").innerText = totals.totalReward.toFixed(2)+" Pi";
 
-  const history = document.getElementById("homeHistory");
-  getStakes().forEach(s => {
+  // Transaction history
+  const historyBox = document.getElementById("homeHistory");
+  historyBox.innerHTML = "";
+  getStakes().forEach(s=>{
     const div = document.createElement("div");
     div.className = "tx";
-    div.innerText =
-      `${s.date} | ${s.project} | ${s.amount} Pi | +${s.reward.toFixed(2)} Pi`;
-    history.appendChild(div);
+    div.innerText = `${s.date} | ${s.project} | ${s.amount} Pi | +${s.reward.toFixed(2)} Pi`;
+    historyBox.appendChild(div);
   });
-  window.addEventListener("storage", () => {
-  location.reload();
-});
+}
+
+// Load on page ready
+window.addEventListener("DOMContentLoaded", loadHome);
 </script>
-  
+
 </body>
 </html>
