@@ -81,70 +81,47 @@ input,select{width:100%;padding:10px;margin-top:6px}
 </div>
 
 <script src="js/staking.js"></script>
+  
 <script>
-const modal = document.getElementById("modal");
 const amountInput = document.getElementById("amount");
 const durationSelect = document.getElementById("duration");
-const rStake = document.getElementById("rStake");
-const rReward = document.getElementById("rReward");
-const raheemHistory = document.getElementById("raheemHistory");
 
-function openModal(){
-  modal.style.display="flex";
-  const min = getMinStake("Raheem");
-  document.getElementById("minHint").innerText =
-    "Minimum stake: " + min + " Pi";
-}
-
-function closeModal(){
-  modal.style.display="none";
-  amountInput.value = "";
-  durationSelect.value = "30";
-}
-
-<div class="modal" id="successModal">
-  <div class="modal-box" style="text-align:center">
-    <h2 style="color:#0f7a3d">✅ Staking Successful</h2>
-    <p id="successText" style="margin:12px 0;font-size:15px"></p>
-    <button class="btn primary" onclick="closeSuccess()">OK</button>
-  </div>
-</div>
-  
 function stake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
-
-  if(!amount || amount <= 0){
-    alert("Invalid amount");
-    return;
-  }
-
   const min = getMinStake("Raheem");
-  if(amount < min){
-    alert("Amount must be at least " + min + " Pi");
+
+  if(!amount || amount < min){
+    alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  addStake({ project: "Raheem", amount, duration });
+  addStake({
+    project:"Raheem",
+    amount,
+    duration
+  });
+
   closeModal();
+  showSuccess(amount, duration);
   load();
 }
 
-function load(){
-  const data = getProjectTotals("Raheem");
-  rStake.innerText = data.stake.toFixed(2)+" Pi";
-  rReward.innerText = data.reward.toFixed(2)+" Pi";
+function showSuccess(amount, duration){
+  const rate = getRate("Raheem", duration);
+  const reward = amount * rate;
 
-  raheemHistory.innerHTML="";
-  data.stakes.forEach(s=>{
-    const d = document.createElement("div");
-    d.className = "tx";
-    d.innerText = `${s.date} | ${s.amount} Pi | +${s.reward.toFixed(2)} Pi`;
-    raheemHistory.appendChild(d);
-  });
+  document.getElementById("successText").innerHTML =
+    `You staked <b>${amount} Pi</b><br>
+     Duration: <b>${duration} days</b><br>
+     Expected reward: <b>${reward.toFixed(2)} Pi</b>`;
+
+  successModal.style.display = "flex";
 }
 
-load();
+function closeSuccess(){
+  successModal.style.display = "none";
+}
 </script>
 
 </body>
