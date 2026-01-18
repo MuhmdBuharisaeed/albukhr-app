@@ -15,11 +15,24 @@ function saveStakes(stakes) {
 }
 
 // Kara sabon staking
-function addStake({ project, amount, duration }) {
-  const rate =
-    duration === 30 ? 0.01 :
-    duration === 60 ? 0.025 :
-    0.05;
+function getRate(project, duration) {
+  // Raheem Pharmacy
+  if (project === "Raheem") {
+    return duration === 30 ? 0.01 :
+           duration === 60 ? 0.025 :
+           0.05;
+  }
+
+  // Hauwal Project
+  if (project === "Hauwal") {
+    return duration === 30 ? 0.02 :
+           duration === 60 ? 0.04 :
+           0.08;
+  }
+
+  // default (future projects)
+  return 0.01;
+}
 
   const reward = amount * rate;
 
