@@ -81,6 +81,15 @@ input,select{width:100%;padding:10px;margin-top:6px}
 
 <script src="staking.js"></script>
 <script>
+
+function openModal(){
+  modal.style.display="flex";
+
+  const min = getMinStake("Raheem");
+  document.getElementById("minHint").innerText =
+    "Minimum stake: " + min + " Pi";
+}
+  
 function openModal(){modal.style.display="flex"}
 function closeModal(){modal.style.display="none"}
 
