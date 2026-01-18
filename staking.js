@@ -75,3 +75,19 @@ function getProjectTotals(project) {
 
   return { stake, reward, stakes };
 }
+
+function addStake({ project, amount, duration }) {
+  const rate = getRate(project, duration);
+  const reward = amount * rate;
+
+  const stakes = getStakes();
+  stakes.push({
+    project,
+    amount,
+    reward,
+    duration,
+    date: new Date().toLocaleDateString()
+  });
+
+  saveStakes(stakes);
+  }
