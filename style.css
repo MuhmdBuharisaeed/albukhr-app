@@ -506,3 +506,23 @@ body {
 .bottom-nav a.active {
   color: #0f7a3d;              /* primary green */
 }
+
+.modal-box{
+  animation: pop .25s ease;
+}
+
+@keyframes pop{
+  from{transform:scale(.9);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+.stat-card strong{
+  display:block;
+  font-size:20px;
+  margin-top:6px;
+  color:#0f7a3d;
+}
+
+.btn.primary:active{
+  transform:scale(.97);
+  }
