@@ -98,7 +98,10 @@
       `${s.date} | ${s.project} | ${s.amount} Pi | +${s.reward.toFixed(2)} Pi`;
     history.appendChild(div);
   });
+  window.addEventListener("storage", () => {
+  location.reload();
+});
 </script>
-
+  
 </body>
 </html>
