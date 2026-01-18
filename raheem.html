@@ -81,9 +81,20 @@ function openModal(){modal.style.display="flex"}
 function closeModal(){modal.style.display="none"}
 
 function stake(){
-  const amount = Number(document.getElementById("amount").value);
-  const duration = Number(document.getElementById("duration").value);
-  if(!amount || amount<=0){alert("Invalid amount");return}
+  const amount = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+
+  const success = addStake({
+    project: "Raheem",
+    amount,
+    duration
+  });
+
+  if(success){
+    closeModal();
+    load();
+  }
+}
   
 localStorage.setItem("albukhr_refresh", Date.now());
   addStake({ project:"Raheem", amount, duration });
