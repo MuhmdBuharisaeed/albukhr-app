@@ -63,6 +63,12 @@ body{
 </header>
 
 <section class="section">
+<div style="display:flex;gap:8px;margin-bottom:12px">
+  <button onclick="filterTx('All')">All</button>
+  <button onclick="filterTx('Successful')">Successful</button>
+  <button onclick="filterTx('Pending')">Pending</button>
+  <button onclick="filterTx('Failed')">Failed</button>
+</div>
   <div id="txList" class="tx-list"></div>
 </section>
 
