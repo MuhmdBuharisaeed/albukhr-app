@@ -653,6 +653,18 @@ body {
   color: #0f7a3d;
   }
 
+/* Transaction section in Home */
+.tx-section{
+  padding: 6px 14px;
+}
+
+/* Title size */
+.tx-title{
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
 /* Home transaction item */
 .home-tx{
   display:flex;
