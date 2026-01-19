@@ -72,3 +72,16 @@ function getTotals() {
 
   return { totalStake, totalReward };
 }
+
+function showSuccess(amount, duration){
+  const reward = amount * getRate("Raheem", duration);
+  document.getElementById("successText").innerHTML =
+    `You staked <b>${amount} Pi</b><br>
+     Duration: <b>${duration} days</b><br>
+     Reward: <b>${reward.toFixed(2)} Pi</b>`;
+  successModal.style.display = "flex";
+}
+
+function closeSuccess(){
+  successModal.style.display = "none";
+}
