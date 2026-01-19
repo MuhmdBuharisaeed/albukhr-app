@@ -198,14 +198,32 @@ function load(){
   rReward.innerText = data.reward.toFixed(2) + " Pi";
 
   raheemHistory.innerHTML="";
-  data.stakes.forEach(s=>{
-    const d=document.createElement("div");
-    d.className="tx";
-    d.innerText =
-      `${s.date} | ${s.amount} Pi | +${s.reward.toFixed(2)} Pi`;
-    raheemHistory.appendChild(d);
-  });
+
+if(data.stakes.length === 0){
+  raheemHistory.innerHTML =
+    "<p style='font-size:12px;color:#777'>No transactions yet</p>";
 }
+
+data.stakes.forEach(s=>{
+  const div = document.createElement("div");
+  div.className = "project-tx";
+
+  div.innerHTML = `
+    <div class="project-icon">💊</div>
+
+    <div class="project-body">
+      <div class="project-title">Raheem Stake</div>
+      <div class="project-date">${s.date}</div>
+    </div>
+
+    <div class="project-right">
+      <div class="project-amount">${s.amount} Pi</div>
+      <div class="project-status">Successful</div>
+    </div>
+  `;
+
+  raheemHistory.appendChild(div);
+});
 
 load();
 </script>
