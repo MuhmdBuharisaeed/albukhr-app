@@ -1,96 +1,74 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transaction History</title><style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#f5f7f6;padding-bottom:60px}
+<title>Transaction History</title>
 
-/* HEADER */
-.header{
-  background:#0f7a3d;
-  color:#fff;
-  padding:16px;
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  background:#f5f7f6;
+  padding-bottom:80px;
+  font-family:Arial
+}
+
+.section{padding:16px}
+
+/* TRANSACTION LIST */
+.tx-list{margin-top:12px}
+
+.tx-item{
+  background:#fff;
+  border-radius:12px;
+  padding:12px;
   display:flex;
   align-items:center;
   gap:10px;
-}
-.header h2{font-size:18px}
-
-/* SECTION */
-.section{padding:16px}
-
-/* TRANSACTION CARD */
-.tx-card{
-  display:flex;
-  align-items:center;
-  gap:14px;
-
-  background:#fff;
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:12px;
+  margin-bottom:8px
 }
 
-/* ICON */
 .tx-icon{
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  background:#eaf6ee;
-  flex-shrink:0;
+  font-size:22px;
+  width:36px;
+  text-align:center
 }
 
-/* BODY */
 .tx-body{flex:1}
+.tx-title{font-size:14px;font-weight:bold}
+.tx-date{font-size:11px;color:#777}
 
-.tx-title{
-  font-size:15px;
-  font-weight:600;
-  color:#222;
-}
-
-.tx-date{
-  font-size:12px;
-  color:#777;
-  margin-top:3px;
-}
-
-/* RIGHT */
 .tx-right{text-align:right}
-
-.tx-amount{
-  font-size:15px;
-  font-weight:600;
-}
+.tx-amount{font-size:14px;font-weight:bold}
 
 .tx-status{
-  font-size:12px;
-  padding:4px 10px;
-  border-radius:14px;
-  margin-top:6px;
-  display:inline-block;
+  font-size:11px;
+  margin-top:4px
 }
 
-.success{background:#e6f6ec;color:#0f7a3d}
-.pending{background:#fff3cd;color:#856404}
-.failed{background:#fdecea;color:#b02a37}
+.success{color:#0f7a3d}
+.pending{color:#c49100}
+.failed{color:#c0392b}
+</style>
+</head>
 
-/* EMPTY */
-.empty{
-  text-align:center;
-  color:#777;
-  margin-top:40px;
-}
-</style></head><body><header class="header">
-  <button onclick="history.back()" style="background:none;border:none;color:#fff;font-size:18px">←</button>
-  <h2>Transaction History</h2>
-</header><section class="section" id="txList"></section><script src="staking.js"></script><script>
-const box = document.getElementById("txList");
+<body>
+
+<!-- ✅ HEADER -->
+<header class="header">
+  <div class="header-left">
+    <span>Transaction History</span>
+  </div>
+</header>
+
+<section class="section">
+  <div id="txList" class="tx-list"></div>
+</section>
+
+<script src="staking.js"></script>
+<script>
+const txList = document.getElementById("txList");
 const stakes = getStakes().slice().reverse();
 
 function icon(project){
@@ -99,35 +77,37 @@ function icon(project){
   return "📦";
 }
 
-if(stakes.length===0){
-  box.innerHTML = "<div class='empty'>No transactions yet</div>";
+if(stakes.length === 0){
+  txList.innerHTML =
+    "<p style='font-size:13px;color:#777'>No transactions yet</p>";
 }
 
 stakes.forEach(s=>{
-  const status = s.status || "Successful";
   const cls =
-    status==="Pending" ? "pending" :
-    status==="Failed" ? "failed" :
+    s.status === "Pending" ? "pending" :
+    s.status === "Failed" ? "failed" :
     "success";
 
   const div = document.createElement("div");
-  div.className = "tx-card";
+  div.className = "tx-item";
 
   div.innerHTML = `
     <div class="tx-icon">${icon(s.project)}</div>
 
     <div class="tx-body">
       <div class="tx-title">${s.project} Stake</div>
-      <div class="tx-date">${s.date} • ${s.duration} days</div>
+      <div class="tx-date">${s.date}</div>
     </div>
 
     <div class="tx-right">
       <div class="tx-amount">${s.amount} Pi</div>
-      <div class="tx-status ${cls}">${status}</div>
+      <div class="tx-status ${cls}">${s.status}</div>
     </div>
   `;
 
-  box.appendChild(div);
+  txList.appendChild(div);
 });
-</script></body>
+</script>
+
+</body>
 </html>
