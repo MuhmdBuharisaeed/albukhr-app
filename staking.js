@@ -138,3 +138,21 @@ function getProjectTotals(project) {
 
   return { stake, reward, stakes };
 }
+
+function processStakes(){
+  const stakes = getStakes();
+  let changed = false;
+
+  stakes.forEach(s=>{
+    if(s.status === "Pending"){
+      // simulation: canza zuwa Successful
+      s.status = "Successful";
+      changed = true;
+    }
+  });
+
+  if(changed) saveStakes(stakes);
+}
+
+// kira shi duk lokacin da page ta bude
+processStakes();
