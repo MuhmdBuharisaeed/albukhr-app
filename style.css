@@ -652,3 +652,45 @@ body {
   background: #e6f6ec;
   color: #0f7a3d;
   }
+
+/* Home transaction item */
+.home-tx{
+  display:flex;
+  align-items:center;
+  background:#fff;
+  padding:8px 10px;
+  border-radius:10px;
+  margin-bottom:6px;
+}
+
+/* Icon */
+.home-icon{
+  font-size:18px;      /* rage girma */
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-right:8px;
+}
+
+/* Body text */
+.home-title{
+  font-size:13px;
+  font-weight:600;
+}
+
+.home-date{
+  font-size:11px;
+  color:#777;
+}
+
+/* Right side */
+.home-amount{
+  font-size:12px;
+  font-weight:600;
+}
+
+.home-status{
+  font-size:11px;
+  }
