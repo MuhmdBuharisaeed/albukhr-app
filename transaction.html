@@ -4,138 +4,126 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Transaction History</title><style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#f5f7f6;padding-bottom:80px}
+body{background:#f5f7f6;padding-bottom:60px}
 
 /* HEADER */
 .header{
   background:#0f7a3d;
   color:#fff;
-  padding:16px
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
+.header h2{font-size:18px}
 
-/* CONTENT */
-.section{padding:14px}
+/* SECTION */
+.section{padding:16px}
 
 /* TRANSACTION CARD */
-.tx{
+.tx-card{
+  display:flex;
+  align-items:center;
+  gap:14px;
+
   background:#fff;
   border-radius:14px;
   padding:14px;
   margin-bottom:12px;
-  display:flex;
-  align-items:center;
-  gap:14px
 }
 
 /* ICON */
 .tx-icon{
-  width:46px;
-  height:46px;
+  width:44px;
+  height:44px;
   border-radius:50%;
-  background:#e6f6ec;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
-  color:#0f7a3d;
-  flex-shrink:0
+  font-size:20px;
+  background:#eaf6ee;
+  flex-shrink:0;
 }
 
 /* BODY */
-.tx-body{
-  flex:1
-}
+.tx-body{flex:1}
 
 .tx-title{
-  font-size:14px;
-  font-weight:bold;
-  color:#111
+  font-size:15px;
+  font-weight:600;
+  color:#222;
 }
 
 .tx-date{
-  font-size:11px;
-  color:#888;
-  margin-top:3px
+  font-size:12px;
+  color:#777;
+  margin-top:3px;
 }
 
-/* RIGHT SIDE */
-.tx-right{
-  text-align:right
-}
+/* RIGHT */
+.tx-right{text-align:right}
 
 .tx-amount{
   font-size:15px;
-  font-weight:bold
+  font-weight:600;
 }
 
-.minus{color:#111}
-.plus{color:#0f7a3d}
-
-/* STATUS */
 .tx-status{
-  display:inline-block;
-  margin-top:6px;
-  font-size:11px;
+  font-size:12px;
   padding:4px 10px;
-  border-radius:12px
+  border-radius:14px;
+  margin-top:6px;
+  display:inline-block;
 }
 
 .success{background:#e6f6ec;color:#0f7a3d}
-.pending{background:#fff4d6;color:#b7791f}
-.failed{background:#fde8e8;color:#c53030}
+.pending{background:#fff3cd;color:#856404}
+.failed{background:#fdecea;color:#b02a37}
 
 /* EMPTY */
 .empty{
-  background:#fff;
-  padding:24px;
-  border-radius:14px;
   text-align:center;
-  color:#666;
-  font-size:14px
+  color:#777;
+  margin-top:40px;
 }
 </style></head><body><header class="header">
-  <h2>📑 Transaction History</h2>
-</header><section class="section" id="txList"></section><script src="js/staking.js"></script><script>
+  <button onclick="history.back()" style="background:none;border:none;color:#fff;font-size:18px">←</button>
+  <h2>Transaction History</h2>
+</header><section class="section" id="txList"></section><script src="staking.js"></script><script>
 const box = document.getElementById("txList");
-const stakes = getStakes().reverse();
+const stakes = getStakes().slice().reverse();
 
-function getIcon(project){
-  if(project === "Raheem") return "💊";
-  if(project === "Hauwal") return "🌾";
+function icon(project){
+  if(project==="Raheem") return "💊";
+  if(project==="Hauwal") return "🌾";
   return "📦";
 }
 
-if(stakes.length === 0){
-  box.innerHTML = `<div class="empty">No transactions yet</div>`;
+if(stakes.length===0){
+  box.innerHTML = "<div class='empty'>No transactions yet</div>";
 }
 
 stakes.forEach(s=>{
   const status = s.status || "Successful";
-  const statusClass =
-    status === "Pending" ? "pending" :
-    status === "Failed" ? "failed" :
+  const cls =
+    status==="Pending" ? "pending" :
+    status==="Failed" ? "failed" :
     "success";
 
-  const amountClass = s.amount >= 0 ? "minus" : "plus";
-
   const div = document.createElement("div");
-  div.className = "tx";
+  div.className = "tx-card";
 
   div.innerHTML = `
-    <div class="tx-icon">${getIcon(s.project)}</div>
+    <div class="tx-icon">${icon(s.project)}</div>
 
     <div class="tx-body">
       <div class="tx-title">${s.project} Stake</div>
-      <div class="tx-date">${s.date}</div>
+      <div class="tx-date">${s.date} • ${s.duration} days</div>
     </div>
 
     <div class="tx-right">
-      <div class="tx-amount ${amountClass}">
-        ${s.amount} Pi
-      </div>
-      <div class="tx-status ${statusClass}">
-        ${status}
-      </div>
+      <div class="tx-amount">${s.amount} Pi</div>
+      <div class="tx-status ${cls}">${status}</div>
     </div>
   `;
 
