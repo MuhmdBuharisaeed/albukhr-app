@@ -101,6 +101,14 @@ function closeModal(){
   modal.style.display = "none";
 }
 
+<div class="modal" id="successModal">
+  <div class="modal-box" style="text-align:center">
+    <h3 style="color:#0f7a3d">✅ Staking Successful</h3>
+    <p id="successText" style="margin:12px 0"></p>
+    <button class="btn primary" onclick="closeSuccess()">OK</button>
+  </div>
+</div>
+  
 function stake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
