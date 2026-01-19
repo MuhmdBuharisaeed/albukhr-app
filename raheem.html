@@ -5,36 +5,102 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Raheem Pharmacy</title>
 
+<link rel="stylesheet" href="style.css">
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#f5f7f6;padding-bottom:80px}
-.header{background:#0f7a3d;color:#fff;padding:16px}
+body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
+
+/* PAGE CONTENT */
 .section{padding:16px}
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{flex:1;background:#fff;border-radius:12px;padding:16px;text-align:center}
-.tx{background:#fff;padding:12px;border-radius:10px;margin-bottom:8px}
-.btns{display:flex;gap:12px}
-.btn{flex:1;padding:14px;border-radius:10px;border:none;font-weight:bold}
+
+.stats{
+  display:flex;
+  gap:12px;
+  margin:16px 0
+}
+
+.stat-card{
+  flex:1;
+  background:#fff;
+  border-radius:14px;
+  padding:16px;
+  text-align:center
+}
+
+.stat-card span{display:block;color:#666;font-size:14px}
+.stat-card strong{font-size:18px;margin-top:6px;display:block}
+
+.btns{display:flex;gap:12px;margin-top:12px}
+
+.btn{
+  flex:1;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  font-weight:bold;
+  font-size:16px
+}
+
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
+.tx{
+  background:#fff;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:8px;
+  font-size:14px
+}
+
 /* MODAL */
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
-.modal-box{background:#fff;width:90%;max-width:400px;padding:20px;border-radius:12px}
-input,select{width:100%;padding:10px;margin-top:6px}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000
+}
+
+.modal-box{
+  background:#fff;
+  width:90%;
+  max-width:420px;
+  padding:20px;
+  border-radius:16px
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px
+}
+
+label{margin-top:12px;display:block}
+
+/* SUCCESS */
+.success{text-align:center}
+.success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
 </head>
 
 <body>
 
+<!-- ✅ HEADER (BA A CIRE BA) -->
 <header class="header">
-  <h2>💊 Raheem Pharmacy</h2>
+  <div class="header-left">
+    <span>💊 Raheem Pharmacy</span>
+  </div>
 </header>
 
+<!-- PAGE CONTENT -->
 <section class="section">
 
-<div class="stats">
+  <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
       <strong id="rStake">0.00 Pi</strong>
@@ -43,123 +109,98 @@ input,select{width:100%;padding:10px;margin-top:6px}
       <span>Your Reward</span>
       <strong id="rReward">0.00 Pi</strong>
     </div>
-</div>
+  </div>
 
-<div class="btns">
-  <button class="btn primary" onclick="openModal()">Stake</button>
-  <button class="btn secondary" onclick="history.back()">Back</button>
-</div>
+  <div class="btns">
+    <button class="btn primary" onclick="openModal()">Stake</button>
+    <button class="btn secondary" onclick="history.back()">Back</button>
+  </div>
 
-<h3 style="margin-top:20px">Transaction History</h3>
-<div id="raheemHistory"></div>
+  <h3 style="margin:20px 0 10px">Transaction History</h3>
+  <div id="raheemHistory"></div>
 
 </section>
 
-<div class="modal" id="modal">
+<!-- STAKE MODAL -->
+<div class="modal" id="stakeModal">
   <div class="modal-box">
     <h3>Stake in Raheem</h3>
 
     <label>Amount (Pi)</label>
-    <input type="number" id="amount">
-    
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-bottom:8px">
+    <input type="number" id="amountInput" placeholder="Enter amount">
+
+    <small id="minHint" style="color:#0f7a3d;margin-top:6px;display:block">
       Minimum stake: --
     </small>
-    
+
     <label>Duration</label>
-    <select id="duration">
+    <select id="durationSelect">
       <option value="30">30 Days</option>
       <option value="60">60 Days</option>
       <option value="90">90 Days</option>
     </select>
 
     <div class="btns" style="margin-top:16px">
-      <button class="btn primary" onclick="stake()">Confirm</button>
+      <button class="btn primary" onclick="confirmStake()">Confirm</button>
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
-<script src="js/staking.js"></script>
-<script>
-const modal = document.getElementById("modal");
-const successModal = document.getElementById("successModal");
-const amountInput = document.getElementById("amount");
-const durationSelect = document.getElementById("duration");
-const rStake = document.getElementById("rStake");
-const rReward = document.getElementById("rReward");
-const raheemHistory = document.getElementById("raheemHistory");
-
-function openModal(){
-  modal.style.display = "flex";
-  const min = getMinStake("Raheem");
-  document.getElementById("minHint").innerText =
-    "Minimum stake: " + min + " Pi";
-}
-
-function closeModal(){
-  modal.style.display = "none";
-}
-
+<!-- SUCCESS MODAL -->
 <div class="modal" id="successModal">
-  <div class="modal-box" style="text-align:center">
-    <h3 style="color:#0f7a3d">✅ Staking Successful</h3>
-    <p id="successText" style="margin:12px 0"></p>
-    <button class="btn primary" onclick="closeSuccess()">OK</button>
+  <div class="modal-box success">
+    <h3>Stake Successful</h3>
+    <p id="successText"></p>
+    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
   </div>
 </div>
-  
-function stake(){
+
+<script src="staking.js"></script>
+<script>
+const stakeModal = document.getElementById("stakeModal");
+const successModal = document.getElementById("successModal");
+
+function openModal(){
+  stakeModal.style.display="flex";
+  document.getElementById("minHint").innerText =
+    "Minimum stake: " + getMinStake("Raheem") + " Pi";
+}
+
+function closeModal(){ stakeModal.style.display="none"; }
+function closeSuccess(){ successModal.style.display="none"; }
+
+function confirmStake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
   const min = getMinStake("Raheem");
 
-  if(!amount || amount < min){
+  if(amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  addStake({
-    project: "Raheem",
-    amount,
-    duration
-  });
-  
-addStake({ project:"Raheem", amount, duration });
-closeModal();
-showSuccess(amount, duration);
-load();
+  addStake({ project:"Raheem", amount, duration });
 
-  
-  closeModal();
-  showSuccess(amount, duration);
-  load();
-}
-
-function showSuccess(amount, duration){
   const reward = amount * getRate("Raheem", duration);
+  successText.innerText =
+    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
 
-  document.getElementById("successText").innerHTML =
-    `You staked <b>${amount} Pi</b><br>
-     Duration: <b>${duration} days</b><br>
-     Reward: <b>${reward.toFixed(2)} Pi</b>`;
-
-  successModal.style.display = "flex";
-}
-
-function closeSuccess(){
-  successModal.style.display = "none";
+  closeModal();
+  successModal.style.display="flex";
+  load();
 }
 
 function load(){
   const data = getProjectTotals("Raheem");
+
   rStake.innerText = data.stake.toFixed(2) + " Pi";
   rReward.innerText = data.reward.toFixed(2) + " Pi";
 
-  raheemHistory.innerHTML = "";
+  raheemHistory.innerHTML="";
   data.stakes.forEach(s=>{
-    const d = document.createElement("div");
-    d.className = "tx";
+    const d=document.createElement("div");
+    d.className="tx";
     d.innerText =
       `${s.date} | ${s.amount} Pi | +${s.reward.toFixed(2)} Pi`;
     raheemHistory.appendChild(d);
@@ -168,5 +209,6 @@ function load(){
 
 load();
 </script>
+
 </body>
 </html>
