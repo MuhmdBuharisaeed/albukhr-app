@@ -65,6 +65,23 @@ function addStake({ project, amount, duration }) {
 
   saveStakes(stakes);
 
+function addStake({ project, amount, duration }) {
+  const rate = getRate(project, duration);
+  const reward = amount * rate;
+
+  const stakes = getStakes();
+  stakes.push({
+    project,
+    amount,
+    reward,
+    duration,
+    status: "Pending",   // 🔴 MUHIMMI
+    date: new Date().toLocaleDateString()
+  });
+
+  saveStakes(stakes);
+}
+   
   // Simulate confirmation (real system = backend)
   setTimeout(() => {
     markStakeSuccessful(stakes[stakes.length - 1].id);
