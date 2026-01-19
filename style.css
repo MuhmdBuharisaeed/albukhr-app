@@ -580,3 +580,75 @@ body {
 .success{background:#e6f6ec;color:#0f7a3d}
 .pending{background:#fff4d6;color:#b7791f}
 .failed{background:#fde8e8;color:#c53030}
+
+/* ===============================
+   HOME TRANSACTION (COMPACT)
+================================*/
+
+.home-tx {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+
+  max-width: 95%;
+}
+
+/* ICON */
+.home-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+  background: #eaf6ee;
+  flex-shrink: 0;
+}
+
+/* BODY */
+.home-body {
+  flex: 1;
+}
+
+.home-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.home-date {
+  font-size: 11px;
+  color: #777;
+  margin-top: 2px;
+}
+
+/* RIGHT */
+.home-right {
+  text-align: right;
+}
+
+.home-amount {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-status {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 3px;
+  display: inline-block;
+}
+
+.home-status.success {
+  background: #e6f6ec;
+  color: #0f7a3d;
+  }
