@@ -44,12 +44,47 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
-.tx{
+/* TRANSACTIONS (IRI DAYA DA HOME) */
+.project-tx{
   background:#fff;
-  padding:12px;
-  border-radius:10px;
+  border-radius:12px;
+  padding:10px 12px;
   margin-bottom:8px;
-  font-size:14px
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.project-icon{
+  font-size:18px;
+}
+
+.project-body{
+  flex:1;
+}
+
+.project-title{
+  font-size:14px;
+  font-weight:600;
+}
+
+.project-date{
+  font-size:11px;
+  color:#777;
+}
+
+.project-right{
+  text-align:right;
+}
+
+.project-amount{
+  font-size:14px;
+  font-weight:bold;
+}
+
+.project-status{
+  font-size:11px;
+  color:#0f7a3d;
 }
 
 /* MODAL */
@@ -97,9 +132,9 @@ label{margin-top:12px;display:block}
   </div>
 </header>
 
-<!-- PAGE CONTENT -->
 <section class="section">
 
+  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -111,13 +146,15 @@ label{margin-top:12px;display:block}
     </div>
   </div>
 
+  <!-- ACTIONS -->
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
-<h3 class="tx-title" style="margin-top:20px">Transaction History</h3>
-<div id="raheemHistory" class="project-tx-list"></div>  
+  <!-- HISTORY -->
+  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
+  <div id="raheemHistory"></div>
 
 </section>
 
@@ -127,9 +164,9 @@ label{margin-top:12px;display:block}
     <h3>Stake in Raheem</h3>
 
     <label>Amount (Pi)</label>
-    <input type="number" id="amountInput" placeholder="Enter amount">
+    <input type="number" id="amountInput">
 
-    <small id="minHint" style="color:#0f7a3d;margin-top:6px;display:block">
+    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
       Minimum stake: --
     </small>
 
@@ -157,15 +194,13 @@ label{margin-top:12px;display:block}
 </div>
 
 <script src="staking.js"></script>
-<link rel="stylesheet" href="style.css">
 <script>
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 
 function openModal(){
   stakeModal.style.display="flex";
-  document.getElementById("minHint").innerText =
-    "Minimum stake: " + getMinStake("Raheem") + " Pi";
+  minHint.innerText = "Minimum stake: " + getMinStake("Raheem") + " Pi";
 }
 
 function closeModal(){ stakeModal.style.display="none"; }
@@ -198,33 +233,32 @@ function load(){
   rStake.innerText = data.stake.toFixed(2) + " Pi";
   rReward.innerText = data.reward.toFixed(2) + " Pi";
 
-raheemHistory.innerHTML="";
+  raheemHistory.innerHTML = "";
 
-if(data.stakes.length === 0){
-  raheemHistory.innerHTML =
-    "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+  if(data.stakes.length === 0){
+    raheemHistory.innerHTML =
+      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+    return;
+  }
+
+  data.stakes.slice().reverse().forEach(s=>{
+    const div = document.createElement("div");
+    div.className = "project-tx";
+    div.innerHTML = `
+      <div class="project-icon">💊</div>
+      <div class="project-body">
+        <div class="project-title">Raheem Stake</div>
+        <div class="project-date">${s.date}</div>
+      </div>
+      <div class="project-right">
+        <div class="project-amount">${s.amount} Pi</div>
+        <div class="project-status">Successful</div>
+      </div>
+    `;
+    raheemHistory.appendChild(div);
+  });
 }
 
-data.stakes.forEach(s=>{
-  const div = document.createElement("div");
-  div.className = "project-tx";
-
-  div.innerHTML = `
-    <div class="project-icon">💊</div>
-
-    <div class="project-body">
-      <div class="project-title">Raheem Stake</div>
-      <div class="project-date">${s.date}</div>
-    </div>
-
-    <div class="project-right">
-      <div class="project-amount">${s.amount} Pi</div>
-      <div class="project-status">Successful</div>
-    </div>
-  `;
-
-  raheemHistory.appendChild(div);
-});
 load();
 </script>
 
