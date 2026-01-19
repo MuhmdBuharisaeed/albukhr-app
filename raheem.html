@@ -124,7 +124,13 @@ function stake(){
     amount,
     duration
   });
+  
+addStake({ project:"Raheem", amount, duration });
+closeModal();
+showSuccess(amount, duration);
+load();
 
+  
   closeModal();
   showSuccess(amount, duration);
   load();
