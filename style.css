@@ -706,3 +706,54 @@ body {
 .home-status{
   font-size:11px;
   }
+
+/* =========================
+   TRANSACTION UI (GLOBAL)
+   ========================= */
+
+.project-tx{
+  display:flex;
+  align-items:center;
+  background:#fff;
+  padding:8px 10px;
+  border-radius:10px;
+  margin-bottom:6px;
+}
+
+.project-icon{
+  font-size:18px;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-right:8px;
+}
+
+.project-body{
+  flex:1;
+}
+
+.project-title{
+  font-size:13px;
+  font-weight:600;
+}
+
+.project-date{
+  font-size:11px;
+  color:#777;
+}
+
+.project-right{
+  text-align:right;
+}
+
+.project-amount{
+  font-size:12px;
+  font-weight:600;
+}
+
+.project-status{
+  font-size:11px;
+  color:#0f7a3d;
+}
