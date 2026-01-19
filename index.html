@@ -124,5 +124,48 @@ function loadHome(){
 window.addEventListener("DOMContentLoaded", loadHome);
 </script>
 
+<script src="staking.js"></script>
+<script>
+const homeBox = document.getElementById("homeTx");
+const stakes = getStakes().slice(-3).reverse();
+
+function icon(project){
+  if(project==="Raheem") return "💊";
+  if(project==="Hauwal") return "🌾";
+  return "📦";
+}
+
+if(stakes.length===0){
+  homeBox.innerHTML = "<p style='color:#777'>No transactions yet</p>";
+}
+
+stakes.forEach(s=>{
+  const status = s.status || "Successful";
+  const cls =
+    status==="Pending" ? "pending" :
+    status==="Failed" ? "failed" :
+    "success";
+
+  const div = document.createElement("div");
+  div.className="home-tx";
+
+  div.innerHTML=`
+    <div class="home-icon">${icon(s.project)}</div>
+
+    <div class="home-body">
+      <div class="home-title">${s.project} Stake</div>
+      <div class="home-date">${s.date}</div>
+    </div>
+
+    <div class="home-right">
+      <div class="home-amount">${s.amount} Pi</div>
+      <div class="home-status ${cls}">${status}</div>
+    </div>
+  `;
+
+  homeBox.appendChild(div);
+});
+</script>
+  
 </body>
 </html>
