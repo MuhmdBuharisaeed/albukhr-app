@@ -197,7 +197,7 @@ function load(){
   rStake.innerText = data.stake.toFixed(2) + " Pi";
   rReward.innerText = data.reward.toFixed(2) + " Pi";
 
-  raheemHistory.innerHTML="";
+raheemHistory.innerHTML="";
 
 if(data.stakes.length === 0){
   raheemHistory.innerHTML =
@@ -224,7 +224,6 @@ data.stakes.forEach(s=>{
 
   raheemHistory.appendChild(div);
 });
-
 load();
 </script>
 
