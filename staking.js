@@ -5,89 +5,62 @@
 const STORAGE_KEY = "albukhr_stakes";
 
 /* ===============================
-   CORE STORAGE
+   STORAGE
 ================================ */
-function getStakes() {
+function getStakes(){
   return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
 
-function saveStakes(stakes) {
+function saveStakes(stakes){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(stakes));
 }
 
 /* ===============================
-   RULES
+   PROJECT RULES
 ================================ */
 const PROJECT_RULES = {
   Raheem: { minStake: 10 },
-  Hauwal: { minStake: 20 }
+  Hauwal: { minStake: 20 },
+  Barsh:  { minStake: 100 }
 };
 
 function getMinStake(project){
   return PROJECT_RULES[project]?.minStake || 0;
 }
 
-const PROJECT_RULES = {
-  Raheem: {
-    minStake: 10
-  },
-  Hauwal: {
-    minStake: 20
-  },
-  Barsh: {
-    minStake: 100
-  }
-};
-
 /* ===============================
-   RATES
+   REWARD RATES
 ================================ */
-function getRate(project, duration) {
-  if (project === "Raheem") {
-    return duration === 30 ? 0.01 :
-           duration === 60 ? 0.025 : 0.05;
-  }
+function getRate(project, duration){
 
-  if (project === "Hauwal") {
-    return duration === 30 ? 0.02 :
-           duration === 60 ? 0.04 : 0.08;
-  }
-
-  return 0.01;
-}
-
-function getRate(project, duration) {
-
-  if (project === "Raheem") {
+  if(project === "Raheem"){
     return duration === 30 ? 0.01 :
            duration === 60 ? 0.025 :
            0.05;
   }
 
-  if (project === "Hauwal") {
+  if(project === "Hauwal"){
     return duration === 30 ? 0.02 :
            duration === 60 ? 0.04 :
            0.08;
   }
 
-  // 🆕 BARSH AGRO
-  if (project === "Barsh") {
+  if(project === "Barsh"){
     return duration === 30 ? 0.03 :
            duration === 60 ? 0.06 :
            0.10;
   }
 
-  return 0.01;
+  return 0;
 }
 
 /* ===============================
-   ADD STAKE (WITH STATUS)
+   ADD STAKE
 ================================ */
-function addStake({ project, amount, duration }) {
-  const rate = getRate(project, duration);
-  const reward = amount * rate;
+function addStake({ project, amount, duration }){
 
   const stakes = getStakes();
+  const reward = amount * getRate(project, duration);
 
   stakes.push({
     id: Date.now(),
@@ -95,62 +68,27 @@ function addStake({ project, amount, duration }) {
     amount,
     duration,
     reward,
-    date: new Date().toLocaleDateString(),
-    status: "Pending" // 👈 default
-  });
-
-  saveStakes(stakes);
-
-function addStake({ project, amount, duration }) {
-  const rate = getRate(project, duration);
-  const reward = amount * rate;
-
-  const stakes = getStakes();
-  stakes.push({
-    project,
-    amount,
-    reward,
-    duration,
-    status: "Pending",   // 🔴 MUHIMMI
+    status: "Successful",   // yanzu kai tsaye successful
     date: new Date().toLocaleDateString()
   });
 
   saveStakes(stakes);
-}
-   
-  // Simulate confirmation (real system = backend)
-  setTimeout(() => {
-    markStakeSuccessful(stakes[stakes.length - 1].id);
-  }, 500);
-
   return true;
 }
 
 /* ===============================
-   STATUS UPDATE
+   TOTALS (HOME)
 ================================ */
-function markStakeSuccessful(id){
-  const stakes = getStakes();
-  const stake = stakes.find(s => s.id === id);
+function getTotals(){
 
-  if(stake){
-    stake.status = "Successful";
-    saveStakes(stakes);
-  }
-}
-
-/* ===============================
-   TOTALS
-================================ */
-function getTotals() {
   const stakes = getStakes();
   let totalStake = 0;
   let totalReward = 0;
 
-  stakes.forEach(s => {
+  stakes.forEach(s=>{
     if(s.status === "Successful"){
-      totalStake += s.amount;
-      totalReward += s.reward;
+      totalStake += Number(s.amount);
+      totalReward += Number(s.reward);
     }
   });
 
@@ -160,35 +98,22 @@ function getTotals() {
 /* ===============================
    PROJECT TOTALS
 ================================ */
-function getProjectTotals(project) {
+function getProjectTotals(project){
+
   const stakes = getStakes().filter(s => s.project === project);
   let stake = 0;
   let reward = 0;
 
-  stakes.forEach(s => {
-    if(s.status === "Successful"){
-      stake += s.amount;
-      reward += s.reward;
-    }
-  });
-
-  return { stake, reward, stakes };
-}
-
-function processStakes(){
-  const stakes = getStakes();
-  let changed = false;
-
   stakes.forEach(s=>{
-    if(s.status === "Pending"){
-      // simulation: canza zuwa Successful
-      s.status = "Successful";
-      changed = true;
+    if(s.status === "Successful"){
+      stake += Number(s.amount);
+      reward += Number(s.reward);
     }
   });
 
-  if(changed) saveStakes(stakes);
+  return {
+    stake,
+    reward,
+    stakes
+  };
 }
-
-// kira shi duk lokacin da page ta bude
-processStakes();
