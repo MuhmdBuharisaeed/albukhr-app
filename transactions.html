@@ -16,13 +16,29 @@ body{
 
 .section{padding:16px}
 
+/* FILTER */
+.tx-filter{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px
+}
+
+.tx-filter button{
+  padding:6px 10px;
+  border-radius:8px;
+  border:1px solid #0f7a3d;
+  background:#fff;
+  font-size:12px;
+  color:#0f7a3d
+}
+
 /* TRANSACTION LIST */
-.tx-list{margin-top:12px}
+.tx-list{margin-top:10px}
 
 .tx-item{
   background:#fff;
   border-radius:12px;
-  padding:12px;
+  padding:10px;
   display:flex;
   align-items:center;
   gap:10px;
@@ -30,21 +46,21 @@ body{
 }
 
 .tx-icon{
-  font-size:22px;
-  width:36px;
+  font-size:18px;
+  width:32px;
   text-align:center
 }
 
 .tx-body{flex:1}
-.tx-title{font-size:14px;font-weight:bold}
+.tx-title{font-size:13px;font-weight:bold}
 .tx-date{font-size:11px;color:#777}
 
 .tx-right{text-align:right}
-.tx-amount{font-size:14px;font-weight:bold}
+.tx-amount{font-size:13px;font-weight:bold}
 
 .tx-status{
   font-size:11px;
-  margin-top:4px
+  margin-top:3px
 }
 
 .success{color:#0f7a3d}
@@ -63,33 +79,46 @@ body{
 </header>
 
 <section class="section">
+
+  <!-- FILTER -->
+  <div class="tx-filter">
+    <button onclick="filterTx('All')">All</button>
+    <button onclick="filterTx('Successful')">Successful</button>
+    <button onclick="filterTx('Pending')">Pending</button>
+    <button onclick="filterTx('Failed')">Failed</button>
+  </div>
+
+  <!-- LIST -->
   <div id="txList" class="tx-list"></div>
+
 </section>
 
-<div style="display:flex;gap:8px;margin-bottom:12px">
-  <button onclick="filterTx('All')">All</button>
-  <button onclick="filterTx('Successful')">Successful</button>
-  <button onclick="filterTx('Pending')">Pending</button>
-  <button onclick="filterTx('Failed')">Failed</button>
-</div>  
-  
 <script src="staking.js"></script>
 <script>
+const txList = document.getElementById("txList");
 const allStakes = getStakes().slice().reverse();
+
+function icon(project){
+  if(project==="Raheem") return "💊";
+  if(project==="Hauwal") return "🌾";
+  return "📦";
+}
 
 function render(list){
   txList.innerHTML = "";
 
   if(list.length === 0){
     txList.innerHTML =
-      "<p style='font-size:13px;color:#777'>No transactions</p>";
+      "<p style='font-size:12px;color:#777'>No transactions</p>";
     return;
   }
 
   list.forEach(s=>{
+    const status = s.status || "Successful";
+
     const cls =
-      s.status === "Pending" ? "pending" :
-      s.status === "Failed" ? "failed" :
+      status==="Pending" ? "pending" :
+      status==="Failed" ? "failed" :
       "success";
 
     const div = document.createElement("div");
@@ -105,7 +134,7 @@ function render(list){
 
       <div class="tx-right">
         <div class="tx-amount">${s.amount} Pi</div>
-        <div class="tx-status ${cls}">${s.status}</div>
+        <div class="tx-status ${cls}">${status}</div>
       </div>
     `;
 
@@ -114,54 +143,15 @@ function render(list){
 }
 
 function filterTx(status){
-  if(status === "All"){
+  if(status==="All"){
     render(allStakes);
   }else{
-    render(allStakes.filter(s=>s.status===status));
+    render(allStakes.filter(s=>(s.status||"Successful")===status));
   }
 }
 
-// farko
+/* LOAD */
 render(allStakes);
-const txList = document.getElementById("txList");
-const stakes = getStakes().slice().reverse();
-
-function icon(project){
-  if(project==="Raheem") return "💊";
-  if(project==="Hauwal") return "🌾";
-  return "📦";
-}
-
-if(stakes.length === 0){
-  txList.innerHTML =
-    "<p style='font-size:13px;color:#777'>No transactions yet</p>";
-}
-
-stakes.forEach(s=>{
-  const cls =
-    s.status === "Pending" ? "pending" :
-    s.status === "Failed" ? "failed" :
-    "success";
-
-  const div = document.createElement("div");
-  div.className = "tx-item";
-
-  div.innerHTML = `
-    <div class="tx-icon">${icon(s.project)}</div>
-
-    <div class="tx-body">
-      <div class="tx-title">${s.project} Stake</div>
-      <div class="tx-date">${s.date}</div>
-    </div>
-
-    <div class="tx-right">
-      <div class="tx-amount">${s.amount} Pi</div>
-      <div class="tx-status ${cls}">${s.status}</div>
-    </div>
-  `;
-
-  txList.appendChild(div);
-});
 </script>
 
 </body>
