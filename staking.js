@@ -44,6 +44,18 @@ function getRate(project, duration) {
   return 0.01;
 }
 
+const PROJECT_RULES = {
+  Raheem: {
+    minStake: 10
+  },
+  Hauwal: {
+    minStake: 20
+  },
+  Barsh: {
+    minStake: 100
+  }
+};
+
 /* ===============================
    ADD STAKE (WITH STATUS)
 ================================ */
