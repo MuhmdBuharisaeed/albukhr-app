@@ -98,11 +98,10 @@ body{
 const txList = document.getElementById("txList");
 const allStakes = getStakes().slice().reverse();
 
-function icons(project){
-  if(project==="Raheem Pharmacy") return "💊";
-  if(project==="Hauwal sumonviter") return "🌽";
-  if(project==="Barsh Agro") return "🌽";
-  
+function icon(project){
+  if(project==="Raheem") return "💊";
+  if(project==="Hauwal") return "🌽";
+  return "📦";
 }
 
 function render(list){
