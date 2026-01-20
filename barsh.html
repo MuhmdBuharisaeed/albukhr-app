@@ -141,6 +141,11 @@ function confirmStake(){
   load();
 }
 
+successText.innerText =
+  `You staked ${amount} Pi in BARSH AGRO successfully.`;
+
+successModal.style.display = "flex";
+  
 function load(){
   const data = getProjectTotals("Barsh");
   bStake.innerText = data.stake.toFixed(2)+" Pi";
