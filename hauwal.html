@@ -31,24 +31,11 @@ body{
   text-align:center
 }
 
-.stat-card span{
-  display:block;
-  color:#666;
-  font-size:13px
-}
-
-.stat-card strong{
-  font-size:18px;
-  margin-top:6px;
-  display:block
-}
+.stat-card span{display:block;color:#666;font-size:14px}
+.stat-card strong{font-size:18px;margin-top:6px;display:block}
 
 /* BUTTONS */
-.btns{
-  display:flex;
-  gap:12px;
-  margin-top:12px
-}
+.btns{display:flex;gap:12px;margin-top:12px}
 
 .btn{
   flex:1;
@@ -62,13 +49,11 @@ body{
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
-/* TRANSACTIONS */
-.project-tx-list{margin-top:10px}
-
+/* PROJECT TRANSACTION (IRI DAYA DA RAHEEM) */
 .project-tx{
   background:#fff;
   border-radius:12px;
-  padding:10px;
+  padding:12px;
   display:flex;
   align-items:center;
   gap:10px;
@@ -77,19 +62,19 @@ body{
 
 .project-icon{
   font-size:20px;
-  width:32px;
+  width:36px;
   text-align:center
 }
 
 .project-body{flex:1}
-.project-title{font-size:13px;font-weight:bold}
+.project-title{font-size:14px;font-weight:bold}
 .project-date{font-size:11px;color:#777}
 
 .project-right{text-align:right}
-.project-amount{font-size:13px;font-weight:bold}
+.project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
 
-/* MODAL */
+/* MODALS */
 .modal{
   position:fixed;
   inset:0;
@@ -127,7 +112,7 @@ label{margin-top:12px;display:block}
 
 <body>
 
-<!-- ✅ HEADER (BA A CIRE BA) -->
+<!-- ✅ HEADER (KADA A TABA CIREWA) -->
 <header class="header">
   <div class="header-left">
     <span>🌾 Hauwal Sumonviter</span>
@@ -155,8 +140,8 @@ label{margin-top:12px;display:block}
   </div>
 
   <!-- TRANSACTION HISTORY -->
-  <h3 style="margin-top:20px;font-size:14px">Transaction History</h3>
-  <div id="hauwalHistory" class="project-tx-list"></div>
+  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
+  <div id="hauwalHistory"></div>
 
 </section>
 
@@ -231,8 +216,6 @@ function confirmStake(){
 }
 
 function load(){
-  updatePendingStakes();
-
   const data = getProjectTotals("Hauwal");
 
   hStake.innerText = data.stake.toFixed(2) + " Pi";
@@ -252,15 +235,18 @@ function load(){
 
     div.innerHTML = `
       <div class="project-icon">🌾</div>
+
       <div class="project-body">
-        <div class="project-title">Hauwal Stake</div>
+        <div class="project-title">Hauwal Sumonviter</div>
         <div class="project-date">${s.date}</div>
       </div>
+
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
-        <div class="project-status">${s.status}</div>
+        <div class="project-status">Successful</div>
       </div>
     `;
+
     hauwalHistory.appendChild(div);
   });
 }
