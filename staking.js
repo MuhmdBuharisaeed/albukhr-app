@@ -24,6 +24,13 @@ const PROJECT_RULES = {
   Barsh:  { minStake: 100 }
 };
 
+const PROJECT_RULES = {
+  Raheem: { minStake: 10 },
+  Hauwal: { minStake: 20 },
+  Barsh:  { minStake: 100 },
+  Khairat:{ minStake: 50 } // 🆕
+};
+
 function getMinStake(project){
   return PROJECT_RULES[project]?.minStake || 0;
 }
@@ -43,6 +50,35 @@ function getRate(project, duration){
     return duration === 30 ? 0.02 :
            duration === 60 ? 0.04 :
            0.08;
+  }
+
+  if(project === "Barsh"){
+    return duration === 30 ? 0.03 :
+           duration === 60 ? 0.06 :
+           0.10;
+  }
+
+  return 0;
+}
+
+function getRate(project, duration){
+
+  if(project === "Raheem"){
+    return duration === 30 ? 0.01 :
+           duration === 60 ? 0.025 :
+           0.05;
+  }
+
+  if(project === "Hauwal"){
+    return duration === 30 ? 0.02 :
+           duration === 60 ? 0.04 :
+           0.08;
+  }
+
+  if(project === "Khairat"){ // 🆕
+    return duration === 30 ? 0.025 :
+           duration === 60 ? 0.05 :
+           0.09;
   }
 
   if(project === "Barsh"){
