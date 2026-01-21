@@ -19,16 +19,10 @@ function saveStakes(stakes){
    PROJECT RULES
 ================================ */
 const PROJECT_RULES = {
-  Raheem: { minStake: 10 },
-  Hauwal: { minStake: 20 },
-  Barsh:  { minStake: 100 }
-};
-
-const PROJECT_RULES = {
-  Raheem: { minStake: 10 },
-  Hauwal: { minStake: 20 },
-  Barsh:  { minStake: 100 },
-  Khairat:{ minStake: 50 } // 🆕
+  Raheem:  { minStake: 10 },
+  Hauwal:  { minStake: 20 },
+  Khairat: { minStake: 50 },   // 🆕 Khairat oganic fertiliser
+  Barsh:   { minStake: 100 }
 };
 
 function getMinStake(project){
@@ -40,47 +34,28 @@ function getMinStake(project){
 ================================ */
 function getRate(project, duration){
 
+  // Raheem Pharmacy
   if(project === "Raheem"){
     return duration === 30 ? 0.01 :
            duration === 60 ? 0.025 :
            0.05;
   }
 
+  // Hauwal Sumonviter
   if(project === "Hauwal"){
     return duration === 30 ? 0.02 :
            duration === 60 ? 0.04 :
            0.08;
   }
 
-  if(project === "Barsh"){
-    return duration === 30 ? 0.03 :
-           duration === 60 ? 0.06 :
-           0.10;
-  }
-
-  return 0;
-}
-
-function getRate(project, duration){
-
-  if(project === "Raheem"){
-    return duration === 30 ? 0.01 :
-           duration === 60 ? 0.025 :
-           0.05;
-  }
-
-  if(project === "Hauwal"){
-    return duration === 30 ? 0.02 :
-           duration === 60 ? 0.04 :
-           0.08;
-  }
-
-  if(project === "Khairat"){ // 🆕
+  // Khairat oganic fertiliser (fi Hauwal, ƙasa da Barsh)
+  if(project === "Khairat"){
     return duration === 30 ? 0.025 :
            duration === 60 ? 0.05 :
            0.09;
   }
 
+  // Barsh Agro (mafi girma)
   if(project === "Barsh"){
     return duration === 30 ? 0.03 :
            duration === 60 ? 0.06 :
@@ -104,7 +79,7 @@ function addStake({ project, amount, duration }){
     amount,
     duration,
     reward,
-    status: "Successful",   // yanzu kai tsaye successful
+    status: "Successful", // tsarin demo
     date: new Date().toLocaleDateString()
   });
 
@@ -147,9 +122,5 @@ function getProjectTotals(project){
     }
   });
 
-  return {
-    stake,
-    reward,
-    stakes
-  };
+  return { stake, reward, stakes };
 }
