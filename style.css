@@ -757,3 +757,7 @@ body {
   font-size:11px;
   color:#0f7a3d;
 }
+
+.small-icon{
+  font-size:14px; /* ⬅ rage daga 18px */
+}
