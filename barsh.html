@@ -3,16 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BARSH AGRO</title>
+<title>Barsh Agro</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{
-  background:#f5f7f6;
-  padding-bottom:90px;
-  font-family:Arial
-}
+body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
+
+/* PAGE CONTENT */
 .section{padding:16px}
 
 .stats{
@@ -20,6 +18,7 @@ body{
   gap:12px;
   margin:16px 0
 }
+
 .stat-card{
   flex:1;
   background:#fff;
@@ -27,32 +26,62 @@ body{
   padding:16px;
   text-align:center
 }
-.stat-card span{font-size:13px;color:#666}
-.stat-card strong{
-  font-size:18px;
-  display:block;
-  margin-top:6px
-}
 
-.btns{
-  display:flex;
-  gap:12px;
-  margin-top:12px
-}
+.stat-card span{display:block;color:#666;font-size:14px}
+.stat-card strong{font-size:18px;margin-top:6px;display:block}
+
+.btns{display:flex;gap:12px;margin-top:12px}
+
 .btn{
   flex:1;
   padding:14px;
   border-radius:12px;
   border:none;
-  font-weight:bold
-}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{
-  background:#fff;
-  border:1px solid #0f7a3d;
-  color:#0f7a3d
+  font-weight:bold;
+  font-size:16px
 }
 
+.primary{background:#0f7a3d;color:#fff}
+.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
+
+/* TRANSACTIONS (IRI DAYA DA HOME) */
+.project-tx{
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.project-icon{font-size:18px}
+
+.project-body{flex:1}
+
+.project-title{
+  font-size:14px;
+  font-weight:600;
+}
+
+.project-date{
+  font-size:11px;
+  color:#777;
+}
+
+.project-right{text-align:right}
+
+.project-amount{
+  font-size:14px;
+  font-weight:bold;
+}
+
+.project-status{
+  font-size:11px;
+  color:#0f7a3d;
+}
+
+/* MODAL */
 .modal{
   position:fixed;
   inset:0;
@@ -62,6 +91,7 @@ body{
   justify-content:center;
   z-index:1000
 }
+
 .modal-box{
   background:#fff;
   width:90%;
@@ -69,19 +99,27 @@ body{
   padding:20px;
   border-radius:16px
 }
+
 input,select{
   width:100%;
   padding:12px;
   margin-top:6px;
   border-radius:10px;
-  border:1px solid #ccc
+  border:1px solid #ccc;
+  font-size:16px
 }
+
+label{margin-top:12px;display:block}
+
+/* SUCCESS */
+.success{text-align:center}
+.success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
 </head>
 
 <body>
 
-<!-- ✅ HEADER -->
+<!-- ✅ HEADER (BA A TABA CIRE BA) -->
 <header class="header">
   <div class="header-left">
     <span>🌾 Barsh Agro</span>
@@ -102,14 +140,14 @@ input,select{
     </div>
   </div>
 
-  <!-- BUTTONS -->
+  <!-- ACTIONS -->
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
   <!-- HISTORY -->
-  <h3 style="margin-top:20px">Transaction History</h3>
+  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="barshHistory"></div>
 
 </section>
@@ -122,7 +160,9 @@ input,select{
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px"></small>
+    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
+      Minimum stake: --
+    </small>
 
     <label>Duration</label>
     <select id="durationSelect">
@@ -138,19 +178,27 @@ input,select{
   </div>
 </div>
 
+<!-- SUCCESS MODAL -->
+<div class="modal" id="successModal">
+  <div class="modal-box success">
+    <h3>Stake Successful</h3>
+    <p id="successText"></p>
+    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
+  </div>
+</div>
+
 <script src="staking.js"></script>
 <script>
 const stakeModal = document.getElementById("stakeModal");
+const successModal = document.getElementById("successModal");
 
 function openModal(){
-  stakeModal.style.display = "flex";
-  minHint.innerText =
-    "Minimum stake: " + getMinStake("Barsh") + " Pi";
+  stakeModal.style.display="flex";
+  minHint.innerText = "Minimum stake: " + getMinStake("Barsh") + " Pi";
 }
 
-function closeModal(){
-  stakeModal.style.display = "none";
-}
+function closeModal(){ stakeModal.style.display="none"; }
+function closeSuccess(){ successModal.style.display="none"; }
 
 function confirmStake(){
   const amount = Number(amountInput.value);
@@ -163,7 +211,13 @@ function confirmStake(){
   }
 
   addStake({ project:"Barsh", amount, duration });
+
+  const reward = amount * getRate("Barsh", duration);
+  successText.innerText =
+    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
+
   closeModal();
+  successModal.style.display="flex";
   load();
 }
 
@@ -181,11 +235,10 @@ function load(){
     return;
   }
 
-  data.stakes.forEach(s=>{
-    const d = document.createElement("div");
-    d.className = "project-tx";
-
-    d.innerHTML = `
+  data.stakes.slice().reverse().forEach(s=>{
+    const div = document.createElement("div");
+    div.className = "project-tx";
+    div.innerHTML = `
       <div class="project-icon">🌾</div>
       <div class="project-body">
         <div class="project-title">Barsh Agro Stake</div>
@@ -193,11 +246,10 @@ function load(){
       </div>
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
-        <div class="project-status">${s.status}</div>
+        <div class="project-status">Successful</div>
       </div>
     `;
-
-    barshHistory.appendChild(d);
+    barshHistory.appendChild(div);
   });
 }
 
@@ -205,4 +257,4 @@ load();
 </script>
 
 </body>
-</html>
+        </html>
