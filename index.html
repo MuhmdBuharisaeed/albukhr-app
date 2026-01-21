@@ -4,49 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ALBUKHR Projects</title>
-
 <link rel="stylesheet" href="style.css">
-
-<style>
-/* RECENT TRANSACTIONS */
-.home-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.home-icon{
-  font-size:16px; /* 👈 an rage girma */
-}
-
-.home-body{flex:1}
-
-.home-title{
-  font-size:13px;
-  font-weight:600;
-}
-
-.home-date{
-  font-size:11px;
-  color:#777;
-}
-
-.home-right{text-align:right}
-
-.home-amount{
-  font-size:13px;
-  font-weight:bold;
-}
-
-.home-status{
-  font-size:11px;
-  color:#0f7a3d;
-}
-</style>
 </head>
 
 <body data-page="home">
@@ -74,8 +32,8 @@
   </div>
 </section>
 
-<!-- PROJECTS -->
-<section class="projects">
+<!-- PROJECTS LIST -->
+<section class="projects" id="projectsList">
   <h2>Albukhr Projects</h2>
 
   <a href="raheem.html" class="project-item active">
@@ -83,9 +41,29 @@
     <small>Demo</small>
   </a>
 
+  <a href="agriculture.html" class="project-item">
+    <span>🌱 Agriculture</span>
+    <small>Coming Soon</small>
+  </a>
+
+  <a href="livestock.html" class="project-item">
+    <span>🐄 Livestock</span>
+    <small>Coming Soon</small>
+  </a>
+
   <a href="barsh.html" class="project-item active">
-    <span>🌾 Barsh Agro</span>
-    <small>Demo</small>
+  <span>🌾 Barsh Agro</span>
+  <small>Demo</small>
+  </a>
+
+  <a href="utilities.html" class="project-item">
+    <span>⚙️ Utilities</span>
+    <small>Coming Soon</small>
+  </a>
+
+  <a href="knowledge.html" class="project-item">
+    <span>📘 Knowledge</span>
+    <small>Coming Soon</small>
   </a>
 
   <a href="hauwal.html" class="project-item active">
@@ -94,19 +72,21 @@
   </a>
 </section>
 
-<!-- RECENT TRANSACTIONS -->
+<!-- TRANSACTION HISTORY -->
 <section class="section">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
     <h3 class="tx-title">Recent Transactions</h3>
-    <a href="transactions.html" style="font-size:13px;color:#0f7a3d;text-decoration:none">
-      View All →
+  <a href="transactions.html" style="font-size:13px;color:#0f7a3d;text-decoration:none">
+      View All  →
     </a>
   </div>
 
   <div id="homeTx"></div>
+
 </section>
 
-<!-- NAV -->
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html" class="active"><span>🏠</span>Home</a>
   <a href="projects.html"><span>📁</span>Projects</a>
@@ -115,34 +95,30 @@
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
+<!-- JS -->
 <script src="staking.js"></script>
 <script>
-function projectIcon(project){
+function icon(project){
   if(project === "Raheem") return "💊";
-  if(project === "Barsh")  return "🌾";
   if(project === "Hauwal") return "🌽";
+  if(project === "Barsh") return "🌾"; // ✅ BARSH AGRO
   return "📦";
-}
+  }
 
 function loadHome(){
-
-  /* TOTALS */
+  // totals
   const totals = getTotals();
-  homeStake.innerText  = totals.totalStake.toFixed(2) + " Pi";
+  homeStake.innerText = totals.totalStake.toFixed(2) + " Pi";
   homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
 
-  /* RECENT TRANSACTIONS (Successful only) */
+  // recent tx
   const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
-  const stakes = getStakes()
-    .filter(s => s.status === "Successful")
-    .slice(-3)
-    .reverse();
+  const stakes = getStakes().slice(-3).reverse();
 
-  if(stakes.length === 0){
-    box.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+  if(stakes.length===0){
+    box.innerHTML = "<p style='color:#777'>No transactions yet</p>";
     return;
   }
 
@@ -152,20 +128,23 @@ function loadHome(){
 
     div.innerHTML = `
       <div class="home-icon">${projectIcon(s.project)}</div>
+
       <div class="home-body">
         <div class="home-title">${s.project} Stake</div>
         <div class="home-date">${s.date}</div>
       </div>
+
       <div class="home-right">
         <div class="home-amount">${s.amount} Pi</div>
-        <div class="home-status">Successful</div>
+        <div class="home-status success">Successful</div>
       </div>
     `;
+
     box.appendChild(div);
   });
 }
 
-document.addEventListener("DOMContentLoaded", loadHome);
+window.addEventListener("DOMContentLoaded", loadHome);
 </script>
 
 </body>
