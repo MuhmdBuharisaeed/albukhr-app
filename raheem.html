@@ -44,7 +44,7 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
-/* TRANSACTIONS (IRI DAYA DA HOME) */
+/* TRANSACTIONS */
 .project-tx{
   background:#fff;
   border-radius:12px;
@@ -55,37 +55,13 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
   gap:10px;
 }
 
-.project-icon{
-  font-size:18px;
-}
-
-.project-body{
-  flex:1;
-}
-
-.project-title{
-  font-size:14px;
-  font-weight:600;
-}
-
-.project-date{
-  font-size:11px;
-  color:#777;
-}
-
-.project-right{
-  text-align:right;
-}
-
-.project-amount{
-  font-size:14px;
-  font-weight:bold;
-}
-
-.project-status{
-  font-size:11px;
-  color:#0f7a3d;
-}
+.project-icon{font-size:18px}
+.project-body{flex:1}
+.project-title{font-size:14px;font-weight:600}
+.project-date{font-size:11px;color:#777}
+.project-right{text-align:right}
+.project-amount{font-size:14px;font-weight:bold}
+.project-status{font-size:11px;color:#0f7a3d}
 
 /* MODAL */
 .modal{
@@ -125,7 +101,6 @@ label{margin-top:12px;display:block}
 
 <body>
 
-<!-- ✅ HEADER (BA A CIRE BA) -->
 <header class="header">
   <div class="header-left">
     <span>💊 Raheem Pharmacy</span>
@@ -134,7 +109,6 @@ label{margin-top:12px;display:block}
 
 <section class="section">
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -146,13 +120,11 @@ label{margin-top:12px;display:block}
     </div>
   </div>
 
-  <!-- ACTIONS -->
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
-  <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="raheemHistory"></div>
 
@@ -198,19 +170,6 @@ label{margin-top:12px;display:block}
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 
-/* ===============================
-   UTIL: DATE + TIME FORMAT
-================================ */
-function formatDateTime(raw){
-  if(!raw) return "--";
-
-  const d = new Date(raw);
-  return d.toLocaleDateString() + " • " + d.toLocaleTimeString();
-}
-
-/* ===============================
-   MODALS
-================================ */
 function openModal(){
   stakeModal.style.display="flex";
   minHint.innerText = "Minimum stake: " + getMinStake("Raheem") + " Pi";
@@ -219,9 +178,6 @@ function openModal(){
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
 
-/* ===============================
-   CONFIRM STAKE
-================================ */
 function confirmStake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
@@ -232,14 +188,9 @@ function confirmStake(){
     return;
   }
 
-  addStake({
-    project:"Raheem",
-    amount,
-    duration
-  });
+  addStake({ project:"Raheem", amount, duration });
 
   const reward = amount * getRate("Raheem", duration);
-
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
 
@@ -248,9 +199,21 @@ function confirmStake(){
   load();
 }
 
-/* ===============================
-   LOAD PROJECT DATA
-================================ */
+/* ✅ SAFE DATE + TIME */
+function safeDateTime(s){
+  if(s.timestamp){
+    const d = new Date(s.timestamp);
+    return {
+      date: d.toLocaleDateString(),
+      time: d.toLocaleTimeString()
+    };
+  }
+  return {
+    date: s.date || "--",
+    time: s.time || "--"
+  };
+}
+
 function load(){
   const data = getProjectTotals("Raheem");
 
@@ -266,25 +229,23 @@ function load(){
   }
 
   data.stakes.slice().reverse().forEach(s=>{
+    const dt = safeDateTime(s);
+
     const div = document.createElement("div");
     div.className = "project-tx";
-
     div.innerHTML = `
       <div class="project-icon">💊</div>
-
       <div class="project-body">
         <div class="project-title">Raheem Stake</div>
         <div class="project-date">
-          ${formatDateTime(s.time || s.timestamp || s.date)}
+          ${dt.date} • ${dt.time}
         </div>
       </div>
-
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
         <div class="project-status">Successful</div>
       </div>
     `;
-
     raheemHistory.appendChild(div);
   });
 }
@@ -293,4 +254,4 @@ load();
 </script>
 
 </body>
-</html>
+        </html>
