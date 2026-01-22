@@ -761,3 +761,26 @@ body {
 .small-icon{
   font-size:9px; /* ⬅ rage daga 18px */
 }
+
+/* HOME TRANSACTIONS */
+.home-tx{
+  background:#fff;
+  border-radius:12px;
+  padding:8px 10px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.home-icon{
+  font-size:14px;   /* 🔽 an rage */
+}
+
+.home-body{flex:1}
+.home-title{font-size:13px;font-weight:600}
+.home-date{font-size:11px;color:#777}
+
+.home-right{text-align:right}
+.home-amount{font-size:13px;font-weight:bold}
+.home-status{font-size:11px;color:#0f7a3d}
