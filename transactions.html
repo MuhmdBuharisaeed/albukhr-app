@@ -8,152 +8,87 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{
-  background:#f5f7f6;
-  padding-bottom:80px;
-  font-family:Arial
-}
+body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 
 .section{padding:16px}
 
-/* FILTER */
-.tx-filter{
-  display:flex;
-  gap:8px;
-  margin-bottom:12px
-}
-
-.tx-filter button{
-  padding:6px 10px;
-  border-radius:8px;
-  border:1px solid #0f7a3d;
-  background:#fff;
-  font-size:12px;
-  color:#0f7a3d
-}
-
-/* TRANSACTION LIST */
-.tx-list{margin-top:10px}
-
-.tx-item{
+.project-tx{
   background:#fff;
   border-radius:12px;
-  padding:10px;
+  padding:10px 12px;
+  margin-bottom:8px;
   display:flex;
   align-items:center;
   gap:10px;
-  margin-bottom:8px
 }
 
-.tx-icon{
-  font-size:18px;
-  width:32px;
-  text-align:center
-}
+.project-icon{font-size:16px}
 
-.tx-body{flex:1}
-.tx-title{font-size:13px;font-weight:bold}
-.tx-date{font-size:11px;color:#777}
+.project-body{flex:1}
+.project-title{font-size:14px;font-weight:600}
+.project-date{font-size:11px;color:#777}
 
-.tx-right{text-align:right}
-.tx-amount{font-size:13px;font-weight:bold}
-
-.tx-status{
-  font-size:11px;
-  margin-top:3px
-}
-
-.success{color:#0f7a3d}
-.pending{color:#c49100}
-.failed{color:#c0392b}
+.project-right{text-align:right}
+.project-amount{font-size:14px;font-weight:bold}
+.project-status{font-size:11px;color:#0f7a3d}
 </style>
 </head>
 
 <body>
 
-<!-- ✅ HEADER -->
 <header class="header">
   <div class="header-left">
-    <span>Transaction History</span>
+    <span>All Transactions</span>
   </div>
 </header>
 
 <section class="section">
-
-  <!-- FILTER -->
-  <div class="tx-filter">
-    <button onclick="filterTx('All')">All</button>
-    <button onclick="filterTx('Successful')">Successful</button>
-    <button onclick="filterTx('Pending')">Pending</button>
-    <button onclick="filterTx('Failed')">Failed</button>
-  </div>
-
-  <!-- LIST -->
-  <div id="txList" class="tx-list"></div>
-
+  <div id="txList"></div>
 </section>
 
 <script src="staking.js"></script>
 <script>
 const txList = document.getElementById("txList");
-const allStakes = getStakes().slice().reverse();
 
-function icon(project){
-  if(project === "Raheem") return "💊";
-  if(project === "Hauwal") return "🌽";
-  if(project === "Barsh")  return "🌾";
-  if(project === "Khairat")return "♻️"; // 🆕
-  return "📦";
-  }
+const ICONS = {
+  Raheem: "💊",
+  Hauwal: "🌽",
+  Barsh: "🌾",
+  Khairat: "🌱"
+};
 
-function render(list){
+function loadTransactions(){
+  const stakes = getStakes().slice().reverse();
+
   txList.innerHTML = "";
 
-  if(list.length === 0){
+  if(stakes.length === 0){
     txList.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions</p>";
+      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  list.forEach(s=>{
-    const status = s.status || "Successful";
-
-    const cls =
-      status==="Pending" ? "pending" :
-      status==="Failed" ? "failed" :
-      "success";
+  stakes.forEach(s=>{
+    if(s.status !== "Successful") return;
 
     const div = document.createElement("div");
-    div.className = "tx-item";
-
+    div.className = "project-tx";
     div.innerHTML = `
-      <div class="tx-icon">${icon(s.project)}</div>
-
-      <div class="tx-body">
-        <div class="tx-title">${s.project} Stake</div>
-        <div class="tx-date">${s.date}</div>
+      <div class="project-icon">${ICONS[s.project] || "📦"}</div>
+      <div class="project-body">
+        <div class="project-title">${s.project} Stake</div>
+        <div class="project-date">${s.date}</div>
       </div>
-
-      <div class="tx-right">
-        <div class="tx-amount">${s.amount} Pi</div>
-        <div class="tx-status ${cls}">${status}</div>
+      <div class="project-right">
+        <div class="project-amount">${s.amount} Pi</div>
+        <div class="project-status">Successful</div>
       </div>
     `;
-
     txList.appendChild(div);
   });
 }
 
-function filterTx(status){
-  if(status==="All"){
-    render(allStakes);
-  }else{
-    render(allStakes.filter(s=>(s.status||"Successful")===status));
-  }
-}
-
-/* LOAD */
-render(allStakes);
+loadTransactions();
 </script>
 
 </body>
