@@ -8,116 +8,29 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
+/* SAME STYLE AS RAHEEM/BARSH */
 body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-
-/* PAGE CONTENT */
 .section{padding:16px}
-
-.stats{
-  display:flex;
-  gap:12px;
-  margin:16px 0
-}
-
-.stat-card{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  text-align:center
-}
-
+.stats{display:flex;gap:12px;margin:16px 0}
+.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
-
 .btns{display:flex;gap:12px;margin-top:12px}
-
-.btn{
-  flex:1;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  font-weight:bold;
-  font-size:16px
-}
-
+.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-
-/* TRANSACTIONS (IRI DAYA DA HOME) */
-.project-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.project-icon{
-  font-size:18px;
-}
-
-.project-body{
-  flex:1;
-}
-
-.project-title{
-  font-size:14px;
-  font-weight:600;
-}
-
-.project-date{
-  font-size:11px;
-  color:#777;
-}
-
-.project-right{
-  text-align:right;
-}
-
-.project-amount{
-  font-size:14px;
-  font-weight:bold;
-}
-
-.project-status{
-  font-size:11px;
-  color:#0f7a3d;
-}
-
-/* MODAL */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000
-}
-
-.modal-box{
-  background:#fff;
-  width:90%;
-  max-width:420px;
-  padding:20px;
-  border-radius:16px
-}
-
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:6px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px
-}
-
+.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.project-icon{font-size:18px}
+.project-body{flex:1}
+.project-title{font-size:14px;font-weight:600}
+.project-date{font-size:11px;color:#777}
+.project-right{text-align:right}
+.project-amount{font-size:14px;font-weight:bold}
+.project-status{font-size:11px;color:#0f7a3d}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
+input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
 label{margin-top:12px;display:block}
-
-/* SUCCESS */
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
@@ -125,7 +38,6 @@ label{margin-top:12px;display:block}
 
 <body>
 
-<!-- ✅ HEADER (BA A CIRE BA) -->
 <header class="header">
   <div class="header-left">
     <span>🌽 Hauwal Sumonviter</span>
@@ -134,7 +46,6 @@ label{margin-top:12px;display:block}
 
 <section class="section">
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -146,19 +57,16 @@ label{margin-top:12px;display:block}
     </div>
   </div>
 
-  <!-- ACTIONS -->
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
-  <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="hauwalHistory"></div>
 
 </section>
 
-<!-- STAKE MODAL -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
     <h3>Stake in Hauwal</h3>
@@ -184,7 +92,6 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- SUCCESS MODAL -->
 <div class="modal" id="successModal">
   <div class="modal-box success">
     <h3>Stake Successful</h3>
@@ -202,7 +109,6 @@ function openModal(){
   stakeModal.style.display="flex";
   minHint.innerText = "Minimum stake: " + getMinStake("Hauwal") + " Pi";
 }
-
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
 
@@ -229,10 +135,8 @@ function confirmStake(){
 
 function load(){
   const data = getProjectTotals("Hauwal");
-
   hStake.innerText = data.stake.toFixed(2) + " Pi";
   hReward.innerText = data.reward.toFixed(2) + " Pi";
-
   hauwalHistory.innerHTML = "";
 
   if(data.stakes.length === 0){
@@ -242,13 +146,14 @@ function load(){
   }
 
   data.stakes.slice().reverse().forEach(s=>{
+    const t = formatDateTime(s);
     const div = document.createElement("div");
     div.className = "project-tx";
     div.innerHTML = `
       <div class="project-icon">🌽</div>
       <div class="project-body">
         <div class="project-title">Hauwal Stake</div>
-        <div class="project-date">${s.date}</div>
+        <div class="project-date">${t.date} • ${t.time}</div>
       </div>
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
@@ -258,7 +163,6 @@ function load(){
     hauwalHistory.appendChild(div);
   });
 }
-
 load();
 </script>
 
