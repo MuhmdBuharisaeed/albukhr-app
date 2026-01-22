@@ -140,30 +140,30 @@
 function icon(project){
   if(project === "Raheem") return "💊";
   if(project === "Hauwal") return "🌽";
-  if(project === "Barsh")  return "🌾";
-  if(project === "Khairat")return "♻️"; // 🆕
-  return "📦";
-  }
+  if(project === "Barsh") return "🌾";
+  if(project === "Khairat") return "♻️";
+  return "";
+}
 
 function loadHome(){
 
   /* TOTALS */
   const totals = getTotals();
-  homeStake.innerText  = totals.totalStake.toFixed(2) + " Pi";
+  homeStake.innerText = totals.totalStake.toFixed(2) + " Pi";
   homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
 
-  /* RECENT TRANSACTIONS (Successful only) */
+  /* RECENT TRANSACTIONS */
   const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
   const stakes = getStakes()
     .filter(s => s.status === "Successful")
-    .slice(-3)
+    .slice(-2)        // ✅ rage zuwa 2
     .reverse();
 
   if(stakes.length === 0){
     box.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+      "<p style='color:#777;font-size:12px'>No transactions yet</p>";
     return;
   }
 
@@ -172,19 +172,24 @@ function loadHome(){
     div.className = "home-tx";
 
     div.innerHTML = `
-      <div class="home-icon">${projectIcon(s.project)}</div>
+      <div class="home-icon" style="font-size:14px">
+        ${icon(s.project)}
+      </div>
+
       <div class="home-body">
         <div class="home-title">${s.project} Stake</div>
         <div class="home-date">${s.date}</div>
       </div>
+
       <div class="home-right">
         <div class="home-amount">${s.amount} Pi</div>
-        <div class="home-status">Successful</div>
+        <div class="home-status success">Successful</div>
       </div>
     `;
+
     box.appendChild(div);
   });
-}
+  }
 
 document.addEventListener("DOMContentLoaded", loadHome);
 </script>
