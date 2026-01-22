@@ -21,8 +21,8 @@ function saveStakes(stakes){
 const PROJECT_RULES = {
   Raheem:  { minStake: 10 },
   Hauwal:  { minStake: 20 },
-  Khairat: { minStake: 50 },   // 🆕 Khairat oganic fertiliser
-  Barsh:   { minStake: 100 }
+  Barsh:   { minStake: 100 },
+  Khairat: { minStake: 50 }
 };
 
 function getMinStake(project){
@@ -34,28 +34,24 @@ function getMinStake(project){
 ================================ */
 function getRate(project, duration){
 
-  // Raheem Pharmacy
   if(project === "Raheem"){
     return duration === 30 ? 0.01 :
            duration === 60 ? 0.025 :
            0.05;
   }
 
-  // Hauwal Sumonviter
   if(project === "Hauwal"){
     return duration === 30 ? 0.02 :
            duration === 60 ? 0.04 :
            0.08;
   }
 
-  // Khairat oganic fertiliser (fi Hauwal, ƙasa da Barsh)
   if(project === "Khairat"){
     return duration === 30 ? 0.025 :
            duration === 60 ? 0.05 :
            0.09;
   }
 
-  // Barsh Agro (mafi girma)
   if(project === "Barsh"){
     return duration === 30 ? 0.03 :
            duration === 60 ? 0.06 :
@@ -66,21 +62,29 @@ function getRate(project, duration){
 }
 
 /* ===============================
-   ADD STAKE
+   ADD STAKE (FUTURE-PROOF)
 ================================ */
 function addStake({ project, amount, duration }){
 
   const stakes = getStakes();
-  const reward = amount * getRate(project, duration);
+  const rate = getRate(project, duration);
+  const reward = amount * rate;
+
+  const now = new Date();
 
   stakes.push({
-    id: Date.now(),
+    id: "TX-" + now.getTime(),   // 🆕 Transaction ID
     project,
     amount,
     duration,
     reward,
-    status: "Successful", // tsarin demo
-    date: new Date().toLocaleDateString()
+    status: "Successful",
+
+    date: now.toLocaleDateString(),
+    time: now.toLocaleTimeString(),
+
+    iso: now.toISOString(),      // 🆕 backend / API ready
+    timestamp: now.getTime()     // 🆕 sorting & audit
   });
 
   saveStakes(stakes);
@@ -112,6 +116,7 @@ function getTotals(){
 function getProjectTotals(project){
 
   const stakes = getStakes().filter(s => s.project === project);
+
   let stake = 0;
   let reward = 0;
 
@@ -122,5 +127,21 @@ function getProjectTotals(project){
     }
   });
 
-  return { stake, reward, stakes };
+  return {
+    stake,
+    reward,
+    stakes
+  };
+}
+
+/* ===============================
+   TIME AGO (UI HELPER)
+================================ */
+function timeAgo(timestamp){
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+
+  if(seconds < 60) return seconds + " sec ago";
+  if(seconds < 3600) return Math.floor(seconds/60) + " min ago";
+  if(seconds < 86400) return Math.floor(seconds/3600) + " hrs ago";
+  return Math.floor(seconds/86400) + " days ago";
 }
