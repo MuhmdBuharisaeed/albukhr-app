@@ -62,27 +62,24 @@ function getRate(project, duration){
 }
 
 /* ===============================
-   ADD STAKE (DATE + TIME)
+   ADD STAKE (SAFE DATE/TIME)
 ================================ */
 function addStake({ project, amount, duration }){
 
   const stakes = getStakes();
   const reward = amount * getRate(project, duration);
-
   const now = new Date();
 
   stakes.push({
-    id: Date.now(),                 // unique
+    id: Date.now(),
     project,
     amount,
     duration,
     reward,
     status: "Successful",
 
-    // 🔐 FUTURE-PROOFING
-    timestamp: now.toISOString(),   // audit / backend / sorting
-    date: now.toLocaleDateString(), // UI fallback
-    time: now.toLocaleTimeString()  // UI fallback
+    // 🔐 SINGLE SOURCE OF TRUTH
+    timestamp: now.toISOString()
   });
 
   saveStakes(stakes);
@@ -124,28 +121,30 @@ function getProjectTotals(project){
     }
   });
 
-  return {
-    stake,
-    reward,
-    stakes
-  };
+  return { stake, reward, stakes };
 }
 
 /* ===============================
-   DATE / TIME FORMATTER (SAFE)
+   DATE / TIME FORMATTER (MASTER)
 ================================ */
 function formatDateTime(stake){
 
-  // New system (preferred)
   if(stake.timestamp){
     const d = new Date(stake.timestamp);
-    return {
-      date: d.toLocaleDateString(),
-      time: d.toLocaleTimeString()
-    };
+
+    if(!isNaN(d)){
+      return {
+        date: d.toLocaleDateString("en-GB"),
+        time: d.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        })
+      };
+    }
   }
 
-  // Old system fallback
+  // legacy fallback
   return {
     date: stake.date || "--",
     time: stake.time || "--"
