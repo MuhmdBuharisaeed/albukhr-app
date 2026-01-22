@@ -173,43 +173,50 @@ label{margin-top:12px;display:block}
 
 <script src="staking.js"></script>
 <script>
-const stakeModal = document.getElementById("stakeModal");
+const stakeModal   = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 
 function openModal(){
-  stakeModal.style.display="flex";
+  stakeModal.style.display = "flex";
   minHint.innerText =
     "Minimum stake: " + getMinStake("Khairat") + " Pi";
 }
 
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
+function closeModal(){ stakeModal.style.display = "none"; }
+function closeSuccess(){ successModal.style.display = "none"; }
 
 function confirmStake(){
-  const amount = Number(amountInput.value);
+
+  const amount   = Number(amountInput.value);
   const duration = Number(durationSelect.value);
-  const min = getMinStake("Khairat");
+  const min      = getMinStake("Khairat");
 
   if(amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  addStake({ project:"Khairat", amount, duration });
+  addStake({
+    project: "Khairat",
+    amount,
+    duration
+  });
 
   const reward = amount * getRate("Khairat", duration);
+
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
 
   closeModal();
-  successModal.style.display="flex";
+  successModal.style.display = "flex";
   load();
 }
 
 function load(){
+
   const data = getProjectTotals("Khairat");
 
-  kStake.innerText = data.stake.toFixed(2) + " Pi";
+  kStake.innerText  = data.stake.toFixed(2)  + " Pi";
   kReward.innerText = data.reward.toFixed(2) + " Pi";
 
   khairatHistory.innerHTML = "";
@@ -221,19 +228,26 @@ function load(){
   }
 
   data.stakes.slice().reverse().forEach(s=>{
+
+    const t = formatDateTime(s);
+
     const div = document.createElement("div");
     div.className = "project-tx";
+
     div.innerHTML = `
       <div class="project-icon">♻️</div>
+
       <div class="project-body">
         <div class="project-title">Khairat Stake</div>
-        <div class="project-date">${s.date}</div>
+        <div class="project-date">${t.date} • ${t.time}</div>
       </div>
+
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
         <div class="project-status">Successful</div>
       </div>
     `;
+
     khairatHistory.appendChild(div);
   });
 }
