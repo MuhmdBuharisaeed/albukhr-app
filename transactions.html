@@ -54,12 +54,22 @@ const ICONS = {
   Raheem: "💊",
   Hauwal: "🌽",
   Barsh: "🌾",
-  Khairat: "♻️"
+  Khairat: "🌿"
 };
+
+function formatDateTime(s){
+  // future-proof: yana karanta sabo ko tsoho
+  if(s.date && s.time){
+    return `${s.date} • ${s.time}`;
+  }
+  if(s.date){
+    return s.date;
+  }
+  return "—";
+}
 
 function loadTransactions(){
   const stakes = getStakes().slice().reverse();
-
   txList.innerHTML = "";
 
   if(stakes.length === 0){
@@ -73,17 +83,21 @@ function loadTransactions(){
 
     const div = document.createElement("div");
     div.className = "project-tx";
+
     div.innerHTML = `
       <div class="project-icon">${ICONS[s.project] || "📦"}</div>
+
       <div class="project-body">
         <div class="project-title">${s.project} Stake</div>
-        <div class="project-date">${s.date}</div>
+        <div class="project-date">${formatDateTime(s)}</div>
       </div>
+
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
         <div class="project-status">Successful</div>
       </div>
     `;
+
     txList.appendChild(div);
   });
 }
