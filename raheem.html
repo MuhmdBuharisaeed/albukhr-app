@@ -198,6 +198,19 @@ label{margin-top:12px;display:block}
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 
+/* ===============================
+   UTIL: DATE + TIME FORMAT
+================================ */
+function formatDateTime(raw){
+  if(!raw) return "--";
+
+  const d = new Date(raw);
+  return d.toLocaleDateString() + " • " + d.toLocaleTimeString();
+}
+
+/* ===============================
+   MODALS
+================================ */
 function openModal(){
   stakeModal.style.display="flex";
   minHint.innerText = "Minimum stake: " + getMinStake("Raheem") + " Pi";
@@ -206,6 +219,9 @@ function openModal(){
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
 
+/* ===============================
+   CONFIRM STAKE
+================================ */
 function confirmStake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
@@ -216,9 +232,14 @@ function confirmStake(){
     return;
   }
 
-  addStake({ project:"Raheem", amount, duration });
+  addStake({
+    project:"Raheem",
+    amount,
+    duration
+  });
 
   const reward = amount * getRate("Raheem", duration);
+
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
 
@@ -227,6 +248,9 @@ function confirmStake(){
   load();
 }
 
+/* ===============================
+   LOAD PROJECT DATA
+================================ */
 function load(){
   const data = getProjectTotals("Raheem");
 
@@ -244,17 +268,23 @@ function load(){
   data.stakes.slice().reverse().forEach(s=>{
     const div = document.createElement("div");
     div.className = "project-tx";
+
     div.innerHTML = `
       <div class="project-icon">💊</div>
+
       <div class="project-body">
         <div class="project-title">Raheem Stake</div>
-        <div class="project-date">${s.date}</div>
+        <div class="project-date">
+          ${formatDateTime(s.time || s.timestamp || s.date)}
+        </div>
       </div>
+
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
         <div class="project-status">Successful</div>
       </div>
     `;
+
     raheemHistory.appendChild(div);
   });
 }
