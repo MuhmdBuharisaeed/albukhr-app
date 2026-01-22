@@ -62,29 +62,27 @@ function getRate(project, duration){
 }
 
 /* ===============================
-   ADD STAKE (FUTURE-PROOF)
+   ADD STAKE (DATE + TIME)
 ================================ */
 function addStake({ project, amount, duration }){
 
   const stakes = getStakes();
-  const rate = getRate(project, duration);
-  const reward = amount * rate;
+  const reward = amount * getRate(project, duration);
 
   const now = new Date();
 
   stakes.push({
-    id: "TX-" + now.getTime(),   // 🆕 Transaction ID
+    id: Date.now(),                 // unique
     project,
     amount,
     duration,
     reward,
     status: "Successful",
 
-    date: now.toLocaleDateString(),
-    time: now.toLocaleTimeString(),
-
-    iso: now.toISOString(),      // 🆕 backend / API ready
-    timestamp: now.getTime()     // 🆕 sorting & audit
+    // 🔐 FUTURE-PROOFING
+    timestamp: now.toISOString(),   // audit / backend / sorting
+    date: now.toLocaleDateString(), // UI fallback
+    time: now.toLocaleTimeString()  // UI fallback
   });
 
   saveStakes(stakes);
@@ -116,7 +114,6 @@ function getTotals(){
 function getProjectTotals(project){
 
   const stakes = getStakes().filter(s => s.project === project);
-
   let stake = 0;
   let reward = 0;
 
@@ -132,16 +129,4 @@ function getProjectTotals(project){
     reward,
     stakes
   };
-}
-
-/* ===============================
-   TIME AGO (UI HELPER)
-================================ */
-function timeAgo(timestamp){
-  const seconds = Math.floor((Date.now() - timestamp) / 1000);
-
-  if(seconds < 60) return seconds + " sec ago";
-  if(seconds < 3600) return Math.floor(seconds/60) + " min ago";
-  if(seconds < 86400) return Math.floor(seconds/3600) + " hrs ago";
-  return Math.floor(seconds/86400) + " days ago";
 }
