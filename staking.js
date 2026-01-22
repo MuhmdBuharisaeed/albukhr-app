@@ -130,3 +130,24 @@ function getProjectTotals(project){
     stakes
   };
 }
+
+/* ===============================
+   DATE / TIME FORMATTER (SAFE)
+================================ */
+function formatDateTime(stake){
+
+  // New system (preferred)
+  if(stake.timestamp){
+    const d = new Date(stake.timestamp);
+    return {
+      date: d.toLocaleDateString(),
+      time: d.toLocaleTimeString()
+    };
+  }
+
+  // Old system fallback
+  return {
+    date: stake.date || "--",
+    time: stake.time || "--"
+  };
+}
