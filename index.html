@@ -137,12 +137,27 @@
 
 <script src="staking.js"></script>
 <script>
-function icon(project){
+function projectIcon(project){
   if(project === "Raheem") return "💊";
   if(project === "Hauwal") return "🌽";
-  if(project === "Barsh") return "🌾";
-  if(project === "Khairat") return "♻️";
-  return "";
+  if(project === "Barsh")  return "🌾";
+  if(project === "Khairat")return "♻️";
+  return "📦";
+}
+
+/* ✅ SAFE DATE + TIME (HOME) */
+function safeDateTime(s){
+  if(s.timestamp){
+    const d = new Date(s.timestamp);
+    return {
+      date: d.toLocaleDateString(),
+      time: d.toLocaleTimeString()
+    };
+  }
+  return {
+    date: s.date || "--",
+    time: s.time || "--"
+  };
 }
 
 function loadHome(){
@@ -156,29 +171,26 @@ function loadHome(){
   const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
-  const stakes = getStakes()
-    .filter(s => s.status === "Successful")
-    .slice(-2)        // ✅ rage zuwa 2
-    .reverse();
+  const stakes = getStakes().slice(-3).reverse();
 
   if(stakes.length === 0){
-    box.innerHTML =
-      "<p style='color:#777;font-size:12px'>No transactions yet</p>";
+    box.innerHTML = "<p style='color:#777'>No transactions yet</p>";
     return;
   }
 
   stakes.forEach(s=>{
+    const dt = safeDateTime(s);
+
     const div = document.createElement("div");
     div.className = "home-tx";
-
     div.innerHTML = `
-      <div class="home-icon" style="font-size:14px">
-        ${icon(s.project)}
-      </div>
+      <div class="home-icon">${projectIcon(s.project)}</div>
 
       <div class="home-body">
         <div class="home-title">${s.project} Stake</div>
-        <div class="home-date">${s.date}</div>
+        <div class="home-date">
+          ${dt.date} • ${dt.time}
+        </div>
       </div>
 
       <div class="home-right">
@@ -186,12 +198,11 @@ function loadHome(){
         <div class="home-status success">Successful</div>
       </div>
     `;
-
     box.appendChild(div);
   });
-  }
+}
 
-document.addEventListener("DOMContentLoaded", loadHome);
+window.addEventListener("DOMContentLoaded", loadHome);
 </script>
 
 </body>
