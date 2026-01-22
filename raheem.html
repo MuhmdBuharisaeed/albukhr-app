@@ -56,9 +56,11 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 }
 
 .project-icon{font-size:18px}
+
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
 .project-date{font-size:11px;color:#777}
+
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
@@ -101,6 +103,7 @@ label{margin-top:12px;display:block}
 
 <body>
 
+<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>💊 Raheem Pharmacy</span>
@@ -109,6 +112,7 @@ label{margin-top:12px;display:block}
 
 <section class="section">
 
+  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -120,11 +124,13 @@ label{margin-top:12px;display:block}
     </div>
   </div>
 
+  <!-- ACTIONS -->
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
+  <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="raheemHistory"></div>
 
@@ -171,12 +177,12 @@ const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 
 function openModal(){
-  stakeModal.style.display="flex";
+  stakeModal.style.display = "flex";
   minHint.innerText = "Minimum stake: " + getMinStake("Raheem") + " Pi";
 }
 
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
+function closeModal(){ stakeModal.style.display = "none"; }
+function closeSuccess(){ successModal.style.display = "none"; }
 
 function confirmStake(){
   const amount = Number(amountInput.value);
@@ -195,23 +201,8 @@ function confirmStake(){
     `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
 
   closeModal();
-  successModal.style.display="flex";
+  successModal.style.display = "flex";
   load();
-}
-
-/* ✅ SAFE DATE + TIME */
-function safeDateTime(s){
-  if(s.timestamp){
-    const d = new Date(s.timestamp);
-    return {
-      date: d.toLocaleDateString(),
-      time: d.toLocaleTimeString()
-    };
-  }
-  return {
-    date: s.date || "--",
-    time: s.time || "--"
-  };
 }
 
 function load(){
@@ -229,7 +220,7 @@ function load(){
   }
 
   data.stakes.slice().reverse().forEach(s=>{
-    const dt = safeDateTime(s);
+    const t = formatDateTime(s);
 
     const div = document.createElement("div");
     div.className = "project-tx";
@@ -237,9 +228,7 @@ function load(){
       <div class="project-icon">💊</div>
       <div class="project-body">
         <div class="project-title">Raheem Stake</div>
-        <div class="project-date">
-          ${dt.date} • ${dt.time}
-        </div>
+        <div class="project-date">${t.date} • ${t.time}</div>
       </div>
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
@@ -254,4 +243,4 @@ load();
 </script>
 
 </body>
-        </html>
+  </html>
