@@ -13,6 +13,23 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 /* PAGE CONTENT */
 .section{padding:16px}
 
+/* HEADER INFO ICON */
+.header-right{
+  margin-left:auto;
+  cursor:pointer;
+  font-size:16px;
+  color:#fff;
+}
+
+/* SHORT INFO */
+.short-info{
+  font-size:13px;
+  color:#555;
+  margin-top:10px;
+  line-height:1.5;
+}
+
+/* STATS */
 .stats{
   display:flex;
   gap:12px;
@@ -30,7 +47,8 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
 
-.btns{display:flex;gap:12px;margin-top:12px}
+/* BUTTONS */
+.btns{display:flex;gap:12px;margin-top:14px}
 
 .btn{
   flex:1;
@@ -65,27 +83,7 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
 
-/* PROJECT INFO INDICATOR */
-.info-indicator{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:8px 14px;
-  font-size:13px;
-  color:#0f7a3d;
-  cursor:pointer;
-  user-select:none;
-}
-
-.info-indicator:hover{
-  text-decoration:underline;
-}
-
-.info-icon{
-  font-size:14px;
-}
-  
-/* MODAL */
+/* MODALS */
 .modal{
   position:fixed;
   inset:0;
@@ -128,13 +126,10 @@ label{margin-top:12px;display:block}
   <div class="header-left">
     <span>💊 Raheem Pharmacy</span>
   </div>
-</header>
 
-<!-- PROJECT INFO INDICATOR -->
-<div class="info-indicator" onclick="openInfo()">
-  <span class="info-icon">ℹ️</span>
-  <span class="info-text">About this project</span>
-</div>
+  <!-- ABOUT ICON (RIGHT) -->
+  <div class="header-right" onclick="openInfo()">ℹ️</div>
+</header>
 
 <section class="section">
 
@@ -156,8 +151,14 @@ label{margin-top:12px;display:block}
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
+  <!-- SHORT INFO -->
+  <div class="short-info">
+    Raheem Pharmacy is an ALBUKHR healthcare project focused on sustainable
+    medicine supply and community-based pharmaceutical services.
+  </div>
+
   <!-- HISTORY -->
-  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
+  <h3 style="margin-top:22px;font-size:15px">Transaction History</h3>
   <div id="raheemHistory"></div>
 
 </section>
@@ -197,17 +198,17 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- FULL PROJECT INFO -->
+<!-- FULL PROJECT INFO (GLOBAL STYLE) -->
 <div class="modal" id="infoModal">
   <div class="modal-box">
     <h3>About Raheem Pharmacy</h3>
     <p style="font-size:14px;color:#444;line-height:1.6">
-      Raheem Pharmacy is an Albukhr healthcare project focused on improving
-      access to pharmaceutical services through transparent,
-      community-driven investment and staking.
+      Raheem Pharmacy is an official ALBUKHR healthcare initiative designed
+      to improve access to medicines through transparent, community-driven
+      staking and investment.
       <br><br>
-      Funds are used for medicine supply, logistics, and healthcare
-      sustainability, with rewards generated over defined periods.
+      Funds support pharmaceutical supply chains, logistics, and long-term
+      healthcare sustainability while providing fair staking rewards.
     </p>
 
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">
@@ -215,11 +216,12 @@ label{margin-top:12px;display:block}
     </button>
   </div>
 </div>
-  
+
 <script src="staking.js"></script>
 <script>
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
+const infoModal = document.getElementById("infoModal");
 
 function openModal(){
   stakeModal.style.display = "flex";
@@ -228,6 +230,9 @@ function openModal(){
 
 function closeModal(){ stakeModal.style.display = "none"; }
 function closeSuccess(){ successModal.style.display = "none"; }
+
+function openInfo(){ infoModal.style.display = "flex"; }
+function closeInfo(){ infoModal.style.display = "none"; }
 
 function confirmStake(){
   const amount = Number(amountInput.value);
@@ -264,16 +269,6 @@ function load(){
     return;
   }
 
-const infoModal = document.getElementById("infoModal");
-
-function openInfo(){
-  infoModal.style.display = "flex";
-}
-
-function closeInfo(){
-  infoModal.style.display = "none";
-  }  
-  
   data.stakes.slice().reverse().forEach(s=>{
     const t = formatDateTime(s);
 
@@ -298,4 +293,4 @@ load();
 </script>
 
 </body>
-  </html>
+</html>
