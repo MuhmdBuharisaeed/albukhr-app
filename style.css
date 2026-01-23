@@ -830,3 +830,20 @@ body {
   font-size:10px;            /* ↓ */
   color:#0f7a3d;
 }
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header-right .about-link{
+  font-size:13px;
+  color:#e6f4ea;
+  cursor:pointer;
+  opacity:.9;
+}
+
+.header-right .about-link:hover{
+  opacity:1;
+}
