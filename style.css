@@ -784,3 +784,49 @@ body {
 .home-right{text-align:right}
 .home-amount{font-size:13px;font-weight:bold}
 .home-status{font-size:11px;color:#0f7a3d}
+
+/* ===============================
+   HOME – RECENT TRANSACTIONS (COMPACT)
+================================ */
+
+.home-tx{
+  background:#fff;
+  border-radius:10px;
+  padding:8px 10px;          /* ↓ rage padding */
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:8px;                   /* ↓ rage tazara */
+}
+
+.home-icon{
+  font-size:16px;            /* ↓ daga 20–22 zuwa 16 */
+}
+
+.home-body{
+  flex:1;
+}
+
+.home-title{
+  font-size:13px;            /* ↓ kadan */
+  font-weight:600;
+}
+
+.home-date{
+  font-size:10px;            /* ↓ */
+  color:#777;
+}
+
+.home-right{
+  text-align:right;
+}
+
+.home-amount{
+  font-size:13px;            /* ↓ */
+  font-weight:bold;
+}
+
+.home-status{
+  font-size:10px;            /* ↓ */
+  color:#0f7a3d;
+}
