@@ -10,6 +10,7 @@
 <style>
 body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 
+/* PAGE CONTENT */
 .section{padding:16px}
 
 .stats{
@@ -43,6 +44,17 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
+/* SHORT INFO */
+.short-info{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-top:14px;
+  font-size:14px;
+  color:#444;
+  line-height:1.6
+}
+
 /* TRANSACTIONS */
 .project-tx{
   background:#fff;
@@ -55,15 +67,22 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 }
 
 .project-icon{font-size:18px}
-
 .project-body{flex:1}
-
 .project-title{font-size:14px;font-weight:600}
 .project-date{font-size:11px;color:#777}
-
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
+
+/* INFO INDICATOR */
+.info-indicator{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  color:#0f7a3d;
+  cursor:pointer
+}
 
 /* MODAL */
 .modal{
@@ -106,7 +125,11 @@ label{margin-top:12px;display:block}
 <!-- HEADER -->
 <header class="header">
   <div class="header-left">
-    <span>♻️ Khairat Organic Fertiliser</span>
+    <span>♻️ Khairat Fertiliser</span>
+  </div>
+
+  <div class="header-right info-indicator" onclick="openInfo()">
+    <span>ℹ️</span>
   </div>
 </header>
 
@@ -130,6 +153,14 @@ label{margin-top:12px;display:block}
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
+  <!-- SHORT INFO -->
+  <div class="short-info">
+    <strong>Khairat Organic Fertiliser</strong> is an ALBUKHR sustainability
+    project focused on converting organic waste into high-quality
+    agricultural fertiliser, supporting eco-friendly farming
+    and soil regeneration.
+  </div>
+
   <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="khairatHistory"></div>
@@ -144,15 +175,15 @@ label{margin-top:12px;display:block}
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
+    <small style="color:#0f7a3d;display:block;margin-top:6px">
+      Minimum stake: 50 Pi
     </small>
 
     <label>Duration</label>
     <select id="durationSelect">
-      <option value="30">30 Days</option>
-      <option value="60">60 Days</option>
-      <option value="90">90 Days</option>
+      <option value="180">180 Days</option>
+      <option value="365">365 Days</option>
+      <option value="430">430 Days</option>
     </select>
 
     <div class="btns" style="margin-top:16px">
@@ -171,52 +202,61 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
+<!-- FULL INFO MODAL -->
+<div class="modal" id="infoModal">
+  <div class="modal-box">
+    <h3>About Khairat Fertiliser</h3>
+    <p style="font-size:14px;line-height:1.6;color:#444">
+      Khairat Organic Fertiliser is an ALBUKHR environmental and agricultural
+      initiative that transforms biodegradable waste into nutrient-rich
+      fertiliser.
+      <br><br>
+      Stake funds support waste collection, processing facilities,
+      composting systems, and local farmer distribution.
+      <br><br>
+      The project promotes circular economy principles, reduces pollution,
+      and increases sustainable food production.
+    </p>
+
+    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
+  </div>
+</div>
+
 <script src="staking.js"></script>
 <script>
-const stakeModal   = document.getElementById("stakeModal");
+const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
+const infoModal = document.getElementById("infoModal");
 
-function openModal(){
-  stakeModal.style.display = "flex";
-  minHint.innerText =
-    "Minimum stake: " + getMinStake("Khairat") + " Pi";
-}
-
-function closeModal(){ stakeModal.style.display = "none"; }
-function closeSuccess(){ successModal.style.display = "none"; }
+function openModal(){ stakeModal.style.display="flex"; }
+function closeModal(){ stakeModal.style.display="none"; }
+function closeSuccess(){ successModal.style.display="none"; }
+function openInfo(){ infoModal.style.display="flex"; }
+function closeInfo(){ infoModal.style.display="none"; }
 
 function confirmStake(){
-
-  const amount   = Number(amountInput.value);
+  const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
-  const min      = getMinStake("Khairat");
 
-  if(amount < min){
-    alert("Minimum stake is " + min + " Pi");
+  if(amount < 50){
+    alert("Minimum stake is 50 Pi");
     return;
   }
 
-  addStake({
-    project: "Khairat",
-    amount,
-    duration
-  });
-
-  const reward = amount * getRate("Khairat", duration);
+  addStake({ project:"Khairat", amount, duration });
 
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
+    `You staked ${amount} Pi for ${duration} days in Khairat Fertiliser.`;
 
   closeModal();
-  successModal.style.display = "flex";
+  successModal.style.display="flex";
   load();
 }
 
 function load(){
-
   const data = getProjectTotals("Khairat");
 
-  kStake.innerText  = data.stake.toFixed(2)  + " Pi";
+  kStake.innerText = data.stake.toFixed(2) + " Pi";
   kReward.innerText = data.reward.toFixed(2) + " Pi";
 
   khairatHistory.innerHTML = "";
@@ -228,26 +268,21 @@ function load(){
   }
 
   data.stakes.slice().reverse().forEach(s=>{
-
     const t = formatDateTime(s);
 
     const div = document.createElement("div");
     div.className = "project-tx";
-
     div.innerHTML = `
       <div class="project-icon">♻️</div>
-
       <div class="project-body">
         <div class="project-title">Khairat Stake</div>
         <div class="project-date">${t.date} • ${t.time}</div>
       </div>
-
       <div class="project-right">
         <div class="project-amount">${s.amount} Pi</div>
         <div class="project-status">Successful</div>
       </div>
     `;
-
     khairatHistory.appendChild(div);
   });
 }
