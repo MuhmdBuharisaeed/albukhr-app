@@ -11,15 +11,12 @@
 body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .section{padding:16px}
 
-/* INFO SHORT */
+/* SHORT INFO (LIKE RAHEEM) */
 .short-info{
-  background:#fff;
-  border-radius:12px;
-  padding:12px;
   font-size:13px;
-  color:#444;
+  color:#555;
   line-height:1.5;
-  margin-bottom:14px
+  margin:6px 0 12px 0;
 }
 
 /* STATS */
@@ -79,7 +76,7 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
   background:#fff;
   width:90%;
   max-width:420px;
-  padding:20px;
+  padding:18px;
   border-radius:16px
 }
 label{margin-top:12px;display:block}
@@ -104,18 +101,15 @@ input,select{
     <span>🚍 Urban Mobility</span>
   </div>
 
-  <div class="header-right" onclick="openInfo()">
-    ℹ️
-  </div>
+  <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
 <section class="section">
 
   <!-- SHORT INFO -->
   <div class="short-info">
-    Urban Mobility is an Albukhr transportation project focused on
-    modernizing movement of people and goods, improving accessibility,
-    efficiency, and community-wide mobility systems.
+    Modern Albukhr transportation project focused on efficient movement
+    of people and goods across communities.
   </div>
 
   <!-- STATS -->
@@ -180,12 +174,9 @@ input,select{
   <div class="modal-box">
     <h3>About Urban Mobility</h3>
     <p style="font-size:14px;color:#444;line-height:1.6">
-      Urban Mobility is a core Albukhr infrastructure project dedicated to
-      transforming transportation and logistics.
-      <br><br>
-      The project focuses on vehicle systems, logistics networks,
-      accessibility solutions, and long-term sustainability,
-      enabling efficient movement for communities and businesses.
+      Urban Mobility is an Albukhr infrastructure project focused on
+      modern transportation systems, logistics efficiency,
+      accessibility, and long-term sustainability for communities.
     </p>
 
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">
@@ -206,7 +197,6 @@ function openModal(){
 }
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
-
 function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
@@ -268,4 +258,4 @@ load();
 </script>
 
 </body>
-</html>
+    </html>
