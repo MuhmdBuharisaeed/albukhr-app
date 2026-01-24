@@ -9,24 +9,21 @@
 
 <style>
 body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-
-/* SECTION */
 .section{padding:16px}
 
-/* HEADER RIGHT INFO */
-.header-right{
-  margin-left:auto;
-  cursor:pointer;
-  font-size:14px;
-  color:#0f7a3d;
+/* INFO SHORT */
+.short-info{
+  background:#fff;
+  border-radius:12px;
+  padding:12px;
+  font-size:13px;
+  color:#444;
+  line-height:1.5;
+  margin-bottom:14px
 }
 
 /* STATS */
-.stats{
-  display:flex;
-  gap:12px;
-  margin:16px 0
-}
+.stats{display:flex;gap:12px;margin:16px 0}
 .stat-card{
   flex:1;
   background:#fff;
@@ -50,7 +47,7 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
-/* TRANSACTION */
+/* TRANSACTIONS */
 .project-tx{
   background:#fff;
   border-radius:12px;
@@ -68,18 +65,7 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
 
-/* SHORT INFO */
-.short-info{
-  background:#fff;
-  padding:14px;
-  border-radius:14px;
-  font-size:14px;
-  color:#444;
-  line-height:1.6;
-  margin-bottom:16px
-}
-
-/* MODAL */
+/* MODALS */
 .modal{
   position:fixed;
   inset:0;
@@ -97,7 +83,7 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
   border-radius:16px
 }
 label{margin-top:12px;display:block}
-input{
+input,select{
   width:100%;
   padding:12px;
   margin-top:6px;
@@ -105,8 +91,6 @@ input{
   border:1px solid #ccc;
   font-size:16px
 }
-
-/* SUCCESS */
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
@@ -119,16 +103,19 @@ input{
   <div class="header-left">
     <span>🚍 Urban Mobility</span>
   </div>
-  <div class="header-right" onclick="openInfo()">About</div>
+
+  <div class="header-right" onclick="openInfo()">
+    ℹ️
+  </div>
 </header>
 
 <section class="section">
 
   <!-- SHORT INFO -->
   <div class="short-info">
-    Urban Mobility is an ALBUKHR infrastructure project focused on
-    modern transportation systems for people and goods,
-    supporting long-term urban growth and accessibility.
+    Urban Mobility is an Albukhr transportation project focused on
+    modernizing movement of people and goods, improving accessibility,
+    efficiency, and community-wide mobility systems.
   </div>
 
   <!-- STATS -->
@@ -163,12 +150,14 @@ input{
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: 100 Pi
+    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
+      Minimum stake: --
     </small>
 
     <label>Duration</label>
-    <input type="text" value="430 Days (Fixed)" disabled>
+    <select id="durationSelect">
+      <option value="430">430 Days</option>
+    </select>
 
     <div class="btns" style="margin-top:16px">
       <button class="btn primary" onclick="confirmStake()">Confirm</button>
@@ -177,7 +166,7 @@ input{
   </div>
 </div>
 
-<!-- SUCCESS MODAL -->
+<!-- SUCCESS -->
 <div class="modal" id="successModal">
   <div class="modal-box success">
     <h3>Stake Successful</h3>
@@ -191,16 +180,17 @@ input{
   <div class="modal-box">
     <h3>About Urban Mobility</h3>
     <p style="font-size:14px;color:#444;line-height:1.6">
-      Urban Mobility is a core ALBUKHR project designed to modernize
-      transportation for people and logistics.
+      Urban Mobility is a core Albukhr infrastructure project dedicated to
+      transforming transportation and logistics.
       <br><br>
-      Funds are allocated to vehicles, smart mobility systems,
-      infrastructure expansion, and long-term transport services.
-      <br><br>
-      This is a long-term infrastructure staking project
-      with fixed duration and sustainable returns.
+      The project focuses on vehicle systems, logistics networks,
+      accessibility solutions, and long-term sustainability,
+      enabling efficient movement for communities and businesses.
     </p>
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
+
+    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">
+      Close
+    </button>
   </div>
 </div>
 
@@ -210,14 +200,19 @@ const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 const infoModal = document.getElementById("infoModal");
 
-function openModal(){ stakeModal.style.display="flex"; }
+function openModal(){
+  stakeModal.style.display="flex";
+  minHint.innerText = "Minimum stake: " + getMinStake("Urban") + " Pi";
+}
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
+
 function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
 function confirmStake(){
   const amount = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
   const min = getMinStake("Urban");
 
   if(amount < min){
@@ -225,11 +220,11 @@ function confirmStake(){
     return;
   }
 
-  addStake({ project:"Urban", amount, duration:430 });
+  addStake({ project:"Urban", amount, duration });
 
-  const reward = amount * getRate("Urban",430);
+  const reward = amount * getRate("Urban", duration);
   successText.innerText =
-    `You staked ${amount} Pi for 430 days and earned ${reward.toFixed(2)} Pi`;
+    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
 
   closeModal();
   successModal.style.display="flex";
@@ -251,12 +246,13 @@ function load(){
 
   data.stakes.slice().reverse().forEach(s=>{
     const t = formatDateTime(s);
+
     const div = document.createElement("div");
-    div.className = "project-tx";
-    div.innerHTML = `
+    div.className="project-tx";
+    div.innerHTML=`
       <div class="project-icon">🚍</div>
       <div class="project-body">
-        <div class="project-title">Urban Mobility Stake</div>
+        <div class="project-title">Urban Stake</div>
         <div class="project-date">${t.date} • ${t.time}</div>
       </div>
       <div class="project-right">
