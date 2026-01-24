@@ -777,6 +777,15 @@ body {
   font-size:14px;   /* 🔽 an rage */
 }
 
+.home-icon{
+  font-size: 14px;      /* ƙaramar sosai */
+  width: 22px;
+  height: 22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
 .home-body{flex:1}
 .home-title{font-size:13px;font-weight:600}
 .home-date{font-size:11px;color:#777}
