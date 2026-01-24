@@ -75,6 +75,10 @@ if(project === "Urban"){
   return 0.18; // 18% flat reward
 }
 
+if(project === "Urban"){
+  return 0.18; // 18% fixed long-term infrastructure
+}
+
 /* ===============================
    ADD STAKE (SAFE DATE/TIME)
 ================================ */
