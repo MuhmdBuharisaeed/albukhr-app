@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urban Mobility</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
+
+/* SECTION */
+.section{padding:16px}
+
+/* HEADER RIGHT INFO */
+.header-right{
+  margin-left:auto;
+  cursor:pointer;
+  font-size:14px;
+  color:#0f7a3d;
+}
+
+/* STATS */
+.stats{
+  display:flex;
+  gap:12px;
+  margin:16px 0
+}
+.stat-card{
+  flex:1;
+  background:#fff;
+  border-radius:14px;
+  padding:16px;
+  text-align:center
+}
+.stat-card span{display:block;color:#666;font-size:14px}
+.stat-card strong{font-size:18px;margin-top:6px;display:block}
+
+/* BUTTONS */
+.btns{display:flex;gap:12px;margin-top:12px}
+.btn{
+  flex:1;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  font-weight:bold;
+  font-size:16px
+}
+.primary{background:#0f7a3d;color:#fff}
+.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
+
+/* TRANSACTION */
+.project-tx{
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.project-icon{font-size:18px}
+.project-body{flex:1}
+.project-title{font-size:14px;font-weight:600}
+.project-date{font-size:11px;color:#777}
+.project-right{text-align:right}
+.project-amount{font-size:14px;font-weight:bold}
+.project-status{font-size:11px;color:#0f7a3d}
+
+/* SHORT INFO */
+.short-info{
+  background:#fff;
+  padding:14px;
+  border-radius:14px;
+  font-size:14px;
+  color:#444;
+  line-height:1.6;
+  margin-bottom:16px
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000
+}
+.modal-box{
+  background:#fff;
+  width:90%;
+  max-width:420px;
+  padding:20px;
+  border-radius:16px
+}
+label{margin-top:12px;display:block}
+input{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px
+}
+
+/* SUCCESS */
+.success{text-align:center}
+.success h3{color:#0f7a3d;margin-bottom:8px}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <span>🚍 Urban Mobility</span>
+  </div>
+  <div class="header-right" onclick="openInfo()">About</div>
+</header>
+
+<section class="section">
+
+  <!-- SHORT INFO -->
+  <div class="short-info">
+    Urban Mobility is an ALBUKHR infrastructure project focused on
+    modern transportation systems for people and goods,
+    supporting long-term urban growth and accessibility.
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <span>Your Stake</span>
+      <strong id="uStake">0.00 Pi</strong>
+    </div>
+    <div class="stat-card">
+      <span>Your Reward</span>
+      <strong id="uReward">0.00 Pi</strong>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="btns">
+    <button class="btn primary" onclick="openModal()">Stake</button>
+    <button class="btn secondary" onclick="history.back()">Back</button>
+  </div>
+
+  <!-- HISTORY -->
+  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
+  <div id="urbanHistory"></div>
+
+</section>
+
+<!-- STAKE MODAL -->
+<div class="modal" id="stakeModal">
+  <div class="modal-box">
+    <h3>Stake in Urban Mobility</h3>
+
+    <label>Amount (Pi)</label>
+    <input type="number" id="amountInput">
+
+    <small style="color:#0f7a3d;display:block;margin-top:6px">
+      Minimum stake: 100 Pi
+    </small>
+
+    <label>Duration</label>
+    <input type="text" value="430 Days (Fixed)" disabled>
+
+    <div class="btns" style="margin-top:16px">
+      <button class="btn primary" onclick="confirmStake()">Confirm</button>
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal" id="successModal">
+  <div class="modal-box success">
+    <h3>Stake Successful</h3>
+    <p id="successText"></p>
+    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
+  </div>
+</div>
+
+<!-- FULL INFO -->
+<div class="modal" id="infoModal">
+  <div class="modal-box">
+    <h3>About Urban Mobility</h3>
+    <p style="font-size:14px;color:#444;line-height:1.6">
+      Urban Mobility is a core ALBUKHR project designed to modernize
+      transportation for people and logistics.
+      <br><br>
+      Funds are allocated to vehicles, smart mobility systems,
+      infrastructure expansion, and long-term transport services.
+      <br><br>
+      This is a long-term infrastructure staking project
+      with fixed duration and sustainable returns.
+    </p>
+    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
+  </div>
+</div>
+
+<script src="staking.js"></script>
+<script>
+const stakeModal = document.getElementById("stakeModal");
+const successModal = document.getElementById("successModal");
+const infoModal = document.getElementById("infoModal");
+
+function openModal(){ stakeModal.style.display="flex"; }
+function closeModal(){ stakeModal.style.display="none"; }
+function closeSuccess(){ successModal.style.display="none"; }
+function openInfo(){ infoModal.style.display="flex"; }
+function closeInfo(){ infoModal.style.display="none"; }
+
+function confirmStake(){
+  const amount = Number(amountInput.value);
+  const min = getMinStake("Urban");
+
+  if(amount < min){
+    alert("Minimum stake is " + min + " Pi");
+    return;
+  }
+
+  addStake({ project:"Urban", amount, duration:430 });
+
+  const reward = amount * getRate("Urban",430);
+  successText.innerText =
+    `You staked ${amount} Pi for 430 days and earned ${reward.toFixed(2)} Pi`;
+
+  closeModal();
+  successModal.style.display="flex";
+  load();
+}
+
+function load(){
+  const data = getProjectTotals("Urban");
+  uStake.innerText = data.stake.toFixed(2) + " Pi";
+  uReward.innerText = data.reward.toFixed(2) + " Pi";
+
+  urbanHistory.innerHTML = "";
+
+  if(data.stakes.length === 0){
+    urbanHistory.innerHTML =
+      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+    return;
+  }
+
+  data.stakes.slice().reverse().forEach(s=>{
+    const t = formatDateTime(s);
+    const div = document.createElement("div");
+    div.className = "project-tx";
+    div.innerHTML = `
+      <div class="project-icon">🚍</div>
+      <div class="project-body">
+        <div class="project-title">Urban Mobility Stake</div>
+        <div class="project-date">${t.date} • ${t.time}</div>
+      </div>
+      <div class="project-right">
+        <div class="project-amount">${s.amount} Pi</div>
+        <div class="project-status">Successful</div>
+      </div>
+    `;
+    urbanHistory.appendChild(div);
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
