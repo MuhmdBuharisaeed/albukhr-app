@@ -22,7 +22,10 @@ const PROJECT_RULES = {
   Raheem:  { minStake: 10 },
   Hauwal:  { minStake: 20 },
   Barsh:   { minStake: 100 },
-  Khairat: { minStake: 50 }
+  Khairat: { minStake: 50 },
+
+  // 🆕 URBAN MOBILITY (UPDATED)
+  Urban:   { minStake: 150 }
 };
 
 function getMinStake(project){
