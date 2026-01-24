@@ -25,14 +25,6 @@ const PROJECT_RULES = {
   Khairat: { minStake: 50 }
 };
 
-const PROJECT_RULES = {
-  Raheem:  { minStake: 10 },
-  Hauwal:  { minStake: 20 },
-  Barsh:   { minStake: 100 },
-  Khairat: { minStake: 50 },
-  Urban:   { minStake: 100 } // Urban Mobility
-};
-
 function getMinStake(project){
   return PROJECT_RULES[project]?.minStake || 0;
 }
@@ -67,16 +59,6 @@ function getRate(project, duration){
   }
 
   return 0;
-}
-
-if(project === "Urban"){
-  // Long-term infrastructure staking
-  // 430 days only
-  return 0.18; // 18% flat reward
-}
-
-if(project === "Urban"){
-  return 0.18; // 18% fixed long-term infrastructure
 }
 
 /* ===============================
