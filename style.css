@@ -847,3 +847,32 @@ body {
 .header-right .about-link:hover{
   opacity:1;
 }
+
+.home-tx{
+  background:#fff;
+  border-radius:12px;
+  padding:8px 10px;          /* rage padding */
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:8px;                   /* rage tazara */
+}
+
+.home-title{
+  font-size:13px;
+  font-weight:600;
+}
+
+.home-date{
+  font-size:11px;
+  color:#777;
+}
+
+.home-amount{
+  font-size:13px;
+  font-weight:600;
+}
+
+.home-status{
+  font-size:11px;
+}
