@@ -71,7 +71,7 @@
     <small>Demo</small>
   </a>
 </section>
-  
+
 <!-- RECENT TRANSACTIONS -->
 <section class="section">
 
@@ -133,7 +133,9 @@ function loadHome(){
     const div = document.createElement("div");
     div.className = "home-tx";
     div.innerHTML = `
-      <div class="home-icon">${ICONS[s.project] || "📦"}</div>
+      <div class="home-icon" style="font-size:14px">
+        ${ICONS[s.project] || "📦"}
+      </div>
 
       <div class="home-body">
         <div class="home-title">${s.project} Stake</div>
