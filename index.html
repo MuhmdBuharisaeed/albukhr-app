@@ -61,18 +61,17 @@
     <small>Demo</small>
   </a>
 
-  <!-- 🆕 Urban Mobility -->
   <a href="urban.html" class="project-item active">
     <span>🚍 Urban Mobility</span>
     <small>Demo</small>
   </a>
+
+  <a href="labbaika.html" class="project-item active">
+    <span>🍞 Labbaika Bakery Center</span>
+    <small>Demo</small>
+  </a>
 </section>
 
-<a href="labbaika.html" class="project-item active">
-  <span>🍞 Labbaika Bakery Center</span>
-  <small>Demo</small>
-</a>
-  
 <!-- RECENT TRANSACTIONS -->
 <section class="section">
 
@@ -105,7 +104,7 @@ const ICONS = {
   Barsh: "🌾",
   Khairat: "♻️",
   Azman: "🧪",
-  Urban: "🚍" // ✅ NEW
+  Urban: "🚍",
   Labbaika: "🍞"
 };
 
@@ -134,7 +133,9 @@ function loadHome(){
     const div = document.createElement("div");
     div.className = "home-tx";
     div.innerHTML = `
-      <div class="home-icon">${ICONS[s.project] || "📦"}</div>
+      <div class="home-icon" style="font-size:14px">
+        ${ICONS[s.project] || "📦"}
+      </div>
 
       <div class="home-body">
         <div class="home-title">${s.project} Stake</div>
@@ -154,4 +155,4 @@ window.addEventListener("DOMContentLoaded", loadHome);
 </script>
 
 </body>
-  </html>
+</html>
