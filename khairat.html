@@ -9,63 +9,17 @@
 
 <style>
 body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-
-/* PAGE CONTENT */
 .section{padding:16px}
-
-.stats{
-  display:flex;
-  gap:12px;
-  margin:16px 0
-}
-
-.stat-card{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  text-align:center
-}
-
+.stats{display:flex;gap:12px;margin:16px 0}
+.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
-
 .btns{display:flex;gap:12px;margin-top:12px}
-
-.btn{
-  flex:1;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  font-weight:bold;
-  font-size:16px
-}
-
+.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-
-/* SHORT INFO */
-.short-info{
-  background:#fff;
-  border-radius:14px;
-  padding:14px;
-  margin-top:14px;
-  font-size:14px;
-  color:#444;
-  line-height:1.6
-}
-
-/* TRANSACTIONS */
-.project-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
+.short-info{background:#fff;border-radius:14px;padding:14px;margin-top:14px;font-size:14px;color:#444;line-height:1.6}
+.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
 .project-icon{font-size:18px}
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
@@ -73,48 +27,11 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
-
-/* INFO INDICATOR */
-.info-indicator{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:13px;
-  color:#0f7a3d;
-  cursor:pointer
-}
-
-/* MODAL */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000
-}
-
-.modal-box{
-  background:#fff;
-  width:90%;
-  max-width:420px;
-  padding:20px;
-  border-radius:16px
-}
-
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:6px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px
-}
-
+.info-indicator{display:flex;align-items:center;gap:6px;font-size:13px;color:#0f7a3d;cursor:pointer}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
+input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
 label{margin-top:12px;display:block}
-
-/* SUCCESS */
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
@@ -122,20 +39,15 @@ label{margin-top:12px;display:block}
 
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>♻️ Khairat Fertiliser</span>
   </div>
-
-  <div class="header-right info-indicator" onclick="openInfo()">
-    <span>ℹ️</span>
-  </div>
+  <div class="header-right info-indicator" onclick="openInfo()">ℹ️</div>
 </header>
 
 <section class="section">
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -147,21 +59,16 @@ label{margin-top:12px;display:block}
     </div>
   </div>
 
-<!-- SHORT INFO -->
   <div class="short-info">
-    <strong>Khairat Organic Fertiliser</strong> is an ALBUKHR sustainability
-    project focused on converting organic waste into high-quality
-    agricultural fertiliser, supporting eco-friendly farming
-    and soil regeneration.
+    <strong>Khairat Organic Fertiliser</strong> converts organic waste into
+    high-quality fertiliser, supporting sustainable farming and soil health.
   </div>
-  
-  <!-- ACTIONS -->
+
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
-  <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="khairatHistory"></div>
 
@@ -175,8 +82,8 @@ label{margin-top:12px;display:block}
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: 50 Pi
+    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
+      Minimum stake: --
     </small>
 
     <label>Duration</label>
@@ -193,7 +100,7 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- SUCCESS MODAL -->
+<!-- SUCCESS -->
 <div class="modal" id="successModal">
   <div class="modal-box success">
     <h3>Stake Successful</h3>
@@ -202,22 +109,14 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- FULL INFO MODAL -->
+<!-- INFO -->
 <div class="modal" id="infoModal">
   <div class="modal-box">
     <h3>About Khairat Fertiliser</h3>
     <p style="font-size:14px;line-height:1.6;color:#444">
-      Khairat Organic Fertiliser is an ALBUKHR environmental and agricultural
-      initiative that transforms biodegradable waste into nutrient-rich
-      fertiliser.
-      <br><br>
-      Stake funds support waste collection, processing facilities,
-      composting systems, and local farmer distribution.
-      <br><br>
-      The project promotes circular economy principles, reduces pollution,
-      and increases sustainable food production.
+      Khairat supports waste recycling, composting systems, and farmer
+      distribution while promoting a circular economy.
     </p>
-
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
   </div>
 </div>
@@ -228,7 +127,10 @@ const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 const infoModal = document.getElementById("infoModal");
 
-function openModal(){ stakeModal.style.display="flex"; }
+function openModal(){
+  stakeModal.style.display="flex";
+  minHint.innerText = "Minimum stake: " + getMinStake("Khairat") + " Pi";
+}
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
 function openInfo(){ infoModal.style.display="flex"; }
@@ -237,9 +139,15 @@ function closeInfo(){ infoModal.style.display="none"; }
 function confirmStake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
+  const min = getMinStake("Khairat");
 
-  if(amount < 50){
-    alert("Minimum stake is 50 Pi");
+  if(isNaN(amount) || amount <= 0){
+    alert("Please enter a valid amount");
+    return;
+  }
+
+  if(amount < min){
+    alert("Minimum stake is " + min + " Pi");
     return;
   }
 
@@ -271,8 +179,8 @@ function load(){
     const t = formatDateTime(s);
 
     const div = document.createElement("div");
-    div.className = "project-tx";
-    div.innerHTML = `
+    div.className="project-tx";
+    div.innerHTML=`
       <div class="project-icon">♻️</div>
       <div class="project-body">
         <div class="project-title">Khairat Stake</div>
