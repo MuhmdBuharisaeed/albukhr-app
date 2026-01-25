@@ -10,53 +10,16 @@
 <style>
 body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .section{padding:16px}
-
-/* INFO SHORT */
-.short-info{
-  background:#fff;
-  border-radius:12px;
-  padding:12px;
-  font-size:13px;
-  color:#444;
-  line-height:1.5;
-  margin-bottom:14px
-}
-
-/* STATS */
+.short-info{background:#fff;border-radius:12px;padding:12px;font-size:13px;color:#444;line-height:1.5;margin-bottom:14px}
 .stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  text-align:center
-}
+.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
-
-/* BUTTONS */
 .btns{display:flex;gap:12px;margin-top:12px}
-.btn{
-  flex:1;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  font-weight:bold;
-  font-size:16px
-}
+.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-
-/* TRANSACTIONS */
-.project-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
 .project-icon{font-size:18px}
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
@@ -64,33 +27,10 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
-
-/* MODALS */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000
-}
-.modal-box{
-  background:#fff;
-  width:90%;
-  max-width:420px;
-  padding:20px;
-  border-radius:16px
-}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
 label{margin-top:12px;display:block}
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:6px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px
-}
+input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
@@ -98,20 +38,15 @@ input,select{
 
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>🚍 Urban Mobility</span>
   </div>
-
-  <div class="header-right" onclick="openInfo()">
-    ℹ️
-  </div>
+  <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
 <section class="section">
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -123,20 +58,17 @@ input,select{
     </div>
   </div>
 
-<!-- SHORT INFORMATION -->
-<div class="short-info">
-  Urban Mobility is an Albukhr infrastructure project focused on
-  modern transportation of people and goods, improving accessibility,
-  efficiency, and long-term sustainable mobility systems.
-</div>
-  
-  <!-- ACTIONS -->
+  <div class="short-info">
+    Urban Mobility is an Albukhr infrastructure project focused on modern
+    transportation of people and goods, improving accessibility and
+    long-term sustainable mobility systems.
+  </div>
+
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
-  <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="urbanHistory"></div>
 
@@ -175,22 +107,16 @@ input,select{
   </div>
 </div>
 
-<!-- FULL INFO -->
+<!-- INFO -->
 <div class="modal" id="infoModal">
   <div class="modal-box">
     <h3>About Urban Mobility</h3>
     <p style="font-size:14px;color:#444;line-height:1.6">
       Urban Mobility is a core Albukhr infrastructure project dedicated to
-      transforming transportation and logistics.
-      <br><br>
-      The project focuses on vehicle systems, logistics networks,
-      accessibility solutions, and long-term sustainability,
-      enabling efficient movement for communities and businesses.
+      transportation systems, logistics networks, and long-term mobility
+      solutions that serve communities and businesses.
     </p>
-
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">
-      Close
-    </button>
+    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
   </div>
 </div>
 
@@ -206,7 +132,6 @@ function openModal(){
 }
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
-
 function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
@@ -215,6 +140,11 @@ function confirmStake(){
   const duration = Number(durationSelect.value);
   const min = getMinStake("Urban");
 
+  if(isNaN(amount) || amount <= 0){
+    alert("Please enter a valid amount");
+    return;
+  }
+
   if(amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
@@ -222,9 +152,8 @@ function confirmStake(){
 
   addStake({ project:"Urban", amount, duration });
 
-  const reward = amount * getRate("Urban", duration);
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
+    `You staked ${amount} Pi for ${duration} days in Urban Mobility.`;
 
   closeModal();
   successModal.style.display="flex";
@@ -233,6 +162,7 @@ function confirmStake(){
 
 function load(){
   const data = getProjectTotals("Urban");
+
   uStake.innerText = data.stake.toFixed(2) + " Pi";
   uReward.innerText = data.reward.toFixed(2) + " Pi";
 
@@ -246,7 +176,6 @@ function load(){
 
   data.stakes.slice().reverse().forEach(s=>{
     const t = formatDateTime(s);
-
     const div = document.createElement("div");
     div.className="project-tx";
     div.innerHTML=`
@@ -268,4 +197,4 @@ load();
 </script>
 
 </body>
-  </html>
+</html>
