@@ -19,21 +19,12 @@ function saveStakes(stakes){
    PROJECT RULES
 ================================ */
 const PROJECT_RULES = {
-  Raheem:  { minStake: 10 },
-  Hauwal:  { minStake: 20 },
-  Barsh:   { minStake: 100 },
-  Khairat: { minStake: 50 },
-
-  // 🆕 URBAN MOBILITY (UPDATED)
-  Urban:   { minStake: 150 }
-};
-
-const PROJECT_RULES = {
   Raheem:   { minStake: 10 },
   Hauwal:   { minStake: 20 },
   Barsh:    { minStake: 100 },
   Khairat:  { minStake: 50 },
-  Labbaika: { minStake: 30 } // 🍞 Bakery project
+  Urban:    { minStake: 150 },   // 🚍 Urban Mobility
+  Labbaika: { minStake: 30 }     // 🍞 Bakery
 };
 
 function getMinStake(project){
@@ -69,13 +60,17 @@ function getRate(project, duration){
            0.10;
   }
 
-  return 0;
-}
+  if(project === "Labbaika"){
+    return duration === 30 ? 0.02 :
+           duration === 60 ? 0.045 :
+           0.075;
+  }
 
-if(project === "Labbaika"){
-  return duration === 30 ? 0.02 :
-         duration === 60 ? 0.045 :
-         0.075;
+  if(project === "Urban"){
+    return 0.12; // long-term infrastructure reward
+  }
+
+  return 0;
 }
 
 /* ===============================
@@ -161,9 +156,8 @@ function formatDateTime(stake){
     }
   }
 
-  // legacy fallback
   return {
-    date: stake.date || "--",
-    time: stake.time || "--"
+    date: "--",
+    time: "--"
   };
 }
