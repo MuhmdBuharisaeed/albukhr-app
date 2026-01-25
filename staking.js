@@ -28,6 +28,14 @@ const PROJECT_RULES = {
   Urban:   { minStake: 150 }
 };
 
+const PROJECT_RULES = {
+  Raheem:   { minStake: 10 },
+  Hauwal:   { minStake: 20 },
+  Barsh:    { minStake: 100 },
+  Khairat:  { minStake: 50 },
+  Labbaika: { minStake: 30 } // 🍞 Bakery project
+};
+
 function getMinStake(project){
   return PROJECT_RULES[project]?.minStake || 0;
 }
@@ -62,6 +70,12 @@ function getRate(project, duration){
   }
 
   return 0;
+}
+
+if(project === "Labbaika"){
+  return duration === 30 ? 0.02 :
+         duration === 60 ? 0.045 :
+         0.075;
 }
 
 /* ===============================
