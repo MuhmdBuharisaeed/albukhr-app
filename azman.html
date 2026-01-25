@@ -3,69 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AZMAN Futures Makers Lab</title>
+<title>Azman Futures Makers Lab</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
 body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-
-/* PAGE CONTENT */
 .section{padding:16px}
 
-.stats{
-  display:flex;
-  gap:12px;
-  margin:16px 0
-}
-
+/* STATS */
+.stats{display:flex;gap:12px;margin:16px 0}
 .stat-card{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  text-align:center
+  flex:1;background:#fff;border-radius:14px;
+  padding:16px;text-align:center
 }
-
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
 
+/* BUTTONS */
 .btns{display:flex;gap:12px;margin-top:12px}
-
 .btn{
-  flex:1;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  font-weight:bold;
-  font-size:16px
+  flex:1;padding:14px;border-radius:12px;border:none;
+  font-weight:bold;font-size:16px
 }
-
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
-/* SHORT INFO */
+/* INFO */
 .short-info{
-  background:#fff;
-  border-radius:14px;
-  padding:14px;
-  margin-top:14px;
-  font-size:14px;
-  color:#444;
-  line-height:1.6
+  background:#fff;border-radius:14px;padding:14px;
+  margin-top:14px;font-size:14px;color:#444;line-height:1.6
 }
 
 /* TRANSACTIONS */
 .project-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:10px;
+  background:#fff;border-radius:12px;padding:10px 12px;
+  margin-bottom:8px;display:flex;align-items:center;gap:10px
 }
-
 .project-icon{font-size:18px}
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
@@ -74,47 +48,20 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
 
-/* INFO INDICATOR */
-.info-indicator{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:13px;
-  color:#0f7a3d;
-  cursor:pointer
-}
-
-/* MODAL */
+/* MODALS */
 .modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000
+  position:fixed;inset:0;background:rgba(0,0,0,.4);
+  display:none;align-items:center;justify-content:center;z-index:1000
 }
-
 .modal-box{
-  background:#fff;
-  width:90%;
-  max-width:420px;
-  padding:20px;
-  border-radius:16px
+  background:#fff;width:90%;max-width:420px;
+  padding:20px;border-radius:16px
 }
-
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:6px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px
-}
-
 label{margin-top:12px;display:block}
-
-/* SUCCESS */
+input,select{
+  width:100%;padding:12px;margin-top:6px;
+  border-radius:10px;border:1px solid #ccc;font-size:16px
+}
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
@@ -122,20 +69,15 @@ label{margin-top:12px;display:block}
 
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
-    <span>🧪 Azman Futures Markers Lab</span>
+    <span>🧪 Azman Futures Makers Lab</span>
   </div>
-
-  <div class="header-right info-indicator" onclick="openInfo()">
-    <span>ℹ️</span>
-  </div>
+  <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
 <section class="section">
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -147,20 +89,17 @@ label{margin-top:12px;display:block}
     </div>
   </div>
 
-<!-- SHORT INFO -->
   <div class="short-info">
-    <strong>AZMAN Futures Makers Lab</strong> is ALBUKHR’s long-term innovation
-    project focused on science, technology, engineering, and future invention
-    through disciplined, long-term staking.
+    <strong>Azman Futures Makers Lab</strong> is ALBUKHR’s long-term
+    science, technology, and innovation project focused on future invention,
+    research labs, and engineering capacity building.
   </div>
-  
-  <!-- ACTIONS -->
+
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
-  <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="azmanHistory"></div>
 
@@ -169,13 +108,13 @@ label{margin-top:12px;display:block}
 <!-- STAKE MODAL -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
-    <h3>Stake in AZMAN</h3>
+    <h3>Stake in Azman</h3>
 
     <label>Amount (Pi)</label>
-    <input type="number" id="amountInput">
+    <input type="number" id="amountInput" min="0">
 
     <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: 150 Pi
+      Minimum stake: --
     </small>
 
     <label>Duration</label>
@@ -192,7 +131,7 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- SUCCESS MODAL -->
+<!-- SUCCESS -->
 <div class="modal" id="successModal">
   <div class="modal-box success">
     <h3>Stake Successful</h3>
@@ -201,21 +140,17 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- FULL INFO MODAL -->
+<!-- INFO -->
 <div class="modal" id="infoModal">
   <div class="modal-box">
-    <h3>About AZMAN Futures Makers Lab</h3>
+    <h3>About Azman Futures Makers Lab</h3>
     <p style="font-size:14px;line-height:1.6;color:#444">
-      AZMAN is ALBUKHR’s flagship future-focused project dedicated to building
-      scientific, technological, and engineering capacity among youth and innovators.
+      Azman is ALBUKHR’s flagship innovation ecosystem supporting research,
+      prototyping, advanced training, and long-term technology development.
       <br><br>
-      Funds are allocated to research labs, prototyping facilities, training programs,
-      and long-term innovation infrastructure.
-      <br><br>
-      AZMAN operates strictly on long-term staking to ensure stability,
-      discipline, and sustainable growth of future technologies.
+      The project operates strictly on long-term staking to ensure stability,
+      discipline, and sustainable innovation growth.
     </p>
-
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
   </div>
 </div>
@@ -228,8 +163,8 @@ const infoModal = document.getElementById("infoModal");
 
 function openModal(){
   stakeModal.style.display="flex";
+  minHint.innerText = "Minimum stake: " + getMinStake("Azman") + " Pi";
 }
-
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
 function openInfo(){ infoModal.style.display="flex"; }
@@ -238,16 +173,17 @@ function closeInfo(){ infoModal.style.display="none"; }
 function confirmStake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
+  const min = getMinStake("Azman");
 
-  if(amount < 150){
-    alert("Minimum stake is 150 Pi");
+  if(!amount || amount < min){
+    alert("Minimum stake is " + min + " Pi");
     return;
   }
 
   addStake({ project:"Azman", amount, duration });
 
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in AZMAN Lab.`;
+    `You staked ${amount} Pi for ${duration} days in AZMAN Futures Lab.`;
 
   closeModal();
   successModal.style.display="flex";
@@ -257,8 +193,8 @@ function confirmStake(){
 function load(){
   const data = getProjectTotals("Azman");
 
-  aStake.innerText = data.stake.toFixed(2) + " Pi";
-  aReward.innerText = data.reward.toFixed(2) + " Pi";
+  aStake.innerText = (data.stake || 0).toFixed(2) + " Pi";
+  aReward.innerText = (data.reward || 0).toFixed(2) + " Pi";
 
   azmanHistory.innerHTML = "";
 
@@ -270,13 +206,12 @@ function load(){
 
   data.stakes.slice().reverse().forEach(s=>{
     const t = formatDateTime(s);
-
     const div = document.createElement("div");
-    div.className = "project-tx";
-    div.innerHTML = `
+    div.className="project-tx";
+    div.innerHTML=`
       <div class="project-icon">🧪</div>
       <div class="project-body">
-        <div class="project-title">Azman Stake</div>
+        <div class="project-title">AZMAN Stake</div>
         <div class="project-date">${t.date} • ${t.time}</div>
       </div>
       <div class="project-right">
@@ -292,4 +227,4 @@ load();
 </script>
 
 </body>
-</html>
+        </html>
