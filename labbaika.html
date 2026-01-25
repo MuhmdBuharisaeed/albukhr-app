@@ -10,53 +10,16 @@
 <style>
 body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .section{padding:16px}
-
-/* STATS */
 .stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  text-align:center
-}
+.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
-
-/* SHORT INFO */
-.short-info{
-  background:#fff;
-  border-radius:12px;
-  padding:12px;
-  font-size:13px;
-  color:#444;
-  line-height:1.5;
-  margin-bottom:14px
-}
-
-/* BUTTONS */
+.short-info{background:#fff;border-radius:12px;padding:12px;font-size:13px;color:#444;line-height:1.5;margin-bottom:14px}
 .btns{display:flex;gap:12px;margin-top:12px}
-.btn{
-  flex:1;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  font-weight:bold;
-  font-size:16px
-}
+.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-
-/* TRANSACTIONS */
-.project-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
 .project-icon{font-size:18px}
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
@@ -64,33 +27,10 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
-
-/* MODALS */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000
-}
-.modal-box{
-  background:#fff;
-  width:90%;
-  max-width:420px;
-  padding:20px;
-  border-radius:16px
-}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
 label{margin-top:12px;display:block}
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:6px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px
-}
+input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
@@ -98,7 +38,6 @@ input,select{
 
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>🍞 Labbaika Bakery</span>
@@ -108,7 +47,6 @@ input,select{
 
 <section class="section">
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -120,20 +58,17 @@ input,select{
     </div>
   </div>
 
-  <!-- SHORT INFO -->
   <div class="short-info">
     Labbaika Bakery Center is an Albukhr food production project focused on
     modern bread and flour-based food processing, quality control,
     and sustainable community supply.
   </div>
 
-  <!-- ACTIONS -->
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button class="btn secondary" onclick="history.back()">Back</button>
   </div>
 
-  <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
   <div id="labbaikaHistory"></div>
 
@@ -174,22 +109,16 @@ input,select{
   </div>
 </div>
 
-<!-- FULL INFO -->
+<!-- INFO -->
 <div class="modal" id="infoModal">
   <div class="modal-box">
     <h3>About Labbaika Bakery</h3>
     <p style="font-size:14px;color:#444;line-height:1.6">
-      Labbaika Bakery Center is designed to modernize bakery production
-      within Albukhr Investment Limited.
-      <br><br>
-      The project focuses on bread, flour-based foods, hygiene,
-      efficient production systems, and consistent quality delivery,
-      generating sustainable returns through daily consumption demand.
+      Labbaika Bakery Center modernizes bread and flour-based food production
+      within Albukhr Investment Limited, ensuring hygiene, efficiency,
+      consistent quality, and stable daily-demand revenue.
     </p>
-
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">
-      Close
-    </button>
+    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
   </div>
 </div>
 
@@ -213,6 +142,11 @@ function confirmStake(){
   const duration = Number(durationSelect.value);
   const min = getMinStake("Labbaika");
 
+  if(isNaN(amount) || amount <= 0){
+    alert("Please enter a valid amount");
+    return;
+  }
+
   if(amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
@@ -220,9 +154,8 @@ function confirmStake(){
 
   addStake({ project:"Labbaika", amount, duration });
 
-  const reward = amount * getRate("Labbaika", duration);
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
+    `You staked ${amount} Pi for ${duration} days in Labbaika Bakery.`;
 
   closeModal();
   successModal.style.display="flex";
@@ -231,6 +164,7 @@ function confirmStake(){
 
 function load(){
   const data = getProjectTotals("Labbaika");
+
   lStake.innerText = data.stake.toFixed(2) + " Pi";
   lReward.innerText = data.reward.toFixed(2) + " Pi";
 
@@ -244,7 +178,6 @@ function load(){
 
   data.stakes.slice().reverse().forEach(s=>{
     const t = formatDateTime(s);
-
     const div = document.createElement("div");
     div.className="project-tx";
     div.innerHTML=`
