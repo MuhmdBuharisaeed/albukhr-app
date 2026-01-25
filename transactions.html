@@ -8,10 +8,15 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
+body{
+  background:#f5f7f6;
+  padding-bottom:90px;
+  font-family:Arial
+}
 
 .section{padding:16px}
 
+/* TRANSACTION CARD */
 .project-tx{
   background:#fff;
   border-radius:12px;
@@ -19,10 +24,15 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
   margin-bottom:8px;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px; /* rage spacing */
 }
 
-.project-icon{font-size:18px}
+/* ICON – RAGE GIRMA */
+.project-icon{
+  font-size:16px;
+  width:26px;
+  text-align:center
+}
 
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
@@ -36,6 +46,7 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 
 <body>
 
+<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>All Transactions</span>
@@ -50,14 +61,15 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 <script>
 const txList = document.getElementById("txList");
 
-/* ICON MAP – HUKUMA */
+/* ✅ HUKUMA ICON MAP */
 const ICONS = {
-  Raheem: "💊",
-  Hauwal: "🌽",
-  Barsh: "🌾",
-  Khairat: "♻️",
-  Azman: "🧪",
-  Urban: "🚍" // ✅ NEW
+  Raheem:   "💊",
+  Hauwal:   "🌽",
+  Barsh:    "🌾",
+  Khairat:  "♻️",
+  Azman:    "🧪",
+  Urban:    "🚍",
+  Labbaika: "🍞"
 };
 
 function loadTransactions(){
@@ -76,12 +88,14 @@ function loadTransactions(){
   }
 
   stakes.forEach(s=>{
-    const t = formatDateTime(s); // 🔐 SAFE (timestamp / fallback)
+    const t = formatDateTime(s); // 🔐 anti-NaN (timestamp based)
 
     const div = document.createElement("div");
     div.className = "project-tx";
     div.innerHTML = `
-      <div class="project-icon">${ICONS[s.project] || "📦"}</div>
+      <div class="project-icon">
+        ${ICONS[s.project] || "📦"}
+      </div>
 
       <div class="project-body">
         <div class="project-title">${s.project} Stake</div>
@@ -89,7 +103,7 @@ function loadTransactions(){
       </div>
 
       <div class="project-right">
-        <div class="project-amount">${s.amount} Pi</div>
+        <div class="project-amount">${Number(s.amount).toFixed(2)} Pi</div>
         <div class="project-status">Successful</div>
       </div>
     `;
