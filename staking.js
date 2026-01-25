@@ -1,5 +1,5 @@
 // ===============================
-// ALBUKHR STAKING ENGINE (FINAL)
+// ALBUKHR STAKING ENGINE (STABLE)
 // ===============================
 
 const STORAGE_KEY = "albukhr_stakes";
@@ -8,7 +8,11 @@ const STORAGE_KEY = "albukhr_stakes";
    STORAGE
 ================================ */
 function getStakes(){
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch {
+    return [];
+  }
 }
 
 function saveStakes(stakes){
@@ -24,7 +28,7 @@ const PROJECT_RULES = {
   Barsh:    { minStake: 100 },
   Khairat:  { minStake: 50 },
   Urban:    { minStake: 150 },   // 🚍 Urban Mobility
-  Labbaika: { minStake: 30 }     // 🍞 Bakery
+  Labbaika: { minStake: 30 }     // 🍞 Labbaika Bakery
 };
 
 function getMinStake(project){
@@ -74,23 +78,35 @@ function getRate(project, duration){
 }
 
 /* ===============================
-   ADD STAKE (SAFE DATE/TIME)
+   ADD STAKE (ANTI-NaN SAFE)
 ================================ */
 function addStake({ project, amount, duration }){
 
-  const stakes = getStakes();
-  const reward = amount * getRate(project, duration);
+  const safeAmount = Number(amount);
+  const safeDuration = Number(duration);
+  const rate = getRate(project, safeDuration);
+
+  if (
+    !project ||
+    isNaN(safeAmount) ||
+    isNaN(safeDuration) ||
+    safeAmount <= 0
+  ) {
+    return false;
+  }
+
+  const reward = safeAmount * rate;
   const now = new Date();
+
+  const stakes = getStakes();
 
   stakes.push({
     id: Date.now(),
     project,
-    amount,
-    duration,
-    reward,
+    amount: safeAmount,
+    duration: safeDuration,
+    reward: Number(reward) || 0,
     status: "Successful",
-
-    // 🔐 SINGLE SOURCE OF TRUTH
     timestamp: now.toISOString()
   });
 
@@ -99,7 +115,7 @@ function addStake({ project, amount, duration }){
 }
 
 /* ===============================
-   TOTALS (HOME)
+   TOTALS (HOME – SAFE)
 ================================ */
 function getTotals(){
 
@@ -108,42 +124,50 @@ function getTotals(){
   let totalReward = 0;
 
   stakes.forEach(s=>{
-    if(s.status === "Successful"){
-      totalStake += Number(s.amount);
-      totalReward += Number(s.reward);
+    if(s && s.status === "Successful"){
+      totalStake += Number(s.amount) || 0;
+      totalReward += Number(s.reward) || 0;
     }
   });
 
-  return { totalStake, totalReward };
+  return {
+    totalStake,
+    totalReward
+  };
 }
 
 /* ===============================
-   PROJECT TOTALS
+   PROJECT TOTALS (SAFE)
 ================================ */
 function getProjectTotals(project){
 
-  const stakes = getStakes().filter(s => s.project === project);
+  const all = getStakes();
+  const filtered = all.filter(s => s.project === project);
+
   let stake = 0;
   let reward = 0;
 
-  stakes.forEach(s=>{
+  filtered.forEach(s=>{
     if(s.status === "Successful"){
-      stake += Number(s.amount);
-      reward += Number(s.reward);
+      stake += Number(s.amount) || 0;
+      reward += Number(s.reward) || 0;
     }
   });
 
-  return { stake, reward, stakes };
+  return {
+    stake,
+    reward,
+    stakes: filtered
+  };
 }
 
 /* ===============================
-   DATE / TIME FORMATTER (MASTER)
+   DATE / TIME FORMATTER (SAFE)
 ================================ */
 function formatDateTime(stake){
 
-  if(stake.timestamp){
+  if(stake && stake.timestamp){
     const d = new Date(stake.timestamp);
-
     if(!isNaN(d)){
       return {
         date: d.toLocaleDateString("en-GB"),
@@ -160,4 +184,4 @@ function formatDateTime(stake){
     date: "--",
     time: "--"
   };
-}
+     }
