@@ -125,7 +125,7 @@ function loadHome(){
 
   const stakes = getStakes()
     .filter(s => s.status === "Successful")
-    .slice(-3)
+    .slice(-2)
     .reverse();
 
   if(stakes.length === 0){
