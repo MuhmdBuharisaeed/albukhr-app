@@ -16,9 +16,21 @@
 
 <!-- WELCOME / ANNOUNCEMENT BAR -->
 <div class="welcome-bar">
+  <!-- SCROLLING WELCOME -->
   <div
-    id="welcomeText"
+    id="welcomeScroll"
+    class="welcome-track"
+    style="display:block"
+  >
+    Welcome to Albukhr Investment Limited — Building sustainable industries
+    & empowering communities through investment.
+  </div>
+
+  <!-- ANNOUNCEMENTS -->
+  <div
+    id="welcomeAnnounce"
     style="
+      display:none;
       width:100%;
       text-align:center;
       font-size:14px;
@@ -27,8 +39,7 @@
       transition:opacity .5s ease;
     "
   >
-    Welcome to Albukhr Investment Limited — Building sustainable industries
-    & empowering communities through investment.
+    📢 Albukhr is opening doors for external projects to join our staking ecosystem.
   </div>
 </div>
 
@@ -148,15 +159,11 @@ function loadHome(){
     const div = document.createElement("div");
     div.className = "home-tx";
     div.innerHTML = `
-      <div class="home-icon">
-        ${ICONS[s.project] || "📦"}
-      </div>
-
+      <div class="home-icon">${ICONS[s.project] || "📦"}</div>
       <div class="home-body">
         <div class="home-title">${s.project} Stake</div>
         <div class="home-date">${t.date} • ${t.time}</div>
       </div>
-
       <div class="home-right">
         <div class="home-amount">${s.amount} Pi</div>
         <div class="home-status success">Successful</div>
@@ -168,29 +175,38 @@ function loadHome(){
 
 window.addEventListener("DOMContentLoaded", loadHome);
 
-/* WELCOME / ANNOUNCEMENT ROTATION */
-const messages = [
-  "Welcome to Albukhr Investment Limited — Building sustainable industries & empowering communities.",
+/* WELCOME → ANNOUNCEMENT LOGIC */
+const scroll = document.getElementById("welcomeScroll");
+const announce = document.getElementById("welcomeAnnounce");
+
+const announcements = [
   "📢 Albukhr is opening doors for external projects to join our staking ecosystem.",
   "🌍 Powered by Pi Network — connecting local industries to global value.",
   "🚀 Stake, grow, and support verified community-driven projects on Albukhr.",
   "🧩 Have a project? Submit it via Services and get verified by Albukhr."
 ];
 
-const welcomeText = document.getElementById("welcomeText");
-let msgIndex = 0;
+let aIndex = 0;
 
-setInterval(() => {
-  welcomeText.style.opacity = 0;
+/* lokacin da scrolling ya gama (daidai da animation duration) */
+setTimeout(() => {
+  scroll.style.display = "none";
+  announce.style.display = "block";
+  announce.style.opacity = 1;
 
-  setTimeout(() => {
-    msgIndex = (msgIndex + 1) % messages.length;
-    welcomeText.textContent = messages[msgIndex];
-    welcomeText.style.opacity = 1;
-  }, 500);
+  setInterval(() => {
+    announce.style.opacity = 0;
 
-}, 6000);
+    setTimeout(() => {
+      aIndex = (aIndex + 1) % announcements.length;
+      announce.textContent = announcements[aIndex];
+      announce.style.opacity = 1;
+    }, 500);
+
+  }, 6000);
+
+}, 18000); /* 18s = welcomeMove animation time */
 </script>
 
 </body>
-    </html>
+</html>
