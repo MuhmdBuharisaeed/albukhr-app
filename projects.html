@@ -1,112 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projects – ALBUKHR</title>
-
-<link rel="stylesheet" href="style.css">
-
-<style>
-.section{padding:16px}
-
-/* SEARCH */
-.project-search{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:1px solid #ddd;
-  font-size:15px;
-  margin-bottom:14px
-}
-
-/* PROJECT LIST */
-.project-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#fff;
-  padding:14px;
-  border-radius:14px;
-  margin-bottom:10px;
-  text-decoration:none;
-  color:#000
-}
-
-.project-item span{font-weight:600}
-.project-item small{font-size:12px;color:#777}
-</style>
+  <meta charset="UTF-8">
+  <title>Albukhr | Projects</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body data-page="projects">
+<!-- HEADER -->
+<div class="header">
+  <div class="brand">Projects</div>
+</div>
 
-<header class="header">
-  <div class="header-left">
-    <span>📁 Verified Projects</span>
-  </div>
-</header>
+<!-- SEARCH BAR -->
+<div class="section">
+  <input type="text" placeholder="Search project name..." class="search-input">
+</div>
 
-<section class="section">
+<!-- PROJECTS LIST -->
+<div class="projects">
 
-  <!-- SEARCH BAR -->
-  <input
-    type="text"
-    id="projectSearch"
-    class="project-search"
-    placeholder="Search verified projects to stake in…"
-  >
-
-  <!-- VERIFIED PROJECTS LIST -->
-  <a href="raheem.html" class="project-item">
-    <span>💊 Raheem Pharmacy</span>
-    <small>Verified</small>
-  </a>
-
-  <a href="hauwal.html" class="project-item">
-    <span>🌽 Hauwal Sumonviter</span>
-    <small>Verified</small>
-  </a>
-
-  <a href="barsh.html" class="project-item">
-    <span>🌾 Barsh Agro</span>
-    <small>Verified</small>
-  </a>
-
-  <a href="khairat.html" class="project-item">
-    <span>♻️ Khairat Organic Fertiliser</span>
-    <small>Verified</small>
-  </a>
-
-  <a href="azman.html" class="project-item">
-    <span>🧪 Azman Futures Makers Lab</span>
-    <small>Verified</small>
-  </a>
-
-  <a href="urban.html" class="project-item">
-    <span>🚍 Urban Mobility</span>
-    <small>Verified</small>
-  </a>
-
-  <a href="labbaika.html" class="project-item">
+  <!-- ALBUKHR CORE -->
+  <a href="#" class="project-item active">
     <span>🍞 Labbaika Bakery Center</span>
-    <small>Verified</small>
+    <small>Albukhr Core</small>
   </a>
 
-</section>
+  <a href="#" class="project-item active">
+    <span>🌽 Hauwal Sumonviter</span>
+    <small>Albukhr Core</small>
+  </a>
 
-<script>
-const searchInput = document.getElementById("projectSearch");
-const projects = document.querySelectorAll(".project-item");
+  <a href="#" class="project-item active">
+    <span>🚜 Barsh Agro</span>
+    <small>Albukhr Core</small>
+  </a>
 
-searchInput.addEventListener("input", () => {
-  const q = searchInput.value.toLowerCase();
+  <a href="#" class="project-item active">
+    <span>⚙️ Azman Innovation Hub</span>
+    <small>Albukhr Core</small>
+  </a>
 
-  projects.forEach(p => {
-    const text = p.innerText.toLowerCase();
-    p.style.display = text.includes(q) ? "flex" : "none";
-  });
-});
-</script>
+  <!-- EXTERNAL PROJECT -->
+  <a href="#" class="project-item">
+    <span>🌍 Green Energy Africa</span>
+    <small>Verified External</small>
+  </a>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a href="home.html"><span>🏠</span>Home</a>
+  <a href="projects.html" class="active"><span>📦</span>Projects</a>
+  <a href="wallet.html"><span>👛</span>Wallet</a>
+  <a href="services.html"><span>🛠</span>Services</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</div>
 
 </body>
 </html>
