@@ -1,692 +1,174 @@
+/* =================================================
+   ALBUKHR – GLOBAL STABLE STYLE.CSS
+   Compatible with all browsers & devices
+================================================= */
+
 /* ================= RESET ================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
 }
 
-html, body {
-  width: 100%;
-  height: 100%;
+html, body{
+  width:100%;
+  height:100%;
 }
 
 /* ================= BODY ================= */
-body {
-  background: #f5f7f6;
-  color: #111;
-  overflow-x: hidden;
-}
-
-/* ================= APP CONTAINER ================= */
-.app {
-  min-height: 100vh;              /* CIKA SCREEN */
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 70px;           /* sarari don bottom nav */
+body{
+  background:#f5f7f6;
+  color:#111;
+  overflow-x:hidden;
+  padding-bottom:70px; /* kare content daga bottom-nav */
 }
 
 /* ================= HEADER ================= */
-.header {
-  background: #0f7a3d;
-  color: white;
-  padding: 16px;
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.brand {
-  font-size: 24px;
-  font-weight: bold;
+.brand{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.header-right{
+  font-size:14px;
+  cursor:pointer;
 }
 
 /* ================= WELCOME BAR ================= */
-.welcome-bar {
-  background: #e6f4ec;
-  overflow: hidden;
-  height: 32px;
-  display: flex;
-  align-items: center;
+.welcome-bar{
+  background:#e6f4ec;
+  height:32px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
 }
 
-.welcome-track {
-  white-space: nowrap;
-  padding-left: 100%;
-  font-size: 14px;
-  color: #0f7a3d;
-  animation: welcomeMove 18s linear infinite;
+.welcome-track{
+  white-space:nowrap;
+  padding-left:100%;
+  font-size:14px;
+  color:#0f7a3d;
+  animation:welcomeMove 18s linear infinite;
 }
 
-@keyframes welcomeMove {
-  from { transform: translateX(0); }
-  to { transform: translateX(-100%); }
+@keyframes welcomeMove{
+  from{transform:translateX(0)}
+  to{transform:translateX(-100%)}
 }
 
-/* ================= STATS ================= */
-.stats {
-  display: flex;
-  gap: 10px;
-  padding: 15px;
+/* ================= STATS (HOME) ================= */
+.stats{
+  display:flex;
+  gap:12px;
+  padding:16px;
 }
 
-.stat-box {
-  background: #ffffff;
-  flex: 1;
-  padding: 14px;
-  border-radius: 8px;
-  text-align: center;
+.stat-card{
+  flex:1;
+  background:#fff;
+  border-radius:12px;
+  padding:16px;
+  text-align:center;
 }
 
-.stat-box span {
-  font-size: 13px;
-  color: #555;
-}
-
-.stat-box strong {
-  display: block;
-  margin-top: 6px;
-  font-size: 16px;
-}
-
-/* ================= PROJECTS ================= */
-.projects {
-  flex: 1;                 /* NAN NE MUHIMMI */
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.projects h2 {
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-
-.project-item {
-  background: #ffffff;
-  border-left: 5px solid #cfded6;
-  padding: 16px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.project-item span {
-  font-size: 16px;
-}
-
-.project-item small {
-  font-size: 12px;
-  color: #777;
-}
-
-.project-item.active {
-  border-left-color: #0f7a3d;
-  background: #e8f5e9;
-}
-
-/* ================= BOTTOM NAV ================= */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: #ffffff;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid #ccc;
-  z-index: 100;
-}
-
-.bottom-nav button {
-  background: none;
-  border: none;
-  font-size: 14px;
-  color: #0f7a3d;
-}
-
-.bottom-nav .active {
-  font-weight: bold;
-  }
-
-/* ================= DASHBOARD STATS ================= */
-.dashboard-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 16px;
-}
-
-.stat-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 90px;
-}
-
-.stat-card .label {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 6px;
-}
-
-.stat-card .value {
-  font-size: 20px;
-  font-weight: bold;
-  color: #0f7a3d;
-}
-
-.stat-card .value small {
-  font-size: 14px;
-  font-weight: normal;
-}
-
-/* Visual priority */
-.stat-card.primary {
-  border-left: 4px solid #0f7a3d;
-}
-
-.stat-card.secondary {
-  border-left: 4px solid #9cccaf;
-  }
-
-/* FIX PROJECT LINKS COLOR */
-.projects a,
-.project-item,
-.project-item span {
-  color: #0f7a3d; /* Albukhr green */
-  text-decoration: none;
-}
-
-/* idan an taba (tap / click) */
-.projects a:visited {
-  color: #0f7a3d;
-}
-
-/* idan ana tap */
-.projects a:active {
-  color: #0f7a3d;
-}
-
-/* ================= PROJECT DETAILS PAGE ================= */
-
-/* tabbatar da page ya cika screen */
-.project-details {
-  min-height: 100vh;          /* cika tsayin screen */
-  width: 100%;                /* cika fadin screen */
-  padding: 16px;
-  background: #f5f7f6;
-}
-
-/* hana abubuwa su takure a tsakiya */
-.project-details h2,
-.project-details h3,
-.project-details p,
-.project-details ul {
-  width: 100%;
-}
-
-/* gyaran rubutu */
-.project-details h2 {
-  margin-bottom: 10px;
-  color: #0f7a3d;
-}
-
-.project-details h3 {
-  margin-top: 20px;
-  margin-bottom: 8px;
-  color: #0f7a3d;
-}
-
-/* BACK BUTTON */
-.back-btn {
-  background: none;
-  border: none;
-  color: #0f7a3d;
-  font-size: 14px;
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-
-/* LIST FULL WIDTH */
-.details-list {
-  padding-left: 16px;
-}
-
-/* ACTION BUTTONS FULL WIDTH */
-.details-actions {
-  margin-top: 20px;
-}
-
-/* ================= STATS DASHBOARD ================= */
-.stats-dashboard {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  width: 100%;
-}
-
-.stat-card {
-  flex: 1;
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 18px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.stat-card span {
-  font-size: 13px;
-  color: #666;
-}
-
-.stat-card strong {
-  display: block;
-  margin-top: 6px;
-  font-size: 20px;
-  color: #0f7a3d;
-  font-weight: bold;
-}
-
-/* ================= PROJECT PAGE FULL SCREEN ================= */
-.project-page {
-  background: #f5f7f6;
-  min-height: 100vh;
-  width: 100%;
-}
-
-/* wrapper na page */
-.project-wrapper {
-  min-height: calc(100vh - 64px); /* cire header height */
-  padding: 16px;
-  width: 100%;
-}
-
-/* project details card */
-.project-details {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 18px;
-  width: 100%;
-}
-
-/* back button */
-.back-btn {
-  background: none;
-  border: none;
-  color: #0f7a3d;
-  font-size: 14px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  }
-
-/* ================= STAKING MODAL ================= */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-box {
-  background: #ffffff;
-  width: 90%;
-  max-width: 360px;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.modal-box h3 {
-  margin-bottom: 15px;
-  color: #0f7a3d;
-}
-
-.modal-box label {
-  font-size: 14px;
-  display: block;
-  margin-top: 10px;
-}
-
-.modal-box input,
-.modal-box select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  }
-
-/* ================= STAKING MODAL ================= */
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
-
-  display: none;              /* 👈 a ɓoye */
-  align-items: center;
-  justify-content: center;
-
-  z-index: 999;
-}
-
-.modal-box {
-  background: #ffffff;
-  width: 90%;
-  max-width: 400px;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.modal-box h3 {
-  margin-bottom: 15px;
-  color: #0f7a3d;
-}
-
-.modal-box input,
-.modal-box select {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0 15px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-}
-
-/* ===== PROJECT ACTION BUTTONS ===== */
-.details-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.action-btn {
-  width: 100%;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 12px;
-}
-
-/* ===== USER STAKING STATS ===== */
-.user-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 24px 0;
-}
-
-.stat-card {
-  background: #f3fdf7;
-  border: 1px solid #cceedd;
-  border-radius: 14px;
-  padding: 16px;
-  text-align: center;
-}
-
-.stat-card span {
-  display: block;
-  font-size: 13px;
-  color: #2f7d4f;
-}
-
-.stat-card strong {
-  font-size: 18px;
-  color: #146c43;
-  margin-top: 6px;
-  display: block;
-}
-
-/* ===== BOTTOM NAV ===== */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: #ffffff;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid #cceedd;
-  padding: 10px 0;
-  z-index: 100;
-}
-
-/* LINKS */
-.bottom-nav a {
-  text-decoration: none;       /* cire underline */
-  color: #0f7a3d;              /* green ALBUKHR */
-  font-weight: bold;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-}
-
-/* ICON + TEXT IN LINKS (idan kana amfani da emoji ko icon) */
-.bottom-nav a span {
-  font-size: 18px;             /* icon size */
-  display: block;
-  margin-bottom: 2px;
-}
-
-/* HOVER STATE */
-.bottom-nav a:hover {
-  color: #146c43;              /* slightly darker green */
-}
-
-/* ACTIVE LINK */
-.bottom-nav a.active {
-  color: #0f7a3d;              /* primary green */
-}
-
-.modal-box{
-  animation: pop .25s ease;
-}
-
-@keyframes pop{
-  from{transform:scale(.9);opacity:0}
-  to{transform:scale(1);opacity:1}
+.stat-card span{
+  font-size:13px;
+  color:#666;
 }
 
 .stat-card strong{
   display:block;
-  font-size:20px;
   margin-top:6px;
+  font-size:18px;
   color:#0f7a3d;
 }
 
-.btn.primary:active{
-  transform:scale(.97);
-  }
+/* ================= PROJECTS LIST ================= */
+.projects{
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.projects h2{
+  font-size:18px;
+  margin-bottom:6px;
+}
+
+.project-item{
+  background:#fff;
+  border-left:5px solid #cfded6;
+  padding:16px;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  text-decoration:none;
+  color:#0f7a3d;
+}
+
+.project-item span{
+  font-size:16px;
+}
+
+.project-item small{
+  font-size:12px;
+  color:#777;
+}
+
+.project-item.active{
+  border-left-color:#0f7a3d;
+  background:#e8f5e9;
+}
+
+/* ================= HOME – RECENT TRANSACTIONS ================= */
+.section{
+  padding:16px;
+}
+
+.tx-title{
+  font-size:14px;
+  font-weight:600;
+}
 
 .home-tx{
   background:#fff;
-  border-radius:14px;
-  padding:12px;
-  margin-bottom:10px;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
   display:flex;
   align-items:center;
-  gap:12px
+  gap:10px;
+  width:100%;
 }
 
 .home-icon{
-  width:40px;
-  height:40px;
+  width:32px;
+  height:32px;
   border-radius:50%;
   background:#e6f6ec;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
-  color:#0f7a3d
+  font-size:16px;
+  flex-shrink:0;
 }
 
-.home-body{flex:1}
-
-.home-title{
-  font-size:13px;
-  font-weight:bold
+.home-body{
+  flex:1;
 }
 
-.home-date{
-  font-size:10px;
-  color:#888;
-  margin-top:2px
-}
-
-.home-right{text-align:right}
-
-.home-amount{
-  font-size:13px;
-  font-weight:bold
-}
-
-.home-status{
-  font-size:10px;
-  padding:3px 8px;
-  border-radius:10px;
-  margin-top:4px;
-  display:inline-block
-}
-
-.success{background:#e6f6ec;color:#0f7a3d}
-.pending{background:#fff4d6;color:#b7791f}
-.failed{background:#fde8e8;color:#c53030}
-
-/* ===============================
-   HOME TRANSACTION (COMPACT)
-================================*/
-
-.home-tx {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-
-  max-width: 95%;
-}
-
-/* ICON */
-.home-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 16px;
-  background: #eaf6ee;
-  flex-shrink: 0;
-}
-
-/* BODY */
-.home-body {
-  flex: 1;
-}
-
-.home-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #222;
-}
-
-.home-date {
-  font-size: 11px;
-  color: #777;
-  margin-top: 2px;
-}
-
-/* RIGHT */
-.home-right {
-  text-align: right;
-}
-
-.home-amount {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.home-status {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 12px;
-  margin-top: 3px;
-  display: inline-block;
-}
-
-.home-status.success {
-  background: #e6f6ec;
-  color: #0f7a3d;
-  }
-
-/* Transaction section in Home */
-.tx-section{
-  padding: 6px 14px;
-}
-
-/* Title size */
-.tx-title{
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-/* Home transaction item */
-.home-tx{
-  display:flex;
-  align-items:center;
-  background:#fff;
-  padding:8px 10px;
-  border-radius:10px;
-  margin-bottom:6px;
-}
-
-/* Icon */
-.home-icon{
-  font-size:18px;      /* rage girma */
-  width:28px;
-  height:28px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin-right:8px;
-}
-
-/* Body text */
 .home-title{
   font-size:13px;
   font-weight:600;
@@ -695,44 +177,51 @@ body {
 .home-date{
   font-size:11px;
   color:#777;
+  margin-top:2px;
 }
 
-/* Right side */
+.home-right{
+  text-align:right;
+}
+
 .home-amount{
-  font-size:12px;
+  font-size:13px;
   font-weight:600;
 }
 
 .home-status{
-  font-size:11px;
-  }
+  font-size:10px;
+  padding:3px 8px;
+  border-radius:10px;
+  background:#e6f6ec;
+  color:#0f7a3d;
+  display:inline-block;
+  margin-top:4px;
+}
 
-/* =========================
-   TRANSACTION UI (GLOBAL)
-   ========================= */
-
+/* ================= GLOBAL TRANSACTIONS ================= */
 .project-tx{
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
   display:flex;
   align-items:center;
-  background:#fff;
-  padding:8px 10px;
-  border-radius:10px;
-  margin-bottom:6px;
+  gap:10px;
 }
 
 .project-icon{
-  font-size:18px;
-  width:28px;
-  height:28px;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#e6f6ec;
   display:flex;
   align-items:center;
   justify-content:center;
-  margin-right:8px;
+  font-size:16px;
 }
 
-.project-body{
-  flex:1;
-}
+.project-body{flex:1}
 
 .project-title{
   font-size:13px;
@@ -744,12 +233,10 @@ body {
   color:#777;
 }
 
-.project-right{
-  text-align:right;
-}
+.project-right{text-align:right}
 
 .project-amount{
-  font-size:12px;
+  font-size:13px;
   font-weight:600;
 }
 
@@ -758,130 +245,111 @@ body {
   color:#0f7a3d;
 }
 
-.small-icon{
-  font-size:9px; /* ⬅ rage daga 18px */
-}
-
-/* HOME TRANSACTIONS */
-.home-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:8px 10px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.home-icon{
-  font-size:14px;   /* 🔽 an rage */
-}
-
-.home-icon{
-  font-size: 14px;      /* ƙaramar sosai */
-  width: 22px;
-  height: 22px;
-  display:flex;
+/* ================= MODALS ================= */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
   align-items:center;
   justify-content:center;
+  z-index:1000;
 }
 
-.home-body{flex:1}
-.home-title{font-size:13px;font-weight:600}
-.home-date{font-size:11px;color:#777}
-
-.home-right{text-align:right}
-.home-amount{font-size:13px;font-weight:bold}
-.home-status{font-size:11px;color:#0f7a3d}
-
-/* ===============================
-   HOME – RECENT TRANSACTIONS (COMPACT)
-================================ */
-
-.home-tx{
+.modal-box{
   background:#fff;
+  width:90%;
+  max-width:420px;
+  padding:20px;
+  border-radius:16px;
+  animation:pop .25s ease;
+}
+
+@keyframes pop{
+  from{transform:scale(.9);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+.modal-box h3{
+  color:#0f7a3d;
+  margin-bottom:12px;
+}
+
+.modal-box label{
+  font-size:14px;
+  display:block;
+  margin-top:10px;
+}
+
+.modal-box input,
+.modal-box select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
   border-radius:10px;
-  padding:8px 10px;          /* ↓ rage padding */
-  margin-bottom:6px;
+  border:1px solid #ccc;
+}
+
+/* ================= BUTTONS ================= */
+.btns{
   display:flex;
-  align-items:center;
-  gap:8px;                   /* ↓ rage tazara */
+  gap:12px;
+  margin-top:16px;
 }
 
-.home-icon{
-  font-size:16px;            /* ↓ daga 20–22 zuwa 16 */
-}
-
-.home-body{
+.btn{
   flex:1;
-}
-
-.home-title{
-  font-size:13px;            /* ↓ kadan */
-  font-weight:600;
-}
-
-.home-date{
-  font-size:10px;            /* ↓ */
-  color:#777;
-}
-
-.home-right{
-  text-align:right;
-}
-
-.home-amount{
-  font-size:13px;            /* ↓ */
+  padding:14px;
+  border-radius:12px;
+  border:none;
   font-weight:bold;
+  font-size:16px;
 }
 
-.home-status{
-  font-size:10px;            /* ↓ */
+.primary{
+  background:#0f7a3d;
+  color:#fff;
+}
+
+.secondary{
+  background:#fff;
+  border:1px solid #0f7a3d;
   color:#0f7a3d;
 }
 
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.btn.primary:active{
+  transform:scale(.97);
 }
 
-.header-right .about-link{
-  font-size:13px;
-  color:#e6f4ea;
-  cursor:pointer;
-  opacity:.9;
-}
-
-.header-right .about-link:hover{
-  opacity:1;
-}
-
-.home-tx{
+/* ================= BOTTOM NAV ================= */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:60px;
   background:#fff;
-  border-radius:12px;
-  padding:8px 10px;          /* rage padding */
-  margin-bottom:6px;
   display:flex;
+  justify-content:space-around;
   align-items:center;
-  gap:8px;                   /* rage tazara */
+  border-top:1px solid #cceedd;
+  z-index:100;
 }
 
-.home-title{
-  font-size:12px;
-  font-weight:600;
+.bottom-nav a{
+  text-decoration:none;
+  color:#0f7a3d;
+  font-weight:bold;
+  font-size:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
-.home-date{
-  font-size:10px;
-  color:#888;
+.bottom-nav a span{
+  font-size:18px;
 }
 
-.home-amount{
-  font-size:12px;
-  font-weight:600;
-}
-
-.home-status{
-  font-size:10px;
-}
+.bottom-nav a.active{
+  color:#0f7a3d;
+                  }
