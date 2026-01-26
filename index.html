@@ -163,3 +163,31 @@ window.addEventListener("DOMContentLoaded", loadHome);
 
 </body>
   </html>
+
+<script>
+const messages = [
+  "Welcome to Albukhr Investment Limited — Building sustainable industries & empowering communities.",
+  "📢 Albukhr is opening doors for external projects to join our staking ecosystem.",
+  "🌍 Powered by Pi Network — connecting local industries to global value.",
+  "🚀 Stake, grow, and support verified community-driven projects on Albukhr.",
+  "🧩 Have a project? Submit it via Services and get verified by Albukhr."
+];
+
+const welcomeText = document.getElementById("welcomeText");
+let index = 0;
+
+function rotateWelcome(){
+  index = (index + 1) % messages.length;
+
+  /* fade out */
+  welcomeText.style.opacity = 0;
+
+  setTimeout(() => {
+    welcomeText.textContent = messages[index];
+    welcomeText.style.opacity = 1;
+  }, 500);
+}
+
+/* canza sako duk sakan 6 */
+setInterval(rotateWelcome, 6000);
+</script>
