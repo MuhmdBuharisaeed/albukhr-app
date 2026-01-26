@@ -9,12 +9,24 @@
 
 <body data-page="home">
 
+<!-- HEADER -->
 <header class="header">
   <h1 class="brand">ALBUKHR</h1>
 </header>
 
+<!-- WELCOME / ANNOUNCEMENT BAR -->
 <div class="welcome-bar">
-  <div class="welcome-track">
+  <div
+    id="welcomeText"
+    style="
+      width:100%;
+      text-align:center;
+      font-size:14px;
+      color:#0f7a3d;
+      padding:6px 10px;
+      transition:opacity .5s ease;
+    "
+  >
     Welcome to Albukhr Investment Limited — Building sustainable industries
     & empowering communities through investment.
   </div>
@@ -32,47 +44,40 @@
   </div>
 </section>
 
-<!-- PROJECTS -->
+<!-- PROJECTS (ALBUKHR CORE ONLY) -->
 <section class="projects">
   <h2>Albukhr Projects</h2>
 
-  <!-- A -->
   <a href="azman.html" class="project-item active">
     <span>🧪 Azman Futures Makers Lab</span>
     <small>Demo</small>
   </a>
 
-  <!-- L -->
   <a href="labbaika.html" class="project-item active">
     <span>🍞 Labbaika Bakery Center</span>
     <small>Demo</small>
   </a>
 
-  <!-- B -->
   <a href="barsh.html" class="project-item active">
     <span>🌾 Barsh Agro</span>
     <small>Demo</small>
   </a>
 
-  <!-- U -->
   <a href="urban.html" class="project-item active">
     <span>🚍 Urban Mobility</span>
     <small>Demo</small>
   </a>
 
-  <!-- K -->
   <a href="khairat.html" class="project-item active">
     <span>♻️ Khairat Organic Fertiliser</span>
     <small>Demo</small>
   </a>
 
-  <!-- H -->
   <a href="hauwal.html" class="project-item active">
     <span>🌽 Hauwal Sumonviter</span>
     <small>Demo</small>
   </a>
 
-  <!-- R -->
   <a href="raheem.html" class="project-item active">
     <span>💊 Raheem Pharmacy</span>
     <small>Demo</small>
@@ -104,7 +109,9 @@
 </nav>
 
 <script src="staking.js"></script>
+
 <script>
+/* ICON MAP */
 const ICONS = {
   Raheem: "💊",
   Hauwal: "🌽",
@@ -115,6 +122,7 @@ const ICONS = {
   Labbaika: "🍞"
 };
 
+/* LOAD HOME DATA */
 function loadHome(){
   const totals = getTotals();
   homeStake.innerText = totals.totalStake.toFixed(2) + " Pi";
@@ -140,7 +148,7 @@ function loadHome(){
     const div = document.createElement("div");
     div.className = "home-tx";
     div.innerHTML = `
-      <div class="home-icon" style="font-size:14px">
+      <div class="home-icon">
         ${ICONS[s.project] || "📦"}
       </div>
 
@@ -159,12 +167,8 @@ function loadHome(){
 }
 
 window.addEventListener("DOMContentLoaded", loadHome);
-</script>
 
-</body>
-  </html>
-
-<script>
+/* WELCOME / ANNOUNCEMENT ROTATION */
 const messages = [
   "Welcome to Albukhr Investment Limited — Building sustainable industries & empowering communities.",
   "📢 Albukhr is opening doors for external projects to join our staking ecosystem.",
@@ -174,20 +178,19 @@ const messages = [
 ];
 
 const welcomeText = document.getElementById("welcomeText");
-let index = 0;
+let msgIndex = 0;
 
-function rotateWelcome(){
-  index = (index + 1) % messages.length;
-
-  /* fade out */
+setInterval(() => {
   welcomeText.style.opacity = 0;
 
   setTimeout(() => {
-    welcomeText.textContent = messages[index];
+    msgIndex = (msgIndex + 1) % messages.length;
+    welcomeText.textContent = messages[msgIndex];
     welcomeText.style.opacity = 1;
   }, 500);
-}
 
-/* canza sako duk sakan 6 */
-setInterval(rotateWelcome, 6000);
+}, 6000);
 </script>
+
+</body>
+    </html>
