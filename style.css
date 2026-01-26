@@ -362,3 +362,7 @@ body{
   border:1px solid #cceedd;
   font-size:15px;
 }
+
+.welcome-track{
+  transition: opacity .5s ease;
+}
