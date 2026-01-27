@@ -94,7 +94,7 @@
 <script src="staking-core.js"></script>
 <script src="staking-internal.js"></script>
 <script src="staking-external.js"></script>
-
+  
 <script>
 /* ICON MAP */
 const ICONS = {
@@ -129,11 +129,19 @@ function loadHome(){
 
   stakes.forEach(s=>{
     const t = formatDateTime(s);
+
+    const projectName =
+      s.meta?.projectName ||
+      s.projectId ||
+      "Project";
+
+    const icon = ICONS[projectName] || "📦";
+
     box.innerHTML += `
       <div class="home-tx">
-        <div class="home-icon">${ICONS[s.project] || "📦"}</div>
+        <div class="home-icon">${icon}</div>
         <div class="home-body">
-          <div class="home-title">${s.project} Stake</div>
+          <div class="home-title">${projectName} Stake</div>
           <div class="home-date">${t.date} • ${t.time}</div>
         </div>
         <div class="home-right">
@@ -146,35 +154,4 @@ function loadHome(){
 }
 
 window.addEventListener("DOMContentLoaded", loadHome);
-
-/* WELCOME → ANNOUNCEMENT FLOW */
-const scroll = document.getElementById("welcomeScroll");
-const announce = document.getElementById("welcomeAnnounce");
-
-const announcements = [
-  "📢 Albukhr is opening doors for external projects to join our staking ecosystem.",
-  "🌍 Powered by Pi Network — connecting local industries to global value.",
-  "🚀 Stake, grow, and support verified community-driven projects on Albukhr.",
-  "🧩 Have a project? Submit it via Services and get verified by Albukhr."
-];
-
-let aIndex = 0;
-
-setTimeout(() => {
-  scroll.style.display = "none";
-  announce.style.display = "block";
-
-  setInterval(() => {
-    announce.style.opacity = 0;
-    setTimeout(() => {
-      aIndex = (aIndex + 1) % announcements.length;
-      announce.textContent = announcements[aIndex];
-      announce.style.opacity = 1;
-    }, 500);
-  }, 6000);
-
-}, 18000);
-</script>
-
-</body>
-</html>
+    </script>
