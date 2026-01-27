@@ -94,6 +94,7 @@ function loadTransactions(){
   stakes.forEach(s=>{
     const t = formatDateTime(s); // 🔐 anti-NaN (timestamp based)
 
+    const recent = getInternalRecent(2);
     const div = document.createElement("div");
     div.className = "project-tx";
     div.innerHTML = `
