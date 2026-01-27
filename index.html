@@ -143,6 +143,10 @@ function loadHome(){
   homeStake.innerText = totals.totalStake.toFixed(2) + " Pi";
   homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
 
+const totals = getInternalTotals();
+homeStake.innerText  = totals.totalStake.toFixed(2) + " Pi";
+homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
+
   const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
