@@ -8,7 +8,11 @@ const INT_STAKE_KEY = "albukhr_internal_stakes";
 /* ---------- HELPERS ---------- */
 
 function loadInternal(){
-  return JSON.parse(localStorage.getItem(INT_STAKE_KEY) || "[]");
+  try{
+    return JSON.parse(localStorage.getItem(INT_STAKE_KEY)) || [];
+  }catch(e){
+    return [];
+  }
 }
 
 function saveInternal(data){
@@ -17,8 +21,8 @@ function saveInternal(data){
 
 /* ---------- CORE FUNCTIONS ---------- */
 
-/* CREATE STAKE */
-function stakeInternal(project, amount){
+/* CREATE INTERNAL STAKE (GUARANTEED) */
+function stakeInternal(projectId, amount){
   amount = Number(amount);
 
   if(isNaN(amount) || amount <= 0){
@@ -27,30 +31,76 @@ function stakeInternal(project, amount){
 
   const reward = +(amount * 0.10).toFixed(2); // 10% fixed reward
 
+  /* INTERNAL RECORD */
   const stake = {
     stakeId: "INT-" + Date.now(),
-    project,
+    project: projectId,
+    projectId,
     amount,
     reward,
     status: "Successful",
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    meta: {
+      engine: "internal",
+      guaranteed: true
+    }
   };
 
   const all = loadInternal();
   all.push(stake);
   saveInternal(all);
 
+  /* CORE LEDGER (SAFE – DOES NOT BREAK IF CORE MISSING) */
+  try{
+    /* RECORD STAKE */
+    recordStake(
+      createStake({
+        user: "system",
+        projectId,
+        projectType: "internal",
+        amount,
+        meta: stake.meta
+      })
+    );
+
+    /* RECORD STAKE TX */
+    recordTransaction(
+      createTransaction({
+        user: "system",
+        projectId,
+        amount,
+        type: "stake",
+        status: "Successful"
+      })
+    );
+
+    /* RECORD REWARD TX */
+    recordTransaction(
+      createTransaction({
+        user: "system",
+        projectId,
+        amount: reward,
+        type: "reward",
+        status: "Successful"
+      })
+    );
+  }catch(e){
+    console.warn("Core ledger unavailable:", e);
+  }
+
   return stake;
 }
 
-/* GET ALL STAKES */
+/* ---------- READ OPERATIONS ---------- */
+
+/* GET ALL INTERNAL STAKES */
 function getInternalStakes(){
   return loadInternal();
 }
 
 /* GET STAKES BY PROJECT */
-function getInternalStakesByProject(project){
-  return loadInternal().filter(s => s.project === project);
+function getInternalStakesByProject(projectId){
+  return loadInternal().filter(s => s.projectId === projectId);
 }
 
 /* TOTALS (HOME DASHBOARD SAFE) */
@@ -61,7 +111,7 @@ function getInternalTotals(){
   let totalReward = 0;
 
   all.forEach(s => {
-    totalStake += Number(s.amount) || 0;
+    totalStake  += Number(s.amount) || 0;
     totalReward += Number(s.reward) || 0;
   });
 
@@ -71,10 +121,10 @@ function getInternalTotals(){
   };
 }
 
-/* RECENT TRANSACTIONS */
+/* RECENT INTERNAL TRANSACTIONS */
 function getInternalRecent(limit = 3){
   return loadInternal()
     .slice()
     .reverse()
     .slice(0, limit);
-}
+         }
