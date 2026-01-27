@@ -1,13 +1,14 @@
 // ===============================
 // ALBUKHR STAKING ENGINE (STABLE)
+// Internal Projects Only
 // ===============================
 
 const STORAGE_KEY = "albukhr_stakes";
 
 /* ===============================
-   STORAGE
+   STORAGE CORE
 ================================ */
-function getStakes(){
+function _getAllStakes(){
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   } catch {
@@ -15,20 +16,20 @@ function getStakes(){
   }
 }
 
-function saveStakes(stakes){
+function _saveAllStakes(stakes){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(stakes));
 }
 
 /* ===============================
-   PROJECT RULES
+   PROJECT RULES (INTERNAL)
 ================================ */
 const PROJECT_RULES = {
   Raheem:   { minStake: 10 },
   Hauwal:   { minStake: 20 },
   Barsh:    { minStake: 100 },
   Khairat:  { minStake: 50 },
-  Urban:    { minStake: 150 },   // 🚍 Urban Mobility
-  Labbaika: { minStake: 30 }     // 🍞 Labbaika Bakery
+  Urban:    { minStake: 150 },
+  Labbaika: { minStake: 30 }
 };
 
 function getMinStake(project){
@@ -36,7 +37,7 @@ function getMinStake(project){
 }
 
 /* ===============================
-   REWARD RATES
+   REWARD RATES (INTERNAL)
 ================================ */
 function getRate(project, duration){
 
@@ -71,7 +72,7 @@ function getRate(project, duration){
   }
 
   if(project === "Urban"){
-    return 0.12; // long-term infrastructure reward
+    return 0.12;
   }
 
   return 0;
@@ -86,19 +87,19 @@ function addStake({ project, amount, duration }){
   const safeDuration = Number(duration);
   const rate = getRate(project, safeDuration);
 
-  if (
+  if(
     !project ||
     isNaN(safeAmount) ||
     isNaN(safeDuration) ||
     safeAmount <= 0
-  ) {
+  ){
     return false;
   }
 
   const reward = safeAmount * rate;
   const now = new Date();
 
-  const stakes = getStakes();
+  const stakes = _getAllStakes();
 
   stakes.push({
     id: Date.now(),
@@ -107,33 +108,31 @@ function addStake({ project, amount, duration }){
     duration: safeDuration,
     reward: Number(reward) || 0,
     status: "Successful",
-    timestamp: now.toISOString()
+    timestamp: now.toISOString(),
+    type: "internal"   // 🔑 future-proof
   });
 
-  saveStakes(stakes);
+  _saveAllStakes(stakes);
   return true;
 }
 
 /* ===============================
-   TOTALS (HOME – SAFE)
+   TOTALS (HOME SAFE)
 ================================ */
 function getTotals(){
 
-  const stakes = getStakes();
+  const stakes = _getAllStakes();
   let totalStake = 0;
   let totalReward = 0;
 
   stakes.forEach(s=>{
-    if(s && s.status === "Successful"){
+    if(s?.status === "Successful"){
       totalStake += Number(s.amount) || 0;
       totalReward += Number(s.reward) || 0;
     }
   });
 
-  return {
-    totalStake,
-    totalReward
-  };
+  return { totalStake, totalReward };
 }
 
 /* ===============================
@@ -141,7 +140,7 @@ function getTotals(){
 ================================ */
 function getProjectTotals(project){
 
-  const all = getStakes();
+  const all = _getAllStakes();
   const filtered = all.filter(s => s.project === project);
 
   let stake = 0;
@@ -154,19 +153,15 @@ function getProjectTotals(project){
     }
   });
 
-  return {
-    stake,
-    reward,
-    stakes: filtered
-  };
+  return { stake, reward, stakes: filtered };
 }
 
 /* ===============================
-   DATE / TIME FORMATTER (SAFE)
+   DATE / TIME FORMATTER
 ================================ */
 function formatDateTime(stake){
 
-  if(stake && stake.timestamp){
+  if(stake?.timestamp){
     const d = new Date(stake.timestamp);
     if(!isNaN(d)){
       return {
@@ -180,22 +175,13 @@ function formatDateTime(stake){
     }
   }
 
-  return {
-    date: "--",
-    time: "--"
-  };
-     }
+  return { date: "--", time: "--" };
+}
 
-/* staking.js = LEGACY BRIDGE */
-
+/* ===============================
+   LEGACY BRIDGE (DO NOT REMOVE)
+   Keeps old pages working
+================================ */
 function getStakes(){
-  return getAllStakes();   // daga core
-}
-
-function getTotals(){
-  return window.getTotals();
-}
-
-function formatDateTime(o){
-  return window.formatDateTime(o);
+  return _getAllStakes();
 }
