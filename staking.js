@@ -185,3 +185,17 @@ function formatDateTime(stake){
     time: "--"
   };
      }
+
+/* staking.js = LEGACY BRIDGE */
+
+function getStakes(){
+  return getAllStakes();   // daga core
+}
+
+function getTotals(){
+  return window.getTotals();
+}
+
+function formatDateTime(o){
+  return window.formatDateTime(o);
+}
