@@ -215,6 +215,17 @@ function renderExternal(q){
     return;
   }
 
+function searchProjects(q){
+  q = q.toLowerCase();
+
+  document.querySelectorAll(".project-card").forEach(card=>{
+    card.style.display =
+      card.innerText.toLowerCase().includes(q)
+      ? "flex"
+      : "none";
+  });
+}
+  
   filtered.forEach(p=>{
     externalList.innerHTML += `
       <div class="project-card">
