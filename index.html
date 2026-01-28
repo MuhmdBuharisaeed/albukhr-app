@@ -90,7 +90,6 @@
 <script src="staking-external.js"></script>
 
 <script>
-/* ---------- ICON MAP ---------- */
 const ICONS = {
   Raheem: "💊",
   Hauwal: "🌽",
@@ -101,32 +100,26 @@ const ICONS = {
   Labbaika: "🍞"
 };
 
-/* ---------- DATE FORMATTER (MISSING FIX) ---------- */
-function formatDateTime(stake){
-  const d = new Date(stake.timestamp);
-  return {
-    date: d.toLocaleDateString(),
-    time: d.toLocaleTimeString()
-  };
-}
-
-/* ---------- LOAD HOME ---------- */
 function loadHome(){
 
-  const homeStake  = document.getElementById("homeStake");
-  const homeReward = document.getElementById("homeReward");
-  const box        = document.getElementById("homeTx");
-
+  /* ===== STATS ===== */
   const totals = getInternalTotals();
-  homeStake.textContent  = totals.totalStake.toFixed(2) + " Pi";
-  homeReward.textContent = totals.totalReward.toFixed(2) + " Pi";
 
+  document.getElementById("homeStake").innerText =
+    totals.totalStake.toFixed(2) + " Pi";
+
+  document.getElementById("homeReward").innerText =
+    totals.totalReward.toFixed(2) + " Pi";
+
+  /* ===== RECENT TRANSACTIONS ===== */
+  const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
   const stakes = getInternalStakes()
     .filter(s => s.status === "Successful")
-    .slice(-2)
-    .reverse();
+    .slice()
+    .reverse()
+    .slice(0,2);
 
   if(stakes.length === 0){
     box.innerHTML =
@@ -136,14 +129,13 @@ function loadHome(){
 
   stakes.forEach(s=>{
     const t = formatDateTime(s);
-    const projectName = s.project || "Project";
-    const icon = ICONS[projectName] || "📦";
+    const icon = ICONS[s.project] || "📦";
 
     box.innerHTML += `
       <div class="home-tx">
         <div class="home-icon">${icon}</div>
         <div class="home-body">
-          <div class="home-title">${projectName} Stake</div>
+          <div class="home-title">${s.project} Stake</div>
           <div class="home-date">${t.date} • ${t.time}</div>
         </div>
         <div class="home-right">
@@ -157,6 +149,6 @@ function loadHome(){
 
 window.addEventListener("DOMContentLoaded", loadHome);
 </script>
-
+  
 </body>
 </html>
