@@ -3,191 +3,115 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raheem Pharmacy</title>
+<title>Transaction History</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
+body{
+  background:#f5f7f6;
+  padding-bottom:90px;
+  font-family:Arial
+}
+
 .section{padding:16px}
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
-.stat-card span{display:block;color:#666;font-size:14px}
-.stat-card strong{font-size:18px;margin-top:6px;display:block}
-.btns{display:flex;gap:12px;margin-top:12px}
-.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-.short-info{background:#fff;border-radius:14px;padding:14px;margin-top:14px;font-size:14px;color:#444;line-height:1.6}
-.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
-.project-icon{font-size:18px}
+
+/* TRANSACTION CARD */
+.project-tx{
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:8px; /* rage spacing */
+}
+
+/* ICON – RAGE GIRMA */
+.project-icon{
+  font-size:16px;
+  width:26px;
+  text-align:center
+}
+
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
 .project-date{font-size:11px;color:#777}
+
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
-.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
-label{margin-top:12px;display:block}
-input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
-.success{text-align:center}
-.success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <header class="header">
   <div class="header-left">
-    <span>💊 Raheem Pharmacy</span>
+    <span>All Transactions</span>
   </div>
-  <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
 <section class="section">
-
-  <div class="stats">
-    <div class="stat-card">
-      <span>Your Stake</span>
-      <strong id="rStake">0.00 Pi</strong>
-    </div>
-    <div class="stat-card">
-      <span>Your Reward</span>
-      <strong id="rReward">0.00 Pi</strong>
-    </div>
-  </div>
-
-  <div class="short-info">
-    <strong>Raheem Pharmacy</strong> is an ALBUKHR healthcare project focused on
-    improving access to essential medicines through transparent,
-    community-driven staking.
-  </div>
-
-  <div class="btns">
-    <button class="btn primary" onclick="openModal()">Stake</button>
-    <button class="btn secondary" onclick="history.back()">Back</button>
-  </div>
-
-  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
-  <div id="raheemHistory"></div>
-
+  <div id="txList"></div>
 </section>
-
-<div class="modal" id="stakeModal">
-  <div class="modal-box">
-    <h3>Stake in Raheem</h3>
-
-    <label>Amount (Pi)</label>
-    <input type="number" id="amountInput">
-
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
-    </small>
-
-    <label>Duration</label>
-    <select id="durationSelect">
-      <option value="30">30 Days</option>
-      <option value="60">60 Days</option>
-      <option value="90">90 Days</option>
-    </select>
-
-    <div class="btns" style="margin-top:16px">
-      <button class="btn primary" onclick="confirmStake()">Confirm</button>
-      <button class="btn secondary" onclick="closeModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="successModal">
-  <div class="modal-box success">
-    <h3>Stake Successful</h3>
-    <p id="successText"></p>
-    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
-  </div>
-</div>
-
-<div class="modal" id="infoModal">
-  <div class="modal-box">
-    <h3>About Raheem Pharmacy</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6">
-      Raheem Pharmacy strengthens pharmaceutical supply chains
-      and community healthcare access through sustainable investment.
-    </p>
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
-  </div>
-</div>
 
 <script src="staking.js"></script>
 <script>
-const stakeModal = document.getElementById("stakeModal");
-const successModal = document.getElementById("successModal");
-const infoModal = document.getElementById("infoModal");
+const txList = document.getElementById("txList");
 
-function openModal(){
-  stakeModal.style.display="flex";
-  minHint.innerText = "Minimum stake: " + getMinStake("Raheem") + " Pi";
-}
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
+/* ✅ HUKUMA ICON MAP */
+const ICONS = {
+  Raheem:   "💊",
+  Hauwal:   "🌽",
+  Barsh:    "🌾",
+  Khairat:  "♻️",
+  Azman:    "🧪",
+  Urban:    "🚍",
+  Labbaika: "🍞"
+};
 
-function confirmStake(){
-  const amount = Number(amountInput.value) || 0;
-  const duration = Number(durationSelect.value);
-  const min = getMinStake("Raheem");
+function loadTransactions(){
 
-  if(amount < min){
-    alert("Minimum stake is " + min + " Pi");
-    return;
-  }
+  const stakes = getStakes()
+    .filter(s => s.status === "Successful")
+    .slice()
+    .reverse();
 
-  addStake({ project:"Raheem", amount, duration });
+  txList.innerHTML = "";
 
-  const reward = amount * getRate("Raheem", duration);
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
-
-  closeModal();
-  successModal.style.display="flex";
-  load();
-}
-
-function load(){
-  const data = getProjectTotals("Raheem") || { stake:0, reward:0, stakes:[] };
-
-  rStake.innerText = (data.stake || 0).toFixed(2) + " Pi";
-  rReward.innerText = (data.reward || 0).toFixed(2) + " Pi";
-
-  raheemHistory.innerHTML = "";
-
-  if(!data.stakes || data.stakes.length === 0){
-    raheemHistory.innerHTML =
+  if(stakes.length === 0){
+    txList.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  data.stakes.slice().reverse().forEach(s=>{
-    const t = formatDateTime(s);
+  stakes.forEach(s=>{
+    const t = formatDateTime(s); // 🔐 anti-NaN (timestamp based)
+
     const div = document.createElement("div");
-    div.className="project-tx";
-    div.innerHTML=`
-      <div class="project-icon">💊</div>
+    div.className = "project-tx";
+    div.innerHTML = `
+      <div class="project-icon">
+        ${ICONS[s.project] || "📦"}
+      </div>
+
       <div class="project-body">
-        <div class="project-title">Raheem Stake</div>
+        <div class="project-title">${s.project} Stake</div>
         <div class="project-date">${t.date} • ${t.time}</div>
       </div>
+
       <div class="project-right">
-        <div class="project-amount">${s.amount} Pi</div>
+        <div class="project-amount">${Number(s.amount).toFixed(2)} Pi</div>
         <div class="project-status">Successful</div>
       </div>
     `;
-    raheemHistory.appendChild(div);
+    txList.appendChild(div);
   });
 }
 
-load();
+loadTransactions();
 </script>
 
 </body>
