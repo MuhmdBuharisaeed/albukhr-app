@@ -128,3 +128,45 @@ function getInternalRecent(limit = 3){
     .reverse()
     .slice(0, limit);
          }
+
+function stakeInternal(project, amount){
+  amount = Number(amount);
+
+  if(isNaN(amount) || amount <= 0){
+    throw "Invalid stake amount";
+  }
+
+  const reward = +(amount * 0.10).toFixed(2);
+
+  const stake = {
+    stakeId: "INT-" + Date.now(),
+    project,
+    amount,
+    reward,
+    status: "Successful",
+    timestamp: Date.now()
+  };
+
+  const all = loadInternal();
+  all.push(stake);
+  saveInternal(all);
+
+  /* ===== CORE TRANSACTION ===== */
+  recordTransaction({
+    user: "internal",
+    projectId: project,
+    amount,
+    type: "stake",
+    status: "Successful"
+  });
+
+  recordTransaction({
+    user: "internal",
+    projectId: project,
+    amount: reward,
+    type: "reward",
+    status: "Successful"
+  });
+
+  return stake;
+       }
