@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Internal Project Onboarding</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px
+}
+label{
+  display:block;
+  font-size:13px;
+  margin-top:12px;
+  color:#444
+}
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:15px
+}
+textarea{min-height:90px}
+.notice{
+  font-size:12px;
+  color:#666;
+  line-height:1.6;
+  margin-top:10px
+}
+.checkbox{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  margin-top:14px;
+  font-size:13px
+}
+button{
+  width:100%;
+  margin-top:16px;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#0f7a3d;
+  color:#fff;
+  font-size:16px;
+  font-weight:700
+}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <span>🔒 Internal Project Registration</span>
+  </div>
+</header>
+
+<section class="section" id="mainContent">
+
+  <div class="card">
+    <h3>Project Information</h3>
+
+    <label>Project Name</label>
+    <input id="pName" placeholder="e.g. Raheem Pharmacy">
+
+    <label>Project Category</label>
+    <select id="pCategory">
+      <option value="">Select category</option>
+      <option>Healthcare</option>
+      <option>Agriculture</option>
+      <option>Technology</option>
+      <option>Transportation</option>
+      <option>Manufacturing</option>
+    </select>
+
+    <label>Short Description</label>
+    <textarea id="pDesc"></textarea>
+  </div>
+
+  <div class="card">
+    <h3>Project Lead (Core Team)</h3>
+
+    <label>Full Name</label>
+    <input id="leadName">
+
+    <label>Role in Albukhr</label>
+    <input id="leadRole" placeholder="Core Team Member">
+
+    <div class="notice">
+      This project will be fully governed under Albukhr internal policies.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Wallet & Governance</h3>
+
+    <div class="notice">
+      • Project funds will be managed via an Albukhr-designated Pi wallet.<br>
+      • Direct external Pi deposits are not enabled unless approved by Pi Network.<br>
+      • Albukhr retains oversight rights on this project.
+    </div>
+
+    <div class="checkbox">
+      <input type="checkbox" id="agree1">
+      <span>I agree that Albukhr Investment Limited has full oversight authority.</span>
+    </div>
+
+    <div class="checkbox">
+      <input type="checkbox" id="agree2">
+      <span>I confirm this project is internal and complies with Albukhr & Pi Network rules.</span>
+    </div>
+  </div>
+
+  <button onclick="submitProject()">Submit Internal Project</button>
+
+</section>
+
+<script>
+/* SIMPLE ACCESS GUARD */
+const params = new URLSearchParams(location.search);
+if(params.get("invite") !== "ALBUKHR_CORE_2026"){
+  document.body.innerHTML =
+    "<p style='padding:40px;text-align:center'>Access Restricted</p>";
+}
+
+/* SUBMIT */
+function submitProject(){
+  if(
+    !pName.value ||
+    !pCategory.value ||
+    !leadName.value ||
+    !agree1.checked ||
+    !agree2.checked
+  ){
+    alert("Please complete all required fields");
+    return;
+  }
+
+  alert(
+    "Project submitted successfully.\n\n" +
+    "Albukhr core team will review and activate this project."
+  );
+
+  // future: save to internal registry / admin approval flow
+}
+</script>
+
+</body>
+</html>
