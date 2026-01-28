@@ -196,3 +196,8 @@ function formatDateTime(obj){
 function getStakes(){
   return _getAllStakes();
      }
+
+/* INTERNAL WRAPPERS */
+function addInternalStake(p){ return addStake(p); }
+function getInternalTotals(){ return getTotals(); }
+function getInternalProjectTotals(p){ return getProjectTotals(p); }
