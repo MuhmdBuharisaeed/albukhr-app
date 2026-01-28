@@ -110,67 +110,63 @@ input{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid
   </div>
 </div>
 
-<!-- CORE SCRIPTS -->
+<!-- INTERNAL STAKING ENGINE (STABLE) -->
 <script src="staking.js"></script>
-<script src="staking-core.js"></script>
-<script src="staking-internal.js"></script>
 
 <script>
-const stakeModal = document.getElementById("stakeModal");
+const stakeModal   = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
-const infoModal = document.getElementById("infoModal");
+const infoModal    = document.getElementById("infoModal");
 
 function openModal(){
-  stakeModal.style.display="flex";
-  document.getElementById("minHint").innerText =
+  stakeModal.style.display = "flex";
+  minHint.innerText =
     "Minimum stake: " + getMinStake("Raheem") + " Pi";
 }
 
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
+function closeModal(){ stakeModal.style.display = "none"; }
+function closeSuccess(){ successModal.style.display = "none"; }
+function openInfo(){ infoModal.style.display = "flex"; }
+function closeInfo(){ infoModal.style.display = "none"; }
 
-/* ===== CONFIRM STAKE ===== */
 function confirmStake(){
+
   const amount   = Number(amountInput.value);
   const duration = Number(durationSelect.value);
   const min      = getMinStake("Raheem");
 
-  if(!amount || amount < min){
+  if(isNaN(amount) || amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  /* USE OLD ENGINE */
-  const stake = addStake({
+  addStake({
     project: "Raheem",
     amount,
     duration
   });
 
-  /* RECORD INTO INTERNAL LEDGER */
-  recordInternalFromLegacy(stake);
+  const reward = amount * getRate("Raheem", duration);
 
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days`;
+    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
 
   closeModal();
-  successModal.style.display="flex";
+  successModal.style.display = "flex";
   loadRaheem();
 }
 
-/* ===== LOAD PAGE ===== */
+/* LOAD DASHBOARD */
 function loadRaheem(){
 
   const data = getProjectTotals("Raheem");
 
-  rStake.innerText  = (data.stake || 0).toFixed(2) + " Pi";
-  rReward.innerText = (data.reward || 0).toFixed(2) + " Pi";
+  rStake.innerText  = data.stake.toFixed(2) + " Pi";
+  rReward.innerText = data.reward.toFixed(2) + " Pi";
 
   raheemHistory.innerHTML = "";
 
-  if(!data.stakes || data.stakes.length === 0){
+  if(data.stakes.length === 0){
     raheemHistory.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
@@ -195,8 +191,7 @@ function loadRaheem(){
   });
 }
 
-loadRaheem();
-</script>
+loadRaheem();                                                                           </script>
 
 </body>
 </html>
