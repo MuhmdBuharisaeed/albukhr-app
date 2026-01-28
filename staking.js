@@ -79,13 +79,13 @@ function getRate(project, duration){
 }
 
 /* ===============================
-   ADD STAKE (ANTI-NaN SAFE)
+   ADD STAKE (NO CHANGE)
 ================================ */
 function addStake({ project, amount, duration }){
 
-  const safeAmount = Number(amount);
+  const safeAmount   = Number(amount);
   const safeDuration = Number(duration);
-  const rate = getRate(project, safeDuration);
+  const rate         = getRate(project, safeDuration);
 
   if(
     !project ||
@@ -97,19 +97,18 @@ function addStake({ project, amount, duration }){
   }
 
   const reward = safeAmount * rate;
-  const now = new Date();
 
   const stakes = _getAllStakes();
 
   stakes.push({
     id: Date.now(),
-    project,
+    project,              // 🔑 INTERNAL PROJECT NAME
     amount: safeAmount,
     duration: safeDuration,
     reward: Number(reward) || 0,
     status: "Successful",
-    timestamp: now.toISOString(),
-    type: "internal"   // 🔑 future-proof
+    timestamp: Date.now(), // 🔑 unified timestamp
+    type: "internal"
   });
 
   _saveAllStakes(stakes);
@@ -117,7 +116,7 @@ function addStake({ project, amount, duration }){
 }
 
 /* ===============================
-   TOTALS (HOME SAFE)
+   TOTALS (INDEX HOME)
 ================================ */
 function getTotals(){
 
@@ -127,7 +126,7 @@ function getTotals(){
 
   stakes.forEach(s=>{
     if(s?.status === "Successful"){
-      totalStake += Number(s.amount) || 0;
+      totalStake  += Number(s.amount) || 0;
       totalReward += Number(s.reward) || 0;
     }
   });
@@ -136,21 +135,34 @@ function getTotals(){
 }
 
 /* ===============================
-   PROJECT TOTALS (SAFE)
+   INTERNAL TOTALS (BRIDGE)
+================================ */
+function getInternalTotals(){
+  return getTotals();
+}
+
+/* ===============================
+   INTERNAL STAKES (BRIDGE)
+================================ */
+function getInternalStakes(){
+  return _getAllStakes().filter(s => s.type === "internal");
+}
+
+/* ===============================
+   PROJECT TOTALS (Raheem etc.)
 ================================ */
 function getProjectTotals(project){
 
-  const all = _getAllStakes();
-  const filtered = all.filter(s => s.project === project);
+  const filtered = _getAllStakes().filter(
+    s => s.project === project && s.status === "Successful"
+  );
 
   let stake = 0;
   let reward = 0;
 
   filtered.forEach(s=>{
-    if(s.status === "Successful"){
-      stake += Number(s.amount) || 0;
-      reward += Number(s.reward) || 0;
-    }
+    stake  += Number(s.amount) || 0;
+    reward += Number(s.reward) || 0;
   });
 
   return { stake, reward, stakes: filtered };
@@ -159,29 +171,28 @@ function getProjectTotals(project){
 /* ===============================
    DATE / TIME FORMATTER
 ================================ */
-function formatDateTime(stake){
+function formatDateTime(obj){
 
-  if(stake?.timestamp){
-    const d = new Date(stake.timestamp);
-    if(!isNaN(d)){
-      return {
-        date: d.toLocaleDateString("en-GB"),
-        time: d.toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
-        })
-      };
-    }
+  const ts = obj?.timestamp || Date.now();
+  const d = new Date(ts);
+
+  if(isNaN(d)){
+    return { date:"--", time:"--" };
   }
 
-  return { date: "--", time: "--" };
+  return {
+    date: d.toLocaleDateString("en-GB"),
+    time: d.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    })
+  };
 }
 
 /* ===============================
-   LEGACY BRIDGE (DO NOT REMOVE)
-   Keeps old pages working
+   LEGACY API (DO NOT REMOVE)
 ================================ */
 function getStakes(){
   return _getAllStakes();
-}
+     }
