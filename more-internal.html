@@ -124,6 +124,39 @@ button{
 
   <button onclick="submitProject()">Submit Internal Project</button>
 
+<script src="internal-registry.js"></script>
+
+<script>
+function submitProject(){
+  if(
+    !pName.value ||
+    !pCategory.value ||
+    !leadName.value ||
+    !agree1.checked ||
+    !agree2.checked
+  ){
+    alert("Please complete all required fields");
+    return;
+  }
+
+  addInternalProject({
+    name: pName.value.trim(),
+    category: pCategory.value,
+    description: pDesc.value.trim(),
+    lead: leadName.value.trim(),
+    role: leadRole.value.trim(),
+    type: "internal"
+  });
+
+  alert(
+    "Submitted successfully.\n\n" +
+    "Status: PENDING APPROVAL"
+  );
+
+  location.reload();
+}
+</script>
+  
 </section>
 
 <script>
