@@ -111,64 +111,74 @@ input{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid
 </div>
 
 <!-- CORE SCRIPTS -->
+<script src="staking.js"></script>
 <script src="staking-core.js"></script>
 <script src="staking-internal.js"></script>
 
 <script>
-const PROJECT = "Raheem";
-
-const stakeModal   = document.getElementById("stakeModal");
+const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
-const infoModal    = document.getElementById("infoModal");
+const infoModal = document.getElementById("infoModal");
 
-function openModal(){ stakeModal.style.display="flex"; }
+function openModal(){
+  stakeModal.style.display="flex";
+  document.getElementById("minHint").innerText =
+    "Minimum stake: " + getMinStake("Raheem") + " Pi";
+}
+
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
 function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
+/* ===== CONFIRM STAKE ===== */
 function confirmStake(){
-  const amount = Number(amountInput.value);
+  const amount   = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+  const min      = getMinStake("Raheem");
 
-  if(!amount || amount <= 0){
-    alert("Enter valid amount");
+  if(!amount || amount < min){
+    alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  const stake = stakeInternal(PROJECT, amount);
+  /* USE OLD ENGINE */
+  const stake = addStake({
+    project: "Raheem",
+    amount,
+    duration
+  });
+
+  /* RECORD INTO INTERNAL LEDGER */
+  recordInternalFromLegacy(stake);
 
   successText.innerText =
-    `You staked ${stake.amount} Pi and earned ${stake.reward} Pi`;
+    `You staked ${amount} Pi for ${duration} days`;
 
   closeModal();
   successModal.style.display="flex";
-  load();
+  loadRaheem();
 }
 
-function load(){
-  const all = getInternalStakesByProject(PROJECT);
+/* ===== LOAD PAGE ===== */
+function loadRaheem(){
 
-  let totalStake = 0;
-  let totalReward = 0;
+  const data = getProjectTotals("Raheem");
 
-  all.forEach(s=>{
-    totalStake += s.amount;
-    totalReward += s.reward;
-  });
-
-  rStake.innerText  = totalStake.toFixed(2) + " Pi";
-  rReward.innerText = totalReward.toFixed(2) + " Pi";
+  rStake.innerText  = (data.stake || 0).toFixed(2) + " Pi";
+  rReward.innerText = (data.reward || 0).toFixed(2) + " Pi";
 
   raheemHistory.innerHTML = "";
 
-  if(all.length === 0){
+  if(!data.stakes || data.stakes.length === 0){
     raheemHistory.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  all.slice().reverse().forEach(s=>{
+  data.stakes.slice().reverse().forEach(s=>{
     const t = formatDateTime(s);
+
     raheemHistory.innerHTML += `
       <div class="project-tx">
         <div class="project-icon">💊</div>
@@ -185,7 +195,7 @@ function load(){
   });
 }
 
-load();
+loadRaheem();
 </script>
 
 </body>
