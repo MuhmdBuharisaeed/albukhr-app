@@ -17,13 +17,11 @@
 <!-- WELCOME / ANNOUNCEMENT BAR -->
 <div class="welcome-bar">
 
-  <!-- SCROLLING WELCOME -->
   <div id="welcomeScroll" class="welcome-track">
     Welcome to Albukhr Investment Limited — Building sustainable industries
     & empowering communities through investment.
   </div>
 
-  <!-- ANNOUNCEMENTS -->
   <div
     id="welcomeAnnounce"
     style="
@@ -53,7 +51,7 @@
   </div>
 </section>
 
-<!-- PROJECTS (ALBUKHR CORE ONLY) -->
+<!-- PROJECTS -->
 <section class="projects">
   <h2>Albukhr Projects</h2>
 
@@ -64,21 +62,17 @@
   <a href="khairat.html" class="project-item active"><span>♻️ Khairat Organic Fertiliser</span><small>Demo</small></a>
   <a href="hauwal.html" class="project-item active"><span>🌽 Hauwal Sumonviter</span><small>Demo</small></a>
   <a href="raheem.html" class="project-item active"><span>💊 Raheem Pharmacy</span><small>Demo</small></a>
-
 </section>
 
 <!-- RECENT TRANSACTIONS -->
 <section class="section">
-
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
     <h3 class="tx-title">Recent Transactions</h3>
     <a href="transactions.html" style="font-size:13px;color:#0f7a3d;text-decoration:none">
       View All →
     </a>
   </div>
-
   <div id="homeTx"></div>
-
 </section>
 
 <!-- BOTTOM NAV -->
@@ -94,9 +88,9 @@
 <script src="staking-core.js"></script>
 <script src="staking-internal.js"></script>
 <script src="staking-external.js"></script>
-  
+
 <script>
-/* ICON MAP */
+/* ---------- ICON MAP ---------- */
 const ICONS = {
   Raheem: "💊",
   Hauwal: "🌽",
@@ -107,14 +101,26 @@ const ICONS = {
   Labbaika: "🍞"
 };
 
-/* LOAD HOME (INTERNAL ONLY) */
+/* ---------- DATE FORMATTER (MISSING FIX) ---------- */
+function formatDateTime(stake){
+  const d = new Date(stake.timestamp);
+  return {
+    date: d.toLocaleDateString(),
+    time: d.toLocaleTimeString()
+  };
+}
+
+/* ---------- LOAD HOME ---------- */
 function loadHome(){
 
-  const totals = getInternalTotals();
-  homeStake.innerText  = totals.totalStake.toFixed(2) + " Pi";
-  homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
+  const homeStake  = document.getElementById("homeStake");
+  const homeReward = document.getElementById("homeReward");
+  const box        = document.getElementById("homeTx");
 
-  const box = document.getElementById("homeTx");
+  const totals = getInternalTotals();
+  homeStake.textContent  = totals.totalStake.toFixed(2) + " Pi";
+  homeReward.textContent = totals.totalReward.toFixed(2) + " Pi";
+
   box.innerHTML = "";
 
   const stakes = getInternalStakes()
@@ -123,18 +129,14 @@ function loadHome(){
     .reverse();
 
   if(stakes.length === 0){
-    box.innerHTML = "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+    box.innerHTML =
+      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
   stakes.forEach(s=>{
     const t = formatDateTime(s);
-
-    const projectName =
-      s.meta?.projectName ||
-      s.projectId ||
-      "Project";
-
+    const projectName = s.project || "Project";
     const icon = ICONS[projectName] || "📦";
 
     box.innerHTML += `
@@ -154,4 +156,7 @@ function loadHome(){
 }
 
 window.addEventListener("DOMContentLoaded", loadHome);
-    </script>
+</script>
+
+</body>
+</html>
