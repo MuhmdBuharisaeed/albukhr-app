@@ -112,7 +112,8 @@
 <!-- ENGINES -->
 <script src="staking.js"></script>          <!-- internal (legacy-safe) -->
 <script src="staking-external.js"></script> <!-- external -->
-
+<script src="internal-registry.js"></script>
+  
 <script>
 /* ===============================
    INTERNAL PROJECT REGISTRY
@@ -142,6 +143,38 @@ function renderInternal(q){
     return;
   }
 
+function loadInternalProjects(){
+  const container = document.getElementById("projectsList");
+  if(!container) return;
+
+  const internals = getInternalProjects()
+    .filter(p => p.status === "approved");
+
+  internals.forEach(p=>{
+    const card = document.createElement("div");
+    card.className = "project-card internal";
+
+    card.innerHTML = `
+      <div class="project-left">
+        <div class="project-icon">🏗️</div>
+        <div>
+          <div class="project-name">${p.name}</div>
+          <div class="project-category">
+            Internal • ${p.category}
+          </div>
+        </div>
+      </div>
+
+      <button class="project-btn"
+        onclick="openInternalProject('${p.name}')">
+        View
+      </button>
+    `;
+
+    container.appendChild(card);
+  });
+    }
+  
   filtered.forEach(p=>{
     internalList.innerHTML += `
       <div class="project-card">
