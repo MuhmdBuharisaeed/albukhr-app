@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submit Project | ALBUKHR</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body data-page="services">
+
+<!-- HEADER -->
+<header class="header">
+  <h1 class="brand">ALBUKHR</h1>
+</header>
+
+<!-- PAGE TITLE -->
+<section class="page-head">
+  <h2>Submit Your Project</h2>
+  <p class="muted">
+    Register your small industry or innovation on Albukhr ecosystem.
+  </p>
+</section>
+
+<!-- FORM WRAPPER -->
+<form class="form-box" id="projectForm">
+
+<!-- STEP 1 -->
+<section class="form-step active">
+  <h3>1. Pi Network Verification</h3>
+
+  <label>Pi Username</label>
+  <input type="text" placeholder="@username" required>
+
+  <label>Pi Wallet Address (Mainnet)</label>
+  <input type="text" placeholder="Gxxxxxxxxxxxxxxxx" required>
+
+  <div class="notice success">
+    ✔ KYC & Migration will be verified automatically
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="form-step">
+  <h3>2. Project Classification</h3>
+
+  <label>Project Name</label>
+  <input type="text" placeholder="Your project name" required>
+
+  <label>Project Category</label>
+  <select required>
+    <option value="">Select category</option>
+    <option>Agriculture</option>
+    <option>Manufacturing</option>
+    <option>Food & Bakery</option>
+    <option>Health</option>
+    <option>Transport</option>
+    <option>Technology</option>
+    <option>Recycling</option>
+    <option>Others</option>
+  </select>
+
+  <label>Project Type</label>
+  <select required>
+    <option value="">Select type</option>
+    <option>Micro Project – 250 Pi</option>
+    <option>Small Industry – 500 Pi</option>
+    <option>Expansion Project – 1,000 Pi</option>
+  </select>
+</section>
+
+<!-- STEP 3 -->
+<section class="form-step">
+  <h3>3. Project Details</h3>
+
+  <label>Project Tagline</label>
+  <input type="text" placeholder="Short one-line description">
+
+  <label>Project Location</label>
+  <input type="text" placeholder="City / Region / Country">
+
+  <label>Project Overview</label>
+  <textarea rows="4" placeholder="Describe your project (min 150 words)" required></textarea>
+
+  <label>Current Stage</label>
+  <select>
+    <option>Idea</option>
+    <option>Pilot</option>
+    <option>Operating</option>
+    <option>Expanding</option>
+  </select>
+</section>
+
+<!-- STEP 4 -->
+<section class="form-step">
+  <h3>4. Owner & Governance</h3>
+
+  <label>Owner Full Name</label>
+  <input type="text" placeholder="Must match Pi KYC name" required>
+
+  <label>Your Role</label>
+  <select>
+    <option>Founder</option>
+    <option>Co-founder</option>
+    <option>Manager</option>
+  </select>
+
+  <label>Funds Usage Plan</label>
+  <select multiple>
+    <option>Equipment</option>
+    <option>Expansion</option>
+    <option>Raw Materials</option>
+    <option>Operations</option>
+    <option>R&D</option>
+  </select>
+
+  <label>
+    <input type="checkbox" required>
+    I declare that this project information is genuine
+  </label>
+</section>
+
+<!-- STEP 5 -->
+<section class="form-step">
+  <h3>5. Review & Submit</h3>
+
+  <div class="notice">
+    • Project wallet will be created after approval  
+    • Staking opens only after verification  
+    • False data leads to rejection or ban
+  </div>
+
+  <label>
+    <input type="checkbox" required>
+    I accept Albukhr verification & transparency rules
+  </label>
+
+  <button type="submit" class="primary-btn">
+    Submit for Verification
+  </button>
+</section>
+
+</form>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="index.html"><span>🏠</span>Home</a>
+  <a href="projects.html"><span>📁</span>Projects</a>
+  <a href="wallet.html"><span>💰</span>Wallet</a>
+  <a href="services.html" class="active"><span>🛠️</span>Services</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</nav>
+
+<!-- SIMPLE STEP SCRIPT -->
+<script>
+const steps = document.querySelectorAll(".form-step");
+let current = 0;
+
+document.addEventListener("click", e=>{
+  if(e.target.classList.contains("next")){
+    steps[current].classList.remove("active");
+    current++;
+    steps[current].classList.add("active");
+  }
+});
+</script>
+
+</body>
+</html>
