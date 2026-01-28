@@ -170,3 +170,20 @@ function stakeInternal(project, amount){
 
   return stake;
        }
+
+/* ADD INTERNAL STAKE FROM OLD ENGINE */
+function recordInternalFromLegacy(stake){
+  const all = loadInternal();
+
+  all.push({
+    stakeId: stake.stakeId || ("INT-" + Date.now()),
+    project: stake.project,
+    amount: Number(stake.amount),
+    reward: Number(stake.reward || 0),
+    duration: stake.duration,
+    status: stake.status || "Successful",
+    timestamp: stake.timestamp || Date.now()
+  });
+
+  saveInternal(all);
+}
