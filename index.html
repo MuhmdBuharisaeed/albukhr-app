@@ -84,12 +84,11 @@
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<!-- CORE SCRIPTS -->
-<script src="staking-core.js"></script>
-<script src="staking-internal.js"></script>
-<script src="staking-external.js"></script>
+<!-- CORE INTERNAL ENGINE (STABLE) -->
+<script src="staking.js"></script>
 
 <script>
+/* ICON MAP */
 const ICONS = {
   Raheem: "💊",
   Hauwal: "🌽",
@@ -100,26 +99,20 @@ const ICONS = {
   Labbaika: "🍞"
 };
 
+/* LOAD HOME (INTERNAL ONLY) */
 function loadHome(){
 
-  /* ===== STATS ===== */
   const totals = getInternalTotals();
+  homeStake.innerText  = totals.totalStake.toFixed(2) + " Pi";
+  homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
 
-  document.getElementById("homeStake").innerText =
-    totals.totalStake.toFixed(2) + " Pi";
-
-  document.getElementById("homeReward").innerText =
-    totals.totalReward.toFixed(2) + " Pi";
-
-  /* ===== RECENT TRANSACTIONS ===== */
   const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
   const stakes = getInternalStakes()
     .filter(s => s.status === "Successful")
-    .slice()
-    .reverse()
-    .slice(0,2);
+    .slice(-2)
+    .reverse();
 
   if(stakes.length === 0){
     box.innerHTML =
@@ -129,11 +122,10 @@ function loadHome(){
 
   stakes.forEach(s=>{
     const t = formatDateTime(s);
-    const icon = ICONS[s.project] || "📦";
 
     box.innerHTML += `
       <div class="home-tx">
-        <div class="home-icon">${icon}</div>
+        <div class="home-icon">${ICONS[s.project] || "📦"}</div>
         <div class="home-body">
           <div class="home-title">${s.project} Stake</div>
           <div class="home-date">${t.date} • ${t.time}</div>
