@@ -16,12 +16,17 @@
 
 <!-- WELCOME / ANNOUNCEMENT BAR -->
 <div class="welcome-bar">
-
-  <div id="welcomeScroll" class="welcome-track">
+  <!-- SCROLLING WELCOME -->
+  <div
+    id="welcomeScroll"
+    class="welcome-track"
+    style="display:block"
+  >
     Welcome to Albukhr Investment Limited — Building sustainable industries
     & empowering communities through investment.
   </div>
 
+  <!-- ANNOUNCEMENTS -->
   <div
     id="welcomeAnnounce"
     style="
@@ -36,7 +41,6 @@
   >
     📢 Albukhr is opening doors for external projects to join our staking ecosystem.
   </div>
-
 </div>
 
 <!-- STATS -->
@@ -51,28 +55,59 @@
   </div>
 </section>
 
-<!-- PROJECTS -->
+<!-- PROJECTS (ALBUKHR CORE ONLY) -->
 <section class="projects">
   <h2>Albukhr Projects</h2>
 
-  <a href="azman.html" class="project-item active"><span>🧪 Azman Futures Makers Lab</span><small>Demo</small></a>
-  <a href="labbaika.html" class="project-item active"><span>🍞 Labbaika Bakery Center</span><small>Demo</small></a>
-  <a href="barsh.html" class="project-item active"><span>🌾 Barsh Agro</span><small>Demo</small></a>
-  <a href="urban.html" class="project-item active"><span>🚍 Urban Mobility</span><small>Demo</small></a>
-  <a href="khairat.html" class="project-item active"><span>♻️ Khairat Organic Fertiliser</span><small>Demo</small></a>
-  <a href="hauwal.html" class="project-item active"><span>🌽 Hauwal Sumonviter</span><small>Demo</small></a>
-  <a href="raheem.html" class="project-item active"><span>💊 Raheem Pharmacy</span><small>Demo</small></a>
+  <a href="azman.html" class="project-item active">
+    <span>🧪 Azman Futures Makers Lab</span>
+    <small>Demo</small>
+  </a>
+
+  <a href="labbaika.html" class="project-item active">
+    <span>🍞 Labbaika Bakery Center</span>
+    <small>Demo</small>
+  </a>
+
+  <a href="barsh.html" class="project-item active">
+    <span>🌾 Barsh Agro</span>
+    <small>Demo</small>
+  </a>
+
+  <a href="urban.html" class="project-item active">
+    <span>🚍 Urban Mobility</span>
+    <small>Demo</small>
+  </a>
+
+  <a href="khairat.html" class="project-item active">
+    <span>♻️ Khairat Organic Fertiliser</span>
+    <small>Demo</small>
+  </a>
+
+  <a href="hauwal.html" class="project-item active">
+    <span>🌽 Hauwal Sumonviter</span>
+    <small>Demo</small>
+  </a>
+
+  <a href="raheem.html" class="project-item active">
+    <span>💊 Raheem Pharmacy</span>
+    <small>Demo</small>
+  </a>
 </section>
 
 <!-- RECENT TRANSACTIONS -->
 <section class="section">
+
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
     <h3 class="tx-title">Recent Transactions</h3>
-    <a href="transactions.html" style="font-size:13px;color:#0f7a3d;text-decoration:none">
-      View All →
+    <a href="transactions.html"
+       style="font-size:13px;color:#0f7a3d;text-decoration:none">
+       View All →
     </a>
   </div>
+
   <div id="homeTx"></div>
+
 </section>
 
 <!-- BOTTOM NAV -->
@@ -84,7 +119,6 @@
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<!-- CORE INTERNAL ENGINE (STABLE) -->
 <script src="staking.js"></script>
 
 <script>
@@ -99,17 +133,16 @@ const ICONS = {
   Labbaika: "🍞"
 };
 
-/* LOAD HOME (INTERNAL ONLY) */
+/* LOAD HOME DATA */
 function loadHome(){
-
-  const totals = getInternalTotals();
-  homeStake.innerText  = totals.totalStake.toFixed(2) + " Pi";
+  const totals = getTotals();
+  homeStake.innerText = totals.totalStake.toFixed(2) + " Pi";
   homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
 
   const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
-  const stakes = getInternalStakes()
+  const stakes = getStakes()
     .filter(s => s.status === "Successful")
     .slice(-2)
     .reverse();
@@ -123,24 +156,57 @@ function loadHome(){
   stakes.forEach(s=>{
     const t = formatDateTime(s);
 
-    box.innerHTML += `
-      <div class="home-tx">
-        <div class="home-icon">${ICONS[s.project] || "📦"}</div>
-        <div class="home-body">
-          <div class="home-title">${s.project} Stake</div>
-          <div class="home-date">${t.date} • ${t.time}</div>
-        </div>
-        <div class="home-right">
-          <div class="home-amount">${s.amount} Pi</div>
-          <div class="home-status success">Successful</div>
-        </div>
+    const div = document.createElement("div");
+    div.className = "home-tx";
+    div.innerHTML = `
+      <div class="home-icon">${ICONS[s.project] || "📦"}</div>
+      <div class="home-body">
+        <div class="home-title">${s.project} Stake</div>
+        <div class="home-date">${t.date} • ${t.time}</div>
+      </div>
+      <div class="home-right">
+        <div class="home-amount">${s.amount} Pi</div>
+        <div class="home-status success">Successful</div>
       </div>
     `;
+    box.appendChild(div);
   });
 }
 
 window.addEventListener("DOMContentLoaded", loadHome);
+
+/* WELCOME → ANNOUNCEMENT LOGIC */
+const scroll = document.getElementById("welcomeScroll");
+const announce = document.getElementById("welcomeAnnounce");
+
+const announcements = [
+  "📢 Albukhr is opening doors for external projects to join our staking ecosystem.",
+  "🌍 Powered by Pi Network — connecting local industries to global value.",
+  "🚀 Stake, grow, and support verified community-driven projects on Albukhr.",
+  "🧩 Have a project? Submit it via Services and get verified by Albukhr."
+];
+
+let aIndex = 0;
+
+/* lokacin da scrolling ya gama (daidai da animation duration) */
+setTimeout(() => {
+  scroll.style.display = "none";
+  announce.style.display = "block";
+  announce.style.opacity = 1;
+
+  setInterval(() => {
+    announce.style.opacity = 0;
+
+    setTimeout(() => {
+      aIndex = (aIndex + 1) % announcements.length;
+      announce.textContent = announcements[aIndex];
+      announce.style.opacity = 1;
+    }, 500);
+
+  }, 6000);
+
+}, 18000); /* 18s = welcomeMove animation time */
 </script>
-  
+
 </body>
 </html>
