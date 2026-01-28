@@ -74,12 +74,13 @@ input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1p
 
 </section>
 
+<!-- STAKE MODAL -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
     <h3>Stake in Raheem</h3>
 
     <label>Amount (Pi)</label>
-    <input type="number" id="amountInput">
+    <input type="number" id="amountInput" placeholder="Enter amount">
 
     <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
       Minimum stake: --
@@ -99,6 +100,7 @@ input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1p
   </div>
 </div>
 
+<!-- SUCCESS -->
 <div class="modal" id="successModal">
   <div class="modal-box success">
     <h3>Stake Successful</h3>
@@ -107,6 +109,7 @@ input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1p
   </div>
 </div>
 
+<!-- INFO -->
 <div class="modal" id="infoModal">
   <div class="modal-box">
     <h3>About Raheem Pharmacy</h3>
@@ -118,51 +121,69 @@ input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1p
   </div>
 </div>
 
+<!-- INTERNAL STAKING ENGINE (STABLE) -->
 <script src="staking.js"></script>
+
 <script>
-const stakeModal = document.getElementById("stakeModal");
+const stakeModal   = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
-const infoModal = document.getElementById("infoModal");
+const infoModal    = document.getElementById("infoModal");
 
 function openModal(){
-  stakeModal.style.display="flex";
+  stakeModal.style.display = "flex";
   minHint.innerText = "Minimum stake: " + getMinStake("Raheem") + " Pi";
 }
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
 
+function closeModal(){ stakeModal.style.display = "none"; }
+function closeSuccess(){ successModal.style.display = "none"; }
+function openInfo(){ infoModal.style.display = "flex"; }
+function closeInfo(){ infoModal.style.display = "none"; }
+
+/* ✅ FIXED — MATCHES OLD STAKING.JS EXACTLY */
 function confirmStake(){
-  const amount = Number(amountInput.value) || 0;
-  const duration = Number(durationSelect.value);
-  const min = getMinStake("Raheem");
 
-  if(amount < min){
+  const amount   = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+  const min      = getMinStake("Raheem");
+
+  if(isNaN(amount) || amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  addStake({ project:"Raheem", amount, duration });
+  const ok = addStake({
+    project: "Raheem",
+    amount: amount,
+    duration: duration
+  });
+
+  if(!ok){
+    alert("Stake failed. Please try again.");
+    return;
+  }
 
   const reward = amount * getRate("Raheem", duration);
+
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
 
+  amountInput.value = "";
   closeModal();
-  successModal.style.display="flex";
-  load();
+  successModal.style.display = "flex";
+  loadRaheem();
 }
 
-function load(){
-  const data = getProjectTotals("Raheem") || { stake:0, reward:0, stakes:[] };
+/* DASHBOARD */
+function loadRaheem(){
 
-  rStake.innerText = (data.stake || 0).toFixed(2) + " Pi";
-  rReward.innerText = (data.reward || 0).toFixed(2) + " Pi";
+  const data = getProjectTotals("Raheem");
+
+  rStake.innerText  = data.stake.toFixed(2) + " Pi";
+  rReward.innerText = data.reward.toFixed(2) + " Pi";
 
   raheemHistory.innerHTML = "";
 
-  if(!data.stakes || data.stakes.length === 0){
+  if(data.stakes.length === 0){
     raheemHistory.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
@@ -170,24 +191,23 @@ function load(){
 
   data.stakes.slice().reverse().forEach(s=>{
     const t = formatDateTime(s);
-    const div = document.createElement("div");
-    div.className="project-tx";
-    div.innerHTML=`
-      <div class="project-icon">💊</div>
-      <div class="project-body">
-        <div class="project-title">Raheem Stake</div>
-        <div class="project-date">${t.date} • ${t.time}</div>
-      </div>
-      <div class="project-right">
-        <div class="project-amount">${s.amount} Pi</div>
-        <div class="project-status">Successful</div>
+    raheemHistory.innerHTML += `
+      <div class="project-tx">
+        <div class="project-icon">💊</div>
+        <div class="project-body">
+          <div class="project-title">Raheem Stake</div>
+          <div class="project-date">${t.date} • ${t.time}</div>
+        </div>
+        <div class="project-right">
+          <div class="project-amount">${s.amount} Pi</div>
+          <div class="project-status">Successful</div>
+        </div>
       </div>
     `;
-    raheemHistory.appendChild(div);
   });
 }
 
-load();
+loadRaheem();
 </script>
 
 </body>
