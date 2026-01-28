@@ -366,3 +366,7 @@ body{
 .welcome-track{
   transition: opacity .5s ease;
 }
+
+.project-card.internal{
+  border-left:4px solid #0f7a3d;
+}
