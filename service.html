@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR Services</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
+.section{padding:16px}
+.project-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px}
+.project-card h4{margin:0 0 6px;font-size:16px;color:#0f7a3d}
+.project-card p{margin:0 0 6px;font-size:13px;color:#555}
+.project-card small{font-size:12px;color:#777}
+.btns{display:flex;gap:12px;margin-top:12px}
+.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
+.primary{background:#0f7a3d;color:#fff}
+.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
+label{margin-top:12px;display:block}
+input{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
+</style>
+</head>
+
+<body data-page="services">
+
+<header class="header">
+  <h1 class="brand">ALBUKHR Services</h1>
+</header>
+
+<section class="section">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <h2>External Projects</h2>
+    <button class="btn primary" id="createProjectBtn">Create New Project</button>
+  </div>
+
+  <div id="serviceProjects"></div>
+</section>
+
+<!-- CREATE PROJECT MODAL -->
+<div class="modal" id="createModal">
+  <div class="modal-box">
+    <h3>Create External Project</h3>
+    <label>Project Name</label>
+    <input type="text" id="newProjectName" placeholder="Enter project name">
+    <label>Description</label>
+    <input type="text" id="newProjectDesc" placeholder="Enter project description">
+    <label>PI Wallet</label>
+    <input type="text" id="newProjectWallet" placeholder="Enter your PI Wallet address">
+    <div class="btns" style="margin-top:16px">
+      <button class="btn primary" onclick="confirmCreateProject()">Create</button>
+      <button class="btn secondary" onclick="closeCreateModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="staking-external.js"></script>
+<script>
+const serviceProjects = document.getElementById("serviceProjects");
+const createModal = document.getElementById("createModal");
+const nameInput = document.getElementById("newProjectName");
+const descInput = document.getElementById("newProjectDesc");
+const walletInput = document.getElementById("newProjectWallet");
+const createBtn = document.getElementById("createProjectBtn");
+
+function loadExternalProjects(){
+  const projects = getExternalProjects();
+  if(projects.length === 0){
+    serviceProjects.innerHTML = "<p style='font-size:12px;color:#777'>No external projects yet.</p>";
+    return;
+  }
+
+  serviceProjects.innerHTML = projects.map(p=>`
+    <div class="project-card">
+      <h4>${p.name}</h4>
+      <p>${p.description || ""}</p>
+      <small>Total Staked: ${p.totalStaked || 0} Pi</small>
+    </div>
+  `).join("");
+}
+
+// Modal functions
+createBtn.addEventListener("click",()=>createModal.style.display="flex");
+function closeCreateModal(){ createModal.style.display="none"; }
+
+// Confirm create project
+function confirmCreateProject(){
+  const name = nameInput.value.trim();
+  const desc = descInput.value.trim();
+  const wallet = walletInput.value.trim();
+
+  if(!name || !wallet){
+    alert("Project name and PI Wallet are required!");
+    return;
+  }
+
+  // Create project using staking-external.js
+  const project = createExternalProject({
+    name,
+    description: desc,
+    totalStaked: 0,
+    status: "active",
+    milestones: []
+  });
+
+  alert(`Project "${project.name}" created successfully!`);
+  closeCreateModal();
+  nameInput.value = descInput.value = walletInput.value = "";
+  loadExternalProjects();
+}
+
+// Initial load
+loadExternalProjects();
+</script>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span>🏠</span>Home</a>
+  <a href="projects.html"><span>📁</span>Projects</a>
+  <a href="wallet.html"><span>💰</span>Wallet</a>
+  <a href="services.html" class="active"><span>🛠️</span>Services</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</nav>
+
+</body>
+</html>
