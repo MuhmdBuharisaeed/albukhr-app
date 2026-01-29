@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr External Project</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
+.section{padding:16px}
+.stats{display:flex;gap:12px;margin:16px 0}
+.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
+.stat-card span{display:block;color:#666;font-size:14px}
+.stat-card strong{font-size:18px;margin-top:6px;display:block}
+.btns{display:flex;gap:12px;margin-top:12px}
+.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
+.primary{background:#0f7a3d;color:#fff}
+.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
+.short-info{background:#fff;border-radius:14px;padding:14px;margin-top:14px;font-size:14px;color:#444;line-height:1.6}
+.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.project-icon{font-size:18px}
+.project-body{flex:1}
+.project-title{font-size:14px;font-weight:600}
+.project-date{font-size:11px;color:#777}
+.project-right{text-align:right}
+.project-amount{font-size:14px;font-weight:bold}
+.project-status{font-size:11px;color:#0f7a3d}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
+label{margin-top:12px;display:block}
+input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
+.success{text-align:center}
+.success h3{color:#0f7a3d;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <span>📁 External Project</span>
+  </div>
+</header>
+
+<section class="section">
+  <div class="stats">
+    <div class="stat-card">
+      <span>Total Staked</span>
+      <strong id="extStake">0.00 Pi</strong>
+    </div>
+  </div>
+
+  <div class="short-info">
+    <strong>External Project</strong> is part of Albukhr Ecosystem. Only verified members can create projects here.
+  </div>
+
+  <div class="btns">
+    <button class="btn primary" onclick="openModal()">Stake Pi</button>
+    <button class="btn secondary" onclick="openProjectModal()">Create Project</button>
+  </div>
+
+  <h3 style="margin-top:20px;font-size:15px">Recent Transactions</h3>
+  <div id="extHistory"></div>
+</section>
+
+<!-- STAKE MODAL -->
+<div class="modal" id="stakeModal">
+  <div class="modal-box">
+    <h3>Stake in Project</h3>
+
+    <label>Project</label>
+    <select id="projectSelect"></select>
+
+    <label>Amount (Pi)</label>
+    <input type="number" id="stakeAmount">
+
+    <div class="btns" style="margin-top:16px">
+      <button class="btn primary" onclick="confirmStake()">Confirm</button>
+      <button class="btn secondary" onclick="closeStakeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE PROJECT MODAL -->
+<div class="modal" id="projectModal">
+  <div class="modal-box">
+    <h3>Create External Project</h3>
+
+    <label>Project Name</label>
+    <input type="text" id="newProjectName">
+
+    <label>Description</label>
+    <input type="text" id="newProjectDesc">
+
+    <label>User ID</label>
+    <input type="text" id="userIdInput">
+
+    <label>Wallet ID</label>
+    <input type="text" id="walletIdInput">
+
+    <div class="btns" style="margin-top:16px">
+      <button class="btn primary" onclick="createProject()">Create</button>
+      <button class="btn secondary" onclick="closeProjectModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="successModal">
+  <div class="modal-box success">
+    <h3>Success</h3>
+    <p id="successText"></p>
+    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
+  </div>
+</div>
+
+<script src="staking-external.js"></script>
+<script>
+const stakeModal    = document.getElementById("stakeModal");
+const projectModal  = document.getElementById("projectModal");
+const successModal  = document.getElementById("successModal");
+const projectSelect = document.getElementById("projectSelect");
+
+function openModal(){
+    loadProjects();
+    stakeModal.style.display="flex";
+}
+function closeStakeModal(){ stakeModal.style.display="none"; }
+function openProjectModal(){ projectModal.style.display="flex"; }
+function closeProjectModal(){ projectModal.style.display="none"; }
+function closeSuccess(){ successModal.style.display="none"; }
+
+function loadProjects(){
+    const projects = getExternalProjects().filter(p=>p.status==="active");
+    projectSelect.innerHTML = "";
+    projects.forEach(p=>{
+        const opt = document.createElement("option");
+        opt.value = p.projectId;
+        opt.innerText = p.name;
+        projectSelect.appendChild(opt);
+    });
+}
+
+function confirmStake(){
+    const projectId = projectSelect.value;
+    const amount = Number(stakeAmount.value) || 0;
+    if(amount <= 0){ alert("Enter valid amount"); return; }
+
+    stakeExternal(projectId,"USER123",amount);
+    successText.innerText = `You staked ${amount} Pi in ${projectSelect.options[projectSelect.selectedIndex].text}`;
+    closeStakeModal();
+    successModal.style.display="flex";
+    loadRecent();
+    loadTotals();
+}
+
+async function createProject(){
+    const name   = document.getElementById("newProjectName").value.trim();
+    const desc   = document.getElementById("newProjectDesc").value.trim();
+    const userId = document.getElementById("userIdInput").value.trim();
+    const wallet = document.getElementById("walletIdInput").value.trim();
+
+    if(!name || !desc || !userId || !wallet){ alert("All fields required"); return; }
+
+    try{
+        const p = await addExternalProject({name, description:desc, userId, walletId:wallet});
+        successText.innerText = `Project "${p.name}" created successfully!`;
+        closeProjectModal();
+        successModal.style.display="flex";
+        loadProjects();
+    } catch(err){
+        alert(err);
+    }
+}
+
+function loadRecent(){
+    const box = document.getElementById("extHistory");
+    box.innerHTML="";
+    const tx = getExternalRecent(5);
+    if(tx.length===0){ box.innerHTML="<p style='font-size:12px;color:#777'>No transactions yet</p>"; return; }
+    tx.forEach(s=>{
+        const p = getExternalProject(s.projectId);
+        const div = document.createElement("div");
+        div.className="project-tx";
+        div.innerHTML=`
+            <div class="project-icon">📦</div>
+            <div class="project-body">
+                <div class="project-title">${p.name} Stake</div>
+                <div class="project-date">${new Date(s.timestamp).toLocaleDateString("en-GB")} • ${new Date(s.timestamp).toLocaleTimeString("en-GB",{hour:'2-digit',minute:'2-digit'})}</div>
+            </div>
+            <div class="project-right">
+                <div class="project-amount">${s.amount} Pi</div>
+                <div class="project-status">Frozen</div>
+            </div>
+        `;
+        box.appendChild(div);
+    });
+}
+
+function loadTotals(){
+    const t = getExternalTotals();
+    document.getElementById("extStake").innerText = t.totalStake.toFixed(2) + " Pi";
+}
+
+// Initial load
+loadProjects();
+loadRecent();
+loadTotals();
+</script>
+
+</body>
+</html>
