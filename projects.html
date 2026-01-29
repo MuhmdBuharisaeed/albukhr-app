@@ -3,214 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Projects</title>
+<title>Albukhr Services</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
 .section{padding:16px}
-.search-box{
-  background:#fff;
-  border-radius:14px;
-  padding:12px 14px;
-  display:flex;
-  gap:10px;
-  align-items:center;
-  margin-bottom:14px
-}
-.search-box input{
-  border:none;
-  outline:none;
-  flex:1;
-  font-size:15px
-}
-.project-card{
+.service-card{
   background:#fff;
   border-radius:16px;
-  padding:14px;
-  margin-bottom:12px;
-  display:flex;
-  gap:12px;
-  align-items:center
+  padding:16px;
+  margin-bottom:14px;
 }
-.project-icon{font-size:22px}
-.project-body{flex:1}
-.project-title{font-size:15px;font-weight:600}
-.project-desc{font-size:12px;color:#666;margin-top:2px}
-.project-meta{font-size:12px;color:#0f7a3d;margin-top:6px}
-.project-tag{
-  font-size:10px;
-  padding:3px 8px;
-  border-radius:20px;
-  background:#e6f5ec;
-  color:#0f7a3d;
-  display:inline-block;
-  margin-top:6px
-}
-.project-action a{
-  font-size:13px;
-  color:#0f7a3d;
-  text-decoration:none;
-  font-weight:600
-}
-.section-title{
-  font-size:14px;
+.service-title{
+  font-size:15px;
   font-weight:700;
-  color:#0f7a3d;
-  margin:16px 0 10px
+  margin-bottom:6px;
 }
-.empty{
-  text-align:center;
+.service-desc{
   font-size:13px;
-  color:#777;
-  margin-top:20px
+  color:#666;
+  line-height:1.6;
 }
+.service-action{
+  margin-top:10px;
+}
+.service-action button{
+  padding:10px 14px;
+  border-radius:10px;
+  border:none;
+  font-weight:600;
+  background:#0f7a3d;
+  color:#fff;
+}
+.service-tag{
+  font-size:11px;
+  color:#0f7a3d;
+  margin-top:6px;
+  display:inline-block;
+}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+.modal-box{
+  background:#fff;
+  width:90%;
+  max-width:420px;
+  padding:20px;
+  border-radius:16px;
+}
+label{display:block;margin-top:12px;font-size:13px}
+input,textarea{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+textarea{resize:none}
 </style>
 </head>
 
-<body data-page="projects">
+<body data-page="services">
 
 <header class="header">
   <div class="header-left">
-    <span>📁 Projects</span>
+    <span>🛠️ Services</span>
   </div>
 </header>
 
 <section class="section">
 
-  <div class="search-box">
-    🔍
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="Search projects..."
-    >
+  <!-- CREATE EXTERNAL PROJECT -->
+  <div class="service-card">
+    <div class="service-title">Create External Project</div>
+    <div class="service-desc">
+      Submit your project to join Albukhr’s verified staking ecosystem.
+      Projects go through review, AI verification, and escrow setup
+      before appearing publicly.
+    </div>
+    <span class="service-tag">External • Verification Required</span>
+    <div class="service-action">
+      <button onclick="openCreate()">Create Project</button>
+    </div>
   </div>
 
-  <div class="section-title">Albukhr Internal Projects</div>
-  <div id="internalList"></div>
+  <!-- COMING SERVICES -->
+  <div class="service-card">
+    <div class="service-title">AI Project Verification</div>
+    <div class="service-desc">
+      Automated checks on project identity, feasibility,
+      and consistency before approval.
+    </div>
+    <span class="service-tag">Coming Soon</span>
+  </div>
 
-  <div class="section-title">Verified External Projects</div>
-  <div id="externalList"></div>
+  <div class="service-card">
+    <div class="service-title">Escrow & Fund Protection</div>
+    <div class="service-desc">
+      Secure holding of funds to protect stakers
+      and ensure project accountability.
+    </div>
+    <span class="service-tag">Coming Soon</span>
+  </div>
+
+  <div class="service-card">
+    <div class="service-title">Support & Dispute Resolution</div>
+    <div class="service-desc">
+      Handle reports, disputes, and support requests
+      within the Albukhr ecosystem.
+    </div>
+    <span class="service-tag">Coming Soon</span>
+  </div>
 
 </section>
 
+<!-- CREATE PROJECT MODAL -->
+<div class="modal" id="createModal">
+  <div class="modal-box">
+    <h3>Create External Project</h3>
+
+    <label>Project Name</label>
+    <input id="pName" placeholder="Project title">
+
+    <label>Description</label>
+    <textarea id="pDesc" rows="3"
+      placeholder="Brief description of the project"></textarea>
+
+    <label>Wallet Address (Escrow)</label>
+    <input id="pWallet" placeholder="Pi wallet address">
+
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn primary" onclick="submitProject()">Submit</button>
+      <button class="btn secondary" onclick="closeCreate()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
-  <a href="projects.html" class="active"><span>📁</span>Projects</a>
+  <a href="projects.html"><span>📁</span>Projects</a>
   <a href="wallet.html"><span>💰</span>Wallet</a>
-  <a href="services.html"><span>🛠️</span>Services</a>
+  <a href="services.html" class="active"><span>🛠️</span>Services</a>
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<!-- ENGINES -->
-<script src="staking.js"></script>
 <script src="staking-external.js"></script>
 
 <script>
-/* ===============================
-   INTERNAL PROJECTS (STATIC CORE)
-================================ */
-const INTERNAL_PROJECTS = [
-  {name:"Raheem",title:"Raheem Pharmacy",icon:"💊",desc:"Healthcare access via community investment.",page:"raheem.html"},
-  {name:"Hauwal",title:"Hauwal Sumonviter",icon:"🌽",desc:"Modern maize flour processing.",page:"hauwal.html"},
-  {name:"Barsh",title:"Barsh Agro",icon:"🌾",desc:"Mechanized farming & livestock.",page:"barsh.html"},
-  {name:"Khairat",title:"Khairat Organic Fertiliser",icon:"♻️",desc:"Organic fertiliser from waste.",page:"khairat.html"},
-  {name:"Urban",title:"Urban Mobility",icon:"🚍",desc:"Urban transportation systems.",page:"urban.html"},
-  {name:"Labbaika",title:"Labbaika Bakery Center",icon:"🍞",desc:"Bakery & flour-based production.",page:"labbaika.html"}
-];
+const modal = document.getElementById("createModal");
 
-/* ===============================
-   RENDER INTERNAL
-================================ */
-function renderInternal(q){
-  internalList.innerHTML = "";
+function openCreate(){
+  modal.style.display = "flex";
+}
+function closeCreate(){
+  modal.style.display = "none";
+}
 
-  const filtered = INTERNAL_PROJECTS.filter(p =>
-    p.title.toLowerCase().includes(q)
-  );
+function submitProject(){
+  const name = pName.value.trim();
+  const desc = pDesc.value.trim();
+  const wallet = pWallet.value.trim();
 
-  if(filtered.length === 0){
-    internalList.innerHTML =
-      "<div class='empty'>No internal projects found</div>";
+  if(!name || !wallet){
+    alert("Project name and wallet are required");
     return;
   }
 
-  filtered.forEach(p=>{
-    internalList.innerHTML += `
-      <div class="project-card">
-        <div class="project-icon">${p.icon}</div>
-        <div class="project-body">
-          <div class="project-title">${p.title}</div>
-          <div class="project-desc">${p.desc}</div>
-          <div class="project-meta">
-            Minimum stake: ${typeof getMinStake === "function" ? getMinStake(p.name) : "--"} Pi
-          </div>
-          <span class="project-tag">Internal</span>
-        </div>
-        <div class="project-action">
-          <a href="${p.page}">Open →</a>
-        </div>
-      </div>
-    `;
+  if(typeof addExternalProject !== "function"){
+    alert("External project system not available");
+    return;
+  }
+
+  addExternalProject({
+    title: name,
+    description: desc,
+    escrowWallet: wallet
   });
+
+  alert("Project submitted for review");
+  closeCreate();
 }
-
-/* ===============================
-   RENDER EXTERNAL
-================================ */
-function renderExternal(q){
-  externalList.innerHTML = "";
-
-  if(typeof getExternalProjects !== "function"){
-    externalList.innerHTML =
-      "<div class='empty'>No external projects available</div>";
-    return;
-  }
-
-  const projects = getExternalProjects();
-
-  const filtered = projects.filter(p =>
-    (p.title || "").toLowerCase().includes(q)
-  );
-
-  if(filtered.length === 0){
-    externalList.innerHTML =
-      "<div class='empty'>No external projects available</div>";
-    return;
-  }
-
-  filtered.forEach(p=>{
-    externalList.innerHTML += `
-      <div class="project-card">
-        <div class="project-icon">🌍</div>
-        <div class="project-body">
-          <div class="project-title">${p.title}</div>
-          <div class="project-desc">${p.description || "External verified project"}</div>
-          <div class="project-meta">
-            Total Staked: ${p.totalStaked || 0} Pi
-          </div>
-          <span class="project-tag">External</span>
-        </div>
-        <div class="project-action">
-          <a href="external-project.html?id=${p.projectId}">View →</a>
-        </div>
-      </div>
-    `;
-  });
-}
-
-/* ===============================
-   MASTER RENDER
-================================ */
-function renderAll(){
-  const q = searchInput.value.toLowerCase();
-  renderInternal(q);
-  renderExternal(q);
-}
-
-searchInput.addEventListener("input", renderAll);
-renderAll();
 </script>
 
 </body>
