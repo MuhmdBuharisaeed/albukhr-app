@@ -3,124 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALBUKHR Services</title>
+<title>Albukhr Services</title>
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.service-card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+}
+.service-title{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+.service-desc{
+  font-size:13px;
+  color:#666;
+  line-height:1.6;
+}
+.service-action{
+  margin-top:10px;
+}
+.service-action button{
+  padding:10px 14px;
+  border-radius:10px;
+  border:none;
+  font-weight:600;
+  background:#0f7a3d;
+  color:#fff;
+}
+.service-tag{
+  font-size:11px;
+  color:#0f7a3d;
+  margin-top:6px;
+  display:inline-block;
+}
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+.modal-box{
+  background:#fff;
+  width:90%;
+  max-width:420px;
+  padding:20px;
+  border-radius:16px;
+}
+label{display:block;margin-top:12px;font-size:13px}
+input,textarea{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+textarea{resize:none}
+</style>
 </head>
 
 <body data-page="services">
 
-<!-- HEADER -->
 <header class="header">
-  <h1 class="brand">ALBUKHR</h1>
+  <div class="header-left">
+    <span>🛠️ Services</span>
+  </div>
 </header>
 
-<!-- PAGE INTRO -->
 <section class="section">
-  <h2>Services</h2>
-  <p style="font-size:13px;color:#666;line-height:1.5">
-    Albukhr Services is the operational hub where users, partners, and innovators
-    access tools, submit projects, and interact with Albukhr’s verified ecosystem.
-  </p>
+
+  <!-- CREATE EXTERNAL PROJECT -->
+  <div class="service-card">
+    <div class="service-title">Create External Project</div>
+    <div class="service-desc">
+      Submit your project to join Albukhr’s verified staking ecosystem.
+      Projects go through review, AI verification, and escrow setup
+      before appearing publicly.
+    </div>
+    <span class="service-tag">External • Verification Required</span>
+    <div class="service-action">
+      <button onclick="openCreate()">Create Project</button>
+    </div>
+  </div>
+
+  <!-- COMING SERVICES -->
+  <div class="service-card">
+    <div class="service-title">AI Project Verification</div>
+    <div class="service-desc">
+      Automated checks on project identity, feasibility,
+      and consistency before approval.
+    </div>
+    <span class="service-tag">Coming Soon</span>
+  </div>
+
+  <div class="service-card">
+    <div class="service-title">Escrow & Fund Protection</div>
+    <div class="service-desc">
+      Secure holding of funds to protect stakers
+      and ensure project accountability.
+    </div>
+    <span class="service-tag">Coming Soon</span>
+  </div>
+
+  <div class="service-card">
+    <div class="service-title">Support & Dispute Resolution</div>
+    <div class="service-desc">
+      Handle reports, disputes, and support requests
+      within the Albukhr ecosystem.
+    </div>
+    <span class="service-tag">Coming Soon</span>
+  </div>
+
 </section>
 
-<!-- CORE SERVICES -->
-<section class="section">
-  <h3>Core Services</h3>
+<!-- CREATE PROJECT MODAL -->
+<div class="modal" id="createModal">
+  <div class="modal-box">
+    <h3>Create External Project</h3>
 
-  <div class="service-card">
-    <div class="service-icon">📁</div>
-    <div class="service-body">
-      <strong>Albukhr Projects</strong>
-      <p>Access and manage core Albukhr-owned projects and initiatives.</p>
+    <label>Project Name</label>
+    <input id="pName" placeholder="Project title">
+
+    <label>Description</label>
+    <textarea id="pDesc" rows="3"
+      placeholder="Brief description of the project"></textarea>
+
+    <label>Wallet Address (Escrow)</label>
+    <input id="pWallet" placeholder="Pi wallet address">
+
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn primary" onclick="submitProject()">Submit</button>
+      <button class="btn secondary" onclick="closeCreate()">Cancel</button>
     </div>
   </div>
+</div>
 
-  <div class="service-card">
-    <div class="service-icon">💰</div>
-    <div class="service-body">
-      <strong>Staking & Rewards</strong>
-      <p>Stake Pi, earn rewards, and support verified community projects.</p>
-    </div>
-  </div>
-
-  <div class="service-card">
-    <div class="service-icon">📊</div>
-    <div class="service-body">
-      <strong>Reports & Performance</strong>
-      <p>Track project growth, staking performance, and reward history.</p>
-    </div>
-  </div>
-</section>
-
-<!-- EXTERNAL PROJECT SERVICES -->
-<section class="section">
-  <h3>External Project Services</h3>
-
-  <a href="external-project.html" class="service-card link">
-    <div class="service-icon">🚀</div>
-    <div class="service-body">
-      <strong>Submit External Project</strong>
-      <p>
-        Submit your project to Albukhr for verification and possible inclusion
-        in the staking ecosystem.
-      </p>
-    </div>
-  </a>
-
-  <div class="service-card">
-    <div class="service-icon">🛡️</div>
-    <div class="service-body">
-      <strong>Project Verification</strong>
-      <p>
-        Albukhr applies AI-assisted and manual verification to ensure project
-        authenticity and transparency.
-      </p>
-    </div>
-  </div>
-
-  <div class="service-card">
-    <div class="service-icon">🤝</div>
-    <div class="service-body">
-      <strong>Partnership Requests</strong>
-      <p>
-        Organizations and founders can request strategic partnerships with Albukhr.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- SUPPORT & FUTURE SERVICES -->
-<section class="section">
-  <h3>Support & Future Services</h3>
-
-  <div class="service-card">
-    <div class="service-icon">📄</div>
-    <div class="service-body">
-      <strong>Documentation</strong>
-      <p>Guides, policies, and technical documentation (coming soon).</p>
-    </div>
-  </div>
-
-  <div class="service-card">
-    <div class="service-icon">❓</div>
-    <div class="service-body">
-      <strong>Help & FAQs</strong>
-      <p>Get answers to common questions about Albukhr services.</p>
-    </div>
-  </div>
-
-  <div class="service-card">
-    <div class="service-icon">🔌</div>
-    <div class="service-body">
-      <strong>APIs & Integrations</strong>
-      <p>
-        Future integration services for Web3 tools, wallets, and apps.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
   <a href="projects.html"><span>📁</span>Projects</a>
@@ -129,5 +155,43 @@
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
+<script src="staking-external.js"></script>
+
+<script>
+const modal = document.getElementById("createModal");
+
+function openCreate(){
+  modal.style.display = "flex";
+}
+function closeCreate(){
+  modal.style.display = "none";
+}
+
+function submitProject(){
+  const name = pName.value.trim();
+  const desc = pDesc.value.trim();
+  const wallet = pWallet.value.trim();
+
+  if(!name || !wallet){
+    alert("Project name and wallet are required");
+    return;
+  }
+
+  if(typeof addExternalProject !== "function"){
+    alert("External project system not available");
+    return;
+  }
+
+  addExternalProject({
+    title: name,
+    description: desc,
+    escrowWallet: wallet
+  });
+
+  alert("Project submitted for review");
+  closeCreate();
+}
+</script>
+
 </body>
-    </html>
+  </html>
