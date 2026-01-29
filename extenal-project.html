@@ -3,207 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr External Project</title>
+<title>Submit External Project | ALBUKHR</title>
 <link rel="stylesheet" href="style.css">
-<style>
-body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-.section{padding:16px}
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
-.stat-card span{display:block;color:#666;font-size:14px}
-.stat-card strong{font-size:18px;margin-top:6px;display:block}
-.btns{display:flex;gap:12px;margin-top:12px}
-.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-.short-info{background:#fff;border-radius:14px;padding:14px;margin-top:14px;font-size:14px;color:#444;line-height:1.6}
-.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
-.project-icon{font-size:18px}
-.project-body{flex:1}
-.project-title{font-size:14px;font-weight:600}
-.project-date{font-size:11px;color:#777}
-.project-right{text-align:right}
-.project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
-.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
-label{margin-top:12px;display:block}
-input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
-.success{text-align:center}
-.success h3{color:#0f7a3d;margin-bottom:8px}
-</style>
 </head>
-<body>
 
+<body data-page="services">
+
+<!-- HEADER -->
 <header class="header">
-  <div class="header-left">
-    <span>📁 External Project</span>
-  </div>
+  <h1 class="brand">ALBUKHR</h1>
 </header>
 
+<!-- INTRO -->
 <section class="section">
-  <div class="stats">
-    <div class="stat-card">
-      <span>Total Staked</span>
-      <strong id="extStake">0.00 Pi</strong>
-    </div>
-  </div>
-
-  <div class="short-info">
-    <strong>External Project</strong> is part of Albukhr Ecosystem. Only verified members can create projects here.
-  </div>
-
-  <div class="btns">
-    <button class="btn primary" onclick="openModal()">Stake Pi</button>
-    <button class="btn secondary" onclick="openProjectModal()">Create Project</button>
-  </div>
-
-  <h3 style="margin-top:20px;font-size:15px">Recent Transactions</h3>
-  <div id="extHistory"></div>
+  <h2>Submit External Project</h2>
+  <p style="font-size:13px;color:#666;line-height:1.6">
+    Albukhr welcomes verified external projects into its ecosystem.
+    All submissions go through a structured review and verification process
+    before approval for listing or staking.
+  </p>
 </section>
 
-<!-- STAKE MODAL -->
-<div class="modal" id="stakeModal">
-  <div class="modal-box">
-    <h3>Stake in Project</h3>
+<!-- FORM -->
+<section class="section">
 
-    <label>Project</label>
-    <select id="projectSelect"></select>
+  <form id="projectForm" class="form">
 
-    <label>Amount (Pi)</label>
-    <input type="number" id="stakeAmount">
+    <label>
+      Project Name
+      <input type="text" required placeholder="e.g. GreenTech Agro Initiative">
+    </label>
 
-    <div class="btns" style="margin-top:16px">
-      <button class="btn primary" onclick="confirmStake()">Confirm</button>
-      <button class="btn secondary" onclick="closeStakeModal()">Cancel</button>
-    </div>
+    <label>
+      Project Category
+      <select required>
+        <option value="">Select category</option>
+        <option>Agriculture & Livestock</option>
+        <option>Manufacturing</option>
+        <option>Health & Pharmacy</option>
+        <option>Technology & Innovation</option>
+        <option>Transportation & Logistics</option>
+        <option>Education & Research</option>
+        <option>Other</option>
+      </select>
+    </label>
+
+    <label>
+      Project Description
+      <textarea rows="4" required
+        placeholder="Briefly explain the project, its goals, and impact"></textarea>
+    </label>
+
+    <label>
+      Founder / Organization Name
+      <input type="text" required placeholder="Individual or Company Name">
+    </label>
+
+    <label>
+      Contact Email
+      <input type="email" required placeholder="example@email.com">
+    </label>
+
+    <label>
+      Location
+      <input type="text" placeholder="City, Country">
+    </label>
+
+    <label>
+      Estimated Capital Requirement (Optional)
+      <input type="number" placeholder="e.g. 5000">
+    </label>
+
+    <label>
+      Intended Use on Albukhr
+      <select required>
+        <option value="">Select option</option>
+        <option>Staking Project</option>
+        <option>Partnership Only</option>
+        <option>Funding & Support</option>
+        <option>Incubation / Mentorship</option>
+      </select>
+    </label>
+
+    <label class="checkbox">
+      <input type="checkbox" required>
+      I confirm that the information provided is accurate and truthful
+    </label>
+
+    <button type="submit" class="btn-primary">
+      🚀 Submit Project
+    </button>
+
+  </form>
+
+</section>
+
+<!-- VERIFICATION NOTICE -->
+<section class="section">
+  <div class="notice">
+    🛡️ <strong>Verification Notice</strong><br>
+    All submitted projects are reviewed using Albukhr’s verification framework,
+    including background checks, feasibility review, and integrity assessment.
+    Approval is not automatic.
   </div>
-</div>
+</section>
 
-<!-- CREATE PROJECT MODAL -->
-<div class="modal" id="projectModal">
-  <div class="modal-box">
-    <h3>Create External Project</h3>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="index.html"><span>🏠</span>Home</a>
+  <a href="projects.html"><span>📁</span>Projects</a>
+  <a href="wallet.html"><span>💰</span>Wallet</a>
+  <a href="services.html" class="active"><span>🛠️</span>Services</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</nav>
 
-    <label>Project Name</label>
-    <input type="text" id="newProjectName">
-
-    <label>Description</label>
-    <input type="text" id="newProjectDesc">
-
-    <label>User ID</label>
-    <input type="text" id="userIdInput">
-
-    <label>Wallet ID</label>
-    <input type="text" id="walletIdInput">
-
-    <div class="btns" style="margin-top:16px">
-      <button class="btn primary" onclick="createProject()">Create</button>
-      <button class="btn secondary" onclick="closeProjectModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="successModal">
-  <div class="modal-box success">
-    <h3>Success</h3>
-    <p id="successText"></p>
-    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
-  </div>
-</div>
-
-<script src="staking-external.js"></script>
 <script>
-const stakeModal    = document.getElementById("stakeModal");
-const projectModal  = document.getElementById("projectModal");
-const successModal  = document.getElementById("successModal");
-const projectSelect = document.getElementById("projectSelect");
-
-function openModal(){
-    loadProjects();
-    stakeModal.style.display="flex";
-}
-function closeStakeModal(){ stakeModal.style.display="none"; }
-function openProjectModal(){ projectModal.style.display="flex"; }
-function closeProjectModal(){ projectModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-
-function loadProjects(){
-    const projects = getExternalProjects().filter(p=>p.status==="active");
-    projectSelect.innerHTML = "";
-    projects.forEach(p=>{
-        const opt = document.createElement("option");
-        opt.value = p.projectId;
-        opt.innerText = p.name;
-        projectSelect.appendChild(opt);
-    });
-}
-
-function confirmStake(){
-    const projectId = projectSelect.value;
-    const amount = Number(stakeAmount.value) || 0;
-    if(amount <= 0){ alert("Enter valid amount"); return; }
-
-    stakeExternal(projectId,"USER123",amount);
-    successText.innerText = `You staked ${amount} Pi in ${projectSelect.options[projectSelect.selectedIndex].text}`;
-    closeStakeModal();
-    successModal.style.display="flex";
-    loadRecent();
-    loadTotals();
-}
-
-async function createProject(){
-    const name   = document.getElementById("newProjectName").value.trim();
-    const desc   = document.getElementById("newProjectDesc").value.trim();
-    const userId = document.getElementById("userIdInput").value.trim();
-    const wallet = document.getElementById("walletIdInput").value.trim();
-
-    if(!name || !desc || !userId || !wallet){ alert("All fields required"); return; }
-
-    try{
-        const p = await addExternalProject({name, description:desc, userId, walletId:wallet});
-        successText.innerText = `Project "${p.name}" created successfully!`;
-        closeProjectModal();
-        successModal.style.display="flex";
-        loadProjects();
-    } catch(err){
-        alert(err);
-    }
-}
-
-function loadRecent(){
-    const box = document.getElementById("extHistory");
-    box.innerHTML="";
-    const tx = getExternalRecent(5);
-    if(tx.length===0){ box.innerHTML="<p style='font-size:12px;color:#777'>No transactions yet</p>"; return; }
-    tx.forEach(s=>{
-        const p = getExternalProject(s.projectId);
-        const div = document.createElement("div");
-        div.className="project-tx";
-        div.innerHTML=`
-            <div class="project-icon">📦</div>
-            <div class="project-body">
-                <div class="project-title">${p.name} Stake</div>
-                <div class="project-date">${new Date(s.timestamp).toLocaleDateString("en-GB")} • ${new Date(s.timestamp).toLocaleTimeString("en-GB",{hour:'2-digit',minute:'2-digit'})}</div>
-            </div>
-            <div class="project-right">
-                <div class="project-amount">${s.amount} Pi</div>
-                <div class="project-status">Frozen</div>
-            </div>
-        `;
-        box.appendChild(div);
-    });
-}
-
-function loadTotals(){
-    const t = getExternalTotals();
-    document.getElementById("extStake").innerText = t.totalStake.toFixed(2) + " Pi";
-}
-
-// Initial load
-loadProjects();
-loadRecent();
-loadTotals();
+document.getElementById("projectForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  alert(
+    "Project submitted successfully.\n\nAlbukhr verification team will review your submission."
+  );
+  this.reset();
+});
 </script>
 
 </body>
