@@ -3,128 +3,178 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Submit External Project | ALBUKHR</title>
+<title>External Project</title>
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.project-box{
+  background:#fff;
+  border-radius:16px;
+  padding:18px;
+}
+.project-title{
+  font-size:18px;
+  font-weight:700;
+}
+.project-desc{
+  font-size:13px;
+  color:#666;
+  margin-top:6px;
+  line-height:1.6;
+}
+.project-meta{
+  margin-top:12px;
+  font-size:13px;
+  color:#0f7a3d;
+}
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  font-size:11px;
+  border-radius:20px;
+  background:#e6f5ec;
+  color:#0f7a3d;
+  margin-top:8px;
+}
+.stake-box{
+  margin-top:18px;
+  background:#f9f9f9;
+  padding:14px;
+  border-radius:14px;
+}
+input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  margin-top:8px;
+}
+button{
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-weight:600;
+  background:#0f7a3d;
+  color:#fff;
+}
+.disabled{
+  background:#aaa !important;
+}
+.notice{
+  font-size:12px;
+  color:#777;
+  margin-top:8px;
+}
+</style>
 </head>
 
-<body data-page="services">
+<body data-page="external-project">
 
-<!-- HEADER -->
 <header class="header">
-  <h1 class="brand">ALBUKHR</h1>
+  <div class="header-left">
+    <span>🌍 External Project</span>
+  </div>
 </header>
 
-<!-- INTRO -->
-<section class="section">
-  <h2>Submit External Project</h2>
-  <p style="font-size:13px;color:#666;line-height:1.6">
-    Albukhr welcomes verified external projects into its ecosystem.
-    All submissions go through a structured review and verification process
-    before approval for listing or staking.
-  </p>
-</section>
-
-<!-- FORM -->
 <section class="section">
 
-  <form id="projectForm" class="form">
-
-    <label>
-      Project Name
-      <input type="text" required placeholder="e.g. GreenTech Agro Initiative">
-    </label>
-
-    <label>
-      Project Category
-      <select required>
-        <option value="">Select category</option>
-        <option>Agriculture & Livestock</option>
-        <option>Manufacturing</option>
-        <option>Health & Pharmacy</option>
-        <option>Technology & Innovation</option>
-        <option>Transportation & Logistics</option>
-        <option>Education & Research</option>
-        <option>Other</option>
-      </select>
-    </label>
-
-    <label>
-      Project Description
-      <textarea rows="4" required
-        placeholder="Briefly explain the project, its goals, and impact"></textarea>
-    </label>
-
-    <label>
-      Founder / Organization Name
-      <input type="text" required placeholder="Individual or Company Name">
-    </label>
-
-    <label>
-      Contact Email
-      <input type="email" required placeholder="example@email.com">
-    </label>
-
-    <label>
-      Location
-      <input type="text" placeholder="City, Country">
-    </label>
-
-    <label>
-      Estimated Capital Requirement (Optional)
-      <input type="number" placeholder="e.g. 5000">
-    </label>
-
-    <label>
-      Intended Use on Albukhr
-      <select required>
-        <option value="">Select option</option>
-        <option>Staking Project</option>
-        <option>Partnership Only</option>
-        <option>Funding & Support</option>
-        <option>Incubation / Mentorship</option>
-      </select>
-    </label>
-
-    <label class="checkbox">
-      <input type="checkbox" required>
-      I confirm that the information provided is accurate and truthful
-    </label>
-
-    <button type="submit" class="btn-primary">
-      🚀 Submit Project
-    </button>
-
-  </form>
-
-</section>
-
-<!-- VERIFICATION NOTICE -->
-<section class="section">
-  <div class="notice">
-    🛡️ <strong>Verification Notice</strong><br>
-    All submitted projects are reviewed using Albukhr’s verification framework,
-    including background checks, feasibility review, and integrity assessment.
-    Approval is not automatic.
+  <div class="project-box" id="projectBox">
+    Loading project...
   </div>
+
 </section>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
-  <a href="projects.html"><span>📁</span>Projects</a>
+  <a href="projects.html" class="active"><span>📁</span>Projects</a>
   <a href="wallet.html"><span>💰</span>Wallet</a>
-  <a href="services.html" class="active"><span>🛠️</span>Services</a>
+  <a href="services.html"><span>🛠️</span>Services</a>
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
+<script src="staking-external.js"></script>
+
 <script>
-document.getElementById("projectForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  alert(
-    "Project submitted successfully.\n\nAlbukhr verification team will review your submission."
-  );
-  this.reset();
-});
+const box = document.getElementById("projectBox");
+
+const params = new URLSearchParams(window.location.search);
+const projectId = params.get("id");
+
+if(!projectId || typeof getExternalProjects !== "function"){
+  box.innerHTML = "<div class='notice'>Project not found</div>";
+} else {
+
+  const project = getExternalProjects()
+    .find(p => p.projectId === projectId);
+
+  if(!project){
+    box.innerHTML = "<div class='notice'>Project not available</div>";
+  } else {
+    renderProject(project);
+  }
+}
+
+function renderProject(p){
+  const verified = p.status === "verified" || p.status === "active";
+
+  box.innerHTML = `
+    <div class="project-title">${p.title}</div>
+    <div class="project-desc">${p.description || ""}</div>
+
+    <div class="project-meta">
+      Total Staked: ${p.totalStaked || 0} Pi
+    </div>
+
+    <span class="badge">
+      Status: ${p.status || "pending"}
+    </span>
+
+    <div class="stake-box">
+      <strong>Stake Pi</strong>
+
+      <input id="stakeAmount"
+        type="number"
+        min="1"
+        placeholder="Amount in Pi">
+
+      <button
+        ${verified ? "" : "disabled"}
+        class="${verified ? "" : "disabled"}"
+        onclick="stake('${p.projectId}')">
+        Stake Now
+      </button>
+
+      <div class="notice">
+        ${verified
+          ? "Funds go to escrow wallet"
+          : "Project must be verified before staking"}
+      </div>
+    </div>
+  `;
+}
+
+function stake(id){
+  const amount = Number(stakeAmount.value);
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(typeof stakeExternalProject !== "function"){
+    alert("Staking system not available");
+    return;
+  }
+
+  stakeExternalProject(id, amount);
+  alert("Stake successful");
+
+  location.reload();
+}
 </script>
 
 </body>
