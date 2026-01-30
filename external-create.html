@@ -148,6 +148,14 @@ textarea{resize:none}
   
 <script>
 function submitExternal(){
+
+  const inviteCheck = validateInvite(invite.value);
+
+  if(!inviteCheck.ok){
+    alert(inviteCheck.reason);
+    return;
+  }
+
   const data = {
     id: "EXT-" + Date.now(),
     name: pName.value.trim(),
@@ -163,8 +171,8 @@ function submitExternal(){
     createdAt: new Date().toISOString()
   };
 
-  if(!data.name || !data.piUsername || !data.invite){
-    alert("Project name, Pi username and invite code are required");
+  if(!data.name || !data.piUsername){
+    alert("Missing required fields");
     return;
   }
 
@@ -172,14 +180,17 @@ function submitExternal(){
     JSON.parse(localStorage.getItem("external_projects_pending") || "[]");
 
   list.push(data);
+
   localStorage.setItem(
     "external_projects_pending",
     JSON.stringify(list)
   );
 
+  consumeInvite(data.invite);
+
   formBox.style.display="none";
   successBox.style.display="block";
-}
+  }
 </script>
 
 </body>
