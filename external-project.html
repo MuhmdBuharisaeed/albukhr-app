@@ -9,71 +9,77 @@
 
 <style>
 .section{padding:16px}
-.project-box{
+.project-header{
   background:#fff;
   border-radius:16px;
-  padding:18px;
+  padding:16px;
+  margin-bottom:14px
 }
 .project-title{
   font-size:18px;
-  font-weight:700;
+  font-weight:700
 }
 .project-desc{
   font-size:13px;
   color:#666;
-  margin-top:6px;
-  line-height:1.6;
+  margin-top:6px
 }
-.project-meta{
-  margin-top:12px;
+.project-status{
+  font-size:12px;
+  margin-top:10px;
+  color:#0f7a3d
+}
+.stats{
+  display:flex;
+  gap:12px;
+  margin:16px 0
+}
+.stat-card{
+  flex:1;
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  text-align:center
+}
+.stat-card span{
   font-size:13px;
-  color:#0f7a3d;
+  color:#666
+}
+.stat-card strong{
+  display:block;
+  margin-top:6px;
+  font-size:17px
+}
+.tx{
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  font-size:13px
 }
 .badge{
-  display:inline-block;
-  padding:4px 10px;
   font-size:11px;
+  padding:3px 8px;
   border-radius:20px;
   background:#e6f5ec;
   color:#0f7a3d;
-  margin-top:8px;
-}
-.stake-box{
-  margin-top:18px;
-  background:#f9f9f9;
-  padding:14px;
-  border-radius:14px;
-}
-input{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  margin-top:8px;
-}
-button{
-  width:100%;
-  margin-top:12px;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  font-weight:600;
-  background:#0f7a3d;
-  color:#fff;
-}
-.disabled{
-  background:#aaa !important;
+  display:inline-block;
+  margin-top:8px
 }
 .notice{
   font-size:12px;
   color:#777;
-  margin-top:8px;
+  line-height:1.6;
+  margin-top:14px
 }
 </style>
 </head>
 
 <body data-page="external-project">
 
+<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>🌍 External Project</span>
@@ -82,12 +88,41 @@ button{
 
 <section class="section">
 
-  <div class="project-box" id="projectBox">
-    Loading project...
+  <!-- PROJECT INFO -->
+  <div class="project-header">
+    <div class="project-title" id="pTitle">Loading…</div>
+    <div class="project-desc" id="pDesc"></div>
+    <div class="project-status" id="pStatus"></div>
+    <span class="badge">Escrow Protected</span>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <span>Total Staked</span>
+      <strong id="pStake">0.00 Pi</strong>
+    </div>
+    <div class="stat-card">
+      <span>Total Rewards</span>
+      <strong>—</strong>
+    </div>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <h3 style="font-size:14px;margin-bottom:8px">
+    Recent Stakes
+  </h3>
+  <div id="txList"></div>
+
+  <div class="notice">
+    ℹ️ Funds staked in this project are held in Albukhr escrow.
+    Release or refund is handled only after verification milestones
+    are met. Rewards (if any) are defined off-chain by agreement.
   </div>
 
 </section>
 
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
   <a href="projects.html" class="active"><span>📁</span>Projects</a>
@@ -96,85 +131,61 @@ button{
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
+<!-- ENGINES -->
 <script src="staking-external.js"></script>
 
 <script>
-const box = document.getElementById("projectBox");
+/* ===============================
+   LOAD PROJECT
+================================ */
+function getParam(name){
+  return new URLSearchParams(window.location.search).get(name);
+}
 
-const params = new URLSearchParams(window.location.search);
-const projectId = params.get("id");
+const projectId = getParam("id");
 
-if(!projectId || typeof getExternalProjects !== "function"){
-  box.innerHTML = "<div class='notice'>Project not found</div>";
-} else {
+function loadProject(){
 
-  const project = getExternalProjects()
-    .find(p => p.projectId === projectId);
+  const project = getExternalProject(projectId);
 
   if(!project){
-    box.innerHTML = "<div class='notice'>Project not available</div>";
-  } else {
-    renderProject(project);
+    document.querySelector(".section").innerHTML =
+      "<p style='text-align:center;color:#777'>Project not found</p>";
+    return;
   }
-}
 
-function renderProject(p){
-  const verified = p.status === "verified" || p.status === "active";
+  pTitle.innerText  = project.title;
+  pDesc.innerText   = project.description || "";
+  pStatus.innerText =
+    "Status: " + project.status.toUpperCase();
 
-  box.innerHTML = `
-    <div class="project-title">${p.title}</div>
-    <div class="project-desc">${p.description || ""}</div>
+  const totals = getExternalProjectTotals(projectId);
+  pStake.innerText = totals.stake.toFixed(2) + " Pi";
 
-    <div class="project-meta">
-      Total Staked: ${p.totalStaked || 0} Pi
-    </div>
+  const box = document.getElementById("txList");
+  box.innerHTML = "";
 
-    <span class="badge">
-      Status: ${p.status || "pending"}
-    </span>
+  const recent = totals.stakes
+    .slice(-3)
+    .reverse();
 
-    <div class="stake-box">
-      <strong>Stake Pi</strong>
+  if(recent.length === 0){
+    box.innerHTML =
+      "<p style='font-size:12px;color:#777'>No stakes yet</p>";
+    return;
+  }
 
-      <input id="stakeAmount"
-        type="number"
-        min="1"
-        placeholder="Amount in Pi">
-
-      <button
-        ${verified ? "" : "disabled"}
-        class="${verified ? "" : "disabled"}"
-        onclick="stake('${p.projectId}')">
-        Stake Now
-      </button>
-
-      <div class="notice">
-        ${verified
-          ? "Funds go to escrow wallet"
-          : "Project must be verified before staking"}
+  recent.forEach(s=>{
+    box.innerHTML += `
+      <div class="tx">
+        <span>${s.amount} Pi</span>
+        <span>${s.status}</span>
       </div>
-    </div>
-  `;
+    `;
+  });
 }
 
-function stake(id){
-  const amount = Number(stakeAmount.value);
-
-  if(!amount || amount <= 0){
-    alert("Enter valid amount");
-    return;
-  }
-
-  if(typeof stakeExternalProject !== "function"){
-    alert("Staking system not available");
-    return;
-  }
-
-  stakeExternalProject(id, amount);
-  alert("Stake successful");
-
-  location.reload();
-}
+window.addEventListener("DOMContentLoaded", loadProject);
 </script>
 
 </body>
