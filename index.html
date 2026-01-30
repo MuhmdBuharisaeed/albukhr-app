@@ -119,7 +119,8 @@
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<script src="staking.js"></script>
+<script src="staking.js"></script>          <!-- internal (legacy) -->
+<script src="staking-external.js"></script> <!-- external escrow -->
 
 <script>
 /* ICON MAP */
@@ -130,43 +131,95 @@ const ICONS = {
   Khairat: "♻️",
   Azman: "🧪",
   Urban: "🚍",
-  Labbaika: "🍞"
+  Labbaika: "🍞",
+  External: "🌍"
 };
 
-/* LOAD HOME DATA */
 function loadHome(){
-  const totals = getTotals();
-  homeStake.innerText = totals.totalStake.toFixed(2) + " Pi";
-  homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
 
+  /* =====================
+     INTERNAL TOTALS
+  ====================== */
+  const internalTotals = getTotals(); // daga staking.js
+
+  /* =====================
+     EXTERNAL TOTALS
+  ====================== */
+  const externalTotals = getExternalTotals
+    ? getExternalTotals()
+    : { totalStake:0, totalReward:0 };
+
+  /* =====================
+     COMBINED TOTALS
+  ====================== */
+  const totalStake =
+    (internalTotals.totalStake || 0) +
+    (externalTotals.totalStake || 0);
+
+  const totalReward =
+    (internalTotals.totalReward || 0) +
+    (externalTotals.totalReward || 0);
+
+  homeStake.innerText  = totalStake.toFixed(2) + " Pi";
+  homeReward.innerText = totalReward.toFixed(2) + " Pi";
+
+  /* =====================
+     RECENT TRANSACTIONS
+  ====================== */
   const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
-  const stakes = getStakes()
-    .filter(s => s.status === "Successful")
-    .slice(-2)
-    .reverse();
+  let internalStakes = getStakes ? getStakes() : [];
+  let externalStakes = [];
 
-  if(stakes.length === 0){
+  if(typeof getExternalProjects === "function"){
+    const escrow = JSON.parse(
+      localStorage.getItem("albukhr_external_escrow") || "{}"
+    );
+    externalStakes = escrow.stakes || [];
+  }
+
+  /* normalize */
+  const merged = [
+    ...internalStakes.map(s=>({
+      ...s,
+      source:"internal"
+    })),
+    ...externalStakes.map(s=>({
+      ...s,
+      project: s.projectTitle,
+      source:"external",
+      status: s.status === "escrowed" ? "Escrowed" : "Released"
+    }))
+  ]
+  .filter(s=>s.status)
+  .sort((a,b)=> new Date(b.createdAt||b.time) - new Date(a.createdAt||a.time))
+  .slice(0,2);
+
+  if(merged.length === 0){
     box.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  stakes.forEach(s=>{
+  merged.forEach(s=>{
     const t = formatDateTime(s);
 
     const div = document.createElement("div");
     div.className = "home-tx";
     div.innerHTML = `
-      <div class="home-icon">${ICONS[s.project] || "📦"}</div>
+      <div class="home-icon">
+        ${ICONS[s.project] || ICONS.External}
+      </div>
       <div class="home-body">
-        <div class="home-title">${s.project} Stake</div>
+        <div class="home-title">
+          ${s.project} • ${s.source === "external" ? "External" : "Internal"}
+        </div>
         <div class="home-date">${t.date} • ${t.time}</div>
       </div>
       <div class="home-right">
         <div class="home-amount">${s.amount} Pi</div>
-        <div class="home-status success">Successful</div>
+        <div class="home-status success">${s.status}</div>
       </div>
     `;
     box.appendChild(div);
@@ -174,38 +227,6 @@ function loadHome(){
 }
 
 window.addEventListener("DOMContentLoaded", loadHome);
-
-/* WELCOME → ANNOUNCEMENT LOGIC */
-const scroll = document.getElementById("welcomeScroll");
-const announce = document.getElementById("welcomeAnnounce");
-
-const announcements = [
-  "📢 Albukhr is opening doors for external projects to join our staking ecosystem.",
-  "🌍 Powered by Pi Network — connecting local industries to global value.",
-  "🚀 Stake, grow, and support verified community-driven projects on Albukhr.",
-  "🧩 Have a project? Submit it via Services and get verified by Albukhr."
-];
-
-let aIndex = 0;
-
-/* lokacin da scrolling ya gama (daidai da animation duration) */
-setTimeout(() => {
-  scroll.style.display = "none";
-  announce.style.display = "block";
-  announce.style.opacity = 1;
-
-  setInterval(() => {
-    announce.style.opacity = 0;
-
-    setTimeout(() => {
-      aIndex = (aIndex + 1) % announcements.length;
-      announce.textContent = announcements[aIndex];
-      announce.style.opacity = 1;
-    }, 500);
-
-  }, 6000);
-
-}, 18000); /* 18s = welcomeMove animation time */
 </script>
 
 </body>
