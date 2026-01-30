@@ -1,15 +1,14 @@
-/* ===============================
-   ALBUKHR – EXTERNAL STAKING ENGINE
-   Escrow / Read-only (Frontend)
-   =============================== */
+// ===================================
+// ALBUKHR – EXTERNAL ESCROW ENGINE
+// ===================================
 
 const EXT_PROJECT_KEY = "albukhr_external_projects";
 const EXT_STAKE_KEY   = "albukhr_external_stakes";
 
 /* ===============================
-   STORAGE HELPERS (SAFE)
+   CORE STORAGE
 ================================ */
-function _extLoad(key){
+function _load(key){
   try {
     return JSON.parse(localStorage.getItem(key)) || [];
   } catch {
@@ -17,15 +16,15 @@ function _extLoad(key){
   }
 }
 
-function _extSave(key, data){
+function _save(key, data){
   localStorage.setItem(key, JSON.stringify(data));
 }
 
 /* ===============================
-   PROJECTS (EXTERNAL)
+   PROJECT READ
 ================================ */
 function getExternalProjects(){
-  return _extLoad(EXT_PROJECT_KEY);
+  return _load(EXT_PROJECT_KEY);
 }
 
 function getExternalProjectById(id){
@@ -34,125 +33,131 @@ function getExternalProjectById(id){
 }
 
 /* ===============================
-   STAKES (READ ONLY)
+   ESCROW STAKE (LOCKED)
+   Pi SDK WILL CALL THIS
 ================================ */
-function getExternalStakes(){
-  return _extLoad(EXT_STAKE_KEY);
+function createExternalStake({
+  projectId,
+  userPiUID,
+  amount
+}){
+  const project = getExternalProjectById(projectId);
+
+  if(!project) throw "Project not found";
+  if(project.status !== "approved")
+    throw "Project not approved";
+
+  const stake = {
+    stakeId: "EXT-" + Date.now(),
+    projectId,
+    userPiUID,
+    amount: Number(amount),
+    status: "locked",          // 🔒 ESCROW
+    timestamp: new Date().toISOString()
+  };
+
+  const stakes = _load(EXT_STAKE_KEY);
+  stakes.push(stake);
+  _save(EXT_STAKE_KEY, stakes);
+
+  project.totalStaked =
+    (project.totalStaked || 0) + Number(amount);
+
+  _save(EXT_PROJECT_KEY, getExternalProjects());
+
+  return stake;
 }
 
+/* ===============================
+   MILESTONE RELEASE (ALBUKHR)
+================================ */
+function releaseMilestone(projectId, milestoneIndex){
+
+  const projects = getExternalProjects();
+  const project  = projects.find(p => p.projectId === projectId);
+
+  if(!project) throw "Project not found";
+  if(!project.milestones) throw "No milestones";
+
+  const m = project.milestones[milestoneIndex];
+
+  if(!m || m.released) throw "Invalid milestone";
+
+  // 🔓 AUTHORISE RELEASE (Pi SDK transfer happens elsewhere)
+  m.released = true;
+  m.releasedAt = new Date().toISOString();
+
+  _save(EXT_PROJECT_KEY, projects);
+  return m;
+}
+
+/* ===============================
+   FREEZE PROJECT (EMERGENCY)
+================================ */
+function freezeExternalProject(projectId, reason=""){
+
+  const projects = getExternalProjects();
+  const project  = projects.find(p => p.projectId === projectId);
+
+  if(!project) throw "Project not found";
+
+  project.status = "frozen";
+  project.freezeReason = reason;
+
+  _save(EXT_PROJECT_KEY, projects);
+}
+
+/* ===============================
+   REFUND (ALBUKHR ONLY)
+================================ */
+function refundExternalProject(projectId){
+
+  const stakes = _load(EXT_STAKE_KEY);
+  let count = 0;
+
+  stakes.forEach(s=>{
+    if(
+      s.projectId === projectId &&
+      s.status === "locked"
+    ){
+      s.status = "refunded";
+      count++;
+    }
+  });
+
+  _save(EXT_STAKE_KEY, stakes);
+  return count;
+}
+
+/* ===============================
+   READ-ONLY (UI SAFE)
+================================ */
 function getExternalStakesByProject(projectId){
-  return getExternalStakes()
+  return _load(EXT_STAKE_KEY)
     .filter(s => s.projectId === projectId);
 }
 
-function getExternalStakesByUser(userId){
-  return getExternalStakes()
-    .filter(s => s.userId === userId);
+function getExternalStakesByUser(userPiUID){
+  return _load(EXT_STAKE_KEY)
+    .filter(s => s.userPiUID === userPiUID);
 }
 
 /* ===============================
-   TOTALS (HOME SAFE)
+   HOME / STATS BRIDGE
 ================================ */
 function getExternalTotals(){
 
-  const stakes = getExternalStakes();
-
-  let totalStake  = 0;
-  let totalReward = 0;
+  const stakes = _load(EXT_STAKE_KEY);
+  let totalStake = 0;
 
   stakes.forEach(s=>{
     if(s.status === "locked"){
-      totalStake  += Number(s.amount) || 0;
-      totalReward += Number(s.reward) || 0;
+      totalStake += Number(s.amount) || 0;
     }
   });
 
-  return { totalStake, totalReward };
-}
-
-/* ===============================
-   PROJECT TOTALS (SAFE)
-================================ */
-function getExternalProjectTotals(projectId){
-
-  const stakes = getExternalStakesByProject(projectId);
-
-  let stake  = 0;
-  let reward = 0;
-
-  stakes.forEach(s=>{
-    if(s.status === "locked"){
-      stake  += Number(s.amount) || 0;
-      reward += Number(s.reward) || 0;
-    }
-  });
-
-  return { stake, reward, stakes };
-}
-
-/* ===============================
-   ADD STAKE (LOCKED ESCROW)
-   NOTE:
-   - No Pi transfer here
-   - SDK handles payment outside
-================================ */
-function addExternalStake({
-  projectId,
-  userId,
-  amount,
-  reward = 0
-}){
-
-  const safeAmount = Number(amount);
-
-  if(!projectId || !userId || isNaN(safeAmount) || safeAmount <= 0){
-    return false;
-  }
-
-  const stake = {
-    id: "EXT-" + Date.now(),
-    projectId,
-    userId,
-    amount: safeAmount,
-    reward: Number(reward) || 0,
-    status: "locked",        // 🔒 escrow
-    timestamp: new Date().toISOString(),
-    type: "external"
+  return {
+    totalStake,
+    totalReward: 0 // rewards defined per project later
   };
-
-  const stakes = getExternalStakes();
-  stakes.push(stake);
-  _extSave(EXT_STAKE_KEY, stakes);
-
-  /* update project total */
-  const projects = getExternalProjects();
-  const p = projects.find(x => x.projectId === projectId);
-  if(p){
-    p.totalStaked = (Number(p.totalStaked) || 0) + safeAmount;
-    _extSave(EXT_PROJECT_KEY, projects);
-  }
-
-  return true;
-}
-
-/* ===============================
-   FORMAT DATE (REUSE STYLE)
-================================ */
-function formatExternalDateTime(stake){
-
-  if(stake?.timestamp){
-    const d = new Date(stake.timestamp);
-    if(!isNaN(d)){
-      return {
-        date: d.toLocaleDateString("en-GB"),
-        time: d.toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
-        })
-      };
-    }
-  }
-
-  return { date:"--", time:"--" };
 }
