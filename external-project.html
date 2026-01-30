@@ -9,64 +9,96 @@
 
 <style>
 .section{padding:16px}
-.card{
+.project-header{
   background:#fff;
   border-radius:16px;
   padding:16px;
   margin-bottom:14px
 }
-.title{font-size:18px;font-weight:700}
-.desc{font-size:14px;color:#555;margin-top:6px;line-height:1.6}
-.meta{font-size:13px;color:#777;margin-top:10px}
-.stat{
-  display:flex;
-  justify-content:space-between;
-  font-size:14px;
-  margin-top:8px
+.project-title{
+  font-size:18px;
+  font-weight:700
 }
-.badge{
-  display:inline-block;
-  margin-top:10px;
-  font-size:11px;
-  padding:4px 10px;
-  border-radius:20px;
-  background:#e6f5ec;
-  color:#0f7a3d
+.project-desc{
+  font-size:13px;
+  color:#555;
+  margin-top:6px;
+  line-height:1.5
+}
+.meta{
+  font-size:12px;
+  color:#0f7a3d;
+  margin-top:10px
+}
+.stat-box{
+  display:flex;
+  gap:12px;
+  margin:16px 0
+}
+.stat{
+  flex:1;
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  text-align:center
+}
+.stat span{
+  font-size:12px;
+  color:#666
+}
+.stat strong{
+  display:block;
+  margin-top:6px;
+  font-size:16px
 }
 .notice{
-  background:#fff3cd;
-  color:#856404;
-  font-size:13px;
-  padding:12px;
+  background:#fff7e6;
   border-radius:12px;
-  margin-top:14px
-}
-.btn{
-  width:100%;
-  margin-top:14px;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:700;
-  background:#ccc;
-  color:#555
+  padding:12px;
+  font-size:13px;
+  color:#8a5a00;
+  line-height:1.5
 }
 </style>
 </head>
 
 <body data-page="external-project">
 
+<!-- HEADER -->
 <header class="header">
-  <div class="header-left">
-    <span>🌍 External Project</span>
-  </div>
+  <div class="header-left">🌍 External Project</div>
 </header>
 
 <section class="section">
-  <div id="projectBox"></div>
+
+  <!-- PROJECT INFO -->
+  <div class="project-header">
+    <div class="project-title" id="pTitle">Loading...</div>
+    <div class="project-desc" id="pDesc"></div>
+    <div class="meta" id="pMeta"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stat-box">
+    <div class="stat">
+      <span>Total Staked</span>
+      <strong id="pStake">0 Pi</strong>
+    </div>
+    <div class="stat">
+      <span>Total Reward</span>
+      <strong id="pReward">0 Pi</strong>
+    </div>
+  </div>
+
+  <!-- NOTICE -->
+  <div class="notice">
+    🔒 This is a verified external project under Albukhr escrow supervision.
+    Direct staking is currently unavailable.
+  </div>
+
 </section>
 
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
   <a href="projects.html"><span>📁</span>Projects</a>
@@ -75,66 +107,51 @@
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<script>
-const KEY = "albukhr_external_projects";
+<!-- EXTERNAL ENGINE ONLY -->
+<script src="staking-external.js"></script>
 
-function getParam(name){
-  return new URLSearchParams(window.location.search).get(name);
+<script>
+/* ===============================
+   LOAD EXTERNAL PROJECT
+================================ */
+
+function getQueryParam(key){
+  return new URLSearchParams(window.location.search).get(key);
 }
 
-function loadProject(){
-  const id = getParam("id");
-  const box = document.getElementById("projectBox");
-
+function loadExternalProject(){
+  const id = getQueryParam("id");
   if(!id){
-    box.innerHTML = "<p>Invalid project</p>";
+    alert("Invalid project");
     return;
   }
 
-  const projects = JSON.parse(localStorage.getItem(KEY) || "[]");
+  const projects = getExternalProjects
+    ? getExternalProjects()
+    : [];
+
   const project = projects.find(p => p.projectId === id);
 
-  if(!project || project.status !== "approved"){
-    box.innerHTML =
-      "<p style='font-size:14px;color:#777'>Project not available</p>";
+  if(!project){
+    alert("Project not found");
     return;
   }
 
-  box.innerHTML = `
-    <div class="card">
-      <div class="title">${project.title}</div>
-      <div class="desc">${project.description}</div>
+  pTitle.innerText = project.title;
+  pDesc.innerText =
+    project.description || "Verified external project on Albukhr.";
+  pMeta.innerText =
+    "Owner: " + (project.owner || "Verified partner");
 
-      <div class="meta">
-        Category: ${project.category || "—"}<br>
-        Owner Wallet: ${project.wallet}
-      </div>
+  const totals = getExternalProjectTotals
+    ? getExternalProjectTotals(id)
+    : { stake:0, reward:0 };
 
-      <div class="stat">
-        <span>Target</span>
-        <strong>${project.target} Pi</strong>
-      </div>
-
-      <div class="stat">
-        <span>Total Staked</span>
-        <strong>${project.totalStaked || 0} Pi</strong>
-      </div>
-
-      <span class="badge">Verified External Project</span>
-
-      <div class="notice">
-        🔒 External staking is currently locked.<br>
-        Funds will be held in escrow once enabled.
-      </div>
-
-      <button class="btn" disabled>
-        Staking Coming Soon
-      </button>
-    </div>
-  `;
+  pStake.innerText = (totals.stake || 0) + " Pi";
+  pReward.innerText = (totals.reward || 0) + " Pi";
 }
 
-loadProject();
+window.addEventListener("DOMContentLoaded", loadExternalProject);
 </script>
 
 </body>
