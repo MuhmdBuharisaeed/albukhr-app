@@ -1,163 +1,159 @@
-// ===================================
-// ALBUKHR – EXTERNAL ESCROW ENGINE
-// ===================================
+/* =====================================
+   ALBUKHR — EXTERNAL ESCROW ENGINE
+   SAFE • LEDGER-BASED • NON-CUSTODIAL
+===================================== */
 
-const EXT_PROJECT_KEY = "albukhr_external_projects";
-const EXT_STAKE_KEY   = "albukhr_external_stakes";
+const ESCROW_KEY = "albukhr_external_escrow";
 
-/* ===============================
-   CORE STORAGE
-================================ */
-function _load(key){
-  try {
-    return JSON.parse(localStorage.getItem(key)) || [];
-  } catch {
-    return [];
+/* -----------------------------
+   INIT STORAGE
+------------------------------ */
+function initEscrow(){
+  if(!localStorage.getItem(ESCROW_KEY)){
+    localStorage.setItem(ESCROW_KEY, JSON.stringify({
+      projects: {},   // projectId -> project meta
+      stakes: []      // all external stakes
+    }));
   }
 }
+initEscrow();
 
-function _save(key, data){
-  localStorage.setItem(key, JSON.stringify(data));
+/* -----------------------------
+   HELPERS
+------------------------------ */
+function getEscrow(){
+  return JSON.parse(localStorage.getItem(ESCROW_KEY));
 }
 
-/* ===============================
-   PROJECT READ
-================================ */
-function getExternalProjects(){
-  return _load(EXT_PROJECT_KEY);
+function saveEscrow(data){
+  localStorage.setItem(ESCROW_KEY, JSON.stringify(data));
 }
 
-function getExternalProjectById(id){
-  return getExternalProjects()
-    .find(p => p.projectId === id);
+function uid(){
+  return Date.now() + "_" + Math.random().toString(36).slice(2);
 }
 
-/* ===============================
-   ESCROW STAKE (LOCKED)
-   Pi SDK WILL CALL THIS
-================================ */
-function createExternalStake({
+function now(){
+  return new Date().toISOString();
+}
+
+/* =============================
+   PROJECT REGISTRATION
+   (Approved by Albukhr only)
+============================= */
+function registerExternalProject({
   projectId,
-  userPiUID,
-  amount
+  title,
+  owner,
+  description,
+  rate = 0.05   // default 5%
 }){
-  const project = getExternalProjectById(projectId);
+  const db = getEscrow();
 
-  if(!project) throw "Project not found";
-  if(project.status !== "approved")
-    throw "Project not approved";
-
-  const stake = {
-    stakeId: "EXT-" + Date.now(),
+  db.projects[projectId] = {
     projectId,
-    userPiUID,
-    amount: Number(amount),
-    status: "locked",          // 🔒 ESCROW
-    timestamp: new Date().toISOString()
+    title,
+    owner,
+    description,
+    rate,
+    status: "approved",
+    createdAt: now()
   };
 
-  const stakes = _load(EXT_STAKE_KEY);
-  stakes.push(stake);
-  _save(EXT_STAKE_KEY, stakes);
+  saveEscrow(db);
+}
 
-  project.totalStaked =
-    (project.totalStaked || 0) + Number(amount);
+/* =============================
+   ADD EXTERNAL STAKE (ESCROW)
+============================= */
+function addExternalStake({
+  projectId,
+  amount,
+  user
+}){
+  const db = getEscrow();
+  const project = db.projects[projectId];
 
-  _save(EXT_PROJECT_KEY, getExternalProjects());
+  if(!project || project.status !== "approved"){
+    throw new Error("Project not approved");
+  }
+
+  if(amount <= 0){
+    throw new Error("Invalid amount");
+  }
+
+  const stake = {
+    stakeId: uid(),
+    projectId,
+    projectTitle: project.title,
+    amount,
+    user,
+    rate: project.rate,
+    reward: amount * project.rate,
+    status: "escrowed",     // NOT paid out
+    createdAt: now()
+  };
+
+  db.stakes.push(stake);
+  saveEscrow(db);
 
   return stake;
 }
 
-/* ===============================
-   MILESTONE RELEASE (ALBUKHR)
-================================ */
-function releaseMilestone(projectId, milestoneIndex){
+/* =============================
+   READ PROJECT TOTALS
+============================= */
+function getExternalProjectTotals(projectId){
+  const db = getEscrow();
 
-  const projects = getExternalProjects();
-  const project  = projects.find(p => p.projectId === projectId);
+  const stakes = db.stakes.filter(
+    s => s.projectId === projectId
+  );
 
-  if(!project) throw "Project not found";
-  if(!project.milestones) throw "No milestones";
-
-  const m = project.milestones[milestoneIndex];
-
-  if(!m || m.released) throw "Invalid milestone";
-
-  // 🔓 AUTHORISE RELEASE (Pi SDK transfer happens elsewhere)
-  m.released = true;
-  m.releasedAt = new Date().toISOString();
-
-  _save(EXT_PROJECT_KEY, projects);
-  return m;
-}
-
-/* ===============================
-   FREEZE PROJECT (EMERGENCY)
-================================ */
-function freezeExternalProject(projectId, reason=""){
-
-  const projects = getExternalProjects();
-  const project  = projects.find(p => p.projectId === projectId);
-
-  if(!project) throw "Project not found";
-
-  project.status = "frozen";
-  project.freezeReason = reason;
-
-  _save(EXT_PROJECT_KEY, projects);
-}
-
-/* ===============================
-   REFUND (ALBUKHR ONLY)
-================================ */
-function refundExternalProject(projectId){
-
-  const stakes = _load(EXT_STAKE_KEY);
-  let count = 0;
-
-  stakes.forEach(s=>{
-    if(
-      s.projectId === projectId &&
-      s.status === "locked"
-    ){
-      s.status = "refunded";
-      count++;
-    }
-  });
-
-  _save(EXT_STAKE_KEY, stakes);
-  return count;
-}
-
-/* ===============================
-   READ-ONLY (UI SAFE)
-================================ */
-function getExternalStakesByProject(projectId){
-  return _load(EXT_STAKE_KEY)
-    .filter(s => s.projectId === projectId);
-}
-
-function getExternalStakesByUser(userPiUID){
-  return _load(EXT_STAKE_KEY)
-    .filter(s => s.userPiUID === userPiUID);
-}
-
-/* ===============================
-   HOME / STATS BRIDGE
-================================ */
-function getExternalTotals(){
-
-  const stakes = _load(EXT_STAKE_KEY);
-  let totalStake = 0;
-
-  stakes.forEach(s=>{
-    if(s.status === "locked"){
-      totalStake += Number(s.amount) || 0;
-    }
-  });
+  const stake = stakes.reduce((a,b)=>a+b.amount,0);
+  const reward = stakes.reduce((a,b)=>a+b.reward,0);
 
   return {
-    totalStake,
-    totalReward: 0 // rewards defined per project later
+    stake,
+    reward,
+    stakes
   };
 }
+
+/* =============================
+   GLOBAL TOTALS (HOME)
+============================= */
+function getExternalTotals(){
+  const db = getEscrow();
+
+  return {
+    totalStake: db.stakes.reduce((a,b)=>a+b.amount,0),
+    totalReward: db.stakes.reduce((a,b)=>a+b.reward,0)
+  };
+}
+
+/* =============================
+   LIST EXTERNAL PROJECTS
+============================= */
+function getExternalProjects(){
+  const db = getEscrow();
+  return Object.values(db.projects);
+}
+
+/* =============================
+   ADMIN: RELEASE FUNDS
+   (Manual / Rule-based)
+============================= */
+function releaseExternalStake(stakeId){
+  const db = getEscrow();
+  const stake = db.stakes.find(s=>s.stakeId===stakeId);
+
+  if(!stake) return false;
+  if(stake.status !== "escrowed") return false;
+
+  stake.status = "released";
+  stake.releasedAt = now();
+
+  saveEscrow(db);
+  return true;
+     }
