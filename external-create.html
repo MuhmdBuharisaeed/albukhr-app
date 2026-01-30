@@ -9,34 +9,39 @@
 
 <style>
 .section{padding:16px}
-.form-box{
+.form-card{
   background:#fff;
-  border-radius:16px;
-  padding:16px;
+  border-radius:18px;
+  padding:18px;
 }
 label{
-  font-size:13px;
-  font-weight:600;
   display:block;
   margin-top:14px;
+  font-size:13px;
+  font-weight:600;
 }
-input,textarea{
+input, select, textarea{
   width:100%;
-  margin-top:6px;
   padding:12px;
+  margin-top:6px;
   border-radius:12px;
   border:1px solid #ccc;
-  font-size:14px;
+  font-size:15px;
 }
-textarea{resize:vertical}
+textarea{resize:none}
+.hint{
+  font-size:12px;
+  color:#777;
+  margin-top:4px;
+}
 .btn{
-  margin-top:18px;
   width:100%;
   padding:14px;
   border:none;
   border-radius:14px;
+  font-weight:700;
   font-size:16px;
-  font-weight:bold;
+  margin-top:20px;
 }
 .primary{
   background:#0f7a3d;
@@ -45,117 +50,133 @@ textarea{resize:vertical}
 .notice{
   font-size:12px;
   color:#666;
+  margin-top:16px;
   line-height:1.6;
-  margin-top:14px;
 }
-.lock{
-  font-size:12px;
-  color:#0f7a3d;
-  margin-top:10px;
+.success{
+  text-align:center;
+  padding:30px 16px;
 }
+.success h3{color:#0f7a3d}
 </style>
 </head>
 
-<body data-page="external-create">
+<body data-page="services">
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
-    <span>🚀 External Project</span>
+    <span>🚀 Create External Project</span>
   </div>
 </header>
 
 <section class="section">
 
-  <div class="form-box">
+<div class="form-card" id="formBox">
 
-    <label>Project Name</label>
-    <input id="pName" placeholder="e.g. GreenFarm Initiative">
+  <label>Project Name</label>
+  <input id="pName" placeholder="e.g. Green Energy Hub">
 
-    <label>Short Description</label>
-    <textarea id="pDesc" rows="3"
-      placeholder="What problem does this project solve?"></textarea>
+  <label>Category</label>
+  <select id="pCategory">
+    <option value="">Select category</option>
+    <option>Agriculture</option>
+    <option>Health</option>
+    <option>Energy</option>
+    <option>Education</option>
+    <option>Technology</option>
+    <option>Other</option>
+  </select>
 
-    <label>Category</label>
-    <input id="pCategory" placeholder="Agriculture / Health / Energy">
+  <label>Short Description</label>
+  <textarea id="pDesc" rows="3"
+    placeholder="Briefly explain what your project does"></textarea>
 
-    <label>Project Wallet (Pi)</label>
-    <input id="pWallet" placeholder="Pi wallet address provided by Albukhr">
+  <label>Owner Full Name</label>
+  <input id="oName" placeholder="Your full name">
 
-    <label>Initial Funding Target (Pi)</label>
-    <input type="number" id="pTarget" placeholder="e.g. 5000">
-
-    <label>Milestones (simple)</label>
-    <textarea id="pMilestones" rows="4"
-      placeholder="Milestone 1: Setup&#10;Milestone 2: Production"></textarea>
-
-    <button class="btn primary" onclick="submitProject()">
-      Submit for Verification
-    </button>
-
-    <div class="lock">
-      🔒 Funds will be locked in escrow until milestones are approved.
-    </div>
-
-    <div class="notice">
-      By submitting, you agree that:
-      <ul>
-        <li>Albukhr controls escrow release</li>
-        <li>No direct withdrawals without approval</li>
-        <li>False information leads to permanent ban</li>
-      </ul>
-    </div>
-
+  <label>Pi Username</label>
+  <input id="piUser" placeholder="Your Pi Network username">
+  <div class="hint">
+    Must be a valid Pi username. KYC is recommended but not mandatory.
   </div>
+
+  <label>Contact (Email / Telegram)</label>
+  <input id="contact" placeholder="How can we reach you?">
+
+  <label>Invite Code / Link</label>
+  <input id="invite" placeholder="Provided by Albukhr or verified member">
+  <div class="hint">
+    Projects without valid invite may be rejected.
+  </div>
+
+  <label>Target Amount (Pi)</label>
+  <input type="number" id="target" placeholder="e.g. 5000">
+
+  <label>Expected Duration (days)</label>
+  <select id="duration">
+    <option value="30">30 days</option>
+    <option value="60">60 days</option>
+    <option value="90">90 days</option>
+  </select>
+
+  <div class="notice">
+    🔒 Funds will be held in Albukhr escrow wallet.<br>
+    Release depends on milestone verification.<br>
+    Submission does not guarantee approval.
+  </div>
+
+  <button class="btn primary" onclick="submitExternal()">
+    Submit Project
+  </button>
+
+</div>
+
+<div class="form-card success" id="successBox" style="display:none">
+  <h3>Submission Received</h3>
+  <p style="font-size:14px;color:#555">
+    Your project is under review.<br>
+    Albukhr team will contact you if approved.
+  </p>
+  <button class="btn primary" onclick="location.href='services.html'">
+    Back to Services
+  </button>
+</div>
 
 </section>
 
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <a href="index.html"><span></span></a>
-  <a href="projects.html"><span></span></a>
-  <a href="wallet.html"><span></span></a>
-  <a href="services.html" class="active"><span></span></a>
-  <a href="settings.html"><span></span></a>
-</nav>
-
-<script src="staking-external.js"></script>
-
 <script>
-function submitProject(){
-
-  const project = {
-    projectId: "EXT-" + Date.now(),
-    title: pName.value.trim(),
+function submitExternal(){
+  const data = {
+    id: "EXT-" + Date.now(),
+    name: pName.value.trim(),
+    category: pCategory.value,
     description: pDesc.value.trim(),
-    category: pCategory.value.trim(),
-    wallet: pWallet.value.trim(),
-    target: Number(pTarget.value),
-    milestones: pMilestones.value
-      .split("\n")
-      .map((m,i)=>({
-        id:i+1,
-        title:m,
-        released:false
-      })),
+    owner: oName.value.trim(),
+    piUsername: piUser.value.trim(),
+    contact: contact.value.trim(),
+    invite: invite.value.trim(),
+    target: Number(target.value),
+    duration: Number(duration.value),
     status: "pending",
-    totalStaked: 0,
-    createdAt: Date.now()
+    createdAt: new Date().toISOString()
   };
 
-  if(!project.title || !project.wallet || !project.target){
-    alert("Please complete all required fields");
+  if(!data.name || !data.piUsername || !data.invite){
+    alert("Project name, Pi username and invite code are required");
     return;
   }
 
-  // Save as pending external project
-  const key = "albukhr_external_projects";
-  const all = JSON.parse(localStorage.getItem(key) || "[]");
-  all.push(project);
-  localStorage.setItem(key, JSON.stringify(all));
+  const list =
+    JSON.parse(localStorage.getItem("external_projects_pending") || "[]");
 
-  alert("Project submitted successfully. Await verification.");
-  window.location.href = "services.html";
+  list.push(data);
+  localStorage.setItem(
+    "external_projects_pending",
+    JSON.stringify(list)
+  );
+
+  formBox.style.display="none";
+  successBox.style.display="block";
 }
 </script>
 
