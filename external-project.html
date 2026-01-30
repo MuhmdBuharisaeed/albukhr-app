@@ -9,77 +9,54 @@
 
 <style>
 .section{padding:16px}
-.project-header{
+.card{
   background:#fff;
   border-radius:16px;
   padding:16px;
   margin-bottom:14px
 }
-.project-title{
-  font-size:18px;
-  font-weight:700
-}
-.project-desc{
-  font-size:13px;
-  color:#666;
-  margin-top:6px
-}
-.project-status{
-  font-size:12px;
-  margin-top:10px;
-  color:#0f7a3d
-}
-.stats{
-  display:flex;
-  gap:12px;
-  margin:16px 0
-}
-.stat-card{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
-  padding:14px;
-  text-align:center
-}
-.stat-card span{
-  font-size:13px;
-  color:#666
-}
-.stat-card strong{
-  display:block;
-  margin-top:6px;
-  font-size:17px
-}
-.tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
+.title{font-size:18px;font-weight:700}
+.desc{font-size:14px;color:#555;margin-top:6px;line-height:1.6}
+.meta{font-size:13px;color:#777;margin-top:10px}
+.stat{
   display:flex;
   justify-content:space-between;
-  font-size:13px
-}
-.badge{
-  font-size:11px;
-  padding:3px 8px;
-  border-radius:20px;
-  background:#e6f5ec;
-  color:#0f7a3d;
-  display:inline-block;
+  font-size:14px;
   margin-top:8px
 }
+.badge{
+  display:inline-block;
+  margin-top:10px;
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:20px;
+  background:#e6f5ec;
+  color:#0f7a3d
+}
 .notice{
-  font-size:12px;
-  color:#777;
-  line-height:1.6;
+  background:#fff3cd;
+  color:#856404;
+  font-size:13px;
+  padding:12px;
+  border-radius:12px;
   margin-top:14px
+}
+.btn{
+  width:100%;
+  margin-top:14px;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:700;
+  background:#ccc;
+  color:#555
 }
 </style>
 </head>
 
 <body data-page="external-project">
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>🌍 External Project</span>
@@ -87,105 +64,77 @@
 </header>
 
 <section class="section">
-
-  <!-- PROJECT INFO -->
-  <div class="project-header">
-    <div class="project-title" id="pTitle">Loading…</div>
-    <div class="project-desc" id="pDesc"></div>
-    <div class="project-status" id="pStatus"></div>
-    <span class="badge">Escrow Protected</span>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat-card">
-      <span>Total Staked</span>
-      <strong id="pStake">0.00 Pi</strong>
-    </div>
-    <div class="stat-card">
-      <span>Total Rewards</span>
-      <strong>—</strong>
-    </div>
-  </div>
-
-  <!-- TRANSACTIONS -->
-  <h3 style="font-size:14px;margin-bottom:8px">
-    Recent Stakes
-  </h3>
-  <div id="txList"></div>
-
-  <div class="notice">
-    ℹ️ Funds staked in this project are held in Albukhr escrow.
-    Release or refund is handled only after verification milestones
-    are met. Rewards (if any) are defined off-chain by agreement.
-  </div>
-
+  <div id="projectBox"></div>
 </section>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
-  <a href="projects.html" class="active"><span>📁</span>Projects</a>
+  <a href="projects.html"><span>📁</span>Projects</a>
   <a href="wallet.html"><span>💰</span>Wallet</a>
   <a href="services.html"><span>🛠️</span>Services</a>
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<!-- ENGINES -->
-<script src="staking-external.js"></script>
-
 <script>
-/* ===============================
-   LOAD PROJECT
-================================ */
+const KEY = "albukhr_external_projects";
+
 function getParam(name){
   return new URLSearchParams(window.location.search).get(name);
 }
 
-const projectId = getParam("id");
-
 function loadProject(){
+  const id = getParam("id");
+  const box = document.getElementById("projectBox");
 
-  const project = getExternalProject(projectId);
-
-  if(!project){
-    document.querySelector(".section").innerHTML =
-      "<p style='text-align:center;color:#777'>Project not found</p>";
+  if(!id){
+    box.innerHTML = "<p>Invalid project</p>";
     return;
   }
 
-  pTitle.innerText  = project.title;
-  pDesc.innerText   = project.description || "";
-  pStatus.innerText =
-    "Status: " + project.status.toUpperCase();
+  const projects = JSON.parse(localStorage.getItem(KEY) || "[]");
+  const project = projects.find(p => p.projectId === id);
 
-  const totals = getExternalProjectTotals(projectId);
-  pStake.innerText = totals.stake.toFixed(2) + " Pi";
-
-  const box = document.getElementById("txList");
-  box.innerHTML = "";
-
-  const recent = totals.stakes
-    .slice(-3)
-    .reverse();
-
-  if(recent.length === 0){
+  if(!project || project.status !== "approved"){
     box.innerHTML =
-      "<p style='font-size:12px;color:#777'>No stakes yet</p>";
+      "<p style='font-size:14px;color:#777'>Project not available</p>";
     return;
   }
 
-  recent.forEach(s=>{
-    box.innerHTML += `
-      <div class="tx">
-        <span>${s.amount} Pi</span>
-        <span>${s.status}</span>
+  box.innerHTML = `
+    <div class="card">
+      <div class="title">${project.title}</div>
+      <div class="desc">${project.description}</div>
+
+      <div class="meta">
+        Category: ${project.category || "—"}<br>
+        Owner Wallet: ${project.wallet}
       </div>
-    `;
-  });
+
+      <div class="stat">
+        <span>Target</span>
+        <strong>${project.target} Pi</strong>
+      </div>
+
+      <div class="stat">
+        <span>Total Staked</span>
+        <strong>${project.totalStaked || 0} Pi</strong>
+      </div>
+
+      <span class="badge">Verified External Project</span>
+
+      <div class="notice">
+        🔒 External staking is currently locked.<br>
+        Funds will be held in escrow once enabled.
+      </div>
+
+      <button class="btn" disabled>
+        Staking Coming Soon
+      </button>
+    </div>
+  `;
 }
 
-window.addEventListener("DOMContentLoaded", loadProject);
+loadProject();
 </script>
 
 </body>
