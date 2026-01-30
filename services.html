@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Services</title>
+<title>Services</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -14,65 +14,43 @@
   border-radius:16px;
   padding:16px;
   margin-bottom:14px;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+}
+.service-icon{
+  font-size:22px;
 }
 .service-title{
-  font-size:15px;
   font-weight:700;
-  margin-bottom:6px;
+  font-size:15px;
 }
 .service-desc{
   font-size:13px;
   color:#666;
-  line-height:1.6;
+  margin-top:4px;
 }
 .service-action{
   margin-top:10px;
-}
-.service-action button{
-  padding:10px 14px;
-  border-radius:10px;
-  border:none;
-  font-weight:600;
-  background:#0f7a3d;
-  color:#fff;
-}
-.service-tag{
-  font-size:11px;
+  font-size:12px;
   color:#0f7a3d;
-  margin-top:6px;
-  display:inline-block;
+  font-weight:600;
 }
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000;
+.locked{
+  opacity:.55;
 }
-.modal-box{
-  background:#fff;
-  width:90%;
-  max-width:420px;
-  padding:20px;
-  border-radius:16px;
+.notice{
+  font-size:12px;
+  color:#777;
+  line-height:1.6;
+  margin-top:18px;
 }
-label{display:block;margin-top:12px;font-size:13px}
-input,textarea{
-  width:100%;
-  padding:12px;
-  margin-top:6px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:14px;
-}
-textarea{resize:none}
 </style>
 </head>
 
 <body data-page="services">
 
+<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>🛠️ Services</span>
@@ -82,71 +60,65 @@ textarea{resize:none}
 <section class="section">
 
   <!-- CREATE EXTERNAL PROJECT -->
-  <div class="service-card">
-    <div class="service-title">Create External Project</div>
-    <div class="service-desc">
-      Submit your project to join Albukhr’s verified staking ecosystem.
-      Projects go through review, AI verification, and escrow setup
-      before appearing publicly.
-    </div>
-    <span class="service-tag">External • Verification Required</span>
-    <div class="service-action">
-      <button onclick="openCreate()">Create Project</button>
+  <div class="service-card" onclick="goCreateExternal()">
+    <div class="service-icon">🚀</div>
+    <div>
+      <div class="service-title">
+        Create External Project
+      </div>
+      <div class="service-desc">
+        Start your own project under Albukhr escrow protection.
+        Funds are locked until milestones are verified.
+      </div>
+      <div class="service-action">
+        Start →
+      </div>
     </div>
   </div>
 
-  <!-- COMING SERVICES -->
-  <div class="service-card">
-    <div class="service-title">AI Project Verification</div>
-    <div class="service-desc">
-      Automated checks on project identity, feasibility,
-      and consistency before approval.
+  <!-- INTERNAL PROJECT (LOCKED) -->
+  <div class="service-card locked">
+    <div class="service-icon">🏗️</div>
+    <div>
+      <div class="service-title">
+        Internal Project Creation
+      </div>
+      <div class="service-desc">
+        Restricted to Albukhr core team only.
+        Access by private link.
+      </div>
+      <div class="service-action">
+        Restricted
+      </div>
     </div>
-    <span class="service-tag">Coming Soon</span>
   </div>
 
-  <div class="service-card">
-    <div class="service-title">Escrow & Fund Protection</div>
-    <div class="service-desc">
-      Secure holding of funds to protect stakers
-      and ensure project accountability.
+  <!-- FUTURE SERVICES PLACEHOLDER -->
+  <div class="service-card locked">
+    <div class="service-icon">🤖</div>
+    <div>
+      <div class="service-title">
+        AI Project Verification
+      </div>
+      <div class="service-desc">
+        Automated seriousness & capability checks
+        before escrow approval.
+      </div>
+      <div class="service-action">
+        Coming soon
+      </div>
     </div>
-    <span class="service-tag">Coming Soon</span>
   </div>
 
-  <div class="service-card">
-    <div class="service-title">Support & Dispute Resolution</div>
-    <div class="service-desc">
-      Handle reports, disputes, and support requests
-      within the Albukhr ecosystem.
-    </div>
-    <span class="service-tag">Coming Soon</span>
+  <div class="notice">
+    ℹ️ Services page is a modular gateway.
+    New services will appear here automatically
+    without affecting existing projects or staking logic.
   </div>
 
 </section>
 
-<!-- CREATE PROJECT MODAL -->
-<div class="modal" id="createModal">
-  <div class="modal-box">
-    <h3>Create External Project</h3>
-
-    <label>Project Name</label>
-    <input id="pName" placeholder="Project title">
-
-    <label>Description</label>
-    <textarea id="pDesc" rows="3"
-      placeholder="Brief description of the project"></textarea>
-
-    <label>Wallet Address (Escrow)</label>
-    <input id="pWallet" placeholder="Pi wallet address">
-
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn primary" onclick="submitProject()">Submit</button>
-      <button class="btn secondary" onclick="closeCreate()">Cancel</button>
-    </div>
-  </div>
-</div>
-
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
   <a href="projects.html"><span>📁</span>Projects</a>
@@ -155,43 +127,11 @@ textarea{resize:none}
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<script src="staking-external.js"></script>
-
 <script>
-const modal = document.getElementById("createModal");
-
-function openCreate(){
-  modal.style.display = "flex";
-}
-function closeCreate(){
-  modal.style.display = "none";
-}
-
-function submitProject(){
-  const name = pName.value.trim();
-  const desc = pDesc.value.trim();
-  const wallet = pWallet.value.trim();
-
-  if(!name || !wallet){
-    alert("Project name and wallet are required");
-    return;
-  }
-
-  if(typeof addExternalProject !== "function"){
-    alert("External project system not available");
-    return;
-  }
-
-  addExternalProject({
-    title: name,
-    description: desc,
-    escrowWallet: wallet
-  });
-
-  alert("Project submitted for review");
-  closeCreate();
+function goCreateExternal(){
+  window.location.href = "external-create.html";
 }
 </script>
 
 </body>
-  </html>
+</html>
