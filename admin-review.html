@@ -2,75 +2,36 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Internal Project Review</title>
+<title>Albukhr – External Review</title>
 <link rel="stylesheet" href="style.css">
-<script src="internal-registry.js"></script>
-
 <style>
+.section{padding:16px}
 .card{
   background:#fff;
   border-radius:14px;
   padding:14px;
-  margin-bottom:12px
+  margin-bottom:12px;
 }
-button{
-  margin-top:10px;
-  padding:10px 14px;
-  border:none;
-  border-radius:10px;
-  font-weight:600
+.title{font-weight:700}
+.meta{font-size:12px;color:#666;margin-top:4px}
+.btns{display:flex;gap:10px;margin-top:10px}
+.btn{
+  flex:1;padding:10px;border:none;
+  border-radius:10px;font-weight:600
 }
 .approve{background:#0f7a3d;color:#fff}
-.reject{background:#c0392b;color:#fff}
+.reject{background:#eee;color:#333}
 </style>
 </head>
 
 <body>
 
-<h2 style="padding:16px">Pending Internal Projects</h2>
+<header class="header">
+  <span>🛡️ External Project Review</span>
+</header>
 
-<div id="list"></div>
+<section class="section" id="list"></section>
 
-<script>
-const params = new URLSearchParams(location.search);
-if(params.get("admin") !== "ALBUKHR_FOUNDER"){
-  document.body.innerHTML = "<p>Access Denied</p>";
-}
-
-const listEl = document.getElementById("list");
-const projects = getInternalProjects().filter(p=>p.status==="pending");
-
-if(projects.length === 0){
-  listEl.innerHTML = "<p style='padding:16px'>No pending projects</p>";
-}
-
-projects.forEach(p=>{
-  const div = document.createElement("div");
-  div.className = "card";
-
-  div.innerHTML = `
-    <h4>${p.name}</h4>
-    <p><b>Category:</b> ${p.category}</p>
-    <p><b>Lead:</b> ${p.lead}</p>
-    <p>${p.description || ""}</p>
-
-    <button class="approve">Approve</button>
-    <button class="reject">Reject</button>
-  `;
-
-  div.querySelector(".approve").onclick = ()=>{
-    approveInternalProject(p.id);
-    location.reload();
-  };
-
-  div.querySelector(".reject").onclick = ()=>{
-    rejectInternalProject(p.id);
-    location.reload();
-  };
-
-  listEl.appendChild(div);
-});
-</script>
-
+<script src="admin-review.js"></script>
 </body>
 </html>
