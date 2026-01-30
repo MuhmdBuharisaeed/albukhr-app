@@ -17,10 +17,9 @@
   display:flex;
   align-items:flex-start;
   gap:12px;
+  cursor:pointer;
 }
-.service-icon{
-  font-size:22px;
-}
+.service-icon{font-size:22px}
 .service-title{
   font-weight:700;
   font-size:15px;
@@ -38,6 +37,7 @@
 }
 .locked{
   opacity:.55;
+  cursor:not-allowed;
 }
 .notice{
   font-size:12px;
@@ -63,57 +63,45 @@
   <div class="service-card" onclick="goCreateExternal()">
     <div class="service-icon">🚀</div>
     <div>
-      <div class="service-title">
-        Create External Project
-      </div>
+      <div class="service-title">Create External Project</div>
       <div class="service-desc">
-        Start your own project under Albukhr escrow protection.
-        Funds are locked until milestones are verified.
+        Launch your own verified project under Albukhr escrow protection.
+        Funds are locked and released only after milestone verification.
       </div>
-      <div class="service-action">
-        Start →
-      </div>
+      <div class="service-action">Start →</div>
     </div>
   </div>
 
-  <!-- INTERNAL PROJECT (LOCKED) -->
+  <!-- INTERNAL PROJECT (RESTRICTED) -->
   <div class="service-card locked">
     <div class="service-icon">🏗️</div>
     <div>
-      <div class="service-title">
-        Internal Project Creation
-      </div>
+      <div class="service-title">Internal Project Creation</div>
       <div class="service-desc">
-        Restricted to Albukhr core team only.
-        Access by private link.
+        Reserved strictly for Albukhr core team.
+        Access is granted only via private link.
       </div>
-      <div class="service-action">
-        Restricted
-      </div>
+      <div class="service-action">Restricted</div>
     </div>
   </div>
 
-  <!-- FUTURE SERVICES PLACEHOLDER -->
+  <!-- AI VERIFICATION (FUTURE) -->
   <div class="service-card locked">
     <div class="service-icon">🤖</div>
     <div>
-      <div class="service-title">
-        AI Project Verification
-      </div>
+      <div class="service-title">AI Project Verification</div>
       <div class="service-desc">
-        Automated seriousness & capability checks
+        Automated seriousness, capability, and risk assessment
         before escrow approval.
       </div>
-      <div class="service-action">
-        Coming soon
-      </div>
+      <div class="service-action">Coming soon</div>
     </div>
   </div>
 
   <div class="notice">
-    ℹ️ Services page is a modular gateway.
-    New services will appear here automatically
-    without affecting existing projects or staking logic.
+    ℹ️ The Services page is a modular gateway for Albukhr ecosystem tools.
+    New services can be added here without affecting existing projects,
+    staking logic, or user balances.
   </div>
 
 </section>
@@ -128,8 +116,27 @@
 </nav>
 
 <script>
+/* ===============================
+   EXTERNAL PROJECT ENTRY POINT
+   =============================== */
 function goCreateExternal(){
+
+  // Placeholder check (safe – does not break anything)
+  if(!userHasPiWallet()){
+    alert("Please connect or setup your Pi Network wallet first.");
+    return;
+  }
+
   window.location.href = "external-create.html";
+}
+
+/* ===============================
+   PI WALLET CHECK (STUB)
+   =============================== */
+function userHasPiWallet(){
+  // Later: integrate Pi SDK wallet check
+  // For now, always allow (safe default)
+  return true;
 }
 </script>
 
