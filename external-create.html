@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create External Project</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.form-box{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+}
+label{
+  font-size:13px;
+  font-weight:600;
+  display:block;
+  margin-top:14px;
+}
+input,textarea{
+  width:100%;
+  margin-top:6px;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+textarea{resize:vertical}
+.btn{
+  margin-top:18px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:bold;
+}
+.primary{
+  background:#0f7a3d;
+  color:#fff;
+}
+.notice{
+  font-size:12px;
+  color:#666;
+  line-height:1.6;
+  margin-top:14px;
+}
+.lock{
+  font-size:12px;
+  color:#0f7a3d;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body data-page="external-create">
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <span>🚀 External Project</span>
+  </div>
+</header>
+
+<section class="section">
+
+  <div class="form-box">
+
+    <label>Project Name</label>
+    <input id="pName" placeholder="e.g. GreenFarm Initiative">
+
+    <label>Short Description</label>
+    <textarea id="pDesc" rows="3"
+      placeholder="What problem does this project solve?"></textarea>
+
+    <label>Category</label>
+    <input id="pCategory" placeholder="Agriculture / Health / Energy">
+
+    <label>Project Wallet (Pi)</label>
+    <input id="pWallet" placeholder="Pi wallet address provided by Albukhr">
+
+    <label>Initial Funding Target (Pi)</label>
+    <input type="number" id="pTarget" placeholder="e.g. 5000">
+
+    <label>Milestones (simple)</label>
+    <textarea id="pMilestones" rows="4"
+      placeholder="Milestone 1: Setup&#10;Milestone 2: Production"></textarea>
+
+    <button class="btn primary" onclick="submitProject()">
+      Submit for Verification
+    </button>
+
+    <div class="lock">
+      🔒 Funds will be locked in escrow until milestones are approved.
+    </div>
+
+    <div class="notice">
+      By submitting, you agree that:
+      <ul>
+        <li>Albukhr controls escrow release</li>
+        <li>No direct withdrawals without approval</li>
+        <li>False information leads to permanent ban</li>
+      </ul>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="index.html"><span>🏠</span>Home</a>
+  <a href="projects.html"><span>📁</span>Projects</a>
+  <a href="wallet.html"><span>💰</span>Wallet</a>
+  <a href="services.html" class="active"><span>🛠️</span>Services</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</nav>
+
+<script src="staking-external.js"></script>
+
+<script>
+function submitProject(){
+
+  const project = {
+    projectId: "EXT-" + Date.now(),
+    title: pName.value.trim(),
+    description: pDesc.value.trim(),
+    category: pCategory.value.trim(),
+    wallet: pWallet.value.trim(),
+    target: Number(pTarget.value),
+    milestones: pMilestones.value
+      .split("\n")
+      .map((m,i)=>({
+        id:i+1,
+        title:m,
+        released:false
+      })),
+    status: "pending",
+    totalStaked: 0,
+    createdAt: Date.now()
+  };
+
+  if(!project.title || !project.wallet || !project.target){
+    alert("Please complete all required fields");
+    return;
+  }
+
+  // Save as pending external project
+  const key = "albukhr_external_projects";
+  const all = JSON.parse(localStorage.getItem(key) || "[]");
+  all.push(project);
+  localStorage.setItem(key, JSON.stringify(all));
+
+  alert("Project submitted successfully. Await verification.");
+  window.location.href = "services.html";
+}
+</script>
+
+</body>
+</html>
