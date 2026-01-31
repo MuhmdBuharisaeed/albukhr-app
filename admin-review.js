@@ -1,39 +1,23 @@
 /* ===============================
-   ALBUKHR – ADMIN EXTERNAL REVIEW
+   ALBUKHR ADMIN – EXTERNAL REVIEW
 ================================ */
 
-const tableBody = document.getElementById("reviewBody");
-const statusFilter = document.getElementById("statusFilter");
+const body = document.getElementById("reviewBody");
 
-/* -------------------------------
-   LOAD PENDING / ALL PROJECTS
--------------------------------- */
-function getReviewProjects(){
-  if(typeof getExternalProjects !== "function") return [];
-  return getExternalProjects();
-}
+function renderReviews(){
 
-/* -------------------------------
-   RENDER TABLE
--------------------------------- */
-function renderReview(){
-  const status = statusFilter.value;
-  let projects = getReviewProjects();
-
-  if(status){
-    projects = projects.filter(p => p.status === status);
+  if(typeof getPendingExternalProjects !== "function"){
+    body.innerHTML =
+      `<tr><td colspan="5" class="empty">Engine not available</td></tr>`;
+    return;
   }
 
-  tableBody.innerHTML = "";
+  const projects = getPendingExternalProjects();
+  body.innerHTML = "";
 
   if(projects.length === 0){
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="6" class="empty">
-          No external projects found
-        </td>
-      </tr>
-    `;
+    body.innerHTML =
+      `<tr><td colspan="5" class="empty">No pending external projects</td></tr>`;
     return;
   }
 
@@ -43,15 +27,24 @@ function renderReview(){
       d.toLocaleDateString() + " " +
       d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
 
-    tableBody.innerHTML += `
+    body.innerHTML += `
       <tr>
         <td>${date}</td>
-        <td>${p.projectId}</td>
-        <td>${p.title}</td>
-        <td>${p.owner || "-"}</td>
-        <td class="${statusClass(p.status)}">${p.status}</td>
         <td>
-          ${actionButtons(p)}
+          <span class="badge external">External</span>
+          <span class="badge pending">Pending</span>
+        </td>
+        <td>${p.title}</td>
+        <td>${p.owner || "—"}</td>
+        <td>
+          <button class="btn approve"
+            onclick="approveProject('${p.projectId}')">
+            Approve
+          </button>
+          <button class="btn reject"
+            onclick="rejectProject('${p.projectId}')">
+            Reject
+          </button>
         </td>
       </tr>
     `;
@@ -59,54 +52,20 @@ function renderReview(){
 }
 
 /* -------------------------------
-   STATUS COLORS
--------------------------------- */
-function statusClass(s){
-  if(s === "approved") return "status-ok";
-  if(s === "rejected") return "status-refunded";
-  return "";
-}
-
-/* -------------------------------
-   ACTION BUTTONS
--------------------------------- */
-function actionButtons(p){
-  if(p.status !== "pending"){
-    return `<span class="badge core">Locked</span>`;
-  }
-
-  return `
-    <button onclick="approveProject('${p.projectId}')"
-      style="padding:6px 10px;border-radius:8px;
-      background:#0f7a3d;color:#fff;border:none">
-      Approve
-    </button>
-
-    <button onclick="rejectProject('${p.projectId}')"
-      style="padding:6px 10px;border-radius:8px;
-      background:#eee;color:#333;border:none">
-      Reject
-    </button>
-  `;
-}
-
-/* -------------------------------
    ACTIONS
 -------------------------------- */
 function approveProject(id){
-  if(!confirm("Approve this external project?")) return;
-  updateExternalStatus(id, "approved");
-  renderReview();
+  if(confirm("Approve this external project?")){
+    updateExternalStatus(id, "approved");
+    renderReviews();
+  }
 }
 
 function rejectProject(id){
-  if(!confirm("Reject this external project?")) return;
-  updateExternalStatus(id, "rejected");
-  renderReview();
+  if(confirm("Reject this external project?")){
+    updateExternalStatus(id, "rejected");
+    renderReviews();
+  }
 }
 
-/* -------------------------------
-   INIT
--------------------------------- */
-statusFilter.addEventListener("change", renderReview);
-renderReview();
+renderReviews();
