@@ -62,13 +62,21 @@ function loadReviews(){
    ACTIONS
 -------------------------------- */
 function approveProject(id){
-  if(!confirm("Approve this external project?")) return;
+  const admin = getAdmin();
+  if(!admin || !["super_admin","review_admin"].includes(admin.role)){
+    alert("Permission denied");
+    return;
+  }
   updateExternalStatus(id, "approved");
   loadReviews();
 }
 
 function rejectProject(id){
-  if(!confirm("Reject this external project?")) return;
+  const admin = getAdmin();
+  if(!admin || !["super_admin","review_admin"].includes(admin.role)){
+    alert("Permission denied");
+    return;
+  }
   updateExternalStatus(id, "rejected");
   loadReviews();
 }
