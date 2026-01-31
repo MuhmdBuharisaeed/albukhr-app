@@ -1,41 +1,153 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr Admin Login</title>
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  background:#f4faf6;
+}
+
+.login-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+
+.login-card{
+  width:100%;
+  max-width:380px;
+  background:#fff;
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.brand{
+  text-align:center;
+  font-size:18px;
+  font-weight:700;
+  color:#0f7a3d;
+  margin-bottom:6px;
+}
+
+.subtitle{
+  text-align:center;
+  font-size:12px;
+  color:#666;
+  margin-bottom:20px;
+}
+
+.form-group{
+  margin-bottom:14px;
+}
+
+.form-group label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.form-group input,
+.form-group select{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #cceedd;
+  font-size:14px;
+  outline:none;
+}
+
+.form-group input:focus,
+.form-group select:focus{
+  border-color:#0f7a3d;
+}
+
+.login-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:14px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.note{
+  margin-top:14px;
+  font-size:11px;
+  color:#777;
+  text-align:center;
+}
+</style>
 </head>
 
 <body>
 
-<div class="admin-wrap">
-  <h2>Admin Login</h2>
+<div class="login-wrap">
+  <div class="login-card">
 
-  <input id="user" placeholder="Username"><br><br>
+    <div class="brand">ALBUKHR • Admin</div>
+    <div class="subtitle">Secure role-based access</div>
 
-  <select id="role">
-    <option value="review_admin">Review Admin</option>
-    <option value="finance_admin">Finance Admin</option>
-    <option value="super_admin">Super Admin</option>
-  </select><br><br>
+    <div class="form-group">
+      <label>Admin Role</label>
+      <select id="role">
+        <option value="super_admin">Super Admin</option>
+        <option value="finance_admin">Finance Admin</option>
+        <option value="review_admin">Review Admin</option>
+        <option value="viewer_admin">Viewer Admin</option>
+      </select>
+    </div>
 
-  <input id="secret" placeholder="Admin Secret"><br><br>
+    <div class="form-group">
+      <label>Admin Access Key</label>
+      <input id="key" type="password" placeholder="Enter admin key">
+    </div>
 
-  <button onclick="login()">Login</button>
+    <button class="login-btn" onclick="login()">Login</button>
+
+    <div class="note">
+      Unauthorized access is prohibited.
+    </div>
+
+  </div>
 </div>
 
-<script src="admin-auth.js"></script>
 <script>
-function login(){
-  const ok = adminLogin(
-    user.value,
-    role.value,
-    secret.value
-  );
+/* DEMO KEYS – LATER MOVE TO BACKEND */
+const KEYS = {
+  super_admin: "ALBUKHR_SUPER_2026",
+  finance_admin: "ALBUKHR_FIN_2026",
+  review_admin: "ALBUKHR_REVIEW_2026",
+  viewer_admin: "ALBUKHR_VIEW_2026"
+};
 
-  if(ok){
+function login(){
+  const role = document.getElementById("role").value;
+  const key = document.getElementById("key").value;
+
+  if(KEYS[role] !== key){
+    alert("Invalid admin credentials");
+    return;
+  }
+
+  localStorage.setItem("albukhr_admin_role", role);
+
+  /* Redirect */
+  if(role === "review_admin"){
     window.location.href = "admin-review.html";
   }else{
-    alert("Invalid admin secret");
+    window.location.href = "admin-transactions.html";
   }
 }
 </script>
