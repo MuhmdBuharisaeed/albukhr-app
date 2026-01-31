@@ -96,6 +96,7 @@
 
   <div class="admin-header">
     <h2>Unified Transactions</h2>
+    <button onclick="adminLogout()">Logout</button>
   </div>
 
   <!-- FILTERS -->
@@ -128,21 +129,18 @@
 </div>
 
 <!-- =============================
-     AUTH MUST LOAD FIRST
+     AUTH (LOAD FIRST)
 ============================= -->
 <script src="admin-auth.js"></script>
-
 <script>
-/* ROLE-BASED ACCESS */
 requireRole([
   "super_admin",
   "finance_admin",
-  "review_admin",
   "viewer_admin"
 ]);
 </script>
 
-<!-- CORE ENGINES -->
+<!-- CORE ENGINE -->
 <script src="transactions-unified.js"></script>
 
 <script>
