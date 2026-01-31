@@ -13,61 +13,29 @@
   background:#fff;
   border-radius:16px;
   padding:16px;
-  margin-bottom:14px
+  margin-bottom:14px;
 }
-.title{
-  font-weight:700;
-  font-size:16px;
-  margin-bottom:6px
+.label{font-size:13px;font-weight:600;margin-bottom:6px}
+.input{
+  width:100%;padding:12px;
+  border-radius:10px;border:1px solid #ddd;
+  font-size:14px;
 }
-.desc{
-  font-size:13px;
-  color:#666;
-  margin-bottom:14px
-}
-label{
-  font-size:12px;
-  font-weight:600;
-  color:#333;
-  display:block;
-  margin-top:12px
-}
-input, textarea{
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  font-size:14px
-}
-textarea{resize:none}
-.note{
-  font-size:12px;
-  color:#777;
-  margin-top:10px;
-  line-height:1.6
-}
+textarea.input{min-height:90px}
 .btn{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:#0f7a3d;
-  color:#fff;
-  font-weight:700;
-  margin-top:18px;
-  font-size:14px
+  width:100%;padding:14px;
+  border:none;border-radius:12px;
+  background:#0f7a3d;color:#fff;
+  font-weight:700;font-size:15px
 }
-.lock{
-  font-size:12px;
-  color:#0f7a3d;
-  margin-top:10px;
-  font-weight:600
+.note{
+  font-size:12px;color:#666;
+  line-height:1.6;margin-top:10px
 }
 </style>
 </head>
 
-<body data-page="create-external">
+<body data-page="external-create">
 
 <header class="header">
   <span>🚀 Create External Project</span>
@@ -75,96 +43,82 @@ textarea{resize:none}
 
 <section class="section">
 
+  <!-- PROJECT INFO -->
   <div class="card">
-    <div class="title">Project Information</div>
-    <div class="desc">
-      Provide accurate details. All external projects
-      are reviewed before approval.
-    </div>
+    <div class="label">Project Title</div>
+    <input class="input" id="title" placeholder="e.g. Solar Water Pump"/>
 
-    <label>Project Title</label>
-    <input id="title" placeholder="e.g. Green Energy Hub">
+    <div class="label" style="margin-top:12px">Category</div>
+    <select class="input" id="category">
+      <option value="">Select category</option>
+      <option>Agro / Farming</option>
+      <option>Manufacturing</option>
+      <option>Technology</option>
+      <option>Energy</option>
+      <option>Logistics</option>
+      <option>Other</option>
+    </select>
 
-    <label>Project Description</label>
-    <textarea id="description" rows="4"
-      placeholder="Explain your project, goals, and impact"></textarea>
-
-    <label>Project Category</label>
-    <input id="category" placeholder="Agriculture, Tech, Health, etc">
-
+    <div class="label" style="margin-top:12px">Project Description</div>
+    <textarea class="input" id="description"
+      placeholder="Explain what the project does, how funds will be used, and expected outcome"></textarea>
   </div>
 
+  <!-- OWNER INFO -->
   <div class="card">
-    <div class="title">Owner & Identity</div>
+    <div class="label">Pi Username</div>
+    <input class="input" id="owner"
+      placeholder="your Pi username"/>
 
-    <label>Pi Username</label>
-    <input id="owner" placeholder="your Pi username">
-
-    <label>Invite / Reference Link</label>
-    <input id="invite"
-      placeholder="Optional invite or reference link">
-
-    <div class="note">
-      ℹ️ Pi username is required for escrow linkage and future payouts.
+    <div class="label" style="margin-top:12px">
+      Invite / Referral Link (optional)
     </div>
+    <input class="input" id="invite"
+      placeholder="who invited you (optional)"/>
   </div>
 
+  <!-- ESCROW NOTICE -->
   <div class="card">
-    <div class="title">Escrow & Verification</div>
-
-    <div class="note">
-      🔒 Funds are locked in Albukhr escrow.<br>
-      🚫 No withdrawal until admin verification.<br>
-      🤖 AI seriousness check coming soon.
-    </div>
-
-    <div class="lock">Escrow Status: LOCKED</div>
+    <strong>🔒 Escrow Protection</strong>
+    <p class="note">
+      Funds staked into this project will be locked under
+      Albukhr escrow. Release depends on verification,
+      milestones and admin approval.
+    </p>
   </div>
 
-  <button class="btn" onclick="submitExternal()">
+  <button class="btn" onclick="submitExternalProject()">
     Submit for Review
   </button>
 
-  <div class="note">
-    By submitting, you agree that Albukhr may review,
-    approve, or reject this project.
-  </div>
-
 </section>
 
-<nav class="bottom-nav">
-  <a href="index.html"><span>🏠</span>Home</a>
-  <a href="projects.html"><span>📁</span>Projects</a>
-  <a href="wallet.html"><span>💰</span>Wallet</a>
-  <a href="services.html" class="active"><span>🛠️</span>Services</a>
-  <a href="settings.html"><span>⚙️</span>Settings</a>
-</nav>
-
 <script src="staking-external.js"></script>
+<script src="external-escrow.js"></script>
 
 <script>
-function submitExternal(){
+function submitExternalProject(){
 
   const data = {
-    projectId: "EXT-" + Date.now(),
+    projectId: "EXT-"+Date.now(),
     title: title.value.trim(),
+    category: category.value,
     description: description.value.trim(),
-    category: category.value.trim(),
     owner: owner.value.trim(),
     invite: invite.value.trim(),
     status: "pending",
-    escrowLocked: true,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    escrowLocked: false
   };
 
-  if(!data.title || !data.description || !data.owner){
-    alert("Please fill required fields");
+  if(!data.title || !data.category || !data.description || !data.owner){
+    alert("Please fill all required fields");
     return;
   }
 
   saveExternalProject(data);
 
-  alert("Project submitted for review");
+  alert("Project submitted for admin review");
   window.location.href = "projects.html";
 }
 </script>
