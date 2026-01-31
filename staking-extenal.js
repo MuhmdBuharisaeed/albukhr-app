@@ -88,3 +88,27 @@ function getExternalTotals(){
 function getExternalProjectTotals(){
   return { stake:0, reward:0, stakes:[] };
      }
+
+function saveExternalProject(project){
+  let list = JSON.parse(localStorage.getItem(EXTERNAL_KEY)) || [];
+
+  if(list.some(p => p.projectId === project.projectId)){
+    console.warn("Project already exists");
+    return false;
+  }
+
+  list.push(project);
+  localStorage.setItem(EXTERNAL_KEY, JSON.stringify(list));
+  return true;
+}
+
+if(!p.history) p.history = [];
+p.history.push({ status, at: Date.now() });
+
+function getExternalTotals(){
+  return {
+    totalStake: 0,
+    totalReward: 0,
+    source: "external"
+  };
+}
