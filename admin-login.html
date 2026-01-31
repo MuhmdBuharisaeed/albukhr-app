@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Albukhr Admin Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div style="padding:30px;max-width:360px;margin:auto">
+  <h3>Admin Login</h3>
+
+  <input id="user" placeholder="Username"><br><br>
+
+  <select id="role">
+    <option value="review_admin">Review Admin</option>
+    <option value="finance_admin">Finance Admin</option>
+    <option value="viewer_admin">Viewer</option>
+    <option value="super_admin">Super Admin</option>
+  </select><br><br>
+
+  <button onclick="login()">Login</button>
+</div>
+
+<script src="admin-auth.js"></script>
+<script>
+function login(){
+  adminLogin(user.value, role.value);
+  window.location.href = "admin-review.html";
+}
+</script>
+
+</body>
+</html>
