@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Admin – External Projects Review</title>
+<title>Albukhr Admin – External Reviews</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
-/* ===== ADMIN TABLE ===== */
 .admin-wrap{
   padding:16px;
   max-width:1000px;
@@ -27,20 +26,6 @@
   color:#0f7a3d;
 }
 
-.filter-bar{
-  display:flex;
-  gap:8px;
-  margin-bottom:12px;
-}
-
-.filter-bar select,
-.filter-bar input{
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #cceedd;
-  font-size:13px;
-}
-
 .review-table{
   width:100%;
   border-collapse:collapse;
@@ -53,8 +38,8 @@
 .review-table td{
   padding:10px;
   font-size:12px;
-  text-align:left;
   border-bottom:1px solid #eee;
+  text-align:left;
 }
 
 .review-table th{
@@ -71,8 +56,7 @@
 }
 
 .badge.pending{background:#fff3cd;color:#856404}
-.badge.approved{background:#e0f3e8;color:#0f7a3d}
-.badge.rejected{background:#f8d7da;color:#842029}
+.badge.external{background:#e7f1ff;color:#084298}
 
 .btn{
   padding:6px 10px;
@@ -83,15 +67,8 @@
   cursor:pointer;
 }
 
-.btn-approve{
-  background:#0f7a3d;
-  color:#fff;
-}
-
-.btn-reject{
-  background:#eee;
-  color:#333;
-}
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#eee;color:#333}
 
 .empty{
   text-align:center;
@@ -104,7 +81,6 @@
 
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <h1 class="brand">ALBUKHR • Admin</h1>
 </header>
@@ -112,31 +88,17 @@
 <div class="admin-wrap">
 
   <div class="admin-header">
-    <h2>External Projects Review</h2>
+    <h2>External Project Reviews</h2>
   </div>
 
-  <!-- FILTERS -->
-  <div class="filter-bar">
-    <select id="statusFilter">
-      <option value="">All Status</option>
-      <option value="pending">Pending</option>
-      <option value="approved">Approved</option>
-      <option value="rejected">Rejected</option>
-    </select>
-
-    <input id="projectFilter" placeholder="Project ID / Title">
-  </div>
-
-  <!-- TABLE -->
   <table class="review-table">
     <thead>
       <tr>
         <th>Date</th>
-        <th>Project ID</th>
-        <th>Title</th>
+        <th>Type</th>
+        <th>Project</th>
         <th>Owner</th>
-        <th>Status</th>
-        <th>Action</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody id="reviewBody"></tbody>
