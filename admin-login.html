@@ -1,32 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr Admin Login</title>
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+.login-wrap{
+  max-width:420px;
+  margin:80px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+}
+.login-title{
+  font-size:18px;
+  font-weight:700;
+  color:#0f7a3d;
+  text-align:center;
+  margin-bottom:14px;
+}
+.login-group{
+  margin-bottom:12px;
+}
+.login-group label{
+  font-size:12px;
+  font-weight:600;
+}
+.login-group input,
+.login-group select{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #cceedd;
+  font-size:13px;
+}
+.login-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  margin-top:10px;
+}
+.notice{
+  font-size:12px;
+  color:#777;
+  text-align:center;
+  margin-top:14px;
+}
+</style>
 </head>
+
 <body>
 
-<div style="padding:30px;max-width:360px;margin:auto">
-  <h3>Admin Login</h3>
+<header class="header">
+  <h1 class="brand">ALBUKHR • Admin</h1>
+</header>
 
-  <input id="user" placeholder="Username"><br><br>
+<div class="login-wrap">
+  <div class="login-title">Admin Login</div>
 
-  <select id="role">
-    <option value="review_admin">Review Admin</option>
-    <option value="finance_admin">Finance Admin</option>
-    <option value="viewer_admin">Viewer</option>
-    <option value="super_admin">Super Admin</option>
-  </select><br><br>
+  <div class="login-group">
+    <label>Admin Username</label>
+    <input id="username" placeholder="e.g. albukhr_root">
+  </div>
 
-  <button onclick="login()">Login</button>
+  <div class="login-group">
+    <label>Role</label>
+    <select id="role">
+      <option value="viewer_admin">Viewer Admin</option>
+      <option value="review_admin">Review Admin</option>
+      <option value="finance_admin">Finance Admin</option>
+      <option value="super_admin">Super Admin</option>
+    </select>
+  </div>
+
+  <div class="login-group">
+    <label>Admin Key</label>
+    <input id="key" type="password" placeholder="Enter admin key">
+  </div>
+
+  <button class="login-btn" onclick="login()">Login</button>
+
+  <div class="notice">
+    🔐 Authorized personnel only.<br>
+    All actions are logged.
+  </div>
 </div>
 
 <script src="admin-auth.js"></script>
+
 <script>
 function login(){
-  adminLogin(user.value, role.value);
-  window.location.href = "admin-review.html";
+  const u = username.value.trim();
+  const r = role.value;
+  const k = key.value.trim();
+
+  if(!u || !k){
+    alert("Fill all fields");
+    return;
+  }
+
+  /* MAIN MASTER KEY */
+  if(k === "ALBUKHR_ADMIN_2026"){
+    adminLogin(u, r);
+    window.location.href = "admin-review.html";
+  }else{
+    alert("Invalid admin key");
+  }
 }
 </script>
 
