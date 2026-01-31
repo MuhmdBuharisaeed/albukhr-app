@@ -1,97 +1,112 @@
 /* ===============================
-   ALBUKHR – ADMIN REVIEW LOGIC
+   ALBUKHR – ADMIN EXTERNAL REVIEW
 ================================ */
 
-/* BASIC ADMIN GUARD (TEMP) */
-const ADMIN_KEY = "albukhr_admin_access";
-
-/* ❗ TEMP: enable admin manually
-   localStorage.setItem("albukhr_admin_access","true");
-*/
-
-if(localStorage.getItem(ADMIN_KEY) !== "true"){
-  document.body.innerHTML = `
-    <div style="padding:30px;text-align:center">
-      <h3>⛔ Access Denied</h3>
-      <p>Admin access required</p>
-    </div>`;
-  throw new Error("Not admin");
-}
-
+const tableBody = document.getElementById("reviewBody");
+const statusFilter = document.getElementById("statusFilter");
 
 /* -------------------------------
-   LOAD PENDING PROJECTS
+   LOAD PENDING / ALL PROJECTS
 -------------------------------- */
-function loadPendingReviews(){
+function getReviewProjects(){
+  if(typeof getExternalProjects !== "function") return [];
+  return getExternalProjects();
+}
 
-  const container = document.getElementById("list");
-  const projects = getPendingExternalProjects();
+/* -------------------------------
+   RENDER TABLE
+-------------------------------- */
+function renderReview(){
+  const status = statusFilter.value;
+  let projects = getReviewProjects();
+
+  if(status){
+    projects = projects.filter(p => p.status === status);
+  }
+
+  tableBody.innerHTML = "";
 
   if(projects.length === 0){
-    container.innerHTML = `
-      <div style="text-align:center;color:#777">
-        No pending external projects
-      </div>`;
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty">
+          No external projects found
+        </td>
+      </tr>
+    `;
     return;
   }
 
-  container.innerHTML = "";
-
   projects.forEach(p=>{
-    container.innerHTML += `
-      <div class="card">
-        <div class="title">${p.title}</div>
-        <div class="meta">
-          👤 ${p.owner}<br>
-          🆔 ${p.projectId}<br>
-          📌 ${p.category}<br>
-          ⏱ ${new Date(p.createdAt).toLocaleString()}
-        </div>
+    const d = new Date(p.createdAt || Date.now());
+    const date =
+      d.toLocaleDateString() + " " +
+      d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
 
-        <div class="btns">
-          <button class="btn approve"
-            onclick="approveProject('${p.projectId}')">
-            Approve
-          </button>
-
-          <button class="btn reject"
-            onclick="rejectProject('${p.projectId}')">
-            Reject
-          </button>
-        </div>
-      </div>
+    tableBody.innerHTML += `
+      <tr>
+        <td>${date}</td>
+        <td>${p.projectId}</td>
+        <td>${p.title}</td>
+        <td>${p.owner || "-"}</td>
+        <td class="${statusClass(p.status)}">${p.status}</td>
+        <td>
+          ${actionButtons(p)}
+        </td>
+      </tr>
     `;
   });
 }
 
+/* -------------------------------
+   STATUS COLORS
+-------------------------------- */
+function statusClass(s){
+  if(s === "approved") return "status-ok";
+  if(s === "rejected") return "status-refunded";
+  return "";
+}
 
 /* -------------------------------
-   APPROVE
+   ACTION BUTTONS
+-------------------------------- */
+function actionButtons(p){
+  if(p.status !== "pending"){
+    return `<span class="badge core">Locked</span>`;
+  }
+
+  return `
+    <button onclick="approveProject('${p.projectId}')"
+      style="padding:6px 10px;border-radius:8px;
+      background:#0f7a3d;color:#fff;border:none">
+      Approve
+    </button>
+
+    <button onclick="rejectProject('${p.projectId}')"
+      style="padding:6px 10px;border-radius:8px;
+      background:#eee;color:#333;border:none">
+      Reject
+    </button>
+  `;
+}
+
+/* -------------------------------
+   ACTIONS
 -------------------------------- */
 function approveProject(id){
-
-  if(!confirm("Approve this project and lock escrow?")) return;
-
-  updateExternalStatus(id,"approved");
-
-  alert("Project approved & escrow locked");
-  loadPendingReviews();
+  if(!confirm("Approve this external project?")) return;
+  updateExternalStatus(id, "approved");
+  renderReview();
 }
 
+function rejectProject(id){
+  if(!confirm("Reject this external project?")) return;
+  updateExternalStatus(id, "rejected");
+  renderReview();
+}
 
 /* -------------------------------
-   REJECT
+   INIT
 -------------------------------- */
-function rejectProject(id){
-
-  if(!confirm("Reject this project?")) return;
-
-  updateExternalStatus(id,"rejected");
-
-  alert("Project rejected");
-  loadPendingReviews();
-}
-
-
-/* INIT */
-loadPendingReviews();
+statusFilter.addEventListener("change", renderReview);
+renderReview();
