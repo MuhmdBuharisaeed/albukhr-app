@@ -1,26 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Albukhr – External Review</title>
+<title>Albukhr – External Project Review</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
+
 <style>
 .section{padding:16px}
 .card{
   background:#fff;
-  border-radius:14px;
+  border-radius:16px;
   padding:14px;
-  margin-bottom:12px;
+  margin-bottom:14px;
 }
-.title{font-weight:700}
+.title{font-weight:700;font-size:15px}
 .meta{font-size:12px;color:#666;margin-top:4px}
-.btns{display:flex;gap:10px;margin-top:10px}
+.block{margin-top:10px;font-size:13px}
+.label{font-weight:600;color:#0f7a3d}
+.btns{
+  display:flex;
+  gap:10px;
+  margin-top:14px
+}
 .btn{
-  flex:1;padding:10px;border:none;
-  border-radius:10px;font-weight:600
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  font-size:13px
 }
 .approve{background:#0f7a3d;color:#fff}
 .reject{background:#eee;color:#333}
+.update{background:#fff;border:1px dashed #0f7a3d;color:#0f7a3d}
+.empty{
+  text-align:center;
+  font-size:13px;
+  color:#777;
+  margin-top:30px
+}
 </style>
 </head>
 
@@ -32,6 +52,106 @@
 
 <section class="section" id="list"></section>
 
-<script src="admin-review.js"></script>
+<script src="staking-external.js"></script>
+
+<script>
+/* ===============================
+   SIMPLE ADMIN PIN GATE
+================================ */
+const ADMIN_PIN = "4422"; // 🔒 can be changed anytime
+const pin = prompt("Enter Admin PIN");
+
+if(pin !== ADMIN_PIN){
+  alert("Access denied");
+  document.body.innerHTML = "";
+}
+
+/* ===============================
+   LOAD PENDING PROJECTS
+================================ */
+function loadPending(){
+  const box = document.getElementById("list");
+  box.innerHTML = "";
+
+  const projects = getExternalProjects
+    ? getExternalProjects().filter(p => p.status === "pending")
+    : [];
+
+  if(projects.length === 0){
+    box.innerHTML =
+      "<div class='empty'>No pending external projects</div>";
+    return;
+  }
+
+  projects.forEach(p=>{
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div class="title">${p.title}</div>
+      <div class="meta">Project ID: ${p.projectId}</div>
+
+      <div class="block">
+        <span class="label">Owner:</span><br>
+        Pi Username: ${p.owner || "N/A"}<br>
+        Invite Link: ${p.invite || "Not provided"}
+      </div>
+
+      <div class="block">
+        <span class="label">Description:</span><br>
+        ${p.description || "No description"}
+      </div>
+
+      <div class="block">
+        <span class="label">Escrow Status:</span><br>
+        Locked: ${p.escrowLocked ? "Yes" : "No"}
+      </div>
+
+      <div class="btns">
+        <button class="btn approve"
+          onclick="approveProject('${p.projectId}')">
+          Approve
+        </button>
+
+        <button class="btn reject"
+          onclick="rejectProject('${p.projectId}')">
+          Reject
+        </button>
+
+        <button class="btn update"
+          onclick="requestUpdate('${p.projectId}')">
+          Request Update
+        </button>
+      </div>
+    `;
+
+    box.appendChild(div);
+  });
+}
+
+/* ===============================
+   ACTIONS
+================================ */
+function approveProject(id){
+  updateExternalStatus(id, "approved");
+  alert("Project approved");
+  loadPending();
+}
+
+function rejectProject(id){
+  updateExternalStatus(id, "rejected");
+  alert("Project rejected");
+  loadPending();
+}
+
+function requestUpdate(id){
+  updateExternalStatus(id, "update_requested");
+  alert("Update requested from owner");
+  loadPending();
+}
+
+loadPending();
+</script>
+
 </body>
-</html></html>
+</html></html></html>
