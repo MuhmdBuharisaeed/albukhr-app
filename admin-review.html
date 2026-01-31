@@ -2,156 +2,151 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Albukhr – External Project Review</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr Admin – External Projects Review</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
-.section{padding:16px}
-.card{
-  background:#fff;
-  border-radius:16px;
-  padding:14px;
+/* ===== ADMIN TABLE ===== */
+.admin-wrap{
+  padding:16px;
+  max-width:1000px;
+  margin:0 auto;
+}
+
+.admin-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   margin-bottom:14px;
 }
-.title{font-weight:700;font-size:15px}
-.meta{font-size:12px;color:#666;margin-top:4px}
-.block{margin-top:10px;font-size:13px}
-.label{font-weight:600;color:#0f7a3d}
-.btns{
+
+.admin-header h2{
+  font-size:18px;
+  color:#0f7a3d;
+}
+
+.filter-bar{
   display:flex;
-  gap:10px;
-  margin-top:14px
+  gap:8px;
+  margin-bottom:12px;
 }
-.btn{
-  flex:1;
+
+.filter-bar select,
+.filter-bar input{
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #cceedd;
+  font-size:13px;
+}
+
+.review-table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.review-table th,
+.review-table td{
   padding:10px;
-  border:none;
-  border-radius:10px;
-  font-weight:700;
-  font-size:13px
+  font-size:12px;
+  text-align:left;
+  border-bottom:1px solid #eee;
 }
-.approve{background:#0f7a3d;color:#fff}
-.reject{background:#eee;color:#333}
-.update{background:#fff;border:1px dashed #0f7a3d;color:#0f7a3d}
+
+.review-table th{
+  background:#eaf6ee;
+  color:#0f7a3d;
+  font-weight:600;
+}
+
+.badge{
+  padding:3px 8px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:600;
+}
+
+.badge.pending{background:#fff3cd;color:#856404}
+.badge.approved{background:#e0f3e8;color:#0f7a3d}
+.badge.rejected{background:#f8d7da;color:#842029}
+
+.btn{
+  padding:6px 10px;
+  border:none;
+  border-radius:8px;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-approve{
+  background:#0f7a3d;
+  color:#fff;
+}
+
+.btn-reject{
+  background:#eee;
+  color:#333;
+}
+
 .empty{
   text-align:center;
   font-size:13px;
   color:#777;
-  margin-top:30px
+  padding:20px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <header class="header">
-  <span>🛡️ EXTERNAL PROJECT REVIEW</span>
+  <h1 class="brand">ALBUKHR • Admin</h1>
 </header>
 
-<section class="section" id="list"></section>
+<div class="admin-wrap">
 
+  <div class="admin-header">
+    <h2>External Projects Review</h2>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar">
+    <select id="statusFilter">
+      <option value="">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+    </select>
+
+    <input id="projectFilter" placeholder="Project ID / Title">
+  </div>
+
+  <!-- TABLE -->
+  <table class="review-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Project ID</th>
+        <th>Title</th>
+        <th>Owner</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="reviewBody"></tbody>
+  </table>
+
+</div>
+
+<!-- ENGINES -->
 <script src="staking-external.js"></script>
-
-<script>
-/* ===============================
-   SIMPLE ADMIN PIN GATE
-================================ */
-const ADMIN_PIN = "4422"; // 🔒 can be changed anytime
-const pin = prompt("Enter Admin PIN");
-
-if(pin !== ADMIN_PIN){
-  alert("Access denied");
-  document.body.innerHTML = "";
-}
-
-/* ===============================
-   LOAD PENDING PROJECTS
-================================ */
-function loadPending(){
-  const box = document.getElementById("list");
-  box.innerHTML = "";
-
-  const projects = getExternalProjects
-    ? getExternalProjects().filter(p => p.status === "pending")
-    : [];
-
-  if(projects.length === 0){
-    box.innerHTML =
-      "<div class='empty'>No pending external projects</div>";
-    return;
-  }
-
-  projects.forEach(p=>{
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
-      <div class="title">${p.title}</div>
-      <div class="meta">Project ID: ${p.projectId}</div>
-
-      <div class="block">
-        <span class="label">Owner:</span><br>
-        Pi Username: ${p.owner || "N/A"}<br>
-        Invite Link: ${p.invite || "Not provided"}
-      </div>
-
-      <div class="block">
-        <span class="label">Description:</span><br>
-        ${p.description || "No description"}
-      </div>
-
-      <div class="block">
-        <span class="label">Escrow Status:</span><br>
-        Locked: ${p.escrowLocked ? "Yes" : "No"}
-      </div>
-
-      <div class="btns">
-        <button class="btn approve"
-          onclick="approveProject('${p.projectId}')">
-          Approve
-        </button>
-
-        <button class="btn reject"
-          onclick="rejectProject('${p.projectId}')">
-          Reject
-        </button>
-
-        <button class="btn update"
-          onclick="requestUpdate('${p.projectId}')">
-          Request Update
-        </button>
-      </div>
-    `;
-
-    box.appendChild(div);
-  });
-}
-
-/* ===============================
-   ACTIONS
-================================ */
-function approveProject(id){
-  updateExternalStatus(id, "approved");
-  alert("Project approved");
-  loadPending();
-}
-
-function rejectProject(id){
-  updateExternalStatus(id, "rejected");
-  alert("Project rejected");
-  loadPending();
-}
-
-function requestUpdate(id){
-  updateExternalStatus(id, "update_requested");
-  alert("Update requested from owner");
-  loadPending();
-}
-
-loadPending();
-</script>
+<script src="admin-review.js"></script>
 
 </body>
-</html></html></html>
+</html>
