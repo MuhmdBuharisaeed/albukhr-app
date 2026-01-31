@@ -1,99 +1,47 @@
-/* =================================
-   ALBUKHR – ADMIN AUTH ENGINE
-================================= */
+/* ===============================
+   ALBUKHR ADMIN AUTH ENGINE
+================================ */
 
-const ADMIN_KEY = "albukhr_admin_session";
+const ADMIN_SESSION_KEY = "albukhr_admin_session";
 
-/*
- Session structure example:
- {
-   username: "albukhr_root",
-   role: "super_admin",
-   loginAt: 1700000000000
- }
-*/
-
-
-/* -------------------------------
-   LOGIN ADMIN
--------------------------------- */
+/* LOGIN */
 function adminLogin(username, role){
   const session = {
     username,
     role,
     loginAt: Date.now()
   };
-
-  localStorage.setItem(ADMIN_KEY, JSON.stringify(session));
+  localStorage.setItem(
+    ADMIN_SESSION_KEY,
+    JSON.stringify(session)
+  );
 }
 
-
-/* -------------------------------
-   LOGOUT ADMIN
--------------------------------- */
+/* LOGOUT */
 function adminLogout(){
-  localStorage.removeItem(ADMIN_KEY);
-  window.location.href = "index.html";
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  window.location.href = "admin-login.html";
 }
 
-
-/* -------------------------------
-   GET CURRENT ADMIN
--------------------------------- */
+/* GET SESSION */
 function getAdmin(){
-  const raw = localStorage.getItem(ADMIN_KEY);
-  if(!raw) return null;
-
-  try{
-    return JSON.parse(raw);
-  }catch(e){
-    return null;
-  }
+  return JSON.parse(
+    localStorage.getItem(ADMIN_SESSION_KEY)
+  );
 }
 
-
-/* -------------------------------
-   REQUIRE ROLE (PAGE GUARD)
--------------------------------- */
-function requireRole(allowedRoles){
-
+/* ROLE GUARD */
+function requireRole(roles){
   const admin = getAdmin();
 
   if(!admin){
-    alert("Admin access required");
-    window.location.href = "index.html";
+    alert("Admin login required");
+    window.location.href = "admin-login.html";
     return;
   }
 
-  if(!allowedRoles.includes(admin.role)){
-    alert("You do not have permission to access this page");
+  if(!roles.includes(admin.role)){
+    alert("Access denied: insufficient role");
     window.location.href = "index.html";
-    return;
   }
-
-}
-
-
-/* -------------------------------
-   PERMISSION HELPERS
--------------------------------- */
-function canReviewProjects(){
-  const admin = getAdmin();
-  return admin && (
-    admin.role === "super_admin" ||
-    admin.role === "review_admin"
-  );
-}
-
-function canManageFinance(){
-  const admin = getAdmin();
-  return admin && (
-    admin.role === "super_admin" ||
-    admin.role === "finance_admin"
-  );
-}
-
-function isSuperAdmin(){
-  const admin = getAdmin();
-  return admin && admin.role === "super_admin";
 }
