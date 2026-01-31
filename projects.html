@@ -47,6 +47,10 @@
   display:inline-block;
   margin-top:6px
 }
+.project-tag.external{
+  background:#fff3cd;
+  color:#856404
+}
 .project-action a{
   font-size:13px;
   color:#0f7a3d;
@@ -70,7 +74,6 @@
 
 <body data-page="projects">
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>📁 Projects</span>
@@ -82,11 +85,7 @@
   <!-- SEARCH -->
   <div class="search-box">
     🔍
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="Search projects..."
-    >
+    <input id="searchInput" placeholder="Search projects...">
   </div>
 
   <!-- INTERNAL -->
@@ -109,12 +108,12 @@
 </nav>
 
 <!-- ENGINES -->
-<script src="staking.js"></script>            <!-- internal (legacy-safe) -->
-<script src="staking-external.js"></script>   <!-- external escrow -->
+<script src="staking.js"></script>
+<script src="staking-external.js"></script>
 
 <script>
 /* ===============================
-   INTERNAL PROJECTS (ALBUKHR CORE)
+   INTERNAL CORE PROJECTS
 ================================ */
 const INTERNAL_PROJECTS = [
   {name:"Raheem",title:"Raheem Pharmacy",icon:"💊",desc:"Healthcare access via community investment.",page:"raheem.html"},
@@ -131,17 +130,17 @@ const INTERNAL_PROJECTS = [
 function renderInternal(q){
   internalList.innerHTML = "";
 
-  const filtered = INTERNAL_PROJECTS.filter(p =>
+  const list = INTERNAL_PROJECTS.filter(p =>
     p.title.toLowerCase().includes(q)
   );
 
-  if(filtered.length === 0){
+  if(list.length === 0){
     internalList.innerHTML =
       "<div class='empty'>No internal projects found</div>";
     return;
   }
 
-  filtered.forEach(p=>{
+  list.forEach(p=>{
     internalList.innerHTML += `
       <div class="project-card">
         <div class="project-icon">${p.icon}</div>
@@ -151,8 +150,8 @@ function renderInternal(q){
           <div class="project-meta">
             Minimum stake: ${
               typeof getMinStake === "function"
-                ? getMinStake(p.name)
-                : "--"
+              ? getMinStake(p.name)
+              : "--"
             } Pi
           </div>
           <span class="project-tag">Internal</span>
@@ -166,44 +165,41 @@ function renderInternal(q){
 }
 
 /* ===============================
-   RENDER EXTERNAL (ESCROW SAFE)
+   RENDER EXTERNAL (APPROVED ONLY)
 ================================ */
 function renderExternal(q){
   externalList.innerHTML = "";
 
   if(typeof getApprovedExternalProjects !== "function"){
     externalList.innerHTML =
-      "<div class='empty'>No external projects available</div>";
+      "<div class='empty'>External projects unavailable</div>";
     return;
   }
 
-  const projects = getApprovedExternalProjects();
+  const projects = getApprovedExternalProjects()
+    .filter(p =>
+      (p.title || "").toLowerCase().includes(q)
+    );
 
-  const filtered = projects.filter(p =>
-    (p.title || "").toLowerCase().includes(q)
-  );
-
-  if(filtered.length === 0){
+  if(projects.length === 0){
     externalList.innerHTML =
-      "<div class='empty'>No external projects available</div>";
+      "<div class='empty'>No verified external projects</div>";
     return;
   }
 
-  filtered.forEach(p=>{
+  projects.forEach(p=>{
     externalList.innerHTML += `
       <div class="project-card">
         <div class="project-icon">🌍</div>
         <div class="project-body">
-          <div class="project-title">
-            ${p.title || "External Project"}
-          </div>
+          <div class="project-title">${p.title}</div>
           <div class="project-desc">
-            ${p.description || "Verified external project under Albukhr escrow"}
+            ${p.description || "Verified external project under escrow."}
           </div>
           <div class="project-meta">
-            Escrow Status: Locked
+            Escrow status: Locked
           </div>
-          <span class="project-tag">External · Verified</span>
+          <span class="project-tag external">External</span>
         </div>
         <div class="project-action">
           <a href="external-project.html?id=${p.projectId}">
@@ -216,7 +212,7 @@ function renderExternal(q){
 }
 
 /* ===============================
-   MASTER RENDER
+   MASTER
 ================================ */
 function renderAll(){
   const q = searchInput.value.toLowerCase();
