@@ -69,3 +69,52 @@ function rejectProject(id){
 }
 
 renderReviews();
+
+
+const list = document.getElementById("list");
+
+function renderReview(){
+  const pending = getPendingExternalProjects();
+
+  list.innerHTML = "";
+
+  if(pending.length === 0){
+    list.innerHTML =
+      "<p style='color:#777;font-size:13px'>No pending projects</p>";
+    return;
+  }
+
+  pending.forEach(p=>{
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div class="title">${p.title}</div>
+      <div class="meta">
+        Owner: ${p.owner}<br>
+        Invite: ${p.invite || "-"}
+      </div>
+
+      <div class="btns">
+        <button class="btn approve"
+          onclick="approve('${p.projectId}')">Approve</button>
+        <button class="btn reject"
+          onclick="reject('${p.projectId}')">Reject</button>
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+function approve(id){
+  updateExternalStatus(id,"approved");
+  renderReview();
+}
+
+function reject(id){
+  updateExternalStatus(id,"rejected");
+  renderReview();
+}
+
+renderReview();
