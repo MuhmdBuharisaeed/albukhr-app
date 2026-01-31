@@ -15,70 +15,41 @@
   padding:16px;
   margin-bottom:14px
 }
-.project-title{
-  font-size:18px;
-  font-weight:700
-}
+.project-title{font-size:18px;font-weight:700}
 .project-desc{
-  font-size:13px;
-  color:#555;
-  margin-top:6px;
-  line-height:1.5
+  font-size:13px;color:#555;
+  margin-top:6px;line-height:1.5
 }
-.meta{
-  font-size:12px;
-  color:#0f7a3d;
-  margin-top:10px
-}
-.stat-box{
-  display:flex;
-  gap:12px;
-  margin:16px 0
-}
+.meta{font-size:12px;color:#0f7a3d;margin-top:10px}
+.stat-box{display:flex;gap:12px;margin:16px 0}
 .stat{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
-  padding:14px;
-  text-align:center
+  flex:1;background:#fff;border-radius:14px;
+  padding:14px;text-align:center
 }
-.stat span{
-  font-size:12px;
-  color:#666
-}
-.stat strong{
-  display:block;
-  margin-top:6px;
-  font-size:16px
-}
+.stat span{font-size:12px;color:#666}
+.stat strong{display:block;margin-top:6px;font-size:16px}
 .notice{
-  background:#fff7e6;
-  border-radius:12px;
-  padding:12px;
-  font-size:13px;
-  color:#8a5a00;
-  line-height:1.5
+  background:#fff7e6;border-radius:12px;
+  padding:12px;font-size:13px;
+  color:#8a5a00;line-height:1.5
 }
 </style>
 </head>
 
 <body data-page="external-project">
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">🌍 External Project</div>
 </header>
 
 <section class="section">
 
-  <!-- PROJECT INFO -->
   <div class="project-header">
     <div class="project-title" id="pTitle">Loading...</div>
     <div class="project-desc" id="pDesc"></div>
     <div class="meta" id="pMeta"></div>
   </div>
 
-  <!-- STATS -->
   <div class="stat-box">
     <div class="stat">
       <span>Total Staked</span>
@@ -90,15 +61,14 @@
     </div>
   </div>
 
-  <!-- NOTICE -->
   <div class="notice">
-    🔒 This is a verified external project under Albukhr escrow supervision.
+    🔒 This external project is under <b>Albukhr Escrow Protection</b>.
+    Funds are locked until milestones are verified.
     Direct staking is currently unavailable.
   </div>
 
 </section>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
   <a href="projects.html"><span>📁</span>Projects</a>
@@ -107,14 +77,9 @@
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<!-- EXTERNAL ENGINE ONLY -->
 <script src="staking-external.js"></script>
 
 <script>
-/* ===============================
-   LOAD EXTERNAL PROJECT
-================================ */
-
 function getQueryParam(key){
   return new URLSearchParams(window.location.search).get(key);
 }
@@ -122,33 +87,39 @@ function getQueryParam(key){
 function loadExternalProject(){
   const id = getQueryParam("id");
   if(!id){
-    alert("Invalid project");
+    alert("Invalid project link");
     return;
   }
 
-  const projects = getExternalProjects
-    ? getExternalProjects()
-    : [];
+  if(typeof getExternalProjectById !== "function"){
+    alert("External engine not available");
+    return;
+  }
 
-  const project = projects.find(p => p.projectId === id);
+  const project = getExternalProjectById(id);
 
   if(!project){
     alert("Project not found");
     return;
   }
 
+  /* 🔐 ALBUKHR RULE */
+  if(project.status !== "approved" || project.escrowLocked !== true){
+    alert("This project is not publicly accessible");
+    window.location.href = "projects.html";
+    return;
+  }
+
   pTitle.innerText = project.title;
   pDesc.innerText =
     project.description || "Verified external project on Albukhr.";
+
   pMeta.innerText =
-    "Owner: " + (project.owner || "Verified partner");
+    `Owner: ${project.owner || "Verified Partner"} • Escrow: Locked`;
 
-  const totals = getExternalProjectTotals
-    ? getExternalProjectTotals(id)
-    : { stake:0, reward:0 };
-
-  pStake.innerText = (totals.stake || 0) + " Pi";
-  pReward.innerText = (totals.reward || 0) + " Pi";
+  /* Totals (future-ready) */
+  pStake.innerText = (project.totalStaked || 0) + " Pi";
+  pReward.innerText = (project.totalReward || 0) + " Pi";
 }
 
 window.addEventListener("DOMContentLoaded", loadExternalProject);
