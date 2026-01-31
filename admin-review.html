@@ -106,6 +106,29 @@
 
 </div>
 
+<input id="adminKey" placeholder="Enter admin key">
+<button onclick="unlock()">Unlock</button>
+
+<script>
+function unlock(){
+  if(adminKey.value === "ALBUKHR_ADMIN_2026"){
+    localStorage.setItem("albukhr_admin", "true");
+    window.location.href = "admin-review.html";
+  }else{
+    alert("Invalid key");
+  }
+}
+</script>
+
+<script>
+(function adminGate(){
+  if(localStorage.getItem("albukhr_admin") !== "true"){
+    alert("Admin access required");
+    window.location.href = "index.html";
+  }
+})();
+</script>  
+  
 <!-- ENGINES -->
 <script src="staking-external.js"></script>
 <script src="admin-review.js"></script>
