@@ -48,3 +48,25 @@ function requireRole(allowed){
     window.location.href = "admin-dashboard.html";
   }
 }
+
+function getAdminRole(){
+  return localStorage.getItem("albukhr_admin_role");
+}
+
+function requireRole(allowed){
+  const role = getAdminRole();
+
+  if(!role || !allowed.includes(role)){
+    alert("Access denied");
+    window.location.href = "index.html";
+  }
+}
+
+function adminLogout(){
+  localStorage.removeItem("albukhr_admin_role");
+  window.location.href = "index.html";
+}
+
+localStorage.setItem("albukhr_admin_role", "super_admin");
+
+localStorage.setItem("albukhr_admin_role", "finance_admin");
