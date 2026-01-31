@@ -1,91 +1,97 @@
 /* ===============================
-   ALBUKHR – ADMIN REVIEW ENGINE
+   ALBUKHR – ADMIN REVIEW LOGIC
 ================================ */
 
-const box = document.getElementById("list");
+/* BASIC ADMIN GUARD (TEMP) */
+const ADMIN_KEY = "albukhr_admin_access";
 
-function getPending(){
-  return JSON.parse(
-    localStorage.getItem("external_projects_pending") || "[]"
-  );
+/* ❗ TEMP: enable admin manually
+   localStorage.setItem("albukhr_admin_access","true");
+*/
+
+if(localStorage.getItem(ADMIN_KEY) !== "true"){
+  document.body.innerHTML = `
+    <div style="padding:30px;text-align:center">
+      <h3>⛔ Access Denied</h3>
+      <p>Admin access required</p>
+    </div>`;
+  throw new Error("Not admin");
 }
 
-function save(key,data){
-  localStorage.setItem(key, JSON.stringify(data));
-}
 
-function render(){
-  const pending = getPending();
-  box.innerHTML = "";
+/* -------------------------------
+   LOAD PENDING PROJECTS
+-------------------------------- */
+function loadPendingReviews(){
 
-  if(pending.length === 0){
-    box.innerHTML =
-      "<p style='color:#777;font-size:13px'>No pending projects</p>";
+  const container = document.getElementById("list");
+  const projects = getPendingExternalProjects();
+
+  if(projects.length === 0){
+    container.innerHTML = `
+      <div style="text-align:center;color:#777">
+        No pending external projects
+      </div>`;
     return;
   }
 
-  pending.forEach((p,i)=>{
-    const div = document.createElement("div");
-    div.className = "card";
+  container.innerHTML = "";
 
-    div.innerHTML = `
-      <div class="title">${p.name}</div>
-      <div class="meta">
-        Owner: ${p.owner}<br>
-        PI: ${p.piUsername}<br>
-        Target: ${p.target} Pi<br>
-        Duration: ${p.duration} days
-      </div>
+  projects.forEach(p=>{
+    container.innerHTML += `
+      <div class="card">
+        <div class="title">${p.title}</div>
+        <div class="meta">
+          👤 ${p.owner}<br>
+          🆔 ${p.projectId}<br>
+          📌 ${p.category}<br>
+          ⏱ ${new Date(p.createdAt).toLocaleString()}
+        </div>
 
-      <div class="btns">
-        <button class="btn approve" onclick="approve(${i})">
-          Approve
-        </button>
-        <button class="btn reject" onclick="reject(${i})">
-          Reject
-        </button>
+        <div class="btns">
+          <button class="btn approve"
+            onclick="approveProject('${p.projectId}')">
+            Approve
+          </button>
+
+          <button class="btn reject"
+            onclick="rejectProject('${p.projectId}')">
+            Reject
+          </button>
+        </div>
       </div>
     `;
-
-    box.appendChild(div);
   });
 }
 
-function approve(index){
-  const pending = getPending();
-  const approved =
-    JSON.parse(localStorage.getItem("external_projects_active") || "[]");
 
-  const project = pending.splice(index,1)[0];
+/* -------------------------------
+   APPROVE
+-------------------------------- */
+function approveProject(id){
 
-  project.status = "approved";
-  project.approvedAt = new Date().toISOString();
-  project.totalStaked = 0;
+  if(!confirm("Approve this project and lock escrow?")) return;
 
-  approved.push(project);
+  updateExternalStatus(id,"approved");
 
-  save("external_projects_pending", pending);
-  save("external_projects_active", approved);
-
-  render();
+  alert("Project approved & escrow locked");
+  loadPendingReviews();
 }
 
-function reject(index){
-  const pending = getPending();
-  const rejected =
-    JSON.parse(localStorage.getItem("external_projects_rejected") || "[]");
 
-  const project = pending.splice(index,1)[0];
+/* -------------------------------
+   REJECT
+-------------------------------- */
+function rejectProject(id){
 
-  project.status = "rejected";
-  project.rejectedAt = new Date().toISOString();
+  if(!confirm("Reject this project?")) return;
 
-  rejected.push(project);
+  updateExternalStatus(id,"rejected");
 
-  save("external_projects_pending", pending);
-  save("external_projects_rejected", rejected);
-
-  render();
+  alert("Project rejected");
+  loadPendingReviews();
 }
 
-render();
+
+/* INIT */
+loadPendingReviews();
