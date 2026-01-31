@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr Admin – Transactions</title>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
-/* ===== ADMIN TABLE ===== */
 .admin-wrap{
   padding:16px;
   max-width:1000px;
@@ -127,7 +127,13 @@
 
 </div>
 
+<!-- =============================
+     AUTH MUST LOAD FIRST
+============================= -->
+<script src="admin-auth.js"></script>
+
 <script>
+/* ROLE-BASED ACCESS */
 requireRole([
   "super_admin",
   "finance_admin",
@@ -135,10 +141,9 @@ requireRole([
   "viewer_admin"
 ]);
 </script>
-  
+
 <!-- CORE ENGINES -->
 <script src="transactions-unified.js"></script>
-<script src="admin-auth.js"></script>
 
 <script>
 const body = document.getElementById("txBody");
