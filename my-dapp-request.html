@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My dApp Request | ALBUKHR</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+}
+
+.title{
+  font-size:16px;
+  font-weight:700;
+}
+
+.desc{
+  font-size:13px;
+  color:#666;
+  margin-top:4px;
+}
+
+.meta{
+  font-size:12px;
+  margin-top:10px;
+  color:#0f7a3d;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  margin-top:8px;
+}
+
+.pending{background:#fff3cd;color:#856404}
+.approved{background:#e0f3e8;color:#0f7a3d}
+.rejected{background:#f8d7da;color:#842029}
+
+.studio{background:#e7f1ff;color:#084298}
+.dev{background:#ede7f6;color:#4527a0}
+
+.empty{
+  text-align:center;
+  font-size:13px;
+  color:#777;
+  margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <span>📱 My dApp Request</span>
+</header>
+
+<section class="section" id="content"></section>
+
+<nav class="bottom-nav">
+  <a href="index.html"><span>🏠</span>Home</a>
+  <a href="projects.html"><span>📁</span>Projects</a>
+  <a href="services.html" class="active"><span>🛠️</span>Services</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</nav>
+
+<script src="pi-dapp-engine.js"></script>
+
+<script>
+const box = document.getElementById("content");
+
+/* ===============================
+   LOAD USER REQUEST
+================================ */
+function loadMyRequest(){
+
+  if(typeof getMyRequest !== "function"){
+    box.innerHTML =
+      "<div class='empty'>Engine not loaded</div>";
+    return;
+  }
+
+  const req = getMyRequest();
+
+  if(!req){
+    box.innerHTML = `
+      <div class="empty">
+        You have not submitted any dApp request yet.
+      </div>`;
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="card">
+      <div class="title">${req.projectName}</div>
+      <div class="desc">${req.description || "Pi dApp request"}</div>
+
+      <span class="badge ${
+        req.serviceType === "developer" ? "dev":"studio"
+      }">
+        ${req.serviceType === "developer" ? "Developer Service":"Pi Studio"}
+      </span>
+
+      <div class="meta">
+        Pi Username: <strong>${req.piUser}</strong><br>
+        Submitted: ${new Date(req.createdAt).toLocaleString()}
+      </div>
+
+      <span class="badge ${req.status}">
+        ${req.status.toUpperCase()}
+      </span>
+
+      ${
+        req.status === "approved"
+        ? `<div class="meta">✅ Admin has approved your request. 
+           You will be contacted or guided next.</div>`
+        : req.status === "rejected"
+        ? `<div class="meta">❌ Request rejected. 
+           You may reapply with correct details.</div>`
+        : `<div class="meta">⏳ Awaiting admin verification.</div>`
+      }
+    </div>
+  `;
+}
+
+window.addEventListener("DOMContentLoaded", loadMyRequest);
+</script>
+
+</body>
+</html>
