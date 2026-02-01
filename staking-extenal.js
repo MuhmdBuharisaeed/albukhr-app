@@ -2,7 +2,6 @@
    ALBUKHR – EXTERNAL ESCROW ENGINE
 ================================ */
 
-/* STORAGE KEY */
 const EXTERNAL_KEY = "albukhr_external_projects";
 
 /* -------------------------------
@@ -12,7 +11,6 @@ function saveExternalProject(project){
   let list = JSON.parse(localStorage.getItem(EXTERNAL_KEY)) || [];
 
   if(list.some(p => p.projectId === project.projectId)){
-    console.warn("External project already exists");
     return false;
   }
 
@@ -49,8 +47,7 @@ function updateExternalStatus(projectId, status){
   list = list.map(p=>{
     if(p.projectId === projectId){
       p.status = status;
-
-      if(!p.history) p.history = [];
+      p.history = p.history || [];
       p.history.push({ status, at: Date.now() });
 
       if(status === "approved"){
@@ -83,18 +80,14 @@ function getPendingExternalProjects(){
    STAKING (LOCKED)
 -------------------------------- */
 function addExternalStake(){
-  alert("External staking is locked until escrow verification");
+  alert("External staking locked until escrow verification");
   return false;
 }
 
 function getExternalTotals(){
-  return {
-    totalStake: 0,
-    totalReward: 0,
-    source: "external"
-  };
+  return { totalStake:0, totalReward:0 };
 }
 
 function getExternalProjectTotals(){
   return { stake:0, reward:0, stakes:[] };
-}
+       }
