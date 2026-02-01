@@ -2,86 +2,116 @@
    ALBUKHR – ADMIN EXTERNAL REVIEW
 ================================ */
 
-const body = document.getElementById("reviewBody");
+document.addEventListener("DOMContentLoaded", () => {
 
-/* -------------------------------
-   LOAD PENDING PROJECTS
--------------------------------- */
-function loadReviews(){
+  const body = document.getElementById("reviewBody");
 
-  if(typeof getPendingExternalProjects !== "function"){
-    body.innerHTML =
-      `<tr><td colspan="5" class="empty">Engine not found</td></tr>`;
+  if(!body){
+    console.error("reviewBody not found");
     return;
   }
 
-  const list = getPendingExternalProjects();
+  /* -------------------------------
+     LOAD PENDING PROJECTS
+  -------------------------------- */
+  function loadReviews(){
 
-  body.innerHTML = "";
+    if(typeof getPendingExternalProjects !== "function"){
+      body.innerHTML =
+        `<tr><td colspan="5" class="empty">External engine not loaded</td></tr>`;
+      return;
+    }
 
-  if(list.length === 0){
-    body.innerHTML =
-      `<tr><td colspan="5" class="empty">No pending external projects</td></tr>`;
-    return;
+    const list = getPendingExternalProjects();
+    body.innerHTML = "";
+
+    if(!list || list.length === 0){
+      body.innerHTML =
+        `<tr><td colspan="5" class="empty">No pending external projects</td></tr>`;
+      return;
+    }
+
+    list.forEach(p => {
+      const d = new Date(p.createdAt || Date.now());
+      const date =
+        d.toLocaleDateString() + " " +
+        d.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+
+      body.innerHTML += `
+        <tr>
+          <td>${date}</td>
+          <td>
+            <span class="badge external">external</span>
+            <span class="badge pending">pending</span>
+          </td>
+          <td>
+            <strong>${p.title || "Untitled"}</strong><br>
+            <small>${p.projectId}</small>
+          </td>
+          <td>${p.owner || "—"}</td>
+          <td>
+            <button class="btn approve"
+              data-id="${p.projectId}">
+              Approve
+            </button>
+            <button class="btn reject"
+              data-id="${p.projectId}">
+              Reject
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    bindActions();
   }
 
-  list.forEach(p=>{
-    const d = new Date(p.createdAt || Date.now());
-    const date =
-      d.toLocaleDateString() + " " +
-      d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+  /* -------------------------------
+     BIND ACTION BUTTONS
+  -------------------------------- */
+  function bindActions(){
+    body.querySelectorAll(".approve").forEach(btn=>{
+      btn.onclick = () => approveProject(btn.dataset.id);
+    });
 
-    body.innerHTML += `
-      <tr>
-        <td>${date}</td>
-        <td>
-          <span class="badge external">external</span>
-          <span class="badge pending">pending</span>
-        </td>
-        <td>
-          <strong>${p.title}</strong><br>
-          <small>${p.projectId}</small>
-        </td>
-        <td>${p.owner || "—"}</td>
-        <td>
-          <button class="btn approve"
-            onclick="approveProject('${p.projectId}')">
-            Approve
-          </button>
-          <button class="btn reject"
-            onclick="rejectProject('${p.projectId}')">
-            Reject
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-}
-
-/* -------------------------------
-   ACTIONS
--------------------------------- */
-function approveProject(id){
-  const admin = getAdmin();
-  if(!admin || !["super_admin","review_admin"].includes(admin.role)){
-    alert("Permission denied");
-    return;
+    body.querySelectorAll(".reject").forEach(btn=>{
+      btn.onclick = () => rejectProject(btn.dataset.id);
+    });
   }
-  updateExternalStatus(id, "approved");
+
+  /* -------------------------------
+     PERMISSION CHECK
+  -------------------------------- */
+  function canReview(){
+    if(typeof getAdmin !== "function") return false;
+    const admin = getAdmin();
+    return admin && ["super_admin","review_admin"].includes(admin.role);
+  }
+
+  /* -------------------------------
+     ACTIONS
+  -------------------------------- */
+  function approveProject(id){
+    if(!canReview()){
+      alert("Permission denied");
+      return;
+    }
+    updateExternalStatus(id, "approved");
+    loadReviews();
+  }
+
+  function rejectProject(id){
+    if(!canReview()){
+      alert("Permission denied");
+      return;
+    }
+    updateExternalStatus(id, "rejected");
+    loadReviews();
+  }
+
+  /* -------------------------------
+     INIT
+  -------------------------------- */
   loadReviews();
-}
 
-function rejectProject(id){
-  const admin = getAdmin();
-  if(!admin || !["super_admin","review_admin"].includes(admin.role)){
-    alert("Permission denied");
-    return;
-  }
-  updateExternalStatus(id, "rejected");
-  loadReviews();
-}
-
-/* -------------------------------
-   INIT
--------------------------------- */
-window.addEventListener("DOMContentLoaded", loadReviews);
+});
