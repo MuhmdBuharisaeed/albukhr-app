@@ -62,3 +62,14 @@ if(isLimitReached()){
   document.getElementById("submitBtn").classList.add("disabled");
   document.getElementById("limitNotice").style.display = "block";
 }
+
+function getMyRequest(){
+  return JSON.parse(
+    localStorage.getItem("albukhr_my_dapp_request")
+  );
+}
+
+localStorage.setItem(
+  "albukhr_my_dapp_request",
+  JSON.stringify(data)
+);
