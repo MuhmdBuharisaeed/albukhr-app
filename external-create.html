@@ -26,7 +26,12 @@ textarea.input{min-height:90px}
   width:100%;padding:14px;
   border:none;border-radius:12px;
   background:#0f7a3d;color:#fff;
-  font-weight:700;font-size:15px
+  font-weight:700;font-size:15px;
+  cursor:pointer;
+}
+.btn:disabled{
+  background:#9ac9b0;
+  cursor:not-allowed;
 }
 .note{
   font-size:12px;color:#666;
@@ -67,54 +72,63 @@ textarea.input{min-height:90px}
   <!-- OWNER INFO -->
   <div class="card">
     <div class="label">Pi Username</div>
-    <input class="input" id="owner"
-      placeholder="your Pi username"/>
+    <input class="input" id="owner" placeholder="your Pi username"/>
 
     <div class="label" style="margin-top:12px">
       Invite / Referral Link (optional)
     </div>
-    <input class="input" id="invite"
-      placeholder="who invited you (optional)"/>
+    <input class="input" id="invite" placeholder="who invited you (optional)"/>
   </div>
 
   <!-- ESCROW NOTICE -->
   <div class="card">
-    <strong>🔒 Escrow Protection</strong>
+    <strong>🔒 Albukhr Escrow Protection</strong>
     <p class="note">
-      Funds staked into this project will be locked under
-      Albukhr escrow. Release depends on verification,
-      milestones and admin approval.
+      Funds staked into this project will be locked under Albukhr escrow.
+      Project must be verified and approved by admin before appearing publicly.
     </p>
   </div>
 
-  <button class="btn" onclick="submitExternalProject()">
+  <button id="submitBtn" class="btn" onclick="submitExternalProject()">
     Submit for Review
   </button>
 
 </section>
 
+<!-- =============================
+     ENGINES (MUST LOAD FIRST)
+============================= -->
 <script src="staking-external.js"></script>
-<script src="external-escrow.js"></script>
 
 <script>
+/* =============================
+   ENGINE CHECK
+============================= */
+if(typeof saveExternalProject !== "function"){
+  alert("External engine not loaded. Please refresh.");
+  document.getElementById("submitBtn").disabled = true;
+}
+
+/* =============================
+   SUBMIT PROJECT
+============================= */
 function submitExternalProject(){
 
-  const titleEl = document.getElementById("title");
-  const categoryEl = document.getElementById("category");
-  const descEl = document.getElementById("description");
-  const ownerEl = document.getElementById("owner");
-  const inviteEl = document.getElementById("invite");
+  if(typeof saveExternalProject !== "function"){
+    alert("Engine error: saveExternalProject not found");
+    return;
+  }
 
   const data = {
     projectId: "EXT-" + Date.now(),
-    title: titleEl.value.trim(),
-    category: categoryEl.value,
-    description: descEl.value.trim(),
-    owner: ownerEl.value.trim(),
-    invite: inviteEl.value.trim(),
+    title: title.value.trim(),
+    category: category.value,
+    description: description.value.trim(),
+    owner: owner.value.trim(),
+    invite: invite.value.trim(),
     status: "pending",
     createdAt: Date.now(),
-    escrowLocked: false
+    escrowLocked: true
   };
 
   if(!data.title || !data.category || !data.description || !data.owner){
@@ -122,14 +136,9 @@ function submitExternalProject(){
     return;
   }
 
-  if(typeof saveExternalProject !== "function"){
-    alert("Engine error: saveExternalProject not found");
-    return;
-  }
-
   saveExternalProject(data);
 
-  alert("Project submitted for admin review");
+  alert("✅ Project submitted successfully.\nWaiting for admin review.");
   window.location.href = "projects.html";
 }
 </script>
