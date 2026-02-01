@@ -5,165 +5,212 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Submit Project | ALBUKHR</title>
 <link rel="stylesheet" href="style.css">
+<style>
+.form-box{max-width:700px;margin:20px auto;padding:16px;background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.form-step{display:none;animation:fadeIn 0.3s;}
+.form-step.active{display:block;}
+input, select, textarea{width:100%;padding:10px;margin:6px 0 14px 0;border:1px solid #ddd;border-radius:10px;font-size:14px;}
+button{padding:12px 20px;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-right:6px;}
+button.primary-btn{background:#0f7a3d;color:#fff;}
+button.next, button.prev{background:#e0f3e8;color:#0f7a3d;}
+.notice{padding:10px;background:#fff3cd;border-radius:10px;margin:10px 0;font-size:13px;}
+@keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
+</style>
 </head>
 
 <body data-page="services">
 
-<!-- HEADER -->
-<header class="header">
-  <h1 class="brand">ALBUKHR</h1>
-</header>
+<header class="header"><h1 class="brand">ALBUKHR</h1></header>
 
-<!-- PAGE TITLE -->
 <section class="page-head">
-  <h2>Submit Your Project</h2>
-  <p class="muted">
-    Register your small industry or innovation on Albukhr ecosystem.
-  </p>
+<h2>Submit Your Project</h2>
+<p class="muted">Register your small industry or innovation on Albukhr ecosystem.</p>
 </section>
 
-<!-- FORM WRAPPER -->
 <form class="form-box" id="projectForm">
 
 <!-- STEP 1 -->
 <section class="form-step active">
-  <h3>1. Pi Network Verification</h3>
+<h3>1. Pi Network Verification</h3>
+<label>Pi Username</label>
+<input type="text" id="piUsername" placeholder="@username" required>
 
-  <label>Pi Username</label>
-  <input type="text" placeholder="@username" required>
+<label>Pi Wallet Address (Mainnet)</label>
+<input type="text" id="piWallet" placeholder="Gxxxxxxxxxxxxxxxx" required>
 
-  <label>Pi Wallet Address (Mainnet)</label>
-  <input type="text" placeholder="Gxxxxxxxxxxxxxxxx" required>
-
-  <div class="notice success">
-    ✔ KYC & Migration will be verified automatically
-  </div>
+<div class="notice success">✔ KYC & Migration will be verified automatically</div>
+<button type="button" class="next">Next →</button>
 </section>
 
 <!-- STEP 2 -->
 <section class="form-step">
-  <h3>2. Project Classification</h3>
+<h3>2. Project Classification</h3>
+<label>Project Name</label>
+<input type="text" id="projectName" placeholder="Your project name" required>
 
-  <label>Project Name</label>
-  <input type="text" placeholder="Your project name" required>
+<label>Project Category</label>
+<select id="projectCategory" required>
+<option value="">Select category</option>
+<option>Agriculture</option>
+<option>Manufacturing</option>
+<option>Food & Bakery</option>
+<option>Health</option>
+<option>Transport</option>
+<option>Technology</option>
+<option>Recycling</option>
+<option>Others</option>
+</select>
 
-  <label>Project Category</label>
-  <select required>
-    <option value="">Select category</option>
-    <option>Agriculture</option>
-    <option>Manufacturing</option>
-    <option>Food & Bakery</option>
-    <option>Health</option>
-    <option>Transport</option>
-    <option>Technology</option>
-    <option>Recycling</option>
-    <option>Others</option>
-  </select>
+<label>Project Type</label>
+<select id="projectType" required>
+<option value="">Select type</option>
+<option>Micro Project – 250 Pi</option>
+<option>Small Industry – 500 Pi</option>
+<option>Expansion Project – 1,000 Pi</option>
+</select>
 
-  <label>Project Type</label>
-  <select required>
-    <option value="">Select type</option>
-    <option>Micro Project – 250 Pi</option>
-    <option>Small Industry – 500 Pi</option>
-    <option>Expansion Project – 1,000 Pi</option>
-  </select>
+<button type="button" class="prev">← Previous</button>
+<button type="button" class="next">Next →</button>
 </section>
 
 <!-- STEP 3 -->
 <section class="form-step">
-  <h3>3. Project Details</h3>
+<h3>3. Project Details</h3>
+<label>Project Tagline</label>
+<input type="text" id="projectTagline" placeholder="Short one-line description">
 
-  <label>Project Tagline</label>
-  <input type="text" placeholder="Short one-line description">
+<label>Project Location</label>
+<input type="text" id="projectLocation" placeholder="City / Region / Country">
 
-  <label>Project Location</label>
-  <input type="text" placeholder="City / Region / Country">
+<label>Project Overview</label>
+<textarea id="projectOverview" rows="4" placeholder="Describe your project (min 150 words)" required></textarea>
 
-  <label>Project Overview</label>
-  <textarea rows="4" placeholder="Describe your project (min 150 words)" required></textarea>
+<label>Current Stage</label>
+<select id="projectStage">
+<option>Idea</option>
+<option>Pilot</option>
+<option>Operating</option>
+<option>Expanding</option>
+</select>
 
-  <label>Current Stage</label>
-  <select>
-    <option>Idea</option>
-    <option>Pilot</option>
-    <option>Operating</option>
-    <option>Expanding</option>
-  </select>
+<button type="button" class="prev">← Previous</button>
+<button type="button" class="next">Next →</button>
 </section>
 
 <!-- STEP 4 -->
 <section class="form-step">
-  <h3>4. Owner & Governance</h3>
+<h3>4. Owner & Governance</h3>
+<label>Owner Full Name</label>
+<input type="text" id="ownerName" placeholder="Must match Pi KYC name" required>
 
-  <label>Owner Full Name</label>
-  <input type="text" placeholder="Must match Pi KYC name" required>
+<label>Your Role</label>
+<select id="ownerRole">
+<option>Founder</option>
+<option>Co-founder</option>
+<option>Manager</option>
+</select>
 
-  <label>Your Role</label>
-  <select>
-    <option>Founder</option>
-    <option>Co-founder</option>
-    <option>Manager</option>
-  </select>
+<label>Funds Usage Plan</label>
+<select id="fundsPlan" multiple>
+<option>Equipment</option>
+<option>Expansion</option>
+<option>Raw Materials</option>
+<option>Operations</option>
+<option>R&D</option>
+</select>
 
-  <label>Funds Usage Plan</label>
-  <select multiple>
-    <option>Equipment</option>
-    <option>Expansion</option>
-    <option>Raw Materials</option>
-    <option>Operations</option>
-    <option>R&D</option>
-  </select>
+<label><input type="checkbox" id="declaration" required> I declare that this project information is genuine</label>
 
-  <label>
-    <input type="checkbox" required>
-    I declare that this project information is genuine
-  </label>
+<button type="button" class="prev">← Previous</button>
+<button type="button" class="next">Next →</button>
 </section>
 
 <!-- STEP 5 -->
 <section class="form-step">
-  <h3>5. Review & Submit</h3>
+<h3>5. Review & Submit</h3>
+<div class="notice">• Project wallet will be created after approval<br>• Staking opens only after verification<br>• False data leads to rejection or ban</div>
 
-  <div class="notice">
-    • Project wallet will be created after approval  
-    • Staking opens only after verification  
-    • False data leads to rejection or ban
-  </div>
+<label><input type="checkbox" id="acceptRules" required> I accept Albukhr verification & transparency rules</label>
 
-  <label>
-    <input type="checkbox" required>
-    I accept Albukhr verification & transparency rules
-  </label>
-
-  <button type="submit" class="primary-btn">
-    Submit for Verification
-  </button>
+<button type="button" class="prev">← Previous</button>
+<button type="submit" class="primary-btn">Submit for Verification</button>
 </section>
 
 </form>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <a href="index.html"><span>🏠</span>Home</a>
-  <a href="projects.html"><span>📁</span>Projects</a>
-  <a href="wallet.html"><span>💰</span>Wallet</a>
-  <a href="services.html" class="active"><span>🛠️</span>Services</a>
-  <a href="settings.html"><span>⚙️</span>Settings</a>
+<a href="index.html"><span>🏠</span>Home</a>
+<a href="projects.html"><span>📁</span>Projects</a>
+<a href="wallet.html"><span>💰</span>Wallet</a>
+<a href="services.html" class="active"><span>🛠️</span>Services</a>
+<a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
-<!-- SIMPLE STEP SCRIPT -->
+<script src="staking-external.js"></script>
+
 <script>
+/* ========================
+   MULTI-STEP NAVIGATION
+========================= */
 const steps = document.querySelectorAll(".form-step");
-let current = 0;
+let currentStep = 0;
+
+function showStep(index){
+  steps.forEach((s,i)=>s.classList.toggle("active", i===index));
+}
 
 document.addEventListener("click", e=>{
   if(e.target.classList.contains("next")){
-    steps[current].classList.remove("active");
-    current++;
-    steps[current].classList.add("active");
+    if(currentStep < steps.length -1) currentStep++;
+    showStep(currentStep);
+  }
+  if(e.target.classList.contains("prev")){
+    if(currentStep >0) currentStep--;
+    showStep(currentStep);
+  }
+});
+
+showStep(currentStep);
+
+/* ========================
+   FORM SUBMISSION
+========================= */
+const form = document.getElementById("projectForm");
+form.addEventListener("submit", e=>{
+  e.preventDefault();
+
+  if(typeof saveExternalProject !== "function"){
+    alert("External engine not loaded, please refresh");
+    return;
+  }
+
+  const project = {
+    projectId: "EXT-" + Date.now(),
+    piUsername: document.getElementById("piUsername").value.trim(),
+    piWallet: document.getElementById("piWallet").value.trim(),
+    title: document.getElementById("projectName").value.trim(),
+    category: document.getElementById("projectCategory").value,
+    type: document.getElementById("projectType").value,
+    tagline: document.getElementById("projectTagline").value.trim(),
+    location: document.getElementById("projectLocation").value.trim(),
+    overview: document.getElementById("projectOverview").value.trim(),
+    stage: document.getElementById("projectStage").value,
+    ownerName: document.getElementById("ownerName").value.trim(),
+    role: document.getElementById("ownerRole").value,
+    fundsPlan: Array.from(document.getElementById("fundsPlan").selectedOptions).map(o=>o.value),
+    status:"pending",
+    createdAt:Date.now(),
+    escrowLocked:false
+  };
+
+  if(saveExternalProject(project)){
+    alert("Project submitted successfully for admin review!");
+    window.location.href = "projects.html";
+  } else {
+    alert("Error: Could not submit project. Please try again.");
   }
 });
 </script>
 
 </body>
-</html>
+  </html>
