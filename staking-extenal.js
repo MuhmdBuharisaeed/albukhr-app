@@ -9,14 +9,22 @@ const EXTERNAL_KEY = "albukhr_external_projects";
    SAVE NEW EXTERNAL PROJECT
 -------------------------------- */
 function saveExternalProject(project){
-
   let list = JSON.parse(localStorage.getItem(EXTERNAL_KEY)) || [];
 
+  if(list.some(p => p.projectId === project.projectId)){
+    console.warn("External project already exists");
+    return false;
+  }
+
+  project.history = [{
+    status: "pending",
+    at: Date.now()
+  }];
+
   list.push(project);
-
   localStorage.setItem(EXTERNAL_KEY, JSON.stringify(list));
+  return true;
 }
-
 
 /* -------------------------------
    GET ALL EXTERNAL PROJECTS
@@ -25,7 +33,6 @@ function getExternalProjects(){
   return JSON.parse(localStorage.getItem(EXTERNAL_KEY)) || [];
 }
 
-
 /* -------------------------------
    GET PROJECT BY ID
 -------------------------------- */
@@ -33,17 +40,18 @@ function getExternalProjectById(id){
   return getExternalProjects().find(p => p.projectId === id);
 }
 
-
 /* -------------------------------
    ADMIN: UPDATE PROJECT STATUS
 -------------------------------- */
 function updateExternalStatus(projectId, status){
-
   let list = getExternalProjects();
 
   list = list.map(p=>{
     if(p.projectId === projectId){
       p.status = status;
+
+      if(!p.history) p.history = [];
+      p.history.push({ status, at: Date.now() });
 
       if(status === "approved"){
         p.approvedAt = Date.now();
@@ -60,50 +68,24 @@ function updateExternalStatus(projectId, status){
   localStorage.setItem(EXTERNAL_KEY, JSON.stringify(list));
 }
 
-
 /* -------------------------------
-   PROJECTS PAGE FILTERS
+   FILTERS
 -------------------------------- */
 function getApprovedExternalProjects(){
-  return getExternalProjects().filter(p=>p.status==="approved");
+  return getExternalProjects().filter(p => p.status === "approved");
 }
 
 function getPendingExternalProjects(){
-  return getExternalProjects().filter(p=>p.status==="pending");
+  return getExternalProjects().filter(p => p.status === "pending");
 }
-
 
 /* -------------------------------
-   STAKING (LOCKED BY DESIGN)
+   STAKING (LOCKED)
 -------------------------------- */
 function addExternalStake(){
-  alert("External staking locked until escrow verification");
+  alert("External staking is locked until escrow verification");
   return false;
 }
-
-function getExternalTotals(){
-  return { totalStake:0, totalReward:0 };
-}
-
-function getExternalProjectTotals(){
-  return { stake:0, reward:0, stakes:[] };
-     }
-
-function saveExternalProject(project){
-  let list = JSON.parse(localStorage.getItem(EXTERNAL_KEY)) || [];
-
-  if(list.some(p => p.projectId === project.projectId)){
-    console.warn("Project already exists");
-    return false;
-  }
-
-  list.push(project);
-  localStorage.setItem(EXTERNAL_KEY, JSON.stringify(list));
-  return true;
-}
-
-if(!p.history) p.history = [];
-p.history.push({ status, at: Date.now() });
 
 function getExternalTotals(){
   return {
@@ -111,4 +93,8 @@ function getExternalTotals(){
     totalReward: 0,
     source: "external"
   };
+}
+
+function getExternalProjectTotals(){
+  return { stake:0, reward:0, stakes:[] };
 }
