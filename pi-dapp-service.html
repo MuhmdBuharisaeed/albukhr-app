@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pi dApp Launch Service | ALBUKHR</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px
+}
+.label{font-size:13px;font-weight:600;margin-bottom:6px}
+.input{
+  width:100%;padding:12px;
+  border-radius:10px;border:1px solid #ddd;
+  font-size:14px
+}
+textarea.input{min-height:90px}
+.select{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd}
+.btn{
+  width:100%;padding:14px;
+  border:none;border-radius:14px;
+  background:#0f7a3d;color:#fff;
+  font-size:15px;font-weight:700
+}
+.notice{
+  font-size:12px;
+  background:#f6fbf8;
+  border-left:4px solid #0f7a3d;
+  padding:10px;
+  margin-top:10px;
+  line-height:1.6
+}
+.disabled{
+  opacity:.5;
+  pointer-events:none
+}
+</style>
+</head>
+
+<body data-page="services">
+
+<header class="header">
+  <h1 class="brand">ALBUKHR</h1>
+</header>
+
+<section class="section">
+
+<h3>🚀 Pi dApp Launch Service</h3>
+<p class="muted">
+Albukhr will assist you to launch your Pi Network dApp under your ownership.
+</p>
+
+<!-- FORM -->
+<div class="card">
+
+  <div class="label">Pi Username</div>
+  <input class="input" id="piUser" placeholder="@username">
+
+  <div class="label" style="margin-top:12px">Project Name</div>
+  <input class="input" id="projectName" placeholder="Your dApp name">
+
+  <div class="label" style="margin-top:12px">Service Type</div>
+  <select class="select" id="serviceType">
+    <option value="">Select service</option>
+    <option value="pi_studio">Pi Studio Assistance (Lower cost)</option>
+    <option value="developer">Developer-built dApp (Higher cost)</option>
+  </select>
+
+  <div class="label" style="margin-top:12px">Project Description</div>
+  <textarea class="input" id="description"
+    placeholder="Explain what your dApp does"></textarea>
+
+</div>
+
+<!-- PAYMENT -->
+<div class="card">
+
+  <strong>💳 Service Fee</strong>
+  <p class="notice">
+    • Pi Studio: <b>Flexible service fee</b><br>
+    • Developer-built: <b>Higher professional fee</b><br><br>
+    Pay to:<br>
+    <b>ALBUKHR SERVICE ACCOUNT</b><br>
+    Bank / Wallet details will be shown after selection.
+  </p>
+
+  <div class="label" style="margin-top:12px">Transaction Receipt (ID or Screenshot)</div>
+  <input class="input" id="receipt" placeholder="Transaction reference">
+
+</div>
+
+<!-- CONSENT -->
+<div class="card">
+  <label>
+    <input type="checkbox" id="agree">
+    I agree that Albukhr only assists and does not own my dApp.
+  </label>
+</div>
+
+<button class="btn" id="submitBtn" onclick="submitDappRequest()">
+Submit for Review
+</button>
+
+<div id="limitNotice" class="notice" style="display:none">
+🚫 Submission limit reached. Please check back later.
+</div>
+
+</section>
+
+<script src="pi-dapp-engine.js"></script>
+</body>
+</html>
