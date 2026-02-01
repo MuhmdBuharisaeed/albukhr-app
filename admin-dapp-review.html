@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr Admin – Pi dApp Requests</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.admin-wrap{
+  padding:16px;
+  max-width:1000px;
+  margin:0 auto;
+}
+
+.admin-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.admin-header h2{
+  font-size:18px;
+  color:#0f7a3d;
+}
+
+.review-table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.review-table th,
+.review-table td{
+  padding:10px;
+  font-size:12px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+}
+
+.review-table th{
+  background:#eaf6ee;
+  color:#0f7a3d;
+  font-weight:600;
+}
+
+.badge{
+  padding:3px 8px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:600;
+}
+
+.badge.pending{background:#fff3cd;color:#856404}
+.badge.approved{background:#e0f3e8;color:#0f7a3d}
+.badge.rejected{background:#f8d7da;color:#842029}
+
+.badge.studio{background:#e7f1ff;color:#084298}
+.badge.dev{background:#ede7f6;color:#4527a0}
+
+.btn{
+  padding:6px 10px;
+  border:none;
+  border-radius:8px;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#eee;color:#333}
+
+.empty{
+  text-align:center;
+  font-size:13px;
+  color:#777;
+  padding:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <h1 class="brand">ALBUKHR • Admin</h1>
+</header>
+
+<div class="admin-wrap">
+
+  <div class="admin-header">
+    <h2>Pi dApp Launch Requests</h2>
+  </div>
+
+  <table class="review-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Service</th>
+        <th>Project</th>
+        <th>User</th>
+        <th>Receipt</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="reviewBody"></tbody>
+  </table>
+
+</div>
+
+<!-- AUTH FIRST -->
+<script src="admin-auth.js"></script>
+<script>
+requireRole(["super_admin","review_admin"]);
+</script>
+
+<!-- ENGINE -->
+<script src="pi-dapp-engine.js"></script>
+<script src="admin-dapp-review.js"></script>
+
+</body>
+</html>
