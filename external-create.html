@@ -99,13 +99,19 @@ textarea.input{min-height:90px}
 <script>
 function submitExternalProject(){
 
+  const titleEl = document.getElementById("title");
+  const categoryEl = document.getElementById("category");
+  const descEl = document.getElementById("description");
+  const ownerEl = document.getElementById("owner");
+  const inviteEl = document.getElementById("invite");
+
   const data = {
-    projectId: "EXT-"+Date.now(),
-    title: title.value.trim(),
-    category: category.value,
-    description: description.value.trim(),
-    owner: owner.value.trim(),
-    invite: invite.value.trim(),
+    projectId: "EXT-" + Date.now(),
+    title: titleEl.value.trim(),
+    category: categoryEl.value,
+    description: descEl.value.trim(),
+    owner: ownerEl.value.trim(),
+    invite: inviteEl.value.trim(),
     status: "pending",
     createdAt: Date.now(),
     escrowLocked: false
@@ -113,6 +119,11 @@ function submitExternalProject(){
 
   if(!data.title || !data.category || !data.description || !data.owner){
     alert("Please fill all required fields");
+    return;
+  }
+
+  if(typeof saveExternalProject !== "function"){
+    alert("Engine error: saveExternalProject not found");
     return;
   }
 
