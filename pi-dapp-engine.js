@@ -5,18 +5,6 @@
 const DAPP_KEY = "albukhr_pi_dapp_requests";
 const DAPP_LIMIT = 10;
 
-/* SERVICE PRICING */
-const PRICING = {
-  pi_studio: {
-    label: "Pi Studio Assistance",
-    fee: "Flexible",
-  },
-  developer: {
-    label: "Developer-built dApp",
-    fee: "Premium",
-  }
-};
-
 /* -------------------------------
    GET ALL REQUESTS
 -------------------------------- */
@@ -25,10 +13,19 @@ function getDappRequests(){
 }
 
 /* -------------------------------
-   CHECK LIMIT
+   CHECK GLOBAL LIMIT
 -------------------------------- */
 function submissionClosed(){
   return getDappRequests().length >= DAPP_LIMIT;
+}
+
+/* -------------------------------
+   CHECK USER PENDING
+-------------------------------- */
+function userHasPending(piUser){
+  return getDappRequests().some(
+    r => r.piUser === piUser && r.status === "pending"
+  );
 }
 
 /* -------------------------------
@@ -41,35 +38,89 @@ function submitDappRequest(){
     return;
   }
 
-  const data = {
-    requestId: "DAPP-" + Date.now(),
-    piUser: piUser.value.trim(),
-    projectName: projectName.value.trim(),
-    serviceType: serviceType.value,
-    description: description.value.trim(),
-    receipt: receipt.value.trim(),
-    status: "pending",
-    createdAt: Date.now()
-  };
+  const piUserVal = piUser.value.trim();
 
-  if(
-    !data.piUser ||
-    !data.projectName ||
-    !data.serviceType ||
-    !data.description ||
-    !data.receipt ||
-    !agree.checked
-  ){
-    alert("Please complete all required fields");
+  if(userHasPending(piUserVal)){
+    alert("⏳ You already have a pending request. Please wait for admin review.");
+    window.location.href = "my-dapp-requests.html";
     return;
   }
 
-  const list = getDappRequests();
-  list.push(data);
-  localStorage.setItem(DAPP_KEY, JSON.stringify(list));
+  const receiptImgFile = document.getElementById("receiptImg").files[0];
 
-  alert("✅ Your request has been submitted for review");
-  window.location.href = "services.html";
+  if(!receiptImgFile){
+    alert("Please upload payment receipt image");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(){
+    const data = {
+      id: "DAPP-" + Date.now(),
+      piUser: piUserVal,
+      projectName: projectName.value.trim(),
+      serviceType: serviceType.value,
+      description: description.value.trim(),
+      receiptRef: receiptRef.value.trim(),
+      receiptImg: reader.result, // Base64
+      status: "pending",
+      telegramUnlocked: false,
+      createdAt: Date.now()
+    };
+
+    if(
+      !data.piUser ||
+      !data.projectName ||
+      !data.serviceType ||
+      !data.description ||
+      !data.receiptRef ||
+      !agree.checked
+    ){
+      alert("Please complete all required fields");
+      return;
+    }
+
+    const list = getDappRequests();
+    list.push(data);
+    localStorage.setItem(DAPP_KEY, JSON.stringify(list));
+
+    alert("✅ Request submitted successfully");
+    window.location.href = "my-dapp-requests.html";
+  };
+
+  reader.readAsDataURL(receiptImgFile);
+}
+
+/* -------------------------------
+   ADMIN ACTIONS
+-------------------------------- */
+function approveDapp(id){
+  updateDappStatus(id, "approved");
+}
+
+function rejectDapp(id){
+  updateDappStatus(id, "rejected");
+}
+
+function updateDappStatus(id,status){
+  let list = getDappRequests();
+
+  list = list.map(r=>{
+    if(r.id === id){
+      r.status = status;
+      if(status === "approved"){
+        r.telegramUnlocked = true;
+        r.approvedAt = Date.now();
+      }
+      if(status === "rejected"){
+        r.rejectedAt = Date.now();
+      }
+    }
+    return r;
+  });
+
+  localStorage.setItem(DAPP_KEY, JSON.stringify(list));
 }
 
 /* -------------------------------
@@ -77,20 +128,9 @@ function submitDappRequest(){
 -------------------------------- */
 window.addEventListener("DOMContentLoaded", ()=>{
   if(submissionClosed()){
-    document.getElementById("submitBtn").classList.add("disabled");
-    document.getElementById("limitNotice").style.display = "block";
+    const btn = document.getElementById("submitBtn");
+    if(btn) btn.classList.add("disabled");
+    const notice = document.getElementById("limitNotice");
+    if(notice) notice.style.display = "block";
   }
 });
-
-{
-  id: "DAPP-1700000000",
-  projectName: "",
-  serviceType: "pi_studio" | "developer",
-  ownerName: "",
-  email: "",
-  paymentReceipt: "",
-  status: "pending",        // pending | approved | rejected
-  telegramUnlocked: false,  // admin only
-  adminNote: "",
-  createdAt: Date.now()
-     }
