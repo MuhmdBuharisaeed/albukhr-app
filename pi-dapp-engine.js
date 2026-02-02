@@ -81,3 +81,16 @@ window.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("limitNotice").style.display = "block";
   }
 });
+
+{
+  id: "DAPP-1700000000",
+  projectName: "",
+  serviceType: "pi_studio" | "developer",
+  ownerName: "",
+  email: "",
+  paymentReceipt: "",
+  status: "pending",        // pending | approved | rejected
+  telegramUnlocked: false,  // admin only
+  adminNote: "",
+  createdAt: Date.now()
+     }
