@@ -73,3 +73,20 @@ localStorage.setItem(
   "albukhr_my_dapp_request",
   JSON.stringify(data)
 );
+
+const DAPP_PRICING = {
+  studio: { price: 250, label: "Pi Studio Assistance" },
+  developer: { min: 500, max: 1000, label: "Developer Built dApp" }
+};
+
+function getDappPrice(type){
+  return DAPP_PRICING[type] || null;
+}
+
+function formatDappPrice(type){
+  const p = getDappPrice(type);
+  if(!p) return "";
+  return p.price
+    ? `${p.price} Pi`
+    : `${p.min} – ${p.max} Pi`;
+}
