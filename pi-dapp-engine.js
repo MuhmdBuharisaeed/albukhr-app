@@ -2,21 +2,33 @@
    ALBUKHR – PI DAPP SERVICE ENGINE
 ================================ */
 
-const KEY = "albukhr_pi_dapp_requests";
-const LIMIT = 10;
+const DAPP_KEY = "albukhr_pi_dapp_requests";
+const DAPP_LIMIT = 10;
+
+/* SERVICE PRICING */
+const PRICING = {
+  pi_studio: {
+    label: "Pi Studio Assistance",
+    fee: "Flexible",
+  },
+  developer: {
+    label: "Developer-built dApp",
+    fee: "Premium",
+  }
+};
 
 /* -------------------------------
    GET ALL REQUESTS
 -------------------------------- */
-function getAllRequests(){
-  return JSON.parse(localStorage.getItem(KEY)) || [];
+function getDappRequests(){
+  return JSON.parse(localStorage.getItem(DAPP_KEY)) || [];
 }
 
 /* -------------------------------
    CHECK LIMIT
 -------------------------------- */
-function isLimitReached(){
-  return getAllRequests().filter(r=>r.status==="pending").length >= LIMIT;
+function submissionClosed(){
+  return getDappRequests().length >= DAPP_LIMIT;
 }
 
 /* -------------------------------
@@ -24,14 +36,13 @@ function isLimitReached(){
 -------------------------------- */
 function submitDappRequest(){
 
-  if(isLimitReached()){
+  if(submissionClosed()){
     document.getElementById("limitNotice").style.display = "block";
-    document.getElementById("submitBtn").classList.add("disabled");
     return;
   }
 
   const data = {
-    id: "DAPP-"+Date.now(),
+    requestId: "DAPP-" + Date.now(),
     piUser: piUser.value.trim(),
     projectName: projectName.value.trim(),
     serviceType: serviceType.value,
@@ -41,52 +52,32 @@ function submitDappRequest(){
     createdAt: Date.now()
   };
 
-  if(!data.piUser || !data.projectName || !data.serviceType ||
-     !data.description || !data.receipt || !agree.checked){
+  if(
+    !data.piUser ||
+    !data.projectName ||
+    !data.serviceType ||
+    !data.description ||
+    !data.receipt ||
+    !agree.checked
+  ){
     alert("Please complete all required fields");
     return;
   }
 
-  const list = getAllRequests();
+  const list = getDappRequests();
   list.push(data);
-  localStorage.setItem(KEY, JSON.stringify(list));
+  localStorage.setItem(DAPP_KEY, JSON.stringify(list));
 
-  alert("Request submitted for admin review");
+  alert("✅ Your request has been submitted for review");
   window.location.href = "services.html";
 }
 
 /* -------------------------------
-   INIT
+   UI LOCK IF FULL
 -------------------------------- */
-if(isLimitReached()){
-  document.getElementById("submitBtn").classList.add("disabled");
-  document.getElementById("limitNotice").style.display = "block";
-}
-
-function getMyRequest(){
-  return JSON.parse(
-    localStorage.getItem("albukhr_my_dapp_request")
-  );
-}
-
-localStorage.setItem(
-  "albukhr_my_dapp_request",
-  JSON.stringify(data)
-);
-
-const DAPP_PRICING = {
-  studio: { price: 250, label: "Pi Studio Assistance" },
-  developer: { min: 500, max: 1000, label: "Developer Built dApp" }
-};
-
-function getDappPrice(type){
-  return DAPP_PRICING[type] || null;
-}
-
-function formatDappPrice(type){
-  const p = getDappPrice(type);
-  if(!p) return "";
-  return p.price
-    ? `${p.price} Pi`
-    : `${p.min} – ${p.max} Pi`;
-}
+window.addEventListener("DOMContentLoaded", ()=>{
+  if(submissionClosed()){
+    document.getElementById("submitBtn").classList.add("disabled");
+    document.getElementById("limitNotice").style.display = "block";
+  }
+});
