@@ -55,18 +55,43 @@ function render(){
   ${r.description || "—"}
 </div>
 
-<br>
+<td>
 
-        <button class="approve" onclick="setStatus(${i},'approved')">
-          Approve
-        </button>
-        <button class="reject" onclick="setStatus(${i},'rejected')">
-          Reject
-        </button>
-      </div>
-    `;
-  });
-}
+  ${
+    r.status === "pending"
+    ? `
+      <button class="btn approve"
+        onclick="approveRequest('${r.id}')">
+        Approve
+      </button>
+
+      <button class="btn reject"
+        onclick="rejectRequest('${r.id}')">
+        Reject
+      </button>
+    `
+    : r.status === "approved"
+    ? `
+      <button class="btn approved disabled">
+        ✓ Approved
+      </button>
+
+      <button class="btn disabled">
+        Reject
+      </button>
+    `
+    : `
+      <button class="btn disabled">
+        Approve
+      </button>
+
+      <button class="btn rejected disabled">
+        ✗ Rejected
+      </button>
+    `
+  }
+
+</td>
 
 function setStatus(i,status){
   list[i].status = status;
