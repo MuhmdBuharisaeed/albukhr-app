@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin – dApp Requests</title>
+<title>ALBUKHR Admin – dApp Requests</title>
 <link rel="stylesheet" href="style.css">
 
 <style>
@@ -18,29 +18,50 @@ button{
   border:none;
   border-radius:8px;
   font-weight:600;
-  cursor:pointer
+  cursor:pointer;
+  margin-right:6px;
+  font-size:12px;
 }
-.btn.approved {
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#eee;color:#333}
+
+.btn.approved{
   background:#0f7a3d;
   color:#fff;
   cursor:default;
 }
-
-.btn.rejected {
+.btn.rejected{
   background:#b02a37;
   color:#fff;
   cursor:default;
 }
-
-.btn.disabled {
+.btn.disabled{
   opacity:.6;
   pointer-events:none;
 }
-.approve{background:#0f7a3d;color:#fff}
-.reject{background:#eee}
+.meta{
+  font-size:12px;
+  color:#555;
+  margin-top:6px;
+}
+.desc{
+  margin-top:8px;
+  font-size:12px;
+  color:#333;
+  line-height:1.6;
+  background:#f7f9f8;
+  padding:8px;
+  border-radius:8px;
+}
+.empty{
+  font-size:13px;
+  color:#777;
+  text-align:center;
+  padding:20px;
+}
 </style>
 </head>
-  
+
 <body>
 
 <header class="header">
@@ -48,73 +69,88 @@ button{
 </header>
 
 <section class="section">
-<h3>🛠 dApp Requests Review</h3>
-<div id="adminList"></div>
+  <h3>🛠 dApp Requests Review</h3>
+  <div id="adminList"></div>
 </section>
 
 <script>
 const listBox = document.getElementById("adminList");
-let list =
-  JSON.parse(localStorage.getItem("albukhr_dapp_requests")) || [];
+let list = JSON.parse(
+  localStorage.getItem("albukhr_dapp_requests")
+) || [];
 
 function render(){
   listBox.innerHTML = "";
+
+  if(list.length === 0){
+    listBox.innerHTML =
+      `<div class="empty">No dApp requests yet</div>`;
+    return;
+  }
+
   list.forEach((r,i)=>{
     listBox.innerHTML += `
       <div class="card">
-        <strong>${r.projectName}</strong><br>
-<small>👤 ${r.piUser}</small><br>
-<small>🛠 ${r.serviceType}</small>
+        <strong>${r.projectName}</strong>
 
-<div style="margin-top:8px;font-size:12px;color:#444">
-  <strong>Description:</strong><br>
-  ${r.description || "—"}
-</div>
+        <div class="meta">
+          👤 ${r.piUser} <br>
+          🛠 ${r.serviceType}
+        </div>
 
-<td>
+        <div class="desc">
+          <strong>Description:</strong><br>
+          ${r.description || "—"}
+        </div>
 
-  ${
-    r.status === "pending"
-    ? `
-      <button class="btn approve"
-        onclick="approveRequest('${r.id}')">
-        Approve
-      </button>
+        <div style="margin-top:10px">
+          ${
+            r.status === "pending"
+            ? `
+              <button class="approve"
+                onclick="setStatus(${i}, 'approved')">
+                Approve
+              </button>
+              <button class="reject"
+                onclick="setStatus(${i}, 'rejected')">
+                Reject
+              </button>
+            `
+            : r.status === "approved"
+            ? `
+              <button class="btn approved disabled">
+                ✓ Approved
+              </button>
+              <button class="btn disabled">
+                Reject
+              </button>
+            `
+            : `
+              <button class="btn disabled">
+                Approve
+              </button>
+              <button class="btn rejected disabled">
+                ✗ Rejected
+              </button>
+            `
+          }
+        </div>
+      </div>
+    `;
+  });
+}
 
-      <button class="btn reject"
-        onclick="rejectRequest('${r.id}')">
-        Reject
-      </button>
-    `
-    : r.status === "approved"
-    ? `
-      <button class="btn approved disabled">
-        ✓ Approved
-      </button>
+function setStatus(index,status){
+  if(list[index].status !== "pending") return;
 
-      <button class="btn disabled">
-        Reject
-      </button>
-    `
-    : `
-      <button class="btn disabled">
-        Approve
-      </button>
+  list[index].status = status;
+  list[index].reviewedAt = Date.now();
 
-      <button class="btn rejected disabled">
-        ✗ Rejected
-      </button>
-    `
-  }
-
-</td>
-
-function setStatus(i,status){
-  list[i].status = status;
   localStorage.setItem(
     "albukhr_dapp_requests",
     JSON.stringify(list)
   );
+
   render();
 }
 
