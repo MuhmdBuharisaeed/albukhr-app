@@ -4,160 +4,87 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My dApp Requests | ALBUKHR</title>
-
 <link rel="stylesheet" href="style.css">
 
 <style>
 .section{padding:16px}
 .card{
   background:#fff;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:14px
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px
 }
-.badge{
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:12px;
+.status{
   font-size:12px;
-  font-weight:600
+  font-weight:700;
+  margin-top:6px
 }
-.pending{background:#fff3cd;color:#856404}
-.approved{background:#e6f4ea;color:#0f7a3d}
-.rejected{background:#fdecea;color:#b02a37}
-.small{font-size:12px;color:#666}
-.telegram-box{
-  margin-top:10px;
+.pending{color:#856404}
+.approved{color:#0f7a3d}
+.rejected{color:#b02a37}
+.notice{
+  font-size:12px;
   background:#f6fbf8;
   border-left:4px solid #0f7a3d;
   padding:10px;
-  font-size:13px
+  margin-top:10px
 }
-.telegram-box a{
+a.btn{
   display:inline-block;
-  margin-top:6px;
-  color:#0f7a3d;
-  font-weight:700;
-  text-decoration:none
-}
-.empty{
-  text-align:center;
-  color:#777;
+  margin-top:10px;
+  padding:10px 14px;
+  background:#0f7a3d;
+  color:#fff;
+  border-radius:10px;
   font-size:13px;
-  padding:20px
+  text-decoration:none
 }
 </style>
 </head>
 
-<body data-page="my-dapp">
+<body>
 
 <header class="header">
   <h1 class="brand">ALBUKHR</h1>
 </header>
 
 <section class="section">
-  <h3>📱 My dApp Requests</h3>
-  <p class="small">
-    Track the status of your Pi dApp launch requests.
-  </p>
-
-  <div id="requestList"></div>
+  <h3>📂 My dApp Requests</h3>
+  <div id="list"></div>
 </section>
 
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <a href="index.html"><span>🏠</span>Home</a>
-  <a href="services.html"><span>🛠️</span>Services</a>
-  <a href="my-dapp-requests.html" class="active"><span>📱</span>My dApps</a>
-  <a href="settings.html"><span>⚙️</span>Settings</a>
-</nav>
-
 <script>
-/* ===============================
-   CONFIG (ADMIN CONTROLLED)
-================================ */
-const TELEGRAM_CHANNEL_LINK =
-  "https://t.me/ALBUKHR_DAPP_CHANNEL"; 
-// ⚠️ Can be changed later or moved to admin config
+const box = document.getElementById("list");
+const data =
+  JSON.parse(localStorage.getItem("albukhr_dapp_requests")) || [];
 
-const STORAGE_KEY = "albukhr_dapp_requests";
+if(data.length === 0){
+  box.innerHTML = "<p class='muted'>No requests found.</p>";
+}
 
-/* ===============================
-   LOAD USER REQUESTS
-================================ */
-function loadMyRequests(){
-  const box = document.getElementById("requestList");
-  const list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+data.reverse().forEach(r=>{
+  let statusClass = r.status;
+  let telegram = "";
 
-  box.innerHTML = "";
-
-  if(list.length === 0){
-    box.innerHTML =
-      `<div class="empty">No dApp requests found</div>`;
-    return;
+  if(r.status === "approved"){
+    telegram = `
+      <a class="btn" href="https://t.me/ALBUKHR_DAPP_CHANNEL" target="_blank">
+        Join Private Telegram Channel
+      </a>
+    `;
   }
 
-  list.reverse().forEach(r=>{
-    box.innerHTML += renderRequest(r);
-  });
-}
-
-/* ===============================
-   RENDER CARD
-================================ */
-function renderRequest(r){
-  let badgeClass = "pending";
-  if(r.status === "approved") badgeClass = "approved";
-  if(r.status === "rejected") badgeClass = "rejected";
-
-  return `
+  box.innerHTML += `
     <div class="card">
       <strong>${r.projectName}</strong><br>
-      <span class="small">
-        Service: ${labelService(r.serviceType)}<br>
-        Submitted: ${new Date(r.createdAt).toLocaleDateString()}
-      </span>
-      <div style="margin-top:8px">
-        <span class="badge ${badgeClass}">
-          ${r.status.toUpperCase()}
-        </span>
+      <small>${r.serviceType.replace("_"," ")}</small>
+      <div class="status ${statusClass}">
+        Status: ${r.status.toUpperCase()}
       </div>
-
-      ${r.status === "approved" && r.telegramUnlocked ? `
-        <div class="telegram-box">
-          🎉 Your request has been approved.<br>
-          Join the private Telegram channel to receive
-          your dApp code, guides, and updates.
-          <br>
-          <a href="${TELEGRAM_CHANNEL_LINK}" target="_blank">
-            👉 Join Telegram Channel
-          </a>
-        </div>
-      ` : ``}
-
-      ${r.status === "rejected" ? `
-        <div class="telegram-box" style="border-color:#b02a37">
-          ❌ This request was rejected.
-          ${r.adminNote ? `<br><b>Note:</b> ${r.adminNote}` : ``}
-        </div>
-      ` : ``}
+      ${telegram}
     </div>
   `;
-}
-
-/* ===============================
-   HELPERS
-================================ */
-function labelService(t){
-  if(t === "pi_studio") return "Pi Studio Assistance";
-  if(t === "developer") return "Developer-built dApp";
-  return t;
-}
-
-/* ===============================
-   INIT
-================================ */
-document.addEventListener("DOMContentLoaded", loadMyRequests);
+});
 </script>
 
 </body>
