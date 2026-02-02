@@ -3,42 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Services</title>
+<title>Albukhr Services</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
 .section{padding:16px}
+
 .service-card{
   background:#fff;
   border-radius:16px;
   padding:16px;
   margin-bottom:14px;
   display:flex;
-  align-items:flex-start;
   gap:12px;
   cursor:pointer;
 }
+
 .service-icon{font-size:22px}
+
 .service-title{
   font-weight:700;
   font-size:15px;
 }
+
 .service-desc{
   font-size:13px;
   color:#666;
   margin-top:4px;
+  line-height:1.5;
 }
+
 .service-action{
   margin-top:10px;
   font-size:12px;
   color:#0f7a3d;
   font-weight:600;
 }
+
+.badge{
+  display:inline-block;
+  font-size:10px;
+  padding:3px 8px;
+  border-radius:20px;
+  margin-top:6px;
+  font-weight:600;
+}
+
+.badge.public{background:#e6f5ec;color:#0f7a3d}
+.badge.paid{background:#fff3cd;color:#856404}
+.badge.restricted{background:#f8d7da;color:#842029}
+.badge.coming{background:#e7f1ff;color:#084298}
+
 .locked{
   opacity:.55;
   cursor:not-allowed;
 }
+
 .notice{
   font-size:12px;
   color:#777;
@@ -59,61 +80,66 @@
 
 <section class="section">
 
-  <!-- CREATE EXTERNAL PROJECT -->
+  <!-- EXTERNAL PROJECT -->
   <div class="service-card" onclick="goCreateExternal()">
     <div class="service-icon">🚀</div>
     <div>
       <div class="service-title">Create External Project</div>
       <div class="service-desc">
-        Launch your own verified project under Albukhr escrow protection.
-        Funds are locked and released only after milestone verification.
+        Register your independent project under Albukhr escrow protection.
+        Projects are reviewed before approval and public listing.
       </div>
+      <span class="badge public">Community</span>
       <div class="service-action">Start →</div>
     </div>
   </div>
 
-  <!-- INTERNAL PROJECT (RESTRICTED) -->
+  <!-- PI DAPP SERVICE -->
+  <div class="service-card" onclick="goDappService()">
+    <div class="service-icon">📱</div>
+    <div>
+      <div class="service-title">Pi dApp Launch Service</div>
+      <div class="service-desc">
+        Albukhr assists you to launch your own Pi Network dApp
+        via Pi Studio or Albukhr developers. Ownership remains yours.
+      </div>
+      <span class="badge paid">Paid Service</span>
+      <div class="service-action">Apply →</div>
+    </div>
+  </div>
+
+  <!-- INTERNAL PROJECT -->
   <div class="service-card locked">
     <div class="service-icon">🏗️</div>
     <div>
       <div class="service-title">Internal Project Creation</div>
       <div class="service-desc">
         Reserved strictly for Albukhr core team.
-        Access is granted only via private link.
+        Accessible only via authorized admin channels.
       </div>
-      <div class="service-action">Restricted</div>
+      <span class="badge restricted">Restricted</span>
+      <div class="service-action">Not available</div>
     </div>
   </div>
 
-  <!-- AI VERIFICATION (FUTURE) -->
+  <!-- AI VERIFICATION -->
   <div class="service-card locked">
     <div class="service-icon">🤖</div>
     <div>
       <div class="service-title">AI Project Verification</div>
       <div class="service-desc">
-        Automated seriousness, capability, and risk assessment
-        before escrow approval.
+        Automated seriousness, risk, and capability analysis
+        for projects before escrow approval.
       </div>
-      <div class="service-action">Coming soon</div>
+      <span class="badge coming">Coming soon</span>
+      <div class="service-action">Unavailable</div>
     </div>
   </div>
 
-<div class="service-card">
-  <h3>🚀 Build My Pi dApp</h3>
-  <p>
-    We help you create and launch your own Pi Network dApp
-    via Pi Studio or Albukhr Developers.
-  </p>
-
-  <a href="dapp-request.html" class="btn">
-    Apply Now
-  </a>
-</div>  
-  
   <div class="notice">
-    ℹ️ The Services page is a modular gateway for Albukhr ecosystem tools.
-    New services can be added here without affecting existing projects,
-    staking logic, or user balances.
+    ℹ️ Services act as controlled entry points into the Albukhr ecosystem.
+    Each service follows approval rules, limits, and admin oversight
+    to protect users and projects.
   </div>
 
 </section>
@@ -121,34 +147,19 @@
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
-  <a href="projects.html"><span>🔎</span>Projects</a>
+  <a href="projects.html"><span>📁</span>Projects</a>
   <a href="wallet.html"><span>💰</span>Wallet</a>
   <a href="services.html" class="active"><span>🛠️</span>Services</a>
   <a href="settings.html"><span>⚙️</span>Settings</a>
 </nav>
 
 <script>
-/* ===============================
-   EXTERNAL PROJECT ENTRY POINT
-   =============================== */
 function goCreateExternal(){
-
-  // Placeholder check (safe – does not break anything)
-  if(!userHasPiWallet()){
-    alert("Please connect or setup your Pi Network wallet first.");
-    return;
-  }
-
   window.location.href = "external-create.html";
 }
 
-/* ===============================
-   PI WALLET CHECK (STUB)
-   =============================== */
-function userHasPiWallet(){
-  // Later: integrate Pi SDK wallet check
-  // For now, always allow (safe default)
-  return true;
+function goDappService(){
+  window.location.href = "dapp-request.html";
 }
 </script>
 
