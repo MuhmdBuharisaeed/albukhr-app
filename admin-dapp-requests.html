@@ -47,8 +47,15 @@ function render(){
     listBox.innerHTML += `
       <div class="card">
         <strong>${r.projectName}</strong><br>
-        <small>${r.piUser}</small><br>
-        <small>${r.serviceType}</small><br><br>
+<small>👤 ${r.piUser}</small><br>
+<small>🛠 ${r.serviceType}</small>
+
+<div style="margin-top:8px;font-size:12px;color:#444">
+  <strong>Description:</strong><br>
+  ${r.description || "—"}
+</div>
+
+<br>
 
         <button class="approve" onclick="setStatus(${i},'approved')">
           Approve
