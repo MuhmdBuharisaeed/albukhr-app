@@ -82,17 +82,45 @@ Albukhr will assist you to launch your Pi Network dApp under your ownership.
 <!-- PAYMENT -->
 <div class="card">
 
-  <strong>💳 Service Fee</strong>
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <strong>💳 Service Fee</strong>
+    <button type="button" class="mini-btn" onclick="togglePayment()">
+      Show details
+    </button>
+  </div>
+
   <p class="notice">
     • Pi Studio: <b>Flexible service fee</b><br>
-    • Developer-built: <b>Higher professional fee</b><br><br>
-    Pay to:<br>
-    <b>ALBUKHR SERVICE ACCOUNT</b><br>
-    Bank / Wallet details will be shown after selection.
+    • Developer-built: <b>Higher professional fee</b>
   </p>
 
-  <div class="label" style="margin-top:12px">Transaction Receipt (ID or Screenshot)</div>
-  <input class="input" id="receipt" placeholder="Transaction reference">
+  <!-- PAYMENT DETAILS (HIDDEN) -->
+  <div id="paymentBox" style="display:none;margin-top:10px">
+
+    <div class="label">Pi Wallet Address</div>
+    <div class="copy-box">
+      <input class="input" id="piWallet" readonly
+        value="pi1q-albukhr-service-wallet">
+      <button onclick="copyText('piWallet')">Copy</button>
+    </div>
+
+    <div class="label" style="margin-top:10px">Bank Account</div>
+    <div class="copy-box">
+      <input class="input" id="bankAcc" readonly
+        value="ALBUKHR LTD – 0123456789">
+      <button onclick="copyText('bankAcc')">Copy</button>
+    </div>
+
+  </div>
+
+  <div class="label" style="margin-top:12px">
+    Transaction Receipt (ID or Screenshot)
+  </div>
+  <input class="input" id="receiptRef"
+    placeholder="Transaction reference">
+
+  <input type="file" class="input" id="receiptImg"
+    accept="image/*">
 
 </div>
 
@@ -114,6 +142,21 @@ Submit for Review
 
 </section>
 
+<script>
+function togglePayment(){
+  const box = document.getElementById("paymentBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+function copyText(id){
+  const el = document.getElementById(id);
+  el.select();
+  el.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  alert("Copied successfully");
+}
+</script>
+  
 <script src="pi-dapp-engine.js"></script>
 </body>
 </html>
