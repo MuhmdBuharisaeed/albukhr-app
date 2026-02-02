@@ -79,6 +79,65 @@ Albukhr will assist you to launch your Pi Network dApp under your ownership.
 
 </div>
 
+<form id="dappForm">
+
+<input id="projectName" type="text" required>
+
+<input type="radio" name="serviceType" value="pi_studio" required>
+<input type="radio" name="serviceType" value="developer">
+
+<input id="ownerName" type="text" required>
+
+<input id="email" type="email">
+
+<input id="receipt" type="text" required>
+
+<button type="submit">
+  Submit for Review
+</button>
+
+</form>
+  
+<script>
+const STORAGE_KEY = "albukhr_dapp_requests";
+
+document.getElementById("dappForm")
+  .addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const projectName = document.getElementById("projectName").value.trim();
+    const serviceType = document.querySelector("input[name='serviceType']:checked")?.value;
+    const ownerName   = document.getElementById("ownerName").value.trim();
+    const email       = document.getElementById("email").value.trim();
+    const receipt     = document.getElementById("receipt").value.trim();
+
+    if(!projectName || !serviceType || !ownerName || !receipt){
+      alert("Please complete all required fields");
+      return;
+    }
+
+    const newRequest = {
+      id: "DAPP-" + Date.now(),
+      projectName,
+      serviceType,
+      ownerName,
+      email,
+      paymentReceipt: receipt,
+      status: "pending",
+      telegramUnlocked: false,
+      adminNote: "",
+      createdAt: Date.now()
+    };
+
+    const list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    list.push(newRequest);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+
+    // ✅ REDIRECT DIRECTLY
+    window.location.href = "my-dapp-requests.html";
+});
+</script>
+  
 <!-- PAYMENT -->
 <div class="card">
 
