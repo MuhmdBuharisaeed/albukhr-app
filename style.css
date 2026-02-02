@@ -370,3 +370,27 @@ body{
 .project-card.internal{
   border-left:4px solid #0f7a3d;
 }
+
+.mini-btn{
+  font-size:11px;
+  padding:6px 10px;
+  border-radius:10px;
+  border:1px solid #0f7a3d;
+  background:#fff;
+  color:#0f7a3d;
+  font-weight:600;
+}
+
+.copy-box{
+  display:flex;
+  gap:6px;
+}
+
+.copy-box button{
+  padding:0 12px;
+  border:none;
+  border-radius:8px;
+  background:#0f7a3d;
+  color:#fff;
+  font-size:12px;
+}
