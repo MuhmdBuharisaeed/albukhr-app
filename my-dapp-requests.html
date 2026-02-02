@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My dApp Requests | ALBUKHR</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px
+}
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:600
+}
+.pending{background:#fff3cd;color:#856404}
+.approved{background:#e6f4ea;color:#0f7a3d}
+.rejected{background:#fdecea;color:#b02a37}
+.small{font-size:12px;color:#666}
+.telegram-box{
+  margin-top:10px;
+  background:#f6fbf8;
+  border-left:4px solid #0f7a3d;
+  padding:10px;
+  font-size:13px
+}
+.telegram-box a{
+  display:inline-block;
+  margin-top:6px;
+  color:#0f7a3d;
+  font-weight:700;
+  text-decoration:none
+}
+.empty{
+  text-align:center;
+  color:#777;
+  font-size:13px;
+  padding:20px
+}
+</style>
+</head>
+
+<body data-page="my-dapp">
+
+<header class="header">
+  <h1 class="brand">ALBUKHR</h1>
+</header>
+
+<section class="section">
+  <h3>📱 My dApp Requests</h3>
+  <p class="small">
+    Track the status of your Pi dApp launch requests.
+  </p>
+
+  <div id="requestList"></div>
+</section>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="index.html"><span>🏠</span>Home</a>
+  <a href="services.html"><span>🛠️</span>Services</a>
+  <a href="my-dapp-requests.html" class="active"><span>📱</span>My dApps</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</nav>
+
+<script>
+/* ===============================
+   CONFIG (ADMIN CONTROLLED)
+================================ */
+const TELEGRAM_CHANNEL_LINK =
+  "https://t.me/ALBUKHR_DAPP_CHANNEL"; 
+// ⚠️ Can be changed later or moved to admin config
+
+const STORAGE_KEY = "albukhr_dapp_requests";
+
+/* ===============================
+   LOAD USER REQUESTS
+================================ */
+function loadMyRequests(){
+  const box = document.getElementById("requestList");
+  const list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+  box.innerHTML = "";
+
+  if(list.length === 0){
+    box.innerHTML =
+      `<div class="empty">No dApp requests found</div>`;
+    return;
+  }
+
+  list.reverse().forEach(r=>{
+    box.innerHTML += renderRequest(r);
+  });
+}
+
+/* ===============================
+   RENDER CARD
+================================ */
+function renderRequest(r){
+  let badgeClass = "pending";
+  if(r.status === "approved") badgeClass = "approved";
+  if(r.status === "rejected") badgeClass = "rejected";
+
+  return `
+    <div class="card">
+      <strong>${r.projectName}</strong><br>
+      <span class="small">
+        Service: ${labelService(r.serviceType)}<br>
+        Submitted: ${new Date(r.createdAt).toLocaleDateString()}
+      </span>
+      <div style="margin-top:8px">
+        <span class="badge ${badgeClass}">
+          ${r.status.toUpperCase()}
+        </span>
+      </div>
+
+      ${r.status === "approved" && r.telegramUnlocked ? `
+        <div class="telegram-box">
+          🎉 Your request has been approved.<br>
+          Join the private Telegram channel to receive
+          your dApp code, guides, and updates.
+          <br>
+          <a href="${TELEGRAM_CHANNEL_LINK}" target="_blank">
+            👉 Join Telegram Channel
+          </a>
+        </div>
+      ` : ``}
+
+      ${r.status === "rejected" ? `
+        <div class="telegram-box" style="border-color:#b02a37">
+          ❌ This request was rejected.
+          ${r.adminNote ? `<br><b>Note:</b> ${r.adminNote}` : ``}
+        </div>
+      ` : ``}
+    </div>
+  `;
+}
+
+/* ===============================
+   HELPERS
+================================ */
+function labelService(t){
+  if(t === "pi_studio") return "Pi Studio Assistance";
+  if(t === "developer") return "Developer-built dApp";
+  return t;
+}
+
+/* ===============================
+   INIT
+================================ */
+document.addEventListener("DOMContentLoaded", loadMyRequests);
+</script>
+
+</body>
+</html>
