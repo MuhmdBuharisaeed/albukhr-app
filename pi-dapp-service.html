@@ -192,5 +192,27 @@ function submitDappRequest(){
 }
 </script>
 
+<script>
+(function blockIfPending(){
+
+  const list =
+    JSON.parse(localStorage.getItem("albukhr_dapp_requests")) || [];
+
+  // duba ko akwai pending
+  const pending = list.find(r => r.status === "pending");
+
+  if(pending){
+    alert(
+      "You already have a pending request.\n" +
+      "Please wait for admin approval or rejection."
+    );
+
+    // kai shi kai tsaye My Requests
+    window.location.href = "my-dapp-requests.html";
+  }
+
+})();
+</script>
+  
 </body>
     </html>
