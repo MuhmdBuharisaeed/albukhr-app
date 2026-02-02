@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Build My Pi dApp | Albukhr</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+  <span>🚀 Build My Pi dApp</span>
+</header>
+
+<section class="section">
+
+  <!-- BASIC INFO -->
+  <div class="card">
+    <label>Pi Username</label>
+    <input class="input" id="piUser" placeholder="@username">
+
+    <label style="margin-top:10px">Project Name</label>
+    <input class="input" id="projectName" placeholder="My Pi App">
+  </div>
+
+  <!-- SERVICE TYPE -->
+  <div class="card">
+    <label>Service Type</label>
+    <select class="input" id="serviceType">
+      <option value="">Select service</option>
+      <option value="studio">Pi Studio Assistance</option>
+      <option value="developer">Developer Built dApp</option>
+    </select>
+
+    <p class="note" id="priceInfo">
+      Select a service to see pricing
+    </p>
+  </div>
+
+  <!-- AGREEMENT -->
+  <div class="card">
+    <label>
+      <input type="checkbox" id="agree">
+      I agree that Albukhr will assist me in creating my Pi dApp
+    </label>
+  </div>
+
+  <button class="btn" onclick="submitDappRequest()">
+    Submit Request
+  </button>
+
+</section>
+
+<script src="pi-dapp-pricing.js"></script>
+<script src="dapp-request.js"></script>
+
+</body>
+</html>
