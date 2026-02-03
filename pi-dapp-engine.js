@@ -38,18 +38,11 @@ function submitDappRequest(){
     return;
   }
 
-  const piUserVal = piUser.value.trim();
+  const fileInput = document.getElementById("receiptImg");
+  const file = fileInput.files[0];
 
-  if(userHasPending(piUserVal)){
-    alert("⏳ You already have a pending request. Please wait for admin review.");
-    window.location.href = "my-dapp-requests.html";
-    return;
-  }
-
-  const receiptImgFile = document.getElementById("receiptImg").files[0];
-
-  if(!receiptImgFile){
-    alert("Please upload payment receipt image");
+  if(!file){
+    alert("Please upload payment receipt screenshot");
     return;
   }
 
@@ -58,14 +51,14 @@ function submitDappRequest(){
   reader.onload = function(){
     const data = {
       id: "DAPP-" + Date.now(),
-      piUser: piUserVal,
+      piUser: piUser.value.trim(),
       projectName: projectName.value.trim(),
       serviceType: serviceType.value,
       description: description.value.trim(),
       receiptRef: receiptRef.value.trim(),
-      receiptImg: reader.result, // Base64
+      receiptImg: reader.result,   // ✅ BASE64 IMAGE
       status: "pending",
-      telegramUnlocked: false,
+      notifyUser: false,
       createdAt: Date.now()
     };
 
@@ -85,11 +78,13 @@ function submitDappRequest(){
     list.push(data);
     localStorage.setItem(DAPP_KEY, JSON.stringify(list));
 
-    alert("✅ Request submitted successfully");
+    // LOCK USER FROM RESUBMIT
+    localStorage.setItem("albukhr_dapp_active", "true");
+
     window.location.href = "my-dapp-requests.html";
   };
 
-  reader.readAsDataURL(receiptImgFile);
+  reader.readAsDataURL(file);
 }
 
 /* -------------------------------
