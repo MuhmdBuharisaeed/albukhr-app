@@ -1,36 +1,41 @@
-/* ===============================
-   ALBUKHR – PI DAPP SERVICE ENGINE
-================================ */
+/* =====================================
+   ALBUKHR – PI dApp SERVICE ENGINE
+   Authoritative Version
+===================================== */
 
-const DAPP_KEY = "albukhr_pi_dapp_requests";
+const DAPP_KEY = "albukhr_dapp_requests";
 const DAPP_LIMIT = 10;
 
-/* -------------------------------
-   GET ALL REQUESTS
--------------------------------- */
+/* -------------------------------------
+   HELPERS
+------------------------------------- */
 function getDappRequests(){
   return JSON.parse(localStorage.getItem(DAPP_KEY)) || [];
 }
 
-/* -------------------------------
-   CHECK GLOBAL LIMIT
--------------------------------- */
-function submissionClosed(){
-  return getDappRequests().length >= DAPP_LIMIT;
+function saveDappRequests(list){
+  localStorage.setItem(DAPP_KEY, JSON.stringify(list));
 }
 
-/* -------------------------------
-   CHECK USER PENDING
--------------------------------- */
+/* -------------------------------------
+   CHECK IF USER HAS PENDING REQUEST
+------------------------------------- */
 function userHasPending(piUser){
   return getDappRequests().some(
     r => r.piUser === piUser && r.status === "pending"
   );
 }
 
-/* -------------------------------
-   SUBMIT REQUEST
--------------------------------- */
+/* -------------------------------------
+   SUBMISSION LIMIT
+------------------------------------- */
+function submissionClosed(){
+  return getDappRequests().length >= DAPP_LIMIT;
+}
+
+/* -------------------------------------
+   MAIN SUBMIT FUNCTION
+------------------------------------- */
 function submitDappRequest(){
 
   if(submissionClosed()){
@@ -38,94 +43,106 @@ function submitDappRequest(){
     return;
   }
 
-  const fileInput = document.getElementById("receiptImg");
-  const file = fileInput.files[0];
+  const piUser = document.getElementById("piUser").value.trim();
+  const projectName = document.getElementById("projectName").value.trim();
+  const serviceType = document.getElementById("serviceType").value;
+  const description = document.getElementById("description").value.trim();
+  const receiptRef = document.getElementById("receiptRef").value.trim();
+  const receiptImgInput = document.getElementById("receiptImg");
+  const agree = document.getElementById("agree").checked;
 
-  if(!file){
-    alert("Please upload payment receipt screenshot");
+  if(
+    !piUser ||
+    !projectName ||
+    !serviceType ||
+    !description ||
+    !receiptRef ||
+    !agree
+  ){
+    alert("Please complete all required fields");
+    return;
+  }
+
+  if(userHasPending(piUser)){
+    alert(
+      "⏳ You already have a pending request.\n" +
+      "Please wait for admin approval or rejection."
+    );
+    window.location.href = "my-dapp-requests.html";
+    return;
+  }
+
+  /* ---------------------------------
+     HANDLE RECEIPT IMAGE
+  --------------------------------- */
+  if(!receiptImgInput.files.length){
+    alert("Please upload payment receipt image");
     return;
   }
 
   const reader = new FileReader();
 
   reader.onload = function(){
-    const data = {
+    const receiptImage = reader.result;
+
+    const request = {
       id: "DAPP-" + Date.now(),
-      piUser: piUser.value.trim(),
-      projectName: projectName.value.trim(),
-      serviceType: serviceType.value,
-      description: description.value.trim(),
-      receiptRef: receiptRef.value.trim(),
-      receiptImg: reader.result,   // ✅ BASE64 IMAGE
+      piUser,
+      projectName,
+      serviceType,
+      description,
+      receiptRef,
+      receiptImage,
       status: "pending",
-      notifyUser: false,
+      adminNote: "",
+      telegramUnlocked: false,
       createdAt: Date.now()
     };
 
-    if(
-      !data.piUser ||
-      !data.projectName ||
-      !data.serviceType ||
-      !data.description ||
-      !data.receiptRef ||
-      !agree.checked
-    ){
-      alert("Please complete all required fields");
-      return;
-    }
-
     const list = getDappRequests();
-    list.push(data);
-    localStorage.setItem(DAPP_KEY, JSON.stringify(list));
+    list.push(request);
+    saveDappRequests(list);
 
-    // LOCK USER FROM RESUBMIT
-    localStorage.setItem("albukhr_dapp_active", "true");
+    alert("✅ Your dApp request has been submitted for review");
 
+    /* redirect user to status page */
     window.location.href = "my-dapp-requests.html";
   };
 
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(receiptImgInput.files[0]);
 }
 
-/* -------------------------------
-   ADMIN ACTIONS
--------------------------------- */
-function approveDapp(id){
-  updateDappStatus(id, "approved");
-}
+/* -------------------------------------
+   UI LOCK IF USER HAS PENDING
+------------------------------------- */
+window.addEventListener("DOMContentLoaded", ()=>{
 
-function rejectDapp(id){
-  updateDappStatus(id, "rejected");
-}
+  const piUserInput = document.getElementById("piUser");
+  const submitBtn = document.getElementById("submitBtn");
 
-function updateDappStatus(id,status){
-  let list = getDappRequests();
+  if(!piUserInput || !submitBtn) return;
 
-  list = list.map(r=>{
-    if(r.id === id){
-      r.status = status;
-      if(status === "approved"){
-        r.telegramUnlocked = true;
-        r.approvedAt = Date.now();
-      }
-      if(status === "rejected"){
-        r.rejectedAt = Date.now();
-      }
+  piUserInput.addEventListener("blur", ()=>{
+    const user = piUserInput.value.trim();
+    if(!user) return;
+
+    if(userHasPending(user)){
+      submitBtn.classList.add("disabled");
+      submitBtn.innerText = "Pending Review";
+      submitBtn.disabled = true;
+
+      alert(
+        "⏳ You already have a pending dApp request.\n" +
+        "Please wait for admin decision."
+      );
+
+      window.location.href = "my-dapp-requests.html";
     }
-    return r;
   });
 
-  localStorage.setItem(DAPP_KEY, JSON.stringify(list));
-}
-
-/* -------------------------------
-   UI LOCK IF FULL
--------------------------------- */
-window.addEventListener("DOMContentLoaded", ()=>{
   if(submissionClosed()){
-    const btn = document.getElementById("submitBtn");
-    if(btn) btn.classList.add("disabled");
-    const notice = document.getElementById("limitNotice");
-    if(notice) notice.style.display = "block";
+    submitBtn.classList.add("disabled");
+    submitBtn.disabled = true;
+    document.getElementById("limitNotice").style.display = "block";
   }
 });
