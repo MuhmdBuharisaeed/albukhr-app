@@ -85,6 +85,18 @@ data.reverse().forEach(r=>{
     </div>
   `;
 });
+
+function showNotify(type, msg){
+  const n = document.createElement("div");
+  n.className = "notify " + type;
+  n.innerText = msg;
+  document.body.appendChild(n);
+
+  setTimeout(()=>{
+    n.remove();
+  }, 4500);
+  }
+  
 </script>
 
 </body>
