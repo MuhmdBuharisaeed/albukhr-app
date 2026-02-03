@@ -149,6 +149,28 @@ function render(){
   });
 }
 
+<div style="margin-top:10px;font-size:12px">
+  <strong>💳 Payment Receipt:</strong><br>
+
+  ${
+    r.receiptImg
+    ? `
+      <img src="${r.receiptImg}"
+        style="
+          max-width:100%;
+          border-radius:8px;
+          margin-top:6px;
+          border:1px solid #ddd
+        "
+      >
+      <div style="margin-top:4px;color:#666">
+        Ref: ${r.receiptRef || "—"}
+      </div>
+    `
+    : `<em>No receipt uploaded</em>`
+  }
+</div>
+  
 function setStatus(index,status){
   if(list[index].status !== "pending") return;
 
