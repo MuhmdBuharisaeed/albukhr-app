@@ -106,18 +106,18 @@ function render(){
         </div>
 
         <div class="receipt-box">
-          <strong>💳 Payment Receipt</strong><br>
-          ${
-            r.receiptImg
-            ? `
-              <img src="${r.receiptImg}">
-              <div style="color:#666;margin-top:4px">
-                Ref: ${r.receiptRef || "—"}
-              </div>
-            `
-            : `<em>No receipt uploaded</em>`
-          }
-        </div>
+  <strong>💳 Payment Receipt</strong><br>
+  ${
+    r.receiptImage
+    ? `
+      <img src="${r.receiptImage}">
+      <div style="color:#666;margin-top:4px">
+        Ref: ${r.receiptRef || "—"}
+      </div>
+    `
+    : `<em>No receipt uploaded</em>`
+  }
+</div>
 
         <div style="margin-top:12px">
           ${
