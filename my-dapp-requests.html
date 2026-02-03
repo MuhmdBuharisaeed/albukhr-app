@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My dApp Requests | ALBUKHR</title>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
@@ -12,16 +13,31 @@
   background:#fff;
   border-radius:14px;
   padding:14px;
-  margin-bottom:12px
+  margin-bottom:14px
+}
+.meta{
+  font-size:12px;
+  color:#555;
+  margin-top:4px
 }
 .status{
   font-size:12px;
   font-weight:700;
-  margin-top:6px
+  margin-top:8px
 }
 .pending{color:#856404}
 .approved{color:#0f7a3d}
 .rejected{color:#b02a37}
+
+.desc{
+  margin-top:10px;
+  font-size:12px;
+  line-height:1.6;
+  background:#f7f9f8;
+  padding:8px;
+  border-radius:8px
+}
+
 .notice{
   font-size:12px;
   background:#f6fbf8;
@@ -29,7 +45,8 @@
   padding:10px;
   margin-top:10px
 }
-a.btn{
+
+.btn{
   display:inline-block;
   margin-top:10px;
   padding:10px 14px;
@@ -38,6 +55,20 @@ a.btn{
   border-radius:10px;
   font-size:13px;
   text-decoration:none
+}
+
+.receipt img{
+  max-width:100%;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ddd
+}
+
+.empty{
+  text-align:center;
+  color:#777;
+  font-size:13px;
+  padding:30px
 }
 </style>
 </head>
@@ -55,48 +86,84 @@ a.btn{
 
 <script>
 const box = document.getElementById("list");
-const data =
-  JSON.parse(localStorage.getItem("albukhr_dapp_requests")) || [];
+let data = JSON.parse(
+  localStorage.getItem("albukhr_dapp_requests")
+) || [];
 
 if(data.length === 0){
-  box.innerHTML = "<p class='muted'>No requests found.</p>";
+  box.innerHTML =
+    `<div class="empty">
+      You have not submitted any dApp request yet.
+    </div>`;
 }
 
-data.reverse().forEach(r=>{
-  let statusClass = r.status;
+/* newest first */
+data.slice().reverse().forEach(r=>{
+  let statusClass = r.status || "pending";
   let telegram = "";
+  let adminNote = "";
 
   if(r.status === "approved"){
     telegram = `
-      <a class="btn" href="https://t.me/ALBUKHR_DAPP_CHANNEL" target="_blank">
-        Join Private Telegram Channel
+      <a class="btn"
+        href="https://t.me/ALBUKHR_DAPP_CHANNEL"
+        target="_blank">
+        🔓 Join Private Telegram Channel
       </a>
+    `;
+  }
+
+  if(r.adminNote){
+    adminNote = `
+      <div class="notice">
+        <strong>📝 Admin Note:</strong><br>
+        ${r.adminNote}
+      </div>
     `;
   }
 
   box.innerHTML += `
     <div class="card">
-      <strong>${r.projectName}</strong><br>
-      <small>${r.serviceType.replace("_"," ")}</small>
-      <div class="status ${statusClass}">
-        Status: ${r.status.toUpperCase()}
+
+      <strong>${r.projectName}</strong>
+      <div class="meta">
+        🛠 ${r.serviceType.replace("_"," ")}<br>
+        👤 ${r.piUser}
       </div>
+
+      <div class="status ${statusClass}">
+        Status: ${statusClass.toUpperCase()}
+      </div>
+
+      <div class="desc">
+        <strong>Description:</strong><br>
+        ${r.description || "—"}
+      </div>
+
+      <div class="receipt">
+        <strong>Payment Receipt:</strong><br>
+        ${
+          r.receiptImage
+          ? `<img src="${r.receiptImage}" alt="Receipt">`
+          : `<em style="font-size:12px;color:#777">
+              No receipt image
+            </em>`
+        }
+        ${
+          r.receiptRef
+          ? `<div style="font-size:12px;color:#666">
+              Ref: ${r.receiptRef}
+            </div>`
+          : ""
+        }
+      </div>
+
+      ${adminNote}
       ${telegram}
+
     </div>
   `;
 });
-
-function showNotify(type, msg){
-  const n = document.createElement("div");
-  n.className = "notify " + type;
-  n.innerText = msg;
-  document.body.appendChild(n);
-
-  setTimeout(()=>{
-    n.remove();
-  }, 4500);
-  }
-  
 </script>
 
 </body>
