@@ -3,30 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pi dApp Launch Service Policy | ALBUKHR</title>
-
+<title>Pi dApp Launch Service – Policy | ALBUKHR</title>
 <link rel="stylesheet" href="style.css">
 
 <style>
 .section{padding:16px}
 .card{
   background:#fff;
-  border-radius:16px;
+  border-radius:14px;
   padding:16px;
   margin-bottom:14px
 }
-h3,h4{margin-top:14px}
-p,li{
-  font-size:14px;
-  line-height:1.7;
+.toggle{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px
+}
+.toggle button{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  background:#eee
+}
+.toggle button.active{
+  background:#0f7a3d;
+  color:#fff
+}
+.policy{
+  font-size:13px;
+  line-height:1.8;
   color:#333
 }
-.notice{
-  font-size:13px;
-  background:#f6fbf8;
-  border-left:4px solid #0f7a3d;
-  padding:12px;
-  margin-top:14px
+.policy h4{
+  margin-top:14px;
+  font-size:14px
 }
 </style>
 </head>
@@ -39,93 +51,107 @@ p,li{
 
 <section class="section">
 
-<h3>📱 Pi dApp Launch Service</h3>
+<h3>📜 Pi dApp Launch Service – Policy & Terms</h3>
 
-<div class="card">
-<p>
-This document outlines the official <b>Policy & Terms of Service</b> for the
-<b>Albukhr Pi dApp Launch Service</b>.
-</p>
+<div class="toggle">
+  <button id="btnEn" class="active" onclick="showLang('en')">English</button>
+  <button id="btnHa" onclick="showLang('ha')">Hausa</button>
 </div>
 
-<div class="card">
-<h4>🎯 Purpose of the Service</h4>
-<p>
-The Pi dApp Launch Service is designed to assist individuals and teams
-who wish to create and launch decentralized applications (dApps)
-within the Pi Network ecosystem but may lack the technical knowledge,
-resources, or guidance to do so independently.
-</p>
+<!-- ENGLISH -->
+<div id="policy-en" class="card policy">
+
+<h4>1. Introduction</h4>
+Albukhr Pi dApp Launch Service is designed to assist individuals and teams
+to create and launch Pi Network decentralized applications (dApps)
+under their own ownership.
+
+<h4>2. Scope of Service</h4>
+Albukhr provides guidance, technical assistance, and optional developer support.
+Albukhr does not own, control, or manage user dApps.
+
+<h4>3. Ownership & Responsibility</h4>
+All dApps created remain the full responsibility and ownership of the user.
+Albukhr bears no liability for misuse, legal violations, or losses.
+
+<h4>4. Payment & Fees</h4>
+Service fees are charged strictly for technical assistance and support.
+Payments are non-refundable once work has commenced.
+
+<h4>5. Approval & Rejection</h4>
+Albukhr reserves the right to approve or reject any request
+without obligation to provide reasons.
+
+<h4>6. Code Delivery & Support</h4>
+Eligible users may receive code snippets, templates, or instructions.
+Users are responsible for implementation unless otherwise agreed.
+
+<h4>7. Termination & Misuse</h4>
+Any attempt to misuse Albukhr services for fraud, scams, or illegal activities
+will result in immediate termination.
+
+<h4>8. Disclaimer</h4>
+Albukhr is not affiliated with Pi Network Core Team.
+This service is independent and community-driven.
+
+<h4>9. Acceptance of Terms</h4>
+By submitting a request, you confirm that you have read,
+understood, and accepted these terms.
 </div>
 
-<div class="card">
-<h4>🧩 What Albukhr Provides</h4>
-<ul>
-  <li>Guidance and assistance in creating a Pi Network dApp</li>
-  <li>Support via Pi Studio or Albukhr Developers</li>
-  <li>Basic technical direction and deployment help</li>
-  <li>Educational guidance on how to manage your own dApp</li>
-</ul>
-</div>
+<!-- HAUSA -->
+<div id="policy-ha" class="card policy" style="display:none">
 
-<div class="card">
-<h4>👤 Ownership & Responsibility</h4>
-<p>
-Albukhr <b>does not own</b> any dApp created through this service.
-All applications are created under the <b>full ownership and responsibility
-of the user</b>.
-</p>
-<p>
-Albukhr acts strictly as a <b>service facilitator</b> and advisor.
-</p>
-</div>
+<h4>1. Gabatarwa</h4>
+Aikin Albukhr Pi dApp Launch Service an kirkireshi ne domin taimaka wa mutane
+su samar da manhajojin Pi Network (dApps) a karkashin ikon su.
 
-<div class="card">
-<h4>💳 Fees & Payments</h4>
-<p>
-Service fees vary depending on the selected option:
-</p>
-<ul>
-  <li><b>Pi Studio Assistance</b>: Lower, flexible service fee</li>
-  <li><b>Developer-built dApp</b>: Higher professional service fee</li>
-</ul>
-<p>
-Payments cover <b>service effort and technical assistance only</b>.
-They do not represent investment, partnership, or equity.
-</p>
-</div>
+<h4>2. Iyakar Aikinmu</h4>
+Albukhr tana bayar da shawara, taimakon fasaha, da jagoranci.
+Ba mallakar Albukhr ba ne app ɗin da aka samar.
 
-<div class="card">
-<h4>🛡️ Review & Approval Process</h4>
-<p>
-All submitted requests are reviewed manually by Albukhr administrators.
-Approval or rejection is based on:
-</p>
-<ul>
-  <li>Clarity of project idea</li>
-  <li>Feasibility within Pi Network guidelines</li>
-  <li>Compliance with Albukhr ecosystem rules</li>
-</ul>
-</div>
+<h4>3. Mallaka da Alhaki</h4>
+Mai app shi ne cikakken mai alhaki da mai mallaka.
+Albukhr ba za ta ɗauki alhakin duk wata matsala ba.
 
-<div class="card">
-<h4>🚫 Limitations & Disclaimer</h4>
-<p>
-Albukhr does not guarantee:
-</p>
-<ul>
-  <li>Success or adoption of the dApp</li>
-  <li>Financial returns or Pi earnings</li>
-  <li>Approval by the Pi Network Core Team</li>
-</ul>
-</div>
+<h4>4. Kudin Aiki</h4>
+Ana karɓar kudi ne domin aikin fasaha kawai.
+Da zarar an fara aiki, ba a mayar da kudi.
 
-<div class="notice">
-<b>By submitting a request</b>, you confirm that you have read,
-understood, and agreed to these terms and policies.
+<h4>5. Amincewa ko ƙin Amincewa</h4>
+Albukhr na da ikon karɓa ko ƙin karɓar kowanne request
+ba tare da bayani ba.
+
+<h4>6. Bayar da Code da Taimako</h4>
+Za a iya bai wa wanda aka amince da shi code ko jagora.
+Aiwan da code alhakin mai app ne.
+
+<h4>7. Hana Amfani da Aiki ba daidai ba</h4>
+Duk wanda aka samu yana amfani da aikin wajen damfara
+za a dakatar da shi kai tsaye.
+
+<h4>8. Bayanin Kariyar Kai</h4>
+Albukhr ba ta da alaka da Pi Network Core Team.
+Wannan aiki na al'umma ne.
+
+<h4>9. Amincewa da Ka'idoji</h4>
+Da zarar ka tura request, kana nuna cewa
+ka karanta kuma ka amince da wannan doka.
 </div>
 
 </section>
+
+<script>
+function showLang(lang){
+  document.getElementById("policy-en").style.display =
+    lang === "en" ? "block" : "none";
+  document.getElementById("policy-ha").style.display =
+    lang === "ha" ? "block" : "none";
+
+  document.getElementById("btnEn").classList.toggle("active", lang==="en");
+  document.getElementById("btnHa").classList.toggle("active", lang==="ha");
+}
+</script>
 
 </body>
 </html>
