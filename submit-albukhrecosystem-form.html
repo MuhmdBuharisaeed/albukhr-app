@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Ecosystem – Contributor Form</title>
+<title>Albukhr Admin – Contributor Panel</title>
 
 <style>
+body{font-family:sans-serif;background:#f3f7f4;margin:0}
 .section{padding:16px}
 .card{
   background:#fff;
@@ -13,138 +14,45 @@
   padding:16px;
   margin-bottom:14px
 }
-.label{font-size:13px;font-weight:700;margin-top:12px}
-.input{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  font-size:14px
-}
-textarea.input{min-height:90px}
+h2{margin:0 0 10px}
+.label{font-size:13px;font-weight:700;margin-top:8px}
+.value{font-size:13px;margin-bottom:6px}
+img{max-width:100%;border-radius:12px;margin-top:8px}
 
 .btn{
-  width:100%;
-  padding:14px;
+  padding:10px 14px;
   border:none;
-  border-radius:14px;
-  background:#0f7a3d;
-  color:#fff;
-  font-size:15px;
+  border-radius:10px;
   font-weight:700;
-  margin-top:16px
+  cursor:pointer;
+  margin-right:6px
 }
-.notice{
-  font-size:12px;
-  line-height:1.7;
-  background:#f6fbf8;
-  border-left:4px solid #0f7a3d;
-  padding:12px;
-  margin-top:12px
-}
-.disabled{opacity:.5;pointer-events:none}
-
-.policy-link{
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#c0392b;color:#fff}
+.badge{
   display:inline-block;
-  margin-top:8px;
-  font-size:12px;
-  color:#0f7a3d;
-  font-weight:700;
-  text-decoration:none
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:8px;
+  margin-bottom:6px
 }
-
-.telegram{
-  margin-top:14px;
-  padding:12px;
-  background:#f6fbf8;
-  border-left:4px solid #0f7a3d;
-  font-size:13px
-}
-.telegram a{
-  color:#0f7a3d;
-  font-weight:800;
-  text-decoration:none
-}
+.pending{background:#f1c40f}
+.approved{background:#0f7a3d;color:#fff}
+.rejected{background:#c0392b;color:#fff}
 </style>
 </head>
 
 <body>
 
 <section class="section">
+<h2>🛡️ Albukhr Admin – Contributors</h2>
 
-<h3>🧩 Albukhr Ecosystem – Contributor Onboarding</h3>
-<p style="font-size:13px">
-This form is strictly for approved contributors invited by ALBUKHR.
-</p>
-
-<div class="card">
-
-<div class="label">Full Name</div>
-<input class="input" id="fullName">
-
-<div class="label">Profile Photo</div>
-<input type="file" class="input" id="photo" accept="image/*">
-
-<div class="label">Phone Number</div>
-<input class="input" id="phone">
-
-<div class="label">Email Address</div>
-<input class="input" id="email">
-
-<div class="label">Full Address</div>
-<textarea class="input" id="address"></textarea>
-
-<div class="label">Country</div>
-<input class="input" id="country">
-
-<div class="label">Primary Skills / Role</div>
-<textarea class="input" id="skills"></textarea>
-
-<div class="label">Web3 Experience</div>
-<textarea class="input" id="experience"></textarea>
-
-<div class="label">Expected Contribution</div>
-<textarea class="input" id="contribution"></textarea>
-
-</div>
-
-<div class="card">
-<a href="albukhr-contributor-policy.html"
-   target="_blank"
-   class="policy-link"
-   onclick="unlockAgree()">
-📜 View Contributor Policy & Rules
-</a>
-
-<br><br>
-
-<label>
-<input type="checkbox" id="agree" disabled>
- I confirm that all information provided is true and I agree to Albukhr
- ecosystem rules and policies.
-</label>
-</div>
-
-<button class="btn" id="submitBtn" onclick="submitContributor()">
-Submit for Review
-</button>
-
-<div class="notice" id="pendingNotice" style="display:none">
-⏳ Your submission is under review. Please wait for approval.
-</div>
-
-<div class="telegram" id="telegramBox" style="display:none">
-✅ Approved contributor  
-<br>
-<a href="https://t.me/ALBUKHR_ECOSYSTEM_GROUP" target="_blank">
-Join Albukhr Telegram Contributor Group
-</a>
-</div>
-
+<div id="list"></div>
 </section>
 
 <script>
 const KEY = "albukhr_contributors";
+const TG_LINK = "https://t.me/ALBUKHR_ECOSYSTEM_GROUP";
 
 function getList(){
   return JSON.parse(localStorage.getItem(KEY)) || [];
@@ -153,85 +61,97 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
-function unlockAgree(){
-  document.getElementById("agree").disabled = false;
-}
-
-function checkStatus(){
+function render(){
   const list = getList();
-  const last = list[list.length - 1];
-  if(!last) return;
+  const box = document.getElementById("list");
+  box.innerHTML = "";
 
-  const btn = document.getElementById("submitBtn");
-
-  if(last.status === "pending"){
-    btn.classList.add("disabled");
-    document.getElementById("pendingNotice").style.display = "block";
-  }
-
-  if(last.status === "approved" && last.telegramUnlocked){
-    btn.classList.add("disabled");
-    document.getElementById("telegramBox").style.display = "block";
-  }
-
-  if(last.status === "rejected"){
-    btn.classList.remove("disabled");
-  }
-}
-
-function submitContributor(){
-  const f = id => document.getElementById(id);
-
-  if(
-    !f("fullName").value ||
-    !f("phone").value ||
-    !f("email").value ||
-    !f("address").value ||
-    !f("skills").value ||
-    !f("contribution").value ||
-    !f("agree").checked
-  ){
-    alert("Please complete all required fields and accept policy");
+  if(!list.length){
+    box.innerHTML = "<p>No contributors yet.</p>";
     return;
   }
 
-  if(!f("photo").files.length){
-    alert("Profile photo is required");
-    return;
-  }
+  list.forEach((c,i)=>{
+    const card = document.createElement("div");
+    card.className = "card";
 
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    const data = {
-      id:"CONTRIB-"+Date.now(),
-      fullName:f("fullName").value.trim(),
-      phone:f("phone").value.trim(),
-      email:f("email").value.trim(),
-      address:f("address").value.trim(),
-      country:f("country").value.trim(),
-      skills:f("skills").value.trim(),
-      experience:f("experience").value.trim(),
-      contribution:f("contribution").value.trim(),
-      photo:reader.result,
-      status:"pending",
-      telegramUnlocked:false,
-      createdAt:Date.now()
-    };
+    const badge =
+      c.status === "pending" ? "pending" :
+      c.status === "approved" ? "approved" : "rejected";
 
-    const list = getList();
-    list.push(data);
-    saveList(list);
+    card.innerHTML = `
+      <span class="badge ${badge}">${c.status.toUpperCase()}</span>
 
-    document.getElementById("submitBtn").classList.add("disabled");
-    document.getElementById("pendingNotice").style.display = "block";
+      <div class="label">Full Name</div>
+      <div class="value">${c.fullName}</div>
 
-    alert("✅ Submitted successfully. Await admin review.");
-  };
+      <div class="label">Email</div>
+      <div class="value">${c.email}</div>
 
-  reader.readAsDataURL(f("photo").files[0]);
+      <div class="label">Phone</div>
+      <div class="value">${c.phone}</div>
+
+      <div class="label">Country</div>
+      <div class="value">${c.country}</div>
+
+      <div class="label">Skills</div>
+      <div class="value">${c.skills}</div>
+
+      <div class="label">Contribution</div>
+      <div class="value">${c.contribution}</div>
+
+      <div class="label">Photo</div>
+      <img src="${c.photo}">
+
+      <br><br>
+
+      ${
+        c.status === "pending"
+        ? `
+          <button class="btn approve" onclick="approve(${i})">
+            Approve
+          </button>
+          <button class="btn reject" onclick="reject(${i})">
+            Reject
+          </button>
+        `
+        : ""
+      }
+
+      ${
+        c.status === "approved"
+        ? `<p style="font-size:12px">
+            🔓 Telegram unlocked:
+            <strong>${TG_LINK}</strong>
+           </p>`
+        : ""
+      }
+    `;
+
+    box.appendChild(card);
+  });
 }
 
-checkStatus();
+function approve(i){
+  const list = getList();
+  list[i].status = "approved";
+  list[i].telegramUnlocked = true;
+  list[i].telegramLink = TG_LINK;
+  saveList(list);
+  render();
+  alert("✅ Contributor approved & Telegram unlocked");
+}
+
+function reject(i){
+  const list = getList();
+  list[i].status = "rejected";
+  list[i].telegramUnlocked = false;
+  saveList(list);
+  render();
+  alert("❌ Contributor rejected");
+}
+
+render();
 </script>
 
 </body>
