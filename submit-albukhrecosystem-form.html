@@ -109,20 +109,21 @@ This form is strictly for approved contributors invited by ALBUKHR.
 </div>
 
 <div class="card">
+
 <a href="albukhr-contributor-policy.html"
    target="_blank"
-   class="policy-link"
-   onclick="unlockAgree()">
+   class="policy-link">
 📜 View Contributor Policy & Rules
 </a>
 
 <br><br>
 
 <label>
-<input type="checkbox" id="agree" disabled>
+<input type="checkbox" id="agree">
  I confirm that all information provided is true and I agree to Albukhr
  ecosystem rules and policies.
 </label>
+
 </div>
 
 <button class="btn" id="submitBtn" onclick="submitContributor()">
@@ -137,7 +138,7 @@ Submit for Review
 ✅ Approved contributor  
 <br>
 <a href="https://t.me/ALBUKHR_ECOSYSTEM_GROUP" target="_blank">
-Join Albukhr Telegram Contributor Group
+Join Albukhr Ecosystem Telegram Group
 </a>
 </div>
 
@@ -153,10 +154,6 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
-function unlockAgree(){
-  document.getElementById("agree").disabled = false;
-}
-
 function checkStatus(){
   const list = getList();
   const last = list[list.length - 1];
@@ -169,7 +166,7 @@ function checkStatus(){
     document.getElementById("pendingNotice").style.display = "block";
   }
 
-  if(last.status === "approved" && last.telegramUnlocked){
+  if(last.status === "approved"){
     btn.classList.add("disabled");
     document.getElementById("telegramBox").style.display = "block";
   }
@@ -191,7 +188,7 @@ function submitContributor(){
     !f("contribution").value ||
     !f("agree").checked
   ){
-    alert("Please complete all required fields and accept policy");
+    alert("Please complete all required fields and confirm details");
     return;
   }
 
@@ -214,7 +211,6 @@ function submitContributor(){
       contribution:f("contribution").value.trim(),
       photo:reader.result,
       status:"pending",
-      telegramUnlocked:false,
       createdAt:Date.now()
     };
 
