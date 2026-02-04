@@ -58,12 +58,7 @@ textarea.input{min-height:90px}
 <p class="muted">
 This form is strictly for approved contributors invited by ALBUKHR.
 </p>
-<p style="font-size:12px;margin-top:10px">
-  📜 <a href="albukhr-contributor-policy.html">
-    View Contributor Policy & Rules
-  </a>
-</p>
-  
+
 <div class="card">
 
 <div class="label">Full Name</div>
@@ -166,7 +161,12 @@ function submitContributor(){
     const list = getList();
     list.push(data);
     saveList(list);
-
+    
+<p style="font-size:12px;margin-top:10px">
+  📜 <a href="albukhr-contributor-policy.html">
+    View Contributor Policy & Rules
+  </a>
+</p>
     document.getElementById("submitBtn").classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
 
