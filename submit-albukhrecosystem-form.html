@@ -6,11 +6,6 @@
 <title>Albukhr Ecosystem – Contributor Form</title>
 
 <style>
-body{
-  font-family:system-ui;
-  background:#f4f7f6;
-  margin:0
-}
 .section{padding:16px}
 .card{
   background:#fff;
@@ -18,11 +13,7 @@ body{
   padding:16px;
   margin-bottom:14px
 }
-.label{
-  font-size:13px;
-  font-weight:700;
-  margin-top:12px
-}
+.label{font-size:13px;font-weight:700;margin-top:12px}
 .input{
   width:100%;
   padding:12px;
@@ -41,20 +32,8 @@ textarea.input{min-height:90px}
   color:#fff;
   font-size:15px;
   font-weight:700;
-  margin-top:16px;
-  cursor:pointer
+  margin-top:16px
 }
-.btn.secondary{
-  background:#e6f3ec;
-  color:#0f7a3d;
-  font-size:13px;
-  margin-top:8px
-}
-.disabled{
-  opacity:.5;
-  pointer-events:none
-}
-
 .notice{
   font-size:12px;
   line-height:1.7;
@@ -63,25 +42,23 @@ textarea.input{min-height:90px}
   padding:12px;
   margin-top:12px
 }
+.disabled{opacity:.5;pointer-events:none}
 
-.policy-box{
-  margin-top:10px;
+.policy-link{
+  display:inline-block;
+  margin-top:8px;
   font-size:12px;
-  color:#333
-}
-
-.policy-box a{
   color:#0f7a3d;
   font-weight:700;
   text-decoration:none
 }
 
 .telegram{
-  background:#eaf6ef;
-  padding:14px;
-  border-radius:14px;
   margin-top:14px;
-  font-size:14px
+  padding:12px;
+  background:#f6fbf8;
+  border-left:4px solid #0f7a3d;
+  font-size:13px
 }
 .telegram a{
   color:#0f7a3d;
@@ -97,7 +74,7 @@ textarea.input{min-height:90px}
 
 <h3>🧩 Albukhr Ecosystem – Contributor Onboarding</h3>
 <p style="font-size:13px">
-This form is strictly for contributors approved and invited by ALBUKHR.
+This form is strictly for approved contributors invited by ALBUKHR.
 </p>
 
 <div class="card">
@@ -132,19 +109,20 @@ This form is strictly for contributors approved and invited by ALBUKHR.
 </div>
 
 <div class="card">
-
-<button class="btn secondary" onclick="openPolicy()">
+<a href="albukhr-contributor-policy.html"
+   target="_blank"
+   class="policy-link"
+   onclick="unlockAgree()">
 📜 View Contributor Policy & Rules
-</button>
+</a>
 
-<div class="policy-box">
+<br><br>
+
 <label>
 <input type="checkbox" id="agree" disabled>
- I confirm that all details provided are true and I agree to Albukhr
- ecosystem rules, confidentiality and disciplinary policies.
+ I confirm that all information provided is true and I agree to Albukhr
+ ecosystem rules and policies.
 </label>
-</div>
-
 </div>
 
 <button class="btn" id="submitBtn" onclick="submitContributor()">
@@ -152,14 +130,14 @@ Submit for Review
 </button>
 
 <div class="notice" id="pendingNotice" style="display:none">
-⏳ Your submission is under review. Please wait for admin decision.
+⏳ Your submission is under review. Please wait for approval.
 </div>
 
 <div class="telegram" id="telegramBox" style="display:none">
-✅ Approved!  
+✅ Approved contributor  
 <br>
 <a href="https://t.me/ALBUKHR_CONTRIBUTORS_GROUP" target="_blank">
-Join Albukhr Contributor Telegram Group
+Join Albukhr Telegram Contributor Group
 </a>
 </div>
 
@@ -175,16 +153,10 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
-/* POLICY VIEW LOGIC */
-function openPolicy(){
-  window.open(
-    "albukhr-contributor-policy.html",
-    "_blank"
-  );
+function unlockAgree(){
   document.getElementById("agree").disabled = false;
 }
 
-/* STATE CHECK */
 function checkStatus(){
   const list = getList();
   const last = list[list.length - 1];
