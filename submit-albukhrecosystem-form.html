@@ -6,7 +6,11 @@
 <title>Albukhr Ecosystem – Contributor Form</title>
 
 <style>
-body{font-family:system-ui;background:#f4f7f6;margin:0}
+body{
+  font-family:system-ui;
+  background:#f4f7f6;
+  margin:0
+}
 .section{padding:16px}
 .card{
   background:#fff;
@@ -14,7 +18,11 @@ body{font-family:system-ui;background:#f4f7f6;margin:0}
   padding:16px;
   margin-bottom:14px
 }
-.label{font-size:13px;font-weight:700;margin-top:12px}
+.label{
+  font-size:13px;
+  font-weight:700;
+  margin-top:12px
+}
 .input{
   width:100%;
   padding:12px;
@@ -23,6 +31,7 @@ body{font-family:system-ui;background:#f4f7f6;margin:0}
   font-size:14px
 }
 textarea.input{min-height:90px}
+
 .btn{
   width:100%;
   padding:14px;
@@ -32,9 +41,20 @@ textarea.input{min-height:90px}
   color:#fff;
   font-size:15px;
   font-weight:700;
-  margin-top:16px
+  margin-top:16px;
+  cursor:pointer
 }
-.disabled{opacity:.5;pointer-events:none}
+.btn.secondary{
+  background:#e6f3ec;
+  color:#0f7a3d;
+  font-size:13px;
+  margin-top:8px
+}
+.disabled{
+  opacity:.5;
+  pointer-events:none
+}
+
 .notice{
   font-size:12px;
   line-height:1.7;
@@ -43,25 +63,30 @@ textarea.input{min-height:90px}
   padding:12px;
   margin-top:12px
 }
-.policy{
+
+.policy-box{
+  margin-top:10px;
   font-size:12px;
-  margin-top:12px
+  color:#333
 }
-.policy a{
-  color:#0b66ff;
-  text-decoration:underline;
-  font-weight:600
+
+.policy-box a{
+  color:#0f7a3d;
+  font-weight:700;
+  text-decoration:none
 }
+
 .telegram{
-  background:#eef6ff;
+  background:#eaf6ef;
   padding:14px;
   border-radius:14px;
   margin-top:14px;
   font-size:14px
 }
 .telegram a{
-  color:#0b66ff;
-  font-weight:700
+  color:#0f7a3d;
+  font-weight:800;
+  text-decoration:none
 }
 </style>
 </head>
@@ -72,7 +97,7 @@ textarea.input{min-height:90px}
 
 <h3>🧩 Albukhr Ecosystem – Contributor Onboarding</h3>
 <p style="font-size:13px">
-This form is strictly for approved contributors invited by ALBUKHR.
+This form is strictly for contributors approved and invited by ALBUKHR.
 </p>
 
 <div class="card">
@@ -107,16 +132,19 @@ This form is strictly for approved contributors invited by ALBUKHR.
 </div>
 
 <div class="card">
-<label>
-<input type="checkbox" id="agree">
- I confirm all details are true and I agree to Albukhr rules & policies.
-</label>
 
-<div class="policy">
-📜 <a href="albukhr-contributor-policy.html">
-View Albukhr Contributor Policy & Rules
-</a>
+<button class="btn secondary" onclick="openPolicy()">
+📜 View Contributor Policy & Rules
+</button>
+
+<div class="policy-box">
+<label>
+<input type="checkbox" id="agree" disabled>
+ I confirm that all details provided are true and I agree to Albukhr
+ ecosystem rules, confidentiality and disciplinary policies.
+</label>
 </div>
+
 </div>
 
 <button class="btn" id="submitBtn" onclick="submitContributor()">
@@ -147,6 +175,16 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
+/* POLICY VIEW LOGIC */
+function openPolicy(){
+  window.open(
+    "albukhr-contributor-policy.html",
+    "_blank"
+  );
+  document.getElementById("agree").disabled = false;
+}
+
+/* STATE CHECK */
 function checkStatus(){
   const list = getList();
   const last = list[list.length - 1];
@@ -172,19 +210,21 @@ function checkStatus(){
 function submitContributor(){
   const f = id => document.getElementById(id);
 
-  if(!f("fullName").value ||
-     !f("phone").value ||
-     !f("email").value ||
-     !f("address").value ||
-     !f("skills").value ||
-     !f("contribution").value ||
-     !f("agree").checked){
-    alert("Complete all required fields");
+  if(
+    !f("fullName").value ||
+    !f("phone").value ||
+    !f("email").value ||
+    !f("address").value ||
+    !f("skills").value ||
+    !f("contribution").value ||
+    !f("agree").checked
+  ){
+    alert("Please complete all required fields and accept policy");
     return;
   }
 
   if(!f("photo").files.length){
-    alert("Profile photo required");
+    alert("Profile photo is required");
     return;
   }
 
@@ -213,8 +253,9 @@ function submitContributor(){
     document.getElementById("submitBtn").classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
 
-    alert("✅ Submitted successfully");
+    alert("✅ Submitted successfully. Await admin review.");
   };
+
   reader.readAsDataURL(f("photo").files[0]);
 }
 
