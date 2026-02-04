@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ALBUKHR Admin – Contributors</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr Admin – Contributor Panel</title>
 
 <style>
+body{font-family:sans-serif;background:#f3f7f4;margin:0}
 .section{padding:16px}
 .card{
   background:#fff;
@@ -13,155 +14,141 @@
   padding:16px;
   margin-bottom:14px
 }
-.meta{
-  font-size:12px;
-  color:#555;
-  margin-top:6px;
-  line-height:1.6
-}
-.photo{
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  object-fit:cover;
-  border:1px solid #ddd;
-  margin-top:8px
-}
-.desc{
-  margin-top:10px;
-  font-size:12px;
-  background:#f7f9f8;
-  padding:10px;
-  border-radius:10px;
-  line-height:1.6
-}
-button{
-  padding:8px 14px;
+h2{margin:0 0 10px}
+.label{font-size:13px;font-weight:700;margin-top:8px}
+.value{font-size:13px;margin-bottom:6px}
+img{max-width:100%;border-radius:12px;margin-top:8px}
+
+.btn{
+  padding:10px 14px;
   border:none;
-  border-radius:8px;
-  font-size:12px;
+  border-radius:10px;
   font-weight:700;
   cursor:pointer;
   margin-right:6px
 }
 .approve{background:#0f7a3d;color:#fff}
-.reject{background:#eee;color:#333}
-.btn.approved{background:#0f7a3d;color:#fff;cursor:default}
-.btn.rejected{background:#b02a37;color:#fff;cursor:default}
-.btn.disabled{opacity:.6;pointer-events:none}
-.telegram{
-  margin-top:10px;
+.reject{background:#c0392b;color:#fff}
+.badge{
   display:inline-block;
-  background:#229ED9;
-  color:#fff;
-  padding:8px 12px;
-  border-radius:10px;
-  font-size:12px;
-  text-decoration:none
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:8px;
+  margin-bottom:6px
 }
-.empty{
-  text-align:center;
-  color:#777;
-  font-size:13px;
-  padding:20px
-}
+.pending{background:#f1c40f}
+.approved{background:#0f7a3d;color:#fff}
+.rejected{background:#c0392b;color:#fff}
 </style>
 </head>
 
 <body>
 
-<header class="header">
-  <h1 class="brand">ALBUKHR • Admin</h1>
-</header>
-
 <section class="section">
-  <h3>🧩 Contributor Review Panel</h3>
-  <div id="list"></div>
+<h2>🛡️ Albukhr Admin – Contributors</h2>
+
+<div id="list"></div>
 </section>
 
 <script>
 const KEY = "albukhr_contributors";
-const box = document.getElementById("list");
+const TG_LINK = "https://t.me/ALBUKHR_ECOSYSTEM_GROUP";
 
-let list = JSON.parse(localStorage.getItem(KEY)) || [];
+function getList(){
+  return JSON.parse(localStorage.getItem(KEY)) || [];
+}
+function saveList(l){
+  localStorage.setItem(KEY, JSON.stringify(l));
+}
 
 function render(){
+  const list = getList();
+  const box = document.getElementById("list");
   box.innerHTML = "";
 
-  if(list.length === 0){
-    box.innerHTML = `<div class="empty">No contributors yet</div>`;
+  if(!list.length){
+    box.innerHTML = "<p>No contributors yet.</p>";
     return;
   }
 
   list.forEach((c,i)=>{
-    box.innerHTML += `
-      <div class="card">
+    const card = document.createElement("div");
+    card.className = "card";
 
-        <strong>${c.fullName}</strong>
+    const badge =
+      c.status === "pending" ? "pending" :
+      c.status === "approved" ? "approved" : "rejected";
 
-        <div class="meta">
-          📞 ${c.phone}<br>
-          ✉️ ${c.email}<br>
-          🌍 ${c.country || "-"}<br>
-          📍 ${c.address}
-        </div>
+    card.innerHTML = `
+      <span class="badge ${badge}">${c.status.toUpperCase()}</span>
 
-        <img src="${c.photo}" class="photo">
+      <div class="label">Full Name</div>
+      <div class="value">${c.fullName}</div>
 
-        <div class="desc">
-          <strong>Skills / Role</strong><br>
-          ${c.skills}<br><br>
+      <div class="label">Email</div>
+      <div class="value">${c.email}</div>
 
-          <strong>Web3 Experience</strong><br>
-          ${c.experience || "-"}<br><br>
+      <div class="label">Phone</div>
+      <div class="value">${c.phone}</div>
 
-          <strong>Contribution</strong><br>
-          ${c.contribution}
-        </div>
+      <div class="label">Country</div>
+      <div class="value">${c.country}</div>
 
-        <div style="margin-top:12px">
-          ${
-            c.status === "pending"
-            ? `
-              <button class="approve" onclick="setStatus(${i}, 'approved')">
-                Approve
-              </button>
-              <button class="reject" onclick="setStatus(${i}, 'rejected')">
-                Reject
-              </button>
-            `
-            : c.status === "approved"
-            ? `
-              <button class="btn approved disabled">✓ Approved</button>
-              <button class="btn disabled">Reject</button>
-              <br>
-              <a class="telegram"
-                 href="https://t.me/ALBUKHR_CONTRIBUTORS"
-                 target="_blank">
-                Join Telegram Group
-              </a>
-            `
-            : `
-              <button class="btn disabled">Approve</button>
-              <button class="btn rejected disabled">✗ Rejected</button>
-            `
-          }
-        </div>
+      <div class="label">Skills</div>
+      <div class="value">${c.skills}</div>
 
-      </div>
+      <div class="label">Contribution</div>
+      <div class="value">${c.contribution}</div>
+
+      <div class="label">Photo</div>
+      <img src="${c.photo}">
+
+      <br><br>
+
+      ${
+        c.status === "pending"
+        ? `
+          <button class="btn approve" onclick="approve(${i})">
+            Approve
+          </button>
+          <button class="btn reject" onclick="reject(${i})">
+            Reject
+          </button>
+        `
+        : ""
+      }
+
+      ${
+        c.status === "approved"
+        ? `<p style="font-size:12px">
+            🔓 Telegram unlocked:
+            <strong>${TG_LINK}</strong>
+           </p>`
+        : ""
+      }
     `;
+
+    box.appendChild(card);
   });
 }
 
-function setStatus(index,status){
-  if(list[index].status !== "pending") return;
-
-  list[index].status = status;
-  list[index].telegramUnlocked = (status === "approved");
-  list[index].reviewedAt = Date.now();
-
-  localStorage.setItem(KEY, JSON.stringify(list));
+function approve(i){
+  const list = getList();
+  list[i].status = "approved";
+  list[i].telegramUnlocked = true;
+  list[i].telegramLink = TG_LINK;
+  saveList(list);
   render();
+  alert("✅ Contributor approved & Telegram unlocked");
+}
+
+function reject(i){
+  const list = getList();
+  list[i].status = "rejected";
+  list[i].telegramUnlocked = false;
+  saveList(list);
+  render();
+  alert("❌ Contributor rejected");
 }
 
 render();
