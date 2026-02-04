@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr Ecosystem – Contributor Form</title>
-<link rel="stylesheet" href="style.css">
 
 <style>
+body{font-family:system-ui;background:#f4f7f6;margin:0}
 .section{padding:16px}
 .card{
   background:#fff;
@@ -34,6 +34,7 @@ textarea.input{min-height:90px}
   font-weight:700;
   margin-top:16px
 }
+.disabled{opacity:.5;pointer-events:none}
 .notice{
   font-size:12px;
   line-height:1.7;
@@ -42,20 +43,35 @@ textarea.input{min-height:90px}
   padding:12px;
   margin-top:12px
 }
-.disabled{opacity:.5;pointer-events:none}
+.policy{
+  font-size:12px;
+  margin-top:12px
+}
+.policy a{
+  color:#0b66ff;
+  text-decoration:underline;
+  font-weight:600
+}
+.telegram{
+  background:#eef6ff;
+  padding:14px;
+  border-radius:14px;
+  margin-top:14px;
+  font-size:14px
+}
+.telegram a{
+  color:#0b66ff;
+  font-weight:700
+}
 </style>
 </head>
 
 <body>
 
-<header class="header">
-  <h1 class="brand">ALBUKHR</h1>
-</header>
-
 <section class="section">
 
 <h3>🧩 Albukhr Ecosystem – Contributor Onboarding</h3>
-<p class="muted">
+<p style="font-size:13px">
 This form is strictly for approved contributors invited by ALBUKHR.
 </p>
 
@@ -80,33 +96,43 @@ This form is strictly for approved contributors invited by ALBUKHR.
 <input class="input" id="country">
 
 <div class="label">Primary Skills / Role</div>
-<textarea class="input" id="skills"
-placeholder="Developer, Researcher, Educator, Community Builder..."></textarea>
+<textarea class="input" id="skills"></textarea>
 
 <div class="label">Web3 Experience</div>
-<textarea class="input" id="experience"
-placeholder="Explain your Web3 background"></textarea>
+<textarea class="input" id="experience"></textarea>
 
-<div class="label">Expected Contribution to Albukhr</div>
-<textarea class="input" id="contribution"
-placeholder="How will you contribute to Albukhr ecosystem?"></textarea>
+<div class="label">Expected Contribution</div>
+<textarea class="input" id="contribution"></textarea>
 
 </div>
 
 <div class="card">
 <label>
 <input type="checkbox" id="agree">
- I confirm that all information provided is true and I agree to
- Albukhr ecosystem rules, confidentiality, and disciplinary policies.
+ I confirm all details are true and I agree to Albukhr rules & policies.
 </label>
+
+<div class="policy">
+📜 <a href="albukhr-contributor-policy.html">
+View Albukhr Contributor Policy & Rules
+</a>
+</div>
 </div>
 
-<button class="btn" onclick="submitContributor()" id="submitBtn">
+<button class="btn" id="submitBtn" onclick="submitContributor()">
 Submit for Review
 </button>
 
 <div class="notice" id="pendingNotice" style="display:none">
-⏳ Your submission is under review. Please wait for approval.
+⏳ Your submission is under review. Please wait for admin decision.
+</div>
+
+<div class="telegram" id="telegramBox" style="display:none">
+✅ Approved!  
+<br>
+<a href="https://t.me/ALBUKHR_ECOSYSTEM_GROUP" target="_blank">
+Join Albukhr Contributor Telegram Group
+</a>
 </div>
 
 </section>
@@ -121,9 +147,31 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
-function submitContributor(){
+function checkStatus(){
+  const list = getList();
+  const last = list[list.length - 1];
+  if(!last) return;
 
+  const btn = document.getElementById("submitBtn");
+
+  if(last.status === "pending"){
+    btn.classList.add("disabled");
+    document.getElementById("pendingNotice").style.display = "block";
+  }
+
+  if(last.status === "approved" && last.telegramUnlocked){
+    btn.classList.add("disabled");
+    document.getElementById("telegramBox").style.display = "block";
+  }
+
+  if(last.status === "rejected"){
+    btn.classList.remove("disabled");
+  }
+}
+
+function submitContributor(){
   const f = id => document.getElementById(id);
+
   if(!f("fullName").value ||
      !f("phone").value ||
      !f("email").value ||
@@ -131,31 +179,31 @@ function submitContributor(){
      !f("skills").value ||
      !f("contribution").value ||
      !f("agree").checked){
-    alert("Please complete all required fields");
+    alert("Complete all required fields");
     return;
   }
 
   if(!f("photo").files.length){
-    alert("Profile photo is required");
+    alert("Profile photo required");
     return;
   }
 
   const reader = new FileReader();
   reader.onload = ()=>{
     const data = {
-      id: "CONTRIB-" + Date.now(),
-      fullName: f("fullName").value.trim(),
-      phone: f("phone").value.trim(),
-      email: f("email").value.trim(),
-      address: f("address").value.trim(),
-      country: f("country").value.trim(),
-      skills: f("skills").value.trim(),
-      experience: f("experience").value.trim(),
-      contribution: f("contribution").value.trim(),
-      photo: reader.result,
-      status: "pending",
-      telegramUnlocked: false,
-      createdAt: Date.now()
+      id:"CONTRIB-"+Date.now(),
+      fullName:f("fullName").value.trim(),
+      phone:f("phone").value.trim(),
+      email:f("email").value.trim(),
+      address:f("address").value.trim(),
+      country:f("country").value.trim(),
+      skills:f("skills").value.trim(),
+      experience:f("experience").value.trim(),
+      contribution:f("contribution").value.trim(),
+      photo:reader.result,
+      status:"pending",
+      telegramUnlocked:false,
+      createdAt:Date.now()
     };
 
     const list = getList();
@@ -165,11 +213,12 @@ function submitContributor(){
     document.getElementById("submitBtn").classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
 
-    alert("✅ Submitted successfully. Await admin review.");
+    alert("✅ Submitted successfully");
   };
-
   reader.readAsDataURL(f("photo").files[0]);
 }
+
+checkStatus();
 </script>
 
 </body>
