@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr Ecosystem – Contributor Form</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px
+}
+.label{font-size:13px;font-weight:700;margin-top:12px}
+.input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:14px
+}
+textarea.input{min-height:90px}
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#0f7a3d;
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  margin-top:16px
+}
+.notice{
+  font-size:12px;
+  line-height:1.7;
+  background:#f6fbf8;
+  border-left:4px solid #0f7a3d;
+  padding:12px;
+  margin-top:12px
+}
+.disabled{opacity:.5;pointer-events:none}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <h1 class="brand">ALBUKHR</h1>
+</header>
+
+<section class="section">
+
+<h3>🧩 Albukhr Ecosystem – Contributor Onboarding</h3>
+<p class="muted">
+This form is strictly for approved contributors invited by ALBUKHR.
+</p>
+
+<div class="card">
+
+<div class="label">Full Name</div>
+<input class="input" id="fullName">
+
+<div class="label">Profile Photo</div>
+<input type="file" class="input" id="photo" accept="image/*">
+
+<div class="label">Phone Number</div>
+<input class="input" id="phone">
+
+<div class="label">Email Address</div>
+<input class="input" id="email">
+
+<div class="label">Full Address</div>
+<textarea class="input" id="address"></textarea>
+
+<div class="label">Country</div>
+<input class="input" id="country">
+
+<div class="label">Primary Skills / Role</div>
+<textarea class="input" id="skills"
+placeholder="Developer, Researcher, Educator, Community Builder..."></textarea>
+
+<div class="label">Web3 Experience</div>
+<textarea class="input" id="experience"
+placeholder="Explain your Web3 background"></textarea>
+
+<div class="label">Expected Contribution to Albukhr</div>
+<textarea class="input" id="contribution"
+placeholder="How will you contribute to Albukhr ecosystem?"></textarea>
+
+</div>
+
+<div class="card">
+<label>
+<input type="checkbox" id="agree">
+ I confirm that all information provided is true and I agree to
+ Albukhr ecosystem rules, confidentiality, and disciplinary policies.
+</label>
+</div>
+
+<button class="btn" onclick="submitContributor()" id="submitBtn">
+Submit for Review
+</button>
+
+<div class="notice" id="pendingNotice" style="display:none">
+⏳ Your submission is under review. Please wait for approval.
+</div>
+
+</section>
+
+<script>
+const KEY = "albukhr_contributors";
+
+function getList(){
+  return JSON.parse(localStorage.getItem(KEY)) || [];
+}
+function saveList(l){
+  localStorage.setItem(KEY, JSON.stringify(l));
+}
+
+function submitContributor(){
+
+  const f = id => document.getElementById(id);
+  if(!f("fullName").value ||
+     !f("phone").value ||
+     !f("email").value ||
+     !f("address").value ||
+     !f("skills").value ||
+     !f("contribution").value ||
+     !f("agree").checked){
+    alert("Please complete all required fields");
+    return;
+  }
+
+  if(!f("photo").files.length){
+    alert("Profile photo is required");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const data = {
+      id: "CONTRIB-" + Date.now(),
+      fullName: f("fullName").value.trim(),
+      phone: f("phone").value.trim(),
+      email: f("email").value.trim(),
+      address: f("address").value.trim(),
+      country: f("country").value.trim(),
+      skills: f("skills").value.trim(),
+      experience: f("experience").value.trim(),
+      contribution: f("contribution").value.trim(),
+      photo: reader.result,
+      status: "pending",
+      telegramUnlocked: false,
+      createdAt: Date.now()
+    };
+
+    const list = getList();
+    list.push(data);
+    saveList(list);
+
+    document.getElementById("submitBtn").classList.add("disabled");
+    document.getElementById("pendingNotice").style.display = "block";
+
+    alert("✅ Submitted successfully. Await admin review.");
+  };
+
+  reader.readAsDataURL(f("photo").files[0]);
+}
+</script>
+
+</body>
+</html>
