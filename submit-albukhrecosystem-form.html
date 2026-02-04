@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr Ecosystem – Contributor Form</title>
-<link rel="stylesheet" href="style.css">
 
 <style>
 .section{padding:16px}
@@ -23,6 +22,7 @@
   font-size:14px
 }
 textarea.input{min-height:90px}
+
 .btn{
   width:100%;
   padding:14px;
@@ -43,19 +43,37 @@ textarea.input{min-height:90px}
   margin-top:12px
 }
 .disabled{opacity:.5;pointer-events:none}
+
+.policy-link{
+  display:inline-block;
+  margin-top:8px;
+  font-size:12px;
+  color:#0f7a3d;
+  font-weight:700;
+  text-decoration:none
+}
+
+.telegram{
+  margin-top:14px;
+  padding:12px;
+  background:#f6fbf8;
+  border-left:4px solid #0f7a3d;
+  font-size:13px
+}
+.telegram a{
+  color:#0f7a3d;
+  font-weight:800;
+  text-decoration:none
+}
 </style>
 </head>
 
 <body>
 
-<header class="header">
-  <h1 class="brand">ALBUKHR</h1>
-</header>
-
 <section class="section">
 
 <h3>🧩 Albukhr Ecosystem – Contributor Onboarding</h3>
-<p class="muted">
+<p style="font-size:13px">
 This form is strictly for approved contributors invited by ALBUKHR.
 </p>
 
@@ -80,33 +98,47 @@ This form is strictly for approved contributors invited by ALBUKHR.
 <input class="input" id="country">
 
 <div class="label">Primary Skills / Role</div>
-<textarea class="input" id="skills"
-placeholder="Developer, Researcher, Educator, Community Builder..."></textarea>
+<textarea class="input" id="skills"></textarea>
 
 <div class="label">Web3 Experience</div>
-<textarea class="input" id="experience"
-placeholder="Explain your Web3 background"></textarea>
+<textarea class="input" id="experience"></textarea>
 
-<div class="label">Expected Contribution to Albukhr</div>
-<textarea class="input" id="contribution"
-placeholder="How will you contribute to Albukhr ecosystem?"></textarea>
+<div class="label">Expected Contribution</div>
+<textarea class="input" id="contribution"></textarea>
 
 </div>
 
 <div class="card">
+<a href="albukhr-contributor-policy.html"
+   target="_blank"
+   class="policy-link"
+   onclick="unlockAgree()">
+📜 View Contributor Policy & Rules
+</a>
+
+<br><br>
+
 <label>
-<input type="checkbox" id="agree">
- I confirm that all information provided is true and I agree to
- Albukhr ecosystem rules, confidentiality, and disciplinary policies.
+<input type="checkbox" id="agree" disabled>
+ I confirm that all information provided is true and I agree to Albukhr
+ ecosystem rules and policies.
 </label>
 </div>
 
-<button class="btn" onclick="submitContributor()" id="submitBtn">
+<button class="btn" id="submitBtn" onclick="submitContributor()">
 Submit for Review
 </button>
 
 <div class="notice" id="pendingNotice" style="display:none">
 ⏳ Your submission is under review. Please wait for approval.
+</div>
+
+<div class="telegram" id="telegramBox" style="display:none">
+✅ Approved contributor  
+<br>
+<a href="https://t.me/ALBUKHR_ECOSYSTEM_GROUP" target="_blank">
+Join Albukhr Telegram Contributor Group
+</a>
 </div>
 
 </section>
@@ -121,17 +153,45 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
-function submitContributor(){
+function unlockAgree(){
+  document.getElementById("agree").disabled = false;
+}
 
+function checkStatus(){
+  const list = getList();
+  const last = list[list.length - 1];
+  if(!last) return;
+
+  const btn = document.getElementById("submitBtn");
+
+  if(last.status === "pending"){
+    btn.classList.add("disabled");
+    document.getElementById("pendingNotice").style.display = "block";
+  }
+
+  if(last.status === "approved" && last.telegramUnlocked){
+    btn.classList.add("disabled");
+    document.getElementById("telegramBox").style.display = "block";
+  }
+
+  if(last.status === "rejected"){
+    btn.classList.remove("disabled");
+  }
+}
+
+function submitContributor(){
   const f = id => document.getElementById(id);
-  if(!f("fullName").value ||
-     !f("phone").value ||
-     !f("email").value ||
-     !f("address").value ||
-     !f("skills").value ||
-     !f("contribution").value ||
-     !f("agree").checked){
-    alert("Please complete all required fields");
+
+  if(
+    !f("fullName").value ||
+    !f("phone").value ||
+    !f("email").value ||
+    !f("address").value ||
+    !f("skills").value ||
+    !f("contribution").value ||
+    !f("agree").checked
+  ){
+    alert("Please complete all required fields and accept policy");
     return;
   }
 
@@ -143,25 +203,25 @@ function submitContributor(){
   const reader = new FileReader();
   reader.onload = ()=>{
     const data = {
-      id: "CONTRIB-" + Date.now(),
-      fullName: f("fullName").value.trim(),
-      phone: f("phone").value.trim(),
-      email: f("email").value.trim(),
-      address: f("address").value.trim(),
-      country: f("country").value.trim(),
-      skills: f("skills").value.trim(),
-      experience: f("experience").value.trim(),
-      contribution: f("contribution").value.trim(),
-      photo: reader.result,
-      status: "pending",
-      telegramUnlocked: false,
-      createdAt: Date.now()
+      id:"CONTRIB-"+Date.now(),
+      fullName:f("fullName").value.trim(),
+      phone:f("phone").value.trim(),
+      email:f("email").value.trim(),
+      address:f("address").value.trim(),
+      country:f("country").value.trim(),
+      skills:f("skills").value.trim(),
+      experience:f("experience").value.trim(),
+      contribution:f("contribution").value.trim(),
+      photo:reader.result,
+      status:"pending",
+      telegramUnlocked:false,
+      createdAt:Date.now()
     };
 
     const list = getList();
     list.push(data);
     saveList(list);
-    
+
     document.getElementById("submitBtn").classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
 
@@ -170,13 +230,9 @@ function submitContributor(){
 
   reader.readAsDataURL(f("photo").files[0]);
 }
+
+checkStatus();
 </script>
 
-<p style="font-size:12px;margin-top:10px">
-  📜 <a href="albukhr-contributor-policy.html">
-    View Contributor Policy & Rules
-  </a>
-</p>  
-  
 </body>
 </html>
