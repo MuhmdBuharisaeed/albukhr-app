@@ -51,3 +51,34 @@ function rejectInternalProject(id){
   const list = getInternalProjects().filter(p=>p.id !== id);
   saveInternalProjects(list);
 }
+
+
+const KEY = "albukhr_internal_projects";
+
+function getInternalProjects(){
+  return JSON.parse(localStorage.getItem(KEY)) || [];
+}
+
+function saveInternalProjects(list){
+  localStorage.setItem(KEY, JSON.stringify(list));
+}
+
+function registerInternalProject(data){
+  const list = getInternalProjects();
+  list.push(data);
+  saveInternalProjects(list);
+}
+
+function updateInternalStatus(id,status){
+  const list = getInternalProjects();
+  const p = list.find(x=>x.id===id);
+  if(p) p.status = status;
+  saveInternalProjects(list);
+}
+
+function updateInternalStage(id,stage){
+  const list = getInternalProjects();
+  const p = list.find(x=>x.id===id);
+  if(p) p.stage = stage;
+  saveInternalProjects(list);
+}
