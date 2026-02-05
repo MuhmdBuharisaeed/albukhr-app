@@ -218,23 +218,5 @@ function submitDappRequest(){
 })();
 </script>
 
-<script>
-/* ======================================
-   ALBUKHR – AUTO REFRESH SECURITY
-====================================== */
-
-/* refresh page every 5 minuts */
-setInterval(() => {
-  location.reload();
-}, 30000);
-
-/* refresh immediately if user returns to tab */
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    location.reload();
-  }
-});
-</script>
-  
 </body>
     </html>
