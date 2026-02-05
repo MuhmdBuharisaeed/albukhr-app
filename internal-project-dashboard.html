@@ -74,6 +74,12 @@ select{
 
 <body>
 
+<script>
+if(sessionStorage.getItem("albukhr_internal_access") !== "true"){
+  location.href = "internal-dashboard-gate.html";
+}
+</script>
+  
 <div class="header">
   <h3>📊 Internal Project Dashboard</h3>
   <p style="font-size:13px;opacity:.9">
