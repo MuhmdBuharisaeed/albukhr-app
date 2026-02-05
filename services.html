@@ -57,7 +57,6 @@
 
 .locked{
   opacity:.55;
-  cursor:not-allowed;
 }
 
 .notice{
@@ -95,30 +94,30 @@
   </div>
 
   <!-- PI DAPP LAUNCH SERVICE -->
-<div class="service-card" onclick="goDappService()">
-  <div class="service-icon">📱</div>
-  <div>
-    <div class="service-title">Pi dApp Launch Service</div>
-    <div class="service-desc">
-      Albukhr assists you to create and launch your own Pi Network dApp
-      either via Pi Studio or Albukhr developers. Full ownership remains yours.
+  <div class="service-card" onclick="goDappService()">
+    <div class="service-icon">📱</div>
+    <div>
+      <div class="service-title">Pi dApp Launch Service</div>
+      <div class="service-desc">
+        Albukhr assists you to create and launch your own Pi Network dApp
+        via Pi Studio or Albukhr developers. Ownership remains yours.
+      </div>
+      <span class="badge paid">Paid Service</span>
+      <div class="service-action">Apply →</div>
     </div>
-    <span class="badge paid">Paid Service</span>
-    <div class="service-action">Apply →</div>
   </div>
-</div>
 
-  <!-- INTERNAL PROJECT -->
-  <div class="service-card locked">
+  <!-- INTERNAL PROJECT GATE -->
+  <div class="service-card" onclick="goInternalGate()">
     <div class="service-icon">🏗️</div>
     <div>
       <div class="service-title">Internal Project Creation</div>
       <div class="service-desc">
-        Reserved strictly for Albukhr core team.
-        Accessible only via authorized admin channels.
+        Private internal project registry for Albukhr core builders
+        and authorized ecosystem architects.
       </div>
-      <span class="badge restricted">Restricted</span>
-      <div class="service-action">Not available</div>
+      <span class="badge restricted">Core Only</span>
+      <div class="service-action">Access Gate →</div>
     </div>
   </div>
 
@@ -137,9 +136,9 @@
   </div>
 
   <div class="notice">
-    ℹ️ Services act as controlled entry points into the Albukhr ecosystem.
-    Each service follows approval rules, limits, and admin oversight
-    to protect users and projects.
+    ℹ️ Services are controlled gateways into the Albukhr ecosystem.
+    Each service enforces approval rules, access levels, and admin oversight
+    to protect contributors, users, and the ecosystem.
   </div>
 
 </section>
@@ -154,12 +153,40 @@
 </nav>
 
 <script>
+/* ===============================
+   SERVICE ROUTING – ALBUKHR
+================================ */
+
 function goCreateExternal(){
   window.location.href = "external-create.html";
 }
 
 function goDappService(){
   window.location.href = "pi-dapp-service.html";
+}
+
+function goInternalGate(){
+  /*
+    SECURITY NOTE:
+    Internal access should later be validated via:
+    - admin session
+    - role flag
+    - signed invite
+  */
+
+  const isAuthorized =
+    localStorage.getItem("albukhr_internal_access") === "true";
+
+  if(!isAuthorized){
+    alert(
+      "⛔ Access Restricted\n\n" +
+      "Internal Project Creation is limited to Albukhr core builders " +
+      "and authorized contributors only."
+    );
+    return;
+  }
+
+  window.location.href = "internal-registry-form.html";
 }
 </script>
 
