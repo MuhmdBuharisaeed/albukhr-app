@@ -105,7 +105,6 @@ textarea.input{min-height:90px}
     • Developer-built: <b>Higher professional fee</b>
   </p>
 
-  <!-- PAYMENT DETAILS -->
   <div id="paymentBox" style="display:none;margin-top:10px">
 
     <div class="label">Pi Wallet Address</div>
@@ -150,13 +149,11 @@ Submit for Review
 </section>
 
 <script>
-/* SHOW PAYMENT AFTER SERVICE TYPE */
 document.getElementById("serviceType").addEventListener("change", e=>{
   document.getElementById("paymentBox").style.display =
     e.target.value ? "block" : "none";
 });
 
-/* COPY */
 function copyText(id){
   const el = document.getElementById(id);
   el.select();
@@ -164,8 +161,7 @@ function copyText(id){
   alert("Copied successfully");
 }
 
-/* SUBMIT */
-<script>
+/* ===== RECEIPT FIX ADDED ONLY HERE ===== */
 function submitDappRequest(){
 
   if(!agree.checked){
@@ -187,7 +183,6 @@ function submitDappRequest(){
 
   const file = fileInput.files[0];
 
-  // size limit (2MB)
   if(file.size > 2 * 1024 * 1024){
     alert("Receipt image too large (max 2MB)");
     return;
@@ -204,25 +199,20 @@ function submitDappRequest(){
       serviceType: serviceType.value,
       description: description.value.trim(),
       receiptRef: receiptRef.value.trim(),
-      receiptImage: reader.result, // ✅ GYARA TA GASKIYA
+      receiptImage: reader.result,
       status: "pending",
       createdAt: Date.now()
     };
 
-    let list =
-      JSON.parse(localStorage.getItem("albukhr_dapp_requests")) || [];
-
+    let list = JSON.parse(localStorage.getItem("albukhr_dapp_requests")) || [];
     list.push(data);
 
-    localStorage.setItem(
-      "albukhr_dapp_requests",
-      JSON.stringify(list)
-    );
+    localStorage.setItem("albukhr_dapp_requests", JSON.stringify(list));
 
     window.location.href = "my-dapp-requests.html";
   };
 
-  reader.readAsDataURL(file); // 👈 nan ne mabuɗi
+  reader.readAsDataURL(file);
 }
 </script>
 
@@ -232,7 +222,6 @@ function submitDappRequest(){
   const list =
     JSON.parse(localStorage.getItem("albukhr_dapp_requests")) || [];
 
-  // duba ko akwai pending
   const pending = list.find(r => r.status === "pending");
 
   if(pending){
@@ -241,7 +230,6 @@ function submitDappRequest(){
       "Please wait for admin approval or rejection."
     );
 
-    // kai shi kai tsaye My Requests
     window.location.href = "my-dapp-requests.html";
   }
 
