@@ -64,6 +64,12 @@ Manage all ALBUKHR internal projects
 <script>
 const container = document.getElementById("projectList");
 
+function daysLeft(approvedAt){
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  const diff = sevenDays - (Date.now() - approvedAt);
+  return Math.ceil(diff / (24 * 60 * 60 * 1000));
+}
+
 function renderAdmin(){
   const list = getInternalProjects();
   container.innerHTML = "";
@@ -73,18 +79,42 @@ function renderAdmin(){
     return;
   }
 
-  list.reverse().forEach(p=>{
+  list.slice().reverse().forEach(p=>{
     const div = document.createElement("div");
     div.className = "card";
+
+    let badgeClass = "pending";
+    let badgeText  = "Pending Review";
+    let lockInfo   = "";
+
+    if(p.status === "internal_approved"){
+      badgeClass = "approved";
+      badgeText  = "Approved";
+
+      if(p.approvedAt){
+        const left = daysLeft(p.approvedAt);
+        if(left > 0){
+          lockInfo = `<p style="font-size:12px;color:#b00020">
+            🔒 Locked for ${left} day(s)
+          </p>`;
+        }
+      }
+    }
+
+    if(p.status === "internal_rejected"){
+      badgeClass = "rejected";
+      badgeText  = "Rejected (Resubmission Allowed)";
+    }
 
     div.innerHTML = `
       <h4>${p.projectName}</h4>
       <small>${p.category} • ${p.stage}</small><br>
 
-      <span class="badge ${p.status.includes("approved") ? "approved" :
-                           p.status.includes("rejected") ? "rejected" : "pending"}">
-        ${p.status.replace("_"," ")}
+      <span class="badge ${badgeClass}">
+        ${badgeText}
       </span>
+
+      ${lockInfo}
 
       <p style="font-size:13px;margin-top:8px">
         <b>Owner:</b> ${p.creatorName} (${p.role})<br>
@@ -101,34 +131,55 @@ function renderAdmin(){
         <p><b>Impact:</b><br>${p.impact || "-"}</p>
       </details>
 
-      <div style="margin-top:10px">
-        <button class="btn approve" onclick="approve('${p.id}')">Approve</button>
-        <button class="btn reject" onclick="reject('${p.id}')">Reject</button>
+      ${
+        p.status === "internal_pending"
+        ? `
+          <div style="margin-top:10px">
+            <button class="btn approve"
+              onclick="approveProject('${p.id}')">
+              Approve
+            </button>
 
-        <select onchange="changeStage('${p.id}', this.value)">
-          <option value="">Change Stage</option>
-          <option>Concept</option>
-          <option>Pilot</option>
-          <option>Active</option>
-          <option>Scaling</option>
-        </select>
-      </div>
+            <button class="btn reject"
+              onclick="rejectProject('${p.id}')">
+              Reject
+            </button>
+
+            <select onchange="changeStage('${p.id}', this.value)">
+              <option value="">Change Stage</option>
+              <option>Concept</option>
+              <option>Pilot</option>
+              <option>Active</option>
+              <option>Scaling</option>
+            </select>
+          </div>
+        `
+        : ""
+      }
     `;
 
     container.appendChild(div);
   });
 }
 
-function approve(id){
-  updateInternalStatus(id,"internal_approved");
-  renderAdmin();
+/* ===============================
+   ADMIN ACTIONS
+================================ */
+
+function approveProject(id){
+  if(confirm("Approve this internal project?")){
+    updateInternalStatus(id,"internal_approved");
+    renderAdmin();
+  }
 }
-function reject(id){
+
+function rejectProject(id){
   if(confirm("Reject this internal project?")){
     updateInternalStatus(id,"internal_rejected");
     renderAdmin();
   }
 }
+
 function changeStage(id,stage){
   if(stage){
     updateInternalStage(id,stage);
