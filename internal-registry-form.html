@@ -186,6 +186,50 @@ Register Internal Project
 <script src="internal-registry.js"></script>
 
 <script>
+const STORAGE_KEY = "albukhr_internal_projects";
+
+function getInternalList(){
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+}
+
+function getLastEntry(){
+  const list = getInternalList();
+  return list[list.length - 1];
+}
+
+function checkInternalAccess(){
+  const last = getLastEntry();
+  if(!last) return;
+
+  const btn = document.getElementById("submitBtn");
+  const notice = document.getElementById("doneNotice");
+
+  // PENDING → LOCK
+  if(last.status === "internal_pending"){
+    btn.classList.add("disabled");
+    notice.style.display = "block";
+    notice.innerHTML = "⏳ Your previous internal project is under review.";
+    return;
+  }
+
+  // APPROVED → 7 DAYS LOCK
+  if(last.status === "internal_approved"){
+    const unlockAt = last.approvedAt + (7 * 24 * 60 * 60 * 1000);
+    if(Date.now() < unlockAt){
+      btn.classList.add("disabled");
+      notice.style.display = "block";
+      notice.innerHTML =
+        "🔒 Approved project locked. You can submit a new one after 7 days.";
+      return;
+    }
+  }
+
+  // REJECTED → ALLOW
+  if(last.status === "internal_rejected"){
+    btn.classList.remove("disabled");
+  }
+}
+
 function submitInternalProject(){
 
   const f = id => document.getElementById(id);
@@ -224,7 +268,9 @@ function submitInternalProject(){
     risk: f("risk").value,
     confidentiality: f("confidentiality").value,
     status: "internal_pending",
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    approvedAt: null,
+    rejectedAt: null
   };
 
   registerInternalProject(data); // internal-registry.js
@@ -234,7 +280,9 @@ function submitInternalProject(){
 
   alert("Internal project registered successfully");
 }
-</script>
+
+checkInternalAccess();
+    </script>
 
 </body>
   </html>
