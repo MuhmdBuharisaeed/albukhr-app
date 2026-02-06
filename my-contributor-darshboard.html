@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Contribution Status | ALBUKHR</title>
+
+<style>
+body{font-family:system-ui;background:#f4f7f6;margin:0}
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:14px;
+  font-weight:800
+}
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px
+}
+.status{
+  font-size:13px;
+  font-weight:800;
+  margin-top:6px
+}
+.pending{color:#856404}
+.approved{color:#0f7a3d}
+.rejected{color:#b02a37}
+
+.meta{
+  font-size:13px;
+  color:#555;
+  margin-top:6px;
+  line-height:1.6
+}
+
+.notice{
+  font-size:13px;
+  background:#f6fbf8;
+  border-left:4px solid #0f7a3d;
+  padding:12px;
+  margin-top:14px;
+  line-height:1.7
+}
+
+.telegram{
+  margin-top:16px;
+  padding:14px;
+  background:#e6f5ec;
+  border-radius:14px;
+  font-size:14px
+}
+.telegram a{
+  color:#0f7a3d;
+  font-weight:800;
+  text-decoration:none
+}
+
+.empty{
+  text-align:center;
+  color:#777;
+  padding:30px;
+  font-size:14px
+}
+
+.btn{
+  display:inline-block;
+  margin-top:14px;
+  padding:12px 16px;
+  background:#0f7a3d;
+  color:#fff;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:700;
+  text-decoration:none
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">ALBUKHR • My Contribution</div>
+
+<section class="section" id="box"></section>
+
+<script>
+const KEY = "albukhr_contributors";
+const box = document.getElementById("box");
+
+const list = JSON.parse(localStorage.getItem(KEY)) || [];
+const last = list[list.length - 1];
+
+if(!last){
+  box.innerHTML = `
+    <div class="empty">
+      No contribution found.<br><br>
+      <a href="submit-albukhrecosystem-form.html" class="btn">
+        Apply as Contributor
+      </a>
+    </div>
+  `;
+}else{
+  let statusClass = last.status;
+  let message = "";
+  let telegram = "";
+
+  if(last.status === "pending"){
+    message = `
+      <div class="notice">
+        ⏳ Your contribution request is under review.<br>
+        Please wait for admin approval.
+      </div>
+    `;
+  }
+
+  if(last.status === "approved"){
+    message = `
+      <div class="notice">
+        ✅ Congratulations! You are now an approved Albukhr contributor.
+      </div>
+    `;
+
+    if(last.telegramUnlocked){
+      telegram = `
+        <div class="telegram">
+          🚀 Join the official Albukhr Ecosystem Group:<br><br>
+          <a href="https://t.me/ALBUKHR_ECOSYSTEM_GROUP" target="_blank">
+            👉 Join Telegram Group
+          </a>
+        </div>
+      `;
+    }
+  }
+
+  if(last.status === "rejected"){
+    message = `
+      <div class="notice" style="border-left-color:#b02a37">
+        ❌ Your request was rejected.<br>
+        You may review your details and submit again.
+      </div>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="card">
+      <strong>${last.fullName}</strong>
+
+      <div class="meta">
+        📧 ${last.email}<br>
+        📞 ${last.phone}<br>
+        🌍 ${last.country || "—"}
+      </div>
+
+      <div class="status ${statusClass}">
+        Status: ${last.status.toUpperCase()}
+      </div>
+
+      ${message}
+      ${telegram}
+
+      ${
+        last.status === "rejected"
+        ? `<a href="submit-albukhrecosystem-form.html" class="btn">
+             Resubmit Application
+           </a>`
+        : ""
+      }
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
