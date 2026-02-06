@@ -192,5 +192,37 @@ function goInternalGate(){
 }
 </script>
 
+<script>
+function hasInternalAccess(){
+  return localStorage.getItem("albukhr_internal_access") === "granted";
+}
+
+function openInternalProject(){
+  if(!hasInternalAccess()){
+    alert("⛔ Restricted Access\nThis service is reserved for Albukhr core team only.");
+    return;
+  }
+
+  // za ka iya canzawa zuwa registry ko dashboard
+  window.location.href = "internal-project-dashboard.html";
+}
+
+// UI auto-lock
+(function(){
+  const card = document.getElementById("internalProjectCard");
+  if(!card) return;
+
+  if(!hasInternalAccess()){
+    card.classList.add("locked");
+    card.querySelector(".service-action").innerText = "Restricted";
+  }else{
+    card.classList.remove("locked");
+    card.querySelector(".service-action").innerText = "Open →";
+    card.querySelector(".badge").innerText = "Internal";
+    card.querySelector(".badge").className = "badge paid";
+  }
+})();
+</script>
+  
 </body>
 </html>
