@@ -3,236 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALBUKHR – Internal Project Registry</title>
+<title>Albukhr Services</title>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
 .section{padding:16px}
-.card{
+
+.service-card{
   background:#fff;
   border-radius:16px;
   padding:16px;
-  margin-bottom:14px
+  margin-bottom:14px;
+  display:flex;
+  gap:12px;
+  cursor:pointer;
 }
-.label{
-  font-size:13px;
+
+.service-icon{font-size:22px}
+
+.service-title{
   font-weight:700;
-  margin-top:12px
-}
-.input, .select{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  font-size:14px
-}
-textarea.input{min-height:90px}
-.btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  background:#0f7a3d;
-  color:#fff;
   font-size:15px;
-  font-weight:700;
-  margin-top:16px
 }
+
+.service-desc{
+  font-size:13px;
+  color:#666;
+  margin-top:4px;
+  line-height:1.5;
+}
+
+.service-action{
+  margin-top:10px;
+  font-size:12px;
+  color:#0f7a3d;
+  font-weight:600;
+}
+
+.badge{
+  display:inline-block;
+  font-size:10px;
+  padding:3px 8px;
+  border-radius:20px;
+  margin-top:6px;
+  font-weight:600;
+}
+
+.badge.public{background:#e6f5ec;color:#0f7a3d}
+.badge.paid{background:#fff3cd;color:#856404}
+.badge.restricted{background:#f8d7da;color:#842029}
+.badge.coming{background:#e7f1ff;color:#084298}
+
+.locked{
+  opacity:.55;
+}
+
 .notice{
   font-size:12px;
-  line-height:1.7;
-  background:#f6fbf8;
-  border-left:4px solid #0f7a3d;
-  padding:12px;
-  margin-top:12px
+  color:#777;
+  line-height:1.6;
+  margin-top:18px;
 }
-.disabled{opacity:.5;pointer-events:none}
 </style>
 </head>
 
-<body>
+<body data-page="services">
 
+<!-- HEADER -->
 <header class="header">
-  <h1 class="brand">ALBUKHR</h1>
+  <div class="header-left">
+    <span>🛠️ Services</span>
+  </div>
 </header>
 
 <section class="section">
 
-<h3>🏗️ Internal Project Registry</h3>
-<p style="font-size:13px">
-This form is strictly for <b>ALBUKHR internal projects</b>.
-Unauthorized use is prohibited.
-</p>
+  <!-- EXTERNAL PROJECT -->
+  <div class="service-card" onclick="goCreateExternal()">
+    <div class="service-icon">🚀</div>
+    <div>
+      <div class="service-title">Create External Project</div>
+      <div class="service-desc">
+        Register your independent project under Albukhr escrow protection.
+        Projects are reviewed before approval and public listing.
+      </div>
+      <span class="badge public">Community</span>
+      <div class="service-action">Start →</div>
+    </div>
+  </div>
 
-<!-- PROJECT IDENTITY -->
-<div class="card">
-  <h4>📌 Project Identity</h4>
+  <!-- PI DAPP LAUNCH SERVICE -->
+  <div class="service-card" onclick="goDappService()">
+    <div class="service-icon">📱</div>
+    <div>
+      <div class="service-title">Pi dApp Launch Service</div>
+      <div class="service-desc">
+        Albukhr assists you to create and launch your own Pi Network dApp
+        via Pi Studio or Albukhr developers. Ownership remains yours.
+      </div>
+      <span class="badge paid">Paid Service</span>
+      <div class="service-action">Apply →</div>
+    </div>
+  </div>
 
-  <div class="label">Project Name</div>
-  <input class="input" id="projectName">
+  <!-- INTERNAL PROJECT GATE -->
+  <div class="service-card" onclick="goInternalGate()">
+    <div class="service-icon">🏗️</div>
+    <div>
+      <div class="service-title">Internal Project Creation</div>
+      <div class="service-desc">
+        Private internal project registry for Albukhr core builders
+        and authorized ecosystem architects.
+      </div>
+      <span class="badge restricted">Core Only</span>
+      <div class="service-action">Access Gate →</div>
+    </div>
+  </div>
 
-  <div class="label">Project Category</div>
-  <select class="select" id="category">
-    <option value="">Select category</option>
-    <option>Agro & Livestock</option>
-    <option>Manufacturing</option>
-    <option>FinTech</option>
-    <option>Urban Transport</option>
-    <option>Education</option>
-    <option>Web3 / Digital</option>
-    <option>Other</option>
-  </select>
+  <!-- AI VERIFICATION -->
+  <div class="service-card locked">
+    <div class="service-icon">🤖</div>
+    <div>
+      <div class="service-title">AI Project Verification</div>
+      <div class="service-desc">
+        Automated seriousness, risk, and capability analysis
+        for projects before escrow approval.
+      </div>
+      <span class="badge coming">Coming soon</span>
+      <div class="service-action">Unavailable</div>
+    </div>
+  </div>
 
-  <div class="label">Project Stage</div>
-  <select class="select" id="stage">
-    <option value="">Select stage</option>
-    <option>Concept</option>
-    <option>Pilot</option>
-    <option>Active</option>
-    <option>Scaling</option>
-  </select>
-</div>
-
-<!-- OWNERSHIP -->
-<div class="card">
-  <h4>👤 Ownership & Control</h4>
-
-  <div class="label">Creator Full Name</div>
-  <input class="input" id="creatorName">
-
-  <div class="label">Role</div>
-  <select class="select" id="role">
-    <option value="">Select role</option>
-    <option>Founder</option>
-    <option>Co-Founder</option>
-    <option>Project Lead</option>
-  </select>
-
-  <div class="label">Albukhr Internal ID</div>
-  <input class="input" id="internalId" placeholder="ALB-INT-XXXX">
-
-  <div class="label">Contact Email</div>
-  <input class="input" id="email">
-
-  <div class="label">Phone Number</div>
-  <input class="input" id="phone">
-</div>
-
-<!-- DESCRIPTION -->
-<div class="card">
-  <h4>🧠 Project Description</h4>
-
-  <div class="label">Project Summary</div>
-  <textarea class="input" id="summary"></textarea>
-
-  <div class="label">Problem Statement</div>
-  <textarea class="input" id="problem"></textarea>
-
-  <div class="label">Solution / Innovation</div>
-  <textarea class="input" id="solution"></textarea>
-
-  <div class="label">Expected Impact</div>
-  <textarea class="input" id="impact"></textarea>
-</div>
-
-<!-- INTERNAL CONTROLS -->
-<div class="card">
-  <h4>🔒 Internal Controls</h4>
-
-  <div class="label">Funding Stage</div>
-  <select class="select" id="funding">
-    <option value="">Select</option>
-    <option>Self-Funded</option>
-    <option>Internal Funding</option>
-    <option>External Partnership</option>
-  </select>
-
-  <div class="label">Risk Level</div>
-  <select class="select" id="risk">
-    <option value="">Select</option>
-    <option>Low</option>
-    <option>Medium</option>
-    <option>High</option>
-  </select>
-
-  <div class="label">Confidentiality Level</div>
-  <select class="select" id="confidentiality">
-    <option value="">Select</option>
-    <option>Internal Only</option>
-    <option>Restricted</option>
-    <option>Executive Only</option>
-  </select>
-</div>
-
-<!-- CONFIRMATION -->
-<div class="card">
-  <label>
-    <input type="checkbox" id="agree">
-    I confirm this is an <b>internal ALBUKHR project</b> and all
-    information provided is accurate.
-  </label>
-</div>
-
-<button class="btn" id="submitBtn" onclick="submitInternalProject()">
-Register Internal Project
-</button>
-
-<div class="notice" id="doneNotice" style="display:none">
-✅ Internal project submitted successfully.
-</div>
+  <div class="notice">
+    ℹ️ Services are controlled gateways into the Albukhr ecosystem.
+    Each service enforces approval rules, access levels, and admin oversight
+    to protect contributors, users, and the ecosystem.
+  </div>
 
 </section>
 
-<script src="internal-registry.js"></script>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="index.html"><span>🏠</span>Home</a>
+  <a href="projects.html"><span>🔎</span>Projects</a>
+  <a href="wallet.html"><span>💰</span>Wallet</a>
+  <a href="services.html" class="active"><span>🛠️</span>Services</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</nav>
 
 <script>
-function submitInternalProject(){
+/* ===============================
+   SERVICE ROUTING – ALBUKHR
+================================ */
 
-  const f = id => document.getElementById(id);
+function goCreateExternal(){
+  window.location.href = "external-create.html";
+}
 
-  if(
-    !f("projectName").value ||
-    !f("category").value ||
-    !f("stage").value ||
-    !f("creatorName").value ||
-    !f("role").value ||
-    !f("internalId").value ||
-    !f("summary").value ||
-    !f("problem").value ||
-    !f("solution").value ||
-    !f("agree").checked
-  ){
-    alert("Please complete all required internal fields");
+function goDappService(){
+  window.location.href = "pi-dapp-service.html";
+}
+
+function goInternalGate(){
+  /*
+    SECURITY NOTE:
+    Internal access should later be validated via:
+    - admin session
+    - role flag
+    - signed invite
+  */
+
+  const isAuthorized =
+    localStorage.getItem("albukhr_internal_access") === "true";
+
+  if(!isAuthorized){
+    alert(
+      "⛔ Access Restricted\n\n" +
+      "Internal Project Creation is limited to Albukhr core builders " +
+      "and authorized contributors only."
+    );
     return;
   }
 
-  const data = {
-    id: "INT-" + Date.now(),
-    projectName: f("projectName").value.trim(),
-    category: f("category").value,
-    stage: f("stage").value,
-    creatorName: f("creatorName").value.trim(),
-    role: f("role").value,
-    internalId: f("internalId").value.trim(),
-    email: f("email").value.trim(),
-    phone: f("phone").value.trim(),
-    summary: f("summary").value.trim(),
-    problem: f("problem").value.trim(),
-    solution: f("solution").value.trim(),
-    impact: f("impact").value.trim(),
-    funding: f("funding").value,
-    risk: f("risk").value,
-    confidentiality: f("confidentiality").value,
-    status: "internal_pending",
-    createdAt: Date.now()
-  };
-
-  registerInternalProject(data); // internal-registry.js
-
-  document.getElementById("submitBtn").classList.add("disabled");
-  document.getElementById("doneNotice").style.display = "block";
-
-  alert("Internal project registered successfully");
+  window.location.href = "internal-registry-form.html";
 }
 </script>
 
