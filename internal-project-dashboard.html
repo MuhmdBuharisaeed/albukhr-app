@@ -3,176 +3,178 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALBUKHR – Internal Project Dashboard</title>
+<title>Internal Project Dashboard | Albukhr</title>
+
+<link rel="stylesheet" href="style.css">
 
 <style>
-body{
-  background:#f4f7f5;
-  font-family:system-ui;
-  margin:0
-}
-.header{
-  background:#0f7a3d;
-  color:#fff;
-  padding:16px
-}
 .section{padding:16px}
 
 .card{
   background:#fff;
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:14px
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
 }
 
-h3,h4{margin:6px 0}
-
-.meta{
-  font-size:12px;
-  color:#555
-}
-
-.badge{
-  display:inline-block;
-  padding:4px 10px;
-  font-size:11px;
-  border-radius:20px;
+.title{
+  font-size:16px;
   font-weight:700;
-  margin-right:6px
+  margin-bottom:6px;
 }
-.pending{background:#fff4cc;color:#8a6d00}
-.approved{background:#e6f7ee;color:#0f7a3d}
-.rejected{background:#fdecea;color:#b00020}
 
-.stage{
-  background:#eef1f0;
-  padding:4px 10px;
-  border-radius:12px;
+.sub{
+  font-size:12px;
+  color:#666;
+  margin-bottom:12px;
+}
+
+.project-name{
+  font-weight:700;
+  font-size:14px;
+}
+
+.project-meta{
   font-size:11px;
-  font-weight:700
+  color:#777;
+  margin-top:4px;
 }
 
-.filter{
-  margin-bottom:14px
+.status{
+  display:inline-block;
+  font-size:10px;
+  padding:4px 10px;
+  border-radius:20px;
+  font-weight:600;
+  margin-top:8px;
 }
-select{
+
+.status.pending{background:#fff3cd;color:#856404}
+.status.approved{background:#e6f5ec;color:#0f7a3d}
+.status.rejected{background:#f8d7da;color:#842029}
+
+.actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.btn{
+  flex:1;
   padding:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  width:100%;
-  font-size:14px
+  border:none;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
 }
+
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#842029;color:#fff}
+.disabled{opacity:.5;pointer-events:none}
 
 .empty{
   font-size:13px;
   color:#777;
   text-align:center;
-  padding:20px
+  margin-top:40px;
 }
 </style>
 </head>
 
-<body>
+<body data-page="internal-dashboard">
 
-<script>
-if(sessionStorage.getItem("albukhr_internal_access") !== "true"){
-  location.href = "internal-dashboard-gate.html";
-}
-</script>
-  
-<div class="header">
-  <h3>📊 Internal Project Dashboard</h3>
-  <p style="font-size:13px;opacity:.9">
-    Read-only overview of ALBUKHR internal projects
-  </p>
-</div>
+<header class="header">
+  <div class="header-left">
+    <span>🧩 Internal Projects</span>
+  </div>
+</header>
 
 <section class="section">
 
-<div class="filter">
-  <select onchange="filterProjects(this.value)">
-    <option value="">All Projects</option>
-    <option value="internal_approved">Approved</option>
-    <option value="pending">Pending</option>
-    <option value="internal_rejected">Rejected</option>
-  </select>
-</div>
+  <div class="title">Internal Project Dashboard</div>
+  <div class="sub">
+    Review, approve, or reject Albukhr internal projects.
+  </div>
 
-<div id="dashboard"></div>
+  <div id="projectList"></div>
 
 </section>
 
-<script src="internal-registry.js"></script>
+<nav class="bottom-nav">
+  <a href="index.html"><span>🏠</span>Home</a>
+  <a href="services.html" class="active"><span>🛠️</span>Services</a>
+  <a href="settings.html"><span>⚙️</span>Settings</a>
+</nav>
 
 <script>
-const box = document.getElementById("dashboard");
-let cached = [];
+const KEY = "albukhr_internal_projects";
 
-function render(list){
+function loadProjects(){
+  const list = JSON.parse(localStorage.getItem(KEY) || "[]");
+  const box = document.getElementById("projectList");
   box.innerHTML = "";
 
-  if(!list.length){
-    box.innerHTML = `<div class="empty">No internal projects available</div>`;
+  if(list.length === 0){
+    box.innerHTML = `<div class="empty">
+      No internal projects submitted yet.
+    </div>`;
     return;
   }
 
-  list.forEach(p=>{
-    const div = document.createElement("div");
-    div.className = "card";
+  list.forEach((p, i)=>{
+    const card = document.createElement("div");
+    card.className = "card";
 
-    const statusClass =
-      p.status === "internal_approved" ? "approved" :
-      p.status === "internal_rejected" ? "rejected" : "pending";
-
-    div.innerHTML = `
-      <h4>${p.projectName}</h4>
-
-      <div class="meta">
-        ${p.category} • Owner: ${p.creatorName}
+    card.innerHTML = `
+      <div class="project-name">${p.name}</div>
+      <div class="project-meta">
+        Category: ${p.category}<br>
+        Lead: ${p.lead}<br>
+        Phase: ${p.phase}
       </div>
 
-      <div style="margin:8px 0">
-        <span class="badge ${statusClass}">
-          ${p.status.replace("_"," ")}
-        </span>
-        <span class="stage">${p.stage || "Concept"}</span>
-      </div>
+      <span class="status ${p.status}">
+        ${p.status.toUpperCase()}
+      </span>
 
-      <details>
-        <summary style="cursor:pointer;font-size:12px">
-          View Summary
-        </summary>
-        <p style="font-size:13px"><b>Summary:</b><br>${p.summary}</p>
-        <p style="font-size:13px"><b>Problem:</b><br>${p.problem}</p>
-        <p style="font-size:13px"><b>Solution:</b><br>${p.solution}</p>
-        <p style="font-size:13px"><b>Impact:</b><br>${p.impact || "-"}</p>
-      </details>
+      <div class="actions">
+        <button class="btn approve"
+          ${p.status !== "pending" ? "disabled class='disabled'" : ""}
+          onclick="approve(${i})">
+          Approve
+        </button>
 
-      <div class="meta" style="margin-top:10px">
-        Internal ID: <b>${p.internalId}</b><br>
-        Created: ${new Date(p.createdAt).toLocaleDateString()}
+        <button class="btn reject"
+          ${p.status !== "pending" ? "disabled class='disabled'" : ""}
+          onclick="reject(${i})">
+          Reject
+        </button>
       </div>
     `;
 
-    box.appendChild(div);
+    box.appendChild(card);
   });
 }
 
-function filterProjects(status){
-  if(!status){
-    render(cached);
-  }else{
-    render(cached.filter(p=>p.status===status));
-  }
+function approve(index){
+  const list = JSON.parse(localStorage.getItem(KEY));
+  list[index].status = "approved";
+  list[index].approvedAt = new Date().toISOString();
+  localStorage.setItem(KEY, JSON.stringify(list));
+  loadProjects();
 }
 
-function init(){
-  cached = getInternalProjects();
-  cached.sort((a,b)=>b.createdAt - a.createdAt);
-  render(cached);
+function reject(index){
+  if(!confirm("Reject this internal project?")) return;
+  const list = JSON.parse(localStorage.getItem(KEY));
+  list[index].status = "rejected";
+  list[index].rejectedAt = new Date().toISOString();
+  localStorage.setItem(KEY, JSON.stringify(list));
+  loadProjects();
 }
 
-init();
+loadProjects();
 </script>
 
 </body>
