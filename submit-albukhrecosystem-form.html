@@ -32,9 +32,13 @@ textarea.input{min-height:90px}
   color:#fff;
   font-size:15px;
   font-weight:700;
-  margin-top:16px
+  margin-top:16px;
+  cursor:pointer
 }
-.disabled{opacity:.5;pointer-events:none}
+.btn.disabled{
+  opacity:.5;
+  pointer-events:none
+}
 .notice{
   font-size:12px;
   line-height:1.7;
@@ -48,20 +52,22 @@ textarea.input{min-height:90px}
   margin-top:12px
 }
 .policy a{
-  color:#0b66ff;
-  text-decoration:underline;
-  font-weight:600
+  color:#0f7a3d;
+  font-weight:700;
+  text-decoration:none
 }
 .telegram{
-  background:#eef6ff;
+  background:#f6fbf8;
   padding:14px;
   border-radius:14px;
   margin-top:14px;
-  font-size:14px
+  font-size:13px;
+  border-left:4px solid #0f7a3d
 }
 .telegram a{
-  color:#0b66ff;
-  font-weight:700
+  color:#0f7a3d;
+  font-weight:800;
+  text-decoration:none
 }
 </style>
 </head>
@@ -113,7 +119,7 @@ This form is strictly for approved contributors invited by ALBUKHR.
 </label>
 
 <div class="policy">
-📜 <a href="albukhr-contributor-policy.html">
+📜 <a href="albukhr-contributor-policy.html" target="_blank">
 View Albukhr Contributor Policy & Rules
 </a>
 </div>
@@ -128,10 +134,9 @@ Submit for Review
 </div>
 
 <div class="telegram" id="telegramBox" style="display:none">
-✅ Approved!  
-<br>
+✅ Approved contributor<br>
 <a href="https://t.me/ALBUKHR_ECOSYSTEM_GROUP" target="_blank">
-Join Albukhr Contributor Telegram Group
+Join Albukhr Ecosystem Telegram Group
 </a>
 </div>
 
@@ -147,44 +152,64 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
+/* ==========================
+   CHECK CURRENT USER STATUS
+========================== */
 function checkStatus(){
+  const email = document.getElementById("email")?.value.trim();
+  if(!email) return;
+
   const list = getList();
-  const last = list[list.length - 1];
-  if(!last) return;
+  const record = list.find(r => r.email === email);
+
+  if(!record) return;
 
   const btn = document.getElementById("submitBtn");
 
-  if(last.status === "pending"){
+  if(record.status === "pending"){
     btn.classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
   }
 
-  if(last.status === "approved" && last.telegramUnlocked){
+  if(record.status === "approved" && record.telegramUnlocked){
     btn.classList.add("disabled");
     document.getElementById("telegramBox").style.display = "block";
   }
 
-  if(last.status === "rejected"){
+  if(record.status === "rejected"){
     btn.classList.remove("disabled");
   }
 }
 
+/* ==========================
+   SUBMIT FUNCTION
+========================== */
 function submitContributor(){
   const f = id => document.getElementById(id);
 
-  if(!f("fullName").value ||
-     !f("phone").value ||
-     !f("email").value ||
-     !f("address").value ||
-     !f("skills").value ||
-     !f("contribution").value ||
-     !f("agree").checked){
-    alert("Complete all required fields");
+  if(
+    !f("fullName").value ||
+    !f("phone").value ||
+    !f("email").value ||
+    !f("address").value ||
+    !f("skills").value ||
+    !f("contribution").value ||
+    !f("agree").checked
+  ){
+    alert("Please complete all required fields");
     return;
   }
 
   if(!f("photo").files.length){
-    alert("Profile photo required");
+    alert("Profile photo is required");
+    return;
+  }
+
+  const list = getList();
+
+  if(list.some(r => r.email === f("email").value && r.status === "pending")){
+    alert("⏳ You already have a pending submission.");
+    checkStatus();
     return;
   }
 
@@ -206,20 +231,21 @@ function submitContributor(){
       createdAt:Date.now()
     };
 
-    const list = getList();
     list.push(data);
     saveList(list);
 
     document.getElementById("submitBtn").classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
 
-    alert("✅ Submitted successfully");
+    alert("✅ Submitted successfully. Await admin review.");
   };
+
   reader.readAsDataURL(f("photo").files[0]);
 }
 
-checkStatus();
+/* auto check when email entered */
+document.getElementById("email").addEventListener("blur", checkStatus);
 </script>
 
 </body>
-</html>
+  </html>
