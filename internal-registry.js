@@ -1,10 +1,13 @@
 // ===============================
-// ALBUKHR INTERNAL REGISTRY
+// ALBUKHR INTERNAL REGISTRY (FIXED)
 // ===============================
 
 const INTERNAL_KEY = "albukhr_internal_projects";
 
-/* LOAD */
+/* ===============================
+   CORE STORAGE
+================================ */
+
 function getInternalProjects(){
   try{
     return JSON.parse(localStorage.getItem(INTERNAL_KEY)) || [];
@@ -13,72 +16,97 @@ function getInternalProjects(){
   }
 }
 
-/* SAVE */
 function saveInternalProjects(list){
   localStorage.setItem(INTERNAL_KEY, JSON.stringify(list));
 }
 
-/* ADD (PENDING) */
-function addInternalProject(project){
-  const list = getInternalProjects();
+/* ===============================
+   HELPERS
+================================ */
 
-  list.push({
-    id: Date.now(),
-    ...project,
-    status: "pending",   // 🔒 important
-    createdAt: new Date().toISOString()
-  });
-
-  saveInternalProjects(list);
+function getLastProjectByInternalId(internalId){
+  const list = getInternalProjects()
+    .filter(p => p.internalId === internalId)
+    .sort((a,b)=>b.createdAt - a.createdAt);
+  return list[0] || null;
 }
 
-/* APPROVE */
-function approveInternalProject(id){
-  const list = getInternalProjects();
+function isLockedByApproval(project){
+  if(project.status !== "internal_approved") return false;
 
-  list.forEach(p=>{
-    if(p.id === id){
-      p.status = "approved";
-      p.approvedAt = new Date().toISOString();
-    }
-  });
+  const approvedAt = project.approvedAt || 0;
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
 
-  saveInternalProjects(list);
+  return (Date.now() - approvedAt) < sevenDays;
 }
 
-/* REJECT */
-function rejectInternalProject(id){
-  const list = getInternalProjects().filter(p=>p.id !== id);
-  saveInternalProjects(list);
-}
+/* ===============================
+   REGISTER (USER SIDE)
+================================ */
 
+function canSubmitInternalProject(internalId){
+  const last = getLastProjectByInternalId(internalId);
+  if(!last) return true;
 
-const KEY = "albukhr_internal_projects";
+  if(last.status === "internal_pending") return false;
+  if(last.status === "internal_rejected") return true;
 
-function getInternalProjects(){
-  return JSON.parse(localStorage.getItem(KEY)) || [];
-}
+  if(last.status === "internal_approved"){
+    return !isLockedByApproval(last);
+  }
 
-function saveInternalProjects(list){
-  localStorage.setItem(KEY, JSON.stringify(list));
+  return true;
 }
 
 function registerInternalProject(data){
+  if(!canSubmitInternalProject(data.internalId)){
+    alert("Submission locked. Await admin decision or approval cooldown.");
+    return false;
+  }
+
   const list = getInternalProjects();
-  list.push(data);
+
+  list.push({
+    ...data,
+    id: data.id || ("INT-" + Date.now()),
+    status: "internal_pending",
+    createdAt: Date.now()
+  });
+
   saveInternalProjects(list);
+  return true;
 }
+
+/* ===============================
+   ADMIN ACTIONS
+================================ */
 
 function updateInternalStatus(id,status){
   const list = getInternalProjects();
-  const p = list.find(x=>x.id===id);
-  if(p) p.status = status;
+  const p = list.find(x => x.id === id);
+
+  if(p){
+    p.status = status;
+
+    if(status === "internal_approved"){
+      p.approvedAt = Date.now();
+    }
+
+    if(status === "internal_rejected"){
+      delete p.approvedAt;
+    }
+  }
+
   saveInternalProjects(list);
 }
 
 function updateInternalStage(id,stage){
   const list = getInternalProjects();
-  const p = list.find(x=>x.id===id);
-  if(p) p.stage = stage;
+  const p = list.find(x => x.id === id);
+
+  if(p){
+    p.stage = stage;
+  }
+
   saveInternalProjects(list);
-     }
+}
