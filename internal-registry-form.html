@@ -3,66 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Internal Project Registry | Albukhr</title>
-
+<title>ALBUKHR – Internal Project Registry</title>
 <link rel="stylesheet" href="style.css">
 
 <style>
 .section{padding:16px}
-
 .card{
   background:#fff;
-  border-radius:18px;
-  padding:18px;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px
 }
-
-.title{
-  font-size:16px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-.sub{
+.label{
   font-size:13px;
-  color:#666;
-  margin-bottom:16px;
-  line-height:1.6;
+  font-weight:700;
+  margin-top:12px
 }
-
-.form-group{
-  margin-bottom:14px;
-}
-
-label{
-  display:block;
-  font-size:12px;
-  font-weight:600;
-  margin-bottom:6px;
-  color:#333;
-}
-
-input, textarea, select{
+.input, .select{
   width:100%;
   padding:12px;
-  border-radius:12px;
+  border-radius:10px;
   border:1px solid #ddd;
-  font-size:13px;
-  outline:none;
+  font-size:14px
 }
-
-textarea{resize:none}
-
-input:focus, textarea:focus, select:focus{
-  border-color:#0f7a3d;
-}
-
-.note{
-  font-size:11px;
-  color:#777;
-  line-height:1.5;
-  margin-top:10px;
-}
-
+textarea.input{min-height:90px}
 .btn{
   width:100%;
   padding:14px;
@@ -70,156 +34,207 @@ input:focus, textarea:focus, select:focus{
   border-radius:14px;
   background:#0f7a3d;
   color:#fff;
+  font-size:15px;
   font-weight:700;
-  font-size:14px;
-  cursor:pointer;
-  margin-top:16px;
+  margin-top:16px
 }
-
-.btn:disabled{
-  background:#9fcbb4;
-  cursor:not-allowed;
+.notice{
+  font-size:12px;
+  line-height:1.7;
+  background:#f6fbf8;
+  border-left:4px solid #0f7a3d;
+  padding:12px;
+  margin-top:12px
 }
-
-.badge{
-  display:inline-block;
-  font-size:10px;
-  padding:4px 10px;
-  border-radius:20px;
-  background:#e6f5ec;
-  color:#0f7a3d;
-  font-weight:600;
-  margin-bottom:12px;
-}
+.disabled{opacity:.5;pointer-events:none}
 </style>
 </head>
 
-<body data-page="internal-registry">
+<body>
 
 <header class="header">
-  <div class="header-left">
-    <span>🏗️ Internal Project</span>
-  </div>
+  <h1 class="brand">ALBUKHR</h1>
 </header>
 
 <section class="section">
 
-  <div class="card">
+<h3>🏗️ Internal Project Registry</h3>
+<p style="font-size:13px">
+This form is strictly for <b>ALBUKHR internal projects</b>.
+Unauthorized use is prohibited.
+</p>
 
-    <span class="badge">Albukhr Core Only</span>
+<!-- PROJECT IDENTITY -->
+<div class="card">
+  <h4>📌 Project Identity</h4>
 
-    <div class="title">Register Internal Project</div>
-    <div class="sub">
-      This form is reserved for Albukhr internal builders.
-      Submitted projects enter admin review before activation.
-    </div>
+  <div class="label">Project Name</div>
+  <input class="input" id="projectName">
 
-    <form id="internalProjectForm">
+  <div class="label">Project Category</div>
+  <select class="select" id="category">
+    <option value="">Select category</option>
+    <option>Agro & Livestock</option>
+    <option>Manufacturing</option>
+    <option>FinTech</option>
+    <option>Urban Transport</option>
+    <option>Education</option>
+    <option>Web3 / Digital</option>
+    <option>Other</option>
+  </select>
 
-      <div class="form-group">
-        <label>Project Name</label>
-        <input type="text" id="projectName" required
-               placeholder="e.g. Barsh Agro Expansion">
-      </div>
+  <div class="label">Project Stage</div>
+  <select class="select" id="stage">
+    <option value="">Select stage</option>
+    <option>Concept</option>
+    <option>Pilot</option>
+    <option>Active</option>
+    <option>Scaling</option>
+  </select>
+</div>
 
-      <div class="form-group">
-        <label>Project Category</label>
-        <select id="projectCategory" required>
-          <option value="">Select category</option>
-          <option>Agro & Livestock</option>
-          <option>Manufacturing</option>
-          <option>Food & Bakery</option>
-          <option>Transportation & Logistics</option>
-          <option>Technology & Innovation</option>
-          <option>Education & Training</option>
-          <option>Other</option>
-        </select>
-      </div>
+<!-- OWNERSHIP -->
+<div class="card">
+  <h4>👤 Ownership & Control</h4>
 
-      <div class="form-group">
-        <label>Project Description</label>
-        <textarea id="projectDesc" rows="4" required
-          placeholder="Describe the purpose, scope, and role of this internal project"></textarea>
-      </div>
+  <div class="label">Creator Full Name</div>
+  <input class="input" id="creatorName">
 
-      <div class="form-group">
-        <label>Project Lead (Name or ID)</label>
-        <input type="text" id="projectLead" required
-               placeholder="Internal team lead or unit head">
-      </div>
+  <div class="label">Role</div>
+  <select class="select" id="role">
+    <option value="">Select role</option>
+    <option>Founder</option>
+    <option>Co-Founder</option>
+    <option>Project Lead</option>
+  </select>
 
-      <div class="form-group">
-        <label>Estimated Phase</label>
-        <select id="projectPhase" required>
-          <option value="">Select phase</option>
-          <option>Idea</option>
-          <option>Planning</option>
-          <option>Development</option>
-          <option>Pilot</option>
-          <option>Operational</option>
-        </select>
-      </div>
+  <div class="label">Albukhr Internal ID</div>
+  <input class="input" id="internalId" placeholder="ALB-INT-XXXX">
 
-      <div class="note">
-        ⚠️ Internal projects are governed by Albukhr core policies.
-        False or incomplete data may lead to rejection.
-      </div>
+  <div class="label">Contact Email</div>
+  <input class="input" id="email">
 
-      <button type="submit" class="btn">
-        Submit for Admin Review
-      </button>
+  <div class="label">Phone Number</div>
+  <input class="input" id="phone">
+</div>
 
-    </form>
-  </div>
+<!-- DESCRIPTION -->
+<div class="card">
+  <h4>🧠 Project Description</h4>
+
+  <div class="label">Project Summary</div>
+  <textarea class="input" id="summary"></textarea>
+
+  <div class="label">Problem Statement</div>
+  <textarea class="input" id="problem"></textarea>
+
+  <div class="label">Solution / Innovation</div>
+  <textarea class="input" id="solution"></textarea>
+
+  <div class="label">Expected Impact</div>
+  <textarea class="input" id="impact"></textarea>
+</div>
+
+<!-- INTERNAL CONTROLS -->
+<div class="card">
+  <h4>🔒 Internal Controls</h4>
+
+  <div class="label">Funding Stage</div>
+  <select class="select" id="funding">
+    <option value="">Select</option>
+    <option>Self-Funded</option>
+    <option>Internal Funding</option>
+    <option>External Partnership</option>
+  </select>
+
+  <div class="label">Risk Level</div>
+  <select class="select" id="risk">
+    <option value="">Select</option>
+    <option>Low</option>
+    <option>Medium</option>
+    <option>High</option>
+  </select>
+
+  <div class="label">Confidentiality Level</div>
+  <select class="select" id="confidentiality">
+    <option value="">Select</option>
+    <option>Internal Only</option>
+    <option>Restricted</option>
+    <option>Executive Only</option>
+  </select>
+</div>
+
+<!-- CONFIRMATION -->
+<div class="card">
+  <label>
+    <input type="checkbox" id="agree">
+    I confirm this is an <b>internal ALBUKHR project</b> and all
+    information provided is accurate.
+  </label>
+</div>
+
+<button class="btn" id="submitBtn" onclick="submitInternalProject()">
+Register Internal Project
+</button>
+
+<div class="notice" id="doneNotice" style="display:none">
+✅ Internal project submitted successfully.
+</div>
 
 </section>
 
-<nav class="bottom-nav">
-  <a href="index.html"><span>🏠</span>Home</a>
-  <a href="projects.html"><span>🔎</span>Projects</a>
-  <a href="services.html" class="active"><span>🛠️</span>Services</a>
-  <a href="settings.html"><span>⚙️</span>Settings</a>
-</nav>
+<script src="internal-registry.js"></script>
 
 <script>
-/* ===============================
-   INTERNAL REGISTRY – STEP 1
-================================ */
+function submitInternalProject(){
 
-document.getElementById("internalProjectForm")
-.addEventListener("submit", function(e){
-  e.preventDefault();
+  const f = id => document.getElementById(id);
 
-  const data = {
-    name: projectName.value.trim(),
-    category: projectCategory.value,
-    description: projectDesc.value.trim(),
-    lead: projectLead.value.trim(),
-    phase: projectPhase.value,
-    status: "pending",
-    createdAt: new Date().toISOString()
-  };
-
-  if(!data.name || !data.category || !data.description){
-    alert("Please complete all required fields.");
+  if(
+    !f("projectName").value ||
+    !f("category").value ||
+    !f("stage").value ||
+    !f("creatorName").value ||
+    !f("role").value ||
+    !f("internalId").value ||
+    !f("summary").value ||
+    !f("problem").value ||
+    !f("solution").value ||
+    !f("agree").checked
+  ){
+    alert("Please complete all required internal fields");
     return;
   }
 
-  // Temporary local storage (will connect to registry.js)
-  let list = JSON.parse(
-    localStorage.getItem("albukhr_internal_projects") || "[]"
-  );
+  const data = {
+    id: "INT-" + Date.now(),
+    projectName: f("projectName").value.trim(),
+    category: f("category").value,
+    stage: f("stage").value,
+    creatorName: f("creatorName").value.trim(),
+    role: f("role").value,
+    internalId: f("internalId").value.trim(),
+    email: f("email").value.trim(),
+    phone: f("phone").value.trim(),
+    summary: f("summary").value.trim(),
+    problem: f("problem").value.trim(),
+    solution: f("solution").value.trim(),
+    impact: f("impact").value.trim(),
+    funding: f("funding").value,
+    risk: f("risk").value,
+    confidentiality: f("confidentiality").value,
+    status: "internal_pending",
+    createdAt: Date.now()
+  };
 
-  list.push(data);
-  localStorage.setItem(
-    "albukhr_internal_projects",
-    JSON.stringify(list)
-  );
+  registerInternalProject(data); // internal-registry.js
 
-  alert("✅ Internal project submitted for admin review.");
-  window.location.href = "services.html";
-});
+  document.getElementById("submitBtn").classList.add("disabled");
+  document.getElementById("doneNotice").style.display = "block";
+
+  alert("Internal project registered successfully");
+}
 </script>
 
 </body>
-</html>
+  </html>
