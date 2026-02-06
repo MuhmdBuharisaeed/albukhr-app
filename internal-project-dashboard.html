@@ -3,178 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Internal Project Dashboard | Albukhr</title>
-
-<link rel="stylesheet" href="style.css">
+<title>ALBUKHR – Internal Project Dashboard</title>
 
 <style>
+body{
+  background:#f4f7f5;
+  font-family:system-ui;
+  margin:0;
+}
 .section{padding:16px}
-
 .card{
   background:#fff;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:14px;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px
 }
+h3,h4{margin:4px 0}
+small{color:#555;font-size:12px}
 
-.title{
-  font-size:16px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-.sub{
-  font-size:12px;
-  color:#666;
-  margin-bottom:12px;
-}
-
-.project-name{
-  font-weight:700;
-  font-size:14px;
-}
-
-.project-meta{
-  font-size:11px;
-  color:#777;
-  margin-top:4px;
-}
-
-.status{
+.badge{
   display:inline-block;
-  font-size:10px;
   padding:4px 10px;
+  font-size:11px;
   border-radius:20px;
-  font-weight:600;
-  margin-top:8px;
+  font-weight:700
 }
+.pending{background:#fff4cc;color:#8a6d00}
+.approved{background:#e6f7ee;color:#0f7a3d}
+.rejected{background:#fdecea;color:#b00020}
 
-.status.pending{background:#fff3cd;color:#856404}
-.status.approved{background:#e6f5ec;color:#0f7a3d}
-.status.rejected{background:#f8d7da;color:#842029}
-
-.actions{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
+.stage{
+  font-size:11px;
+  background:#444;
+  color:#fff;
+  padding:4px 8px;
+  border-radius:6px;
+  display:inline-block;
+  margin-left:6px
 }
-
-.btn{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:12px;
+.lock{
   font-size:12px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.approve{background:#0f7a3d;color:#fff}
-.reject{background:#842029;color:#fff}
-.disabled{opacity:.5;pointer-events:none}
-
-.empty{
-  font-size:13px;
-  color:#777;
-  text-align:center;
-  margin-top:40px;
+  color:#b00020;
+  margin-top:6px
 }
 </style>
 </head>
 
-<body data-page="internal-dashboard">
-
-<header class="header">
-  <div class="header-left">
-    <span>🧩 Internal Projects</span>
-  </div>
-</header>
+<body>
 
 <section class="section">
+  <h3>📊 Internal Project Dashboard</h3>
+  <p style="font-size:13px">
+    Read-only overview of all ALBUKHR internal projects
+  </p>
 
-  <div class="title">Internal Project Dashboard</div>
-  <div class="sub">
-    Review, approve, or reject Albukhr internal projects.
-  </div>
-
-  <div id="projectList"></div>
-
+  <div id="dashboard"></div>
 </section>
 
-<nav class="bottom-nav">
-  <a href="index.html"><span>🏠</span>Home</a>
-  <a href="services.html" class="active"><span>🛠️</span>Services</a>
-  <a href="settings.html"><span>⚙️</span>Settings</a>
-</nav>
+<script src="internal-registry.js"></script>
 
 <script>
-const KEY = "albukhr_internal_projects";
+const container = document.getElementById("dashboard");
 
-function loadProjects(){
-  const list = JSON.parse(localStorage.getItem(KEY) || "[]");
-  const box = document.getElementById("projectList");
-  box.innerHTML = "";
+function daysLeft(approvedAt){
+  const limit = 7 * 24 * 60 * 60 * 1000;
+  const diff = limit - (Date.now() - approvedAt);
+  return Math.ceil(diff / (24 * 60 * 60 * 1000));
+}
 
-  if(list.length === 0){
-    box.innerHTML = `<div class="empty">
-      No internal projects submitted yet.
-    </div>`;
+function renderDashboard(){
+  const list = getInternalProjects();
+  container.innerHTML = "";
+
+  if(!list.length){
+    container.innerHTML = "<p>No internal projects available.</p>";
     return;
   }
 
-  list.forEach((p, i)=>{
+  list.slice().reverse().forEach(p=>{
+    let badge = "pending";
+    let badgeText = "Pending Review";
+    let lockInfo = "";
+
+    if(p.status === "internal_approved"){
+      badge = "approved";
+      badgeText = "Approved";
+
+      if(p.approvedAt){
+        const left = daysLeft(p.approvedAt);
+        if(left > 0){
+          lockInfo = `
+            <div class="lock">
+              🔒 Locked for ${left} day(s)
+            </div>`;
+        }
+      }
+    }
+
+    if(p.status === "internal_rejected"){
+      badge = "rejected";
+      badgeText = "Rejected";
+    }
+
     const card = document.createElement("div");
     card.className = "card";
 
     card.innerHTML = `
-      <div class="project-name">${p.name}</div>
-      <div class="project-meta">
-        Category: ${p.category}<br>
-        Lead: ${p.lead}<br>
-        Phase: ${p.phase}
-      </div>
+      <h4>${p.projectName}</h4>
+      <small>
+        ${p.category}
+        <span class="stage">${p.stage || "Concept"}</span>
+      </small>
+      <br><br>
 
-      <span class="status ${p.status}">
-        ${p.status.toUpperCase()}
+      <span class="badge ${badge}">
+        ${badgeText}
       </span>
 
-      <div class="actions">
-        <button class="btn approve"
-          ${p.status !== "pending" ? "disabled class='disabled'" : ""}
-          onclick="approve(${i})">
-          Approve
-        </button>
+      ${lockInfo}
 
-        <button class="btn reject"
-          ${p.status !== "pending" ? "disabled class='disabled'" : ""}
-          onclick="reject(${i})">
-          Reject
-        </button>
-      </div>
+      <p style="font-size:13px;margin-top:10px">
+        <b>Owner:</b> ${p.creatorName} (${p.role})<br>
+        <b>Internal ID:</b> ${p.internalId}<br>
+        <b>Risk:</b> ${p.risk || "N/A"}<br>
+        <b>Confidentiality:</b> ${p.confidentiality || "N/A"}
+      </p>
+
+      <details>
+        <summary style="cursor:pointer;font-size:12px">
+          View project details
+        </summary>
+        <p><b>Summary:</b><br>${p.summary}</p>
+        <p><b>Problem:</b><br>${p.problem}</p>
+        <p><b>Solution:</b><br>${p.solution}</p>
+        <p><b>Impact:</b><br>${p.impact || "-"}</p>
+      </details>
     `;
 
-    box.appendChild(card);
+    container.appendChild(card);
   });
 }
 
-function approve(index){
-  const list = JSON.parse(localStorage.getItem(KEY));
-  list[index].status = "approved";
-  list[index].approvedAt = new Date().toISOString();
-  localStorage.setItem(KEY, JSON.stringify(list));
-  loadProjects();
-}
-
-function reject(index){
-  if(!confirm("Reject this internal project?")) return;
-  const list = JSON.parse(localStorage.getItem(KEY));
-  list[index].status = "rejected";
-  list[index].rejectedAt = new Date().toISOString();
-  localStorage.setItem(KEY, JSON.stringify(list));
-  loadProjects();
-}
-
-loadProjects();
+renderDashboard();
 </script>
 
 </body>
