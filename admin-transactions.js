@@ -32,3 +32,11 @@ function updateTransactionStatus(id,status){
   }
   saveTransactions(list);
 }
+
+addTransaction({
+  title: "Pi dApp Launch Service",
+  user: piUser,
+  amount: "50 PI",
+  reference: receiptRef,
+  service: "pi-dapp"
+});
