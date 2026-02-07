@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ALBUKHR – Admin Dashboard</title>
+<style>
+body{margin:0;font-family:system-ui;background:#f4f7f5}
+header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:14px;
+  font-weight:700
+}
+.nav{
+  display:flex;
+  gap:8px;
+  padding:10px;
+  overflow-x:auto;
+  background:#e6f7ee
+}
+.nav button{
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  background:#fff;
+  cursor:pointer
+}
+.nav button.active{
+  background:#0f7a3d;
+  color:#fff
+}
+.panel{display:none;padding:16px}
+.panel.active{display:block}
+</style>
+</head>
+
+<body>
+
+<header>🛠️ ALBUKHR Unified Admin Dashboard</header>
+
+<div class="nav" id="adminNav"></div>
+
+<div id="panels">
+  <div id="internal" class="panel"></div>
+  <div id="external" class="panel"></div>
+  <div id="review" class="panel"></div>
+  <div id="dapp" class="panel"></div>
+  <div id="permissions" class="panel"></div>
+  <div id="transactions" class="panel"></div>
+</div>
+
+<script src="admin-dashboard.js"></script>
+</body>
+</html>
