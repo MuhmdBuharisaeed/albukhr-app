@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>External Project – Admin View</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{background:#f4f7f5;font-family:system-ui}
+.section{max-width:900px;margin:auto;padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px
+}
+h2{margin:0 0 6px}
+.label{font-size:12px;color:#666}
+.value{font-weight:600;margin-bottom:10px}
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  font-size:11px;
+  border-radius:20px;
+  font-weight:700
+}
+.pending{background:#fff3cd;color:#856404}
+.approved{background:#e6f4ea;color:#0f7a3d}
+.rejected{background:#fdecea;color:#c0392b}
+.actions{
+  display:flex;
+  gap:12px;
+  margin-top:16px
+}
+.btn{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer
+}
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#c0392b;color:#fff}
+.history{
+  font-size:13px;
+  line-height:1.6
+}
+.empty{text-align:center;color:#777}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <h1 class="brand">🔍 External Project – Admin</h1>
+</header>
+
+<section class="section" id="box">
+  <div class="empty">Loading project...</div>
+</section>
+
+<!-- =============================
+     ENGINE
+============================= -->
+<script src="staking-external.js"></script>
+
+<script>
+const box = document.getElementById("box");
+const params = new URLSearchParams(window.location.search);
+const projectId = params.get("id");
+
+/* =============================
+   LOAD PROJECT
+============================= */
+function loadProject(){
+  if(!projectId){
+    box.innerHTML = "<p>Invalid project ID</p>";
+    return;
+  }
+
+  const p = getExternalProjectById(projectId);
+  if(!p){
+    box.innerHTML = "<p>Project not found</p>";
+    return;
+  }
+
+  const statusClass =
+    p.status === "approved" ? "approved" :
+    p.status === "rejected" ? "rejected" : "pending";
+
+  box.innerHTML = `
+    <div class="card">
+      <span class="badge ${statusClass}">
+        ${p.status.toUpperCase()}
+      </span>
+
+      <h2>${p.title}</h2>
+
+      <div class="label">Category</div>
+      <div class="value">${p.category}</div>
+
+      <div class="label">Owner (Pi Username)</div>
+      <div class="value">${p.owner}</div>
+
+      <div class="label">Invite / Referral</div>
+      <div class="value">${p.invite || "—"}</div>
+
+      <div class="label">Description</div>
+      <div class="value">${p.description}</div>
+
+      <div class="label">Escrow Status</div>
+      <div class="value">
+        ${p.escrowLocked ? "🔒 Locked in escrow" : "🔓 Not locked"}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📜 Status History</h3>
+      <div class="history">
+        ${renderHistory(p.history)}
+      </div>
+    </div>
+
+    ${p.status === "pending" ? `
+    <div class="card">
+      <h3>Admin Action</h3>
+      <div class="actions">
+        <button class="btn approve"
+          onclick="approve('${p.projectId}')">
+          Approve
+        </button>
+        <button class="btn reject"
+          onclick="reject('${p.projectId}')">
+          Reject
+        </button>
+      </div>
+    </div>
+    ` : ""}
+  `;
+}
+
+/* =============================
+   HISTORY RENDER
+============================= */
+function renderHistory(history=[]){
+  if(!history.length) return "No history recorded.";
+  return history.map(h=>{
+    const d = new Date(h.at).toLocaleString();
+    return `• <b>${h.status}</b> — ${d}<br>`;
+  }).join("");
+}
+
+/* =============================
+   ACTIONS
+============================= */
+function approve(id){
+  if(!confirm("Approve this project?")) return;
+  updateExternalStatus(id,"approved");
+  alert("✅ Project approved");
+  loadProject();
+}
+
+function reject(id){
+  if(!confirm("Reject this project?")) return;
+  updateExternalStatus(id,"rejected");
+  alert("❌ Project rejected");
+  loadProject();
+}
+
+loadProject();
+</script>
+
+</body>
+</html>
