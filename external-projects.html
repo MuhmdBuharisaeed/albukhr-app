@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR – External Projects</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{background:#f4f7f5;font-family:system-ui}
+.section{padding:16px;max-width:1100px;margin:auto}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px
+}
+.header h2{color:#0f7a3d}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:14px
+}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between
+}
+.card h4{margin:0 0 6px 0}
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  font-size:11px;
+  border-radius:20px;
+  font-weight:700;
+  background:#e6f7ee;
+  color:#0f7a3d;
+  margin-bottom:8px
+}
+small{font-size:12px;color:#555}
+.desc{
+  font-size:13px;
+  color:#333;
+  margin:8px 0
+}
+.footer{
+  border-top:1px solid #eee;
+  margin-top:10px;
+  padding-top:8px;
+  font-size:12px;
+  color:#666
+}
+.btn{
+  margin-top:10px;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#9ac9b0;
+  color:#fff;
+  font-weight:700;
+  font-size:13px;
+  cursor:not-allowed
+}
+.note{
+  font-size:12px;
+  color:#666;
+  margin-top:12px;
+  text-align:center
+}
+</style>
+</head>
+
+<body>
+
+<section class="section">
+
+  <div class="header">
+    <h2>🌍 External Projects</h2>
+    <button onclick="location.href='index.html'">Home</button>
+  </div>
+
+  <div id="projectGrid" class="grid"></div>
+
+  <p class="note">
+    🔒 All projects are protected by ALBUKHR escrow.<br>
+    Staking will open after full verification.
+  </p>
+
+</section>
+
+<!-- ENGINE -->
+<script src="staking-external.js"></script>
+
+<script>
+const grid = document.getElementById("projectGrid");
+
+/* ===============================
+   LOAD APPROVED PROJECTS ONLY
+================================ */
+function render(){
+  const list = getApprovedExternalProjects();
+  grid.innerHTML = "";
+
+  if(!list.length){
+    grid.innerHTML = "<p>No approved external projects yet.</p>";
+    return;
+  }
+
+  list.forEach(p=>{
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div>
+        <span class="badge">APPROVED</span>
+        <h4>${p.title}</h4>
+        <small>${p.category}</small>
+
+        <p class="desc">
+          ${truncate(p.description,120)}
+        </p>
+      </div>
+
+      <div class="footer">
+        <div><b>Owner:</b> ${p.owner}</div>
+        <div><b>Escrow:</b> Locked</div>
+
+        <button class="btn">
+          Staking Locked
+        </button>
+      </div>
+    `;
+
+    grid.appendChild(div);
+  });
+}
+
+/* ===============================
+   HELPERS
+================================ */
+function truncate(text,len){
+  if(!text) return "";
+  return text.length > len ? text.slice(0,len)+"…" : text;
+}
+
+/* INIT */
+render();
+</script>
+
+</body>
+</html>
