@@ -140,6 +140,11 @@ function render(){
   });
 }
 
+div.onclick = () => {
+  location.href = "external-project.html?id=" + p.projectId;
+};
+div.style.cursor = "pointer";
+  
 /* ===============================
    HELPERS
 ================================ */
