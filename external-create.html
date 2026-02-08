@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-.section{padding:16px}
+.section{padding:16px;max-width:700px;margin:auto}
 .card{
   background:#fff;
   border-radius:16px;
@@ -29,13 +29,22 @@ textarea.input{min-height:90px}
   font-weight:700;font-size:15px;
   cursor:pointer;
 }
-.btn:disabled{
-  background:#9ac9b0;
-  cursor:not-allowed;
-}
 .note{
   font-size:12px;color:#666;
   line-height:1.6;margin-top:10px
+}
+.tg-box{
+  background:#f1f9f5;
+  border:1px dashed #0f7a3d;
+  padding:14px;
+  border-radius:14px;
+}
+.tg-box a{
+  display:inline-block;
+  margin-top:8px;
+  font-weight:700;
+  color:#0f7a3d;
+  text-decoration:none;
 }
 </style>
 </head>
@@ -75,57 +84,49 @@ textarea.input{min-height:90px}
     <input class="input" id="owner" placeholder="your Pi username"/>
 
     <div class="label" style="margin-top:12px">
-      Invite / Referral Link (optional)
+      Invite / Referral (optional)
     </div>
     <input class="input" id="invite" placeholder="who invited you (optional)"/>
+  </div>
+
+  <!-- TELEGRAM GROUP -->
+  <div class="card tg-box">
+    <strong>📢 Albukhr External Projects – Telegram</strong>
+    <p class="note">
+      Join our official Telegram group for all external project owners.
+      Updates, approvals, escrow notices & collaboration happen there.
+    </p>
+    <a href="https://t.me/ALBUKHR_EXTERNAL" target="_blank">
+      👉 Join Telegram Group
+    </a>
   </div>
 
   <!-- ESCROW NOTICE -->
   <div class="card">
     <strong>🔒 Albukhr Escrow Protection</strong>
     <p class="note">
-      Funds staked into this project will be locked under Albukhr escrow.
-      Project must be verified and approved by admin before appearing publicly.
+      All submitted external projects enter escrow review.
+      Project must be approved by admin before appearing publicly.
     </p>
   </div>
 
-  <button id="submitBtn" class="btn">
+  <button class="btn" onclick="submitExternalProject()">
     Submit for Review
   </button>
 
 </section>
 
-<!-- =============================
-     EXTERNAL ENGINE (LOAD FIRST)
-============================= -->
+<!-- ENGINE (MUST EXIST) -->
 <script src="staking-external.js"></script>
 
 <script>
-/* =============================
-   SAFE INIT
-============================= */
-document.addEventListener("DOMContentLoaded", ()=>{
-
-  const btn = document.getElementById("submitBtn");
-
-  // Engine validation
-  if(typeof window.saveExternalProject !== "function"){
-    console.error("External engine not loaded");
-    btn.disabled = true;
-    alert("⚠️ System not ready. Please refresh the page.");
-    return;
-  }
-
-  btn.addEventListener("click", submitExternalProject);
-});
-
 /* =============================
    SUBMIT PROJECT
 ============================= */
 function submitExternalProject(){
 
-  if(typeof window.saveExternalProject !== "function"){
-    alert("⚠️ System error. Please refresh.");
+  if(typeof saveExternalProject !== "function"){
+    alert("System error: External engine not available");
     return;
   }
 
@@ -137,8 +138,9 @@ function submitExternalProject(){
     owner: owner.value.trim(),
     invite: invite.value.trim(),
     status: "pending",
-    createdAt: new Date().toISOString(),
-    escrowLocked: true
+    createdAt: Date.now(),
+    escrowLocked: true,
+    telegramJoined: true
   };
 
   if(!data.title || !data.category || !data.description || !data.owner){
@@ -146,9 +148,15 @@ function submitExternalProject(){
     return;
   }
 
-  saveExternalProject(data);
+  const saved = saveExternalProject(data);
 
-  alert("✅ Project submitted successfully.\nWaiting for admin review.");
+  if(!saved){
+    alert("Duplicate project detected");
+    return;
+  }
+
+  alert("✅ External project submitted successfully.\nWaiting for admin review.");
+
   window.location.href = "projects.html";
 }
 </script>
