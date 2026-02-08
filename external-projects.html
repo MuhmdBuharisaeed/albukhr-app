@@ -2,36 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ALBUKHR – External Projects</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="style.css">
 
 <style>
 body{background:#f4f7f5;font-family:system-ui}
-.section{padding:16px;max-width:1100px;margin:auto}
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:16px
-}
-.header h2{color:#0f7a3d}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:14px
+.section{
+  padding:16px;
+  max-width:900px;
+  margin:auto
 }
 .card{
   background:#fff;
   border-radius:16px;
   padding:16px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between
+  margin-bottom:14px;
+  cursor:pointer;
+  transition:0.2s
 }
-.card h4{margin:0 0 6px 0}
+.card:hover{
+  box-shadow:0 6px 20px rgba(0,0,0,.06);
+  transform:translateY(-2px)
+}
 .badge{
   display:inline-block;
   padding:4px 10px;
@@ -40,121 +34,86 @@ body{background:#f4f7f5;font-family:system-ui}
   font-weight:700;
   background:#e6f7ee;
   color:#0f7a3d;
-  margin-bottom:8px
+  margin-bottom:6px
 }
-small{font-size:12px;color:#555}
-.desc{
-  font-size:13px;
-  color:#333;
-  margin:8px 0
+h3{
+  margin:4px 0;
+  color:#222
 }
-.footer{
-  border-top:1px solid #eee;
-  margin-top:10px;
-  padding-top:8px;
+small{
   font-size:12px;
   color:#666
 }
-.btn{
-  margin-top:10px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:#9ac9b0;
-  color:#fff;
-  font-weight:700;
-  font-size:13px;
-  cursor:not-allowed
-}
-.note{
-  font-size:12px;
-  color:#666;
-  margin-top:12px;
-  text-align:center
+.empty{
+  text-align:center;
+  font-size:14px;
+  color:#777;
+  margin-top:40px
 }
 </style>
 </head>
 
 <body>
 
+<header class="header">
+  <h1 class="brand">🌍 ALBUKHR External Projects</h1>
+</header>
+
 <section class="section">
-
-  <div class="header">
-    <h2>🌍 External Projects</h2>
-    <button onclick="location.href='index.html'">Home</button>
-  </div>
-
-  <div id="projectGrid" class="grid"></div>
-
-  <p class="note">
-    🔒 All projects are protected by ALBUKHR escrow.<br>
-    Staking will open after full verification.
-  </p>
-
+  <div id="projectList"></div>
 </section>
 
-<!-- ENGINE -->
+<!-- =============================
+     EXTERNAL ENGINE
+============================= -->
 <script src="staking-external.js"></script>
 
 <script>
-const grid = document.getElementById("projectGrid");
+const container = document.getElementById("projectList");
 
-/* ===============================
-   LOAD APPROVED PROJECTS ONLY
-================================ */
-function render(){
-  const list = getApprovedExternalProjects();
-  grid.innerHTML = "";
-
-  if(!list.length){
-    grid.innerHTML = "<p>No approved external projects yet.</p>";
+/* =============================
+   LOAD APPROVED PROJECTS
+============================= */
+function loadProjects(){
+  if(typeof getApprovedExternalProjects !== "function"){
+    container.innerHTML = "<p>Engine not loaded.</p>";
     return;
   }
 
-  list.forEach(p=>{
+  const list = getApprovedExternalProjects();
+  container.innerHTML = "";
+
+  if(!list.length){
+    container.innerHTML = `
+      <div class="empty">
+        No approved external projects yet.
+      </div>
+    `;
+    return;
+  }
+
+  list.reverse().forEach(p=>{
     const div = document.createElement("div");
     div.className = "card";
 
     div.innerHTML = `
-      <div>
-        <span class="badge">APPROVED</span>
-        <h4>${p.title}</h4>
-        <small>${p.category}</small>
-
-        <p class="desc">
-          ${truncate(p.description,120)}
-        </p>
-      </div>
-
-      <div class="footer">
-        <div><b>Owner:</b> ${p.owner}</div>
-        <div><b>Escrow:</b> Locked</div>
-
-        <button class="btn">
-          Staking Locked
-        </button>
-      </div>
+      <span class="badge">APPROVED</span>
+      <h3>${p.title}</h3>
+      <small>${p.category}</small><br>
+      <small>Owner: ${p.owner}</small>
     `;
 
-    grid.appendChild(div);
+    /* 👉 CLICK → PROJECT DETAILS */
+    div.onclick = ()=>{
+      window.location.href =
+        "external-project.html?id=" + p.projectId;
+    };
+
+    container.appendChild(div);
   });
 }
 
-div.onclick = () => {
-  location.href = "external-project.html?id=" + p.projectId;
-};
-div.style.cursor = "pointer";
-  
-/* ===============================
-   HELPERS
-================================ */
-function truncate(text,len){
-  if(!text) return "";
-  return text.length > len ? text.slice(0,len)+"…" : text;
-}
-
-/* INIT */
-render();
+loadProjects();
 </script>
 
 </body>
