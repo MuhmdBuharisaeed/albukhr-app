@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR – External Projects Admin</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{background:#f4f7f5;font-family:system-ui}
+.section{padding:16px;max-width:1000px;margin:auto}
+.header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:16px
+}
+.header h2{color:#0f7a3d}
+
+.tabs{
+  display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap
+}
+.tab{
+  padding:8px 14px;
+  border-radius:20px;
+  background:#e0e0e0;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer
+}
+.tab.active{background:#0f7a3d;color:#fff}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px
+}
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  font-size:11px;
+  border-radius:20px;
+  font-weight:700
+}
+.pending{background:#fff4cc;color:#8a6d00}
+.approved{background:#e6f7ee;color:#0f7a3d}
+.rejected{background:#fdecea;color:#b00020}
+
+.btn{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  margin-right:6px
+}
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#b00020;color:#fff}
+
+small{color:#555;font-size:12px}
+details summary{cursor:pointer;font-size:12px}
+</style>
+</head>
+
+<body>
+
+<section class="section">
+
+  <div class="header">
+    <h2>🌍 External Projects – Admin Panel</h2>
+    <button onclick="location.href='admin-dashboard.html'">← Dashboard</button>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('pending')">Pending</div>
+    <div class="tab" onclick="switchTab('approved')">Approved</div>
+    <div class="tab" onclick="switchTab('rejected')">Rejected</div>
+  </div>
+
+  <!-- PROJECT LIST -->
+  <div id="projectList"></div>
+
+</section>
+
+<!-- ENGINE -->
+<script src="staking-external.js"></script>
+
+<script>
+/* =====================================
+   SAFETY CHECK
+===================================== */
+if(!window.__ALBUKHR_EXTERNAL_ENGINE__){
+  alert("External engine not loaded");
+}
+
+/* =====================================
+   STATE
+===================================== */
+let currentTab = "pending";
+const container = document.getElementById("projectList");
+
+/* =====================================
+   TAB SWITCH
+===================================== */
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  event.target.classList.add("active");
+  render();
+}
+
+/* =====================================
+   RENDER
+===================================== */
+function render(){
+  let list = getExternalProjects().filter(p=>p.status === currentTab);
+  container.innerHTML = "";
+
+  if(!list.length){
+    container.innerHTML = "<p>No projects found.</p>";
+    return;
+  }
+
+  list.reverse().forEach(p=>{
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <h4>${p.title}</h4>
+      <small>${p.category} • ID: ${p.projectId}</small><br>
+
+      <span class="badge ${p.status}">
+        ${p.status.toUpperCase()}
+      </span>
+
+      <p style="font-size:13px;margin-top:8px">
+        <b>Owner:</b> ${p.owner}<br>
+        <b>Invite:</b> ${p.invite || "-"}<br>
+        <b>Escrow Locked:</b> ${p.escrowLocked ? "Yes" : "No"}
+      </p>
+
+      <details>
+        <summary>View Description</summary>
+        <p>${p.description}</p>
+      </details>
+
+      <details>
+        <summary>History</summary>
+        ${renderHistory(p.history)}
+      </details>
+
+      <div style="margin-top:10px">
+        ${p.status==="pending" ? `
+          <button class="btn approve" onclick="approve('${p.projectId}')">Approve</button>
+          <button class="btn reject" onclick="reject('${p.projectId}')">Reject</button>
+        ` : ""}
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+/* =====================================
+   HISTORY VIEW
+===================================== */
+function renderHistory(history=[]){
+  return history.map(h=>
+    `<small>• ${h.status} – ${new Date(h.at).toLocaleString()}</small><br>`
+  ).join("");
+}
+
+/* =====================================
+   ACTIONS
+===================================== */
+function approve(id){
+  if(confirm("Approve this external project?")){
+    updateExternalStatus(id,"approved");
+    render();
+  }
+}
+
+function reject(id){
+  if(confirm("Reject this external project?")){
+    updateExternalStatus(id,"rejected");
+    render();
+  }
+}
+
+/* INIT */
+render();
+</script>
+
+</body>
+</html>
