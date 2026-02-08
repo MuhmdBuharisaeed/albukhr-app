@@ -1,93 +1,153 @@
-/* ===============================
-   ALBUKHR – EXTERNAL ESCROW ENGINE
-================================ */
+/* =========================================
+   ALBUKHR – EXTERNAL PROJECT ESCROW ENGINE
+========================================= */
 
 const EXTERNAL_KEY = "albukhr_external_projects";
 
-/* -------------------------------
-   SAVE NEW EXTERNAL PROJECT
--------------------------------- */
-function saveExternalProject(project){
-  let list = JSON.parse(localStorage.getItem(EXTERNAL_KEY)) || [];
+/* =========================================
+   UTILS
+========================================= */
+function loadExternalList(){
+  try{
+    return JSON.parse(localStorage.getItem(EXTERNAL_KEY)) || [];
+  }catch(e){
+    console.error("External storage error", e);
+    return [];
+  }
+}
 
+function saveExternalList(list){
+  localStorage.setItem(EXTERNAL_KEY, JSON.stringify(list));
+}
+
+/* =========================================
+   SAVE NEW EXTERNAL PROJECT (USER)
+========================================= */
+function saveExternalProject(project){
+
+  const list = loadExternalList();
+
+  // prevent duplicate ID
   if(list.some(p => p.projectId === project.projectId)){
     return false;
   }
 
-  project.history = [{
-    status: "pending",
-    at: Date.now()
-  }];
+  const cleanProject = {
+    projectId: project.projectId,
+    title: project.title,
+    category: project.category,
+    description: project.description,
+    owner: project.owner,
+    invite: project.invite || null,
 
-  list.push(project);
-  localStorage.setItem(EXTERNAL_KEY, JSON.stringify(list));
+    status: "pending",
+    escrowLocked: true,
+
+    createdAt: project.createdAt || Date.now(),
+
+    history: [{
+      status: "pending",
+      at: Date.now()
+    }]
+  };
+
+  list.push(cleanProject);
+  saveExternalList(list);
   return true;
 }
 
-/* -------------------------------
-   GET ALL EXTERNAL PROJECTS
--------------------------------- */
+/* =========================================
+   GETTERS
+========================================= */
 function getExternalProjects(){
-  return JSON.parse(localStorage.getItem(EXTERNAL_KEY)) || [];
+  return loadExternalList();
 }
 
-/* -------------------------------
-   GET PROJECT BY ID
--------------------------------- */
-function getExternalProjectById(id){
-  return getExternalProjects().find(p => p.projectId === id);
+function getExternalProjectById(projectId){
+  return loadExternalList().find(p => p.projectId === projectId) || null;
 }
 
-/* -------------------------------
-   ADMIN: UPDATE PROJECT STATUS
--------------------------------- */
-function updateExternalStatus(projectId, status){
-  let list = getExternalProjects();
+/* =========================================
+   ADMIN ACTIONS
+========================================= */
+function updateExternalStatus(projectId, newStatus){
 
-  list = list.map(p=>{
+  const allowed = ["pending","approved","rejected","paused"];
+  if(!allowed.includes(newStatus)) return false;
+
+  const list = loadExternalList();
+  let updated = false;
+
+  list.forEach(p=>{
     if(p.projectId === projectId){
-      p.status = status;
+      p.status = newStatus;
       p.history = p.history || [];
-      p.history.push({ status, at: Date.now() });
+      p.history.push({
+        status: newStatus,
+        at: Date.now()
+      });
 
-      if(status === "approved"){
+      if(newStatus === "approved"){
         p.approvedAt = Date.now();
+        p.escrowLocked = false; // 🔓 ready for staking later
+      }
+
+      if(newStatus === "rejected"){
+        p.rejectedAt = Date.now();
         p.escrowLocked = true;
       }
 
-      if(status === "rejected"){
-        p.rejectedAt = Date.now();
-      }
+      updated = true;
     }
-    return p;
   });
 
-  localStorage.setItem(EXTERNAL_KEY, JSON.stringify(list));
+  if(updated){
+    saveExternalList(list);
+  }
+
+  return updated;
 }
 
-/* -------------------------------
-   FILTERS
--------------------------------- */
-function getApprovedExternalProjects(){
-  return getExternalProjects().filter(p => p.status === "approved");
-}
-
+/* =========================================
+   FILTERS (ADMIN / PUBLIC)
+========================================= */
 function getPendingExternalProjects(){
   return getExternalProjects().filter(p => p.status === "pending");
 }
 
-/* -------------------------------
-   STAKING (LOCKED)
--------------------------------- */
+function getApprovedExternalProjects(){
+  return getExternalProjects().filter(p => p.status === "approved");
+}
+
+function getRejectedExternalProjects(){
+  return getExternalProjects().filter(p => p.status === "rejected");
+}
+
+/* =========================================
+   STAKING (PLACEHOLDER – FUTURE)
+========================================= */
 function addExternalStake(){
-  alert("External staking locked until escrow verification");
+  alert("🔒 External staking is locked until escrow activation.");
   return false;
 }
 
 function getExternalTotals(){
-  return { totalStake:0, totalReward:0 };
+  return {
+    totalStake: 0,
+    totalReward: 0
+  };
 }
 
-function getExternalProjectTotals(){
-  return { stake:0, reward:0, stakes:[] };
-       }
+function getExternalProjectTotals(projectId){
+  return {
+    projectId,
+    stake: 0,
+    reward: 0,
+    stakes: []
+  };
+}
+
+/* =========================================
+   ENGINE READY FLAG
+========================================= */
+window.__ALBUKHR_EXTERNAL_ENGINE__ = true;
