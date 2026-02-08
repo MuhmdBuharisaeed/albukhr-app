@@ -100,24 +100,30 @@ textarea.input{min-height:90px}
 ============================= -->
 <script src="staking-external.js"></script>
 
-<script>
 /* =============================
    ENGINE CHECK
 ============================= */
-if(typeof saveExternalProject !== "function"){
-  alert("External engine not loaded. Please refresh.");
-  document.getElementById("submitBtn").disabled = true;
-}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  if(typeof window.saveExternalProject !== "function"){
+    console.error("External engine not loaded");
+    document.getElementById("submitBtn").disabled = true;
+    alert("⚠️ System not ready. Please refresh the page.");
+  }
+
+});
+    </script>
 
 /* =============================
    SUBMIT PROJECT
 ============================= */
 function submitExternalProject(){
 
-  if(typeof saveExternalProject !== "function"){
-    alert("Engine error: saveExternalProject not found");
-    return;
-  }
+if(typeof window.saveExternalProject !== "function"){
+  alert("⚠️ System temporarily unavailable. Please refresh once.");
+  return;
+}
 
   const data = {
     projectId: "EXT-" + Date.now(),
