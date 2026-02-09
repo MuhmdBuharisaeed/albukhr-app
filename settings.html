@@ -1,70 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>ALBUKHR – Settings</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px
+}
+h3{margin:0 0 10px;color:#0f7a3d}
+.toggle{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:10px 0;
+  font-size:14px
+}
+.toggle input{transform:scale(1.2)}
+.link{
+  display:block;
+  padding:10px 0;
+  color:#0f7a3d;
+  font-weight:600;
+  text-decoration:none
+}
+small{color:#666;font-size:12px}
+</style>
 </head>
 
-<body>
+<body data-page="settings">
 
 <header class="header">
-  <h2>⚙️ Settings</h2>
+  <span>⚙️ Settings</span>
 </header>
 
-<section class="section card">
+<section class="section">
 
-<h3>User Settings</h3>
+  <!-- SECURITY -->
+  <div class="card">
+    <h3>🔐 Security</h3>
 
-<label>Username</label>
-<input class="input" disabled value="@" />
+    <div class="toggle">
+      <span>Enable 2FA</span>
+      <input type="checkbox" id="twoFA">
+    </div>
 
-<label>Telegram</label>
-<input class="input" id="telegram" placeholder="@username" />
+    <div class="toggle">
+      <span>Biometric Login (optional)</span>
+      <input type="checkbox" id="biometric">
+    </div>
 
-<label>
-  <input type="checkbox" id="notify"> Enable notifications
-</label>
+    <div class="toggle">
+      <span>Encrypt sensitive data</span>
+      <input type="checkbox" id="encryption">
+    </div>
 
-<button onclick="saveUser()">Save</button>
+    <small>
+      Security is enforced to protect your assets and projects.
+    </small>
+  </div>
 
-<hr>
+  <!-- SOCIAL / MEDIA -->
+  <div class="card">
+    <h3>🌐 Media & Channels</h3>
 
-<h3>Security</h3>
+    <a class="link" href="https://t.me/ALBUKHR_ECOSYSTEM_GROUP" target="_blank">Telegram Community</a>
+    <a class="link" href="#" target="_blank">WhatsApp Group</a>
+    <a class="link" href="#" target="_blank">X (Twitter)</a>
+    <a class="link" href="#" target="_blank">Facebook</a>
 
-<label>
-  <input type="checkbox" id="lock"> Transaction Lock
-</label>
+    <small>
+      Official public channels of ALBUKHR ecosystem
+    </small>
+  </div>
 
-<p id="freezeInfo"></p>
+  <!-- POLICIES -->
+  <div class="card">
+    <h3>📜 Legal & Policies</h3>
+
+    <a class="link" href="privacy-policy.html">Privacy Policy</a>
+    <a class="link" href="terms-of-service.html">Terms of Service</a>
+    <a class="link" href="whitepaper.html">Whitepaper</a>
+
+    <small>
+      All users must comply with ALBUKHR rules and governance.
+    </small>
+  </div>
 
 </section>
 
-<script src="js/settings-engine.js"></script>
-<script>
-const s = getSettings();
-
-telegram.value = s.telegram;
-notify.checked = s.notifications;
-lock.checked = s.txLock;
-
-if(s.accountFrozen){
-  document.getElementById("freezeInfo").innerText =
-    "⛔ Account is frozen by admin";
-}
-
-function saveUser(){
-  updateUserSettings({
-    telegram: telegram.value,
-    notifications: notify.checked
-  });
-
-  setTxLock(lock.checked);
-
-  alert("Settings saved");
-}
-</script>
+<!-- CORE FIRST -->
+<script src="js/settings/settings-core.js"></script>
+<script src="js/settings/settings-ui.js"></script>
 
 </body>
 </html>
