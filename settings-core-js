@@ -1,0 +1,45 @@
+/* ===============================
+   ALBUKHR – SETTINGS CORE
+================================ */
+
+const SETTINGS_KEY = "albukhr_user_settings";
+
+/* DEFAULT SETTINGS */
+const defaultSettings = {
+  twoFA: false,
+  biometric: false,
+  encryption: true,
+  acceptedPolicies: false,
+  updatedAt: Date.now()
+};
+
+/* LOAD */
+function getSettings(){
+  try{
+    return {
+      ...defaultSettings,
+      ...JSON.parse(localStorage.getItem(SETTINGS_KEY))
+    };
+  }catch{
+    return {...defaultSettings};
+  }
+}
+
+/* SAVE */
+function saveSettings(settings){
+  settings.updatedAt = Date.now();
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+/* UPDATE SINGLE */
+function updateSetting(key,value){
+  const s = getSettings();
+  s[key] = value;
+  saveSettings(s);
+}
+
+/* SECURITY GATE (FOR FUTURE USE) */
+function isSecurityStrong(){
+  const s = getSettings();
+  return s.encryption && (s.twoFA || s.biometric);
+}
