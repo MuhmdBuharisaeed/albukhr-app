@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ALBUKHR – Settings</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+  <h2>⚙️ Settings</h2>
+</header>
+
+<section class="section card">
+
+<h3>User Settings</h3>
+
+<label>Username</label>
+<input class="input" disabled value="@" />
+
+<label>Telegram</label>
+<input class="input" id="telegram" placeholder="@username" />
+
+<label>
+  <input type="checkbox" id="notify"> Enable notifications
+</label>
+
+<button onclick="saveUser()">Save</button>
+
+<hr>
+
+<h3>Security</h3>
+
+<label>
+  <input type="checkbox" id="lock"> Transaction Lock
+</label>
+
+<p id="freezeInfo"></p>
+
+</section>
+
+<script src="js/settings-engine.js"></script>
+<script>
+const s = getSettings();
+
+telegram.value = s.telegram;
+notify.checked = s.notifications;
+lock.checked = s.txLock;
+
+if(s.accountFrozen){
+  document.getElementById("freezeInfo").innerText =
+    "⛔ Account is frozen by admin";
+}
+
+function saveUser(){
+  updateUserSettings({
+    telegram: telegram.value,
+    notifications: notify.checked
+  });
+
+  setTxLock(lock.checked);
+
+  alert("Settings saved");
+}
+</script>
+
+</body>
+</html>
