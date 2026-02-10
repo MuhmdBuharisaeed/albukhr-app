@@ -239,16 +239,29 @@ function confirmReceive(){
 }
 
 function confirmWithdraw(){
+
   const amt=parseFloat(withdrawAmount.value);
   const addr=withdrawAddress.value.trim();
 
   if(!amt||amt<=0||!addr)
     return alert("Enter valid amount and address");
 
+  if(is2FAEnabled()){
+    const otp = generateOTP();
+    alert("Your OTP code (demo): "+otp);
+
+    const userInput = prompt("Enter 6-digit OTP:");
+
+    if(!verifyOTP(userInput)){
+      alert("Invalid or expired OTP");
+      return;
+    }
+  }
+
   walletRequestWithdraw(amt,addr);
   closeModals();
   renderWallet();
-}
+  }
 
 renderWallet();
 </script>
