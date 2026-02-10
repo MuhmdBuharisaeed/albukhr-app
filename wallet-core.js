@@ -146,3 +146,29 @@ function getWalletTransactions(){
   }
   return getWallet().transactions;
 }
+
+/* ===============================
+   2FA ENGINE (Simple Secure Layer)
+================================ */
+
+function is2FAEnabled(){
+  const settings = JSON.parse(localStorage.getItem("albukhr_settings")) || {};
+  return settings.twoFA === true;
+}
+
+function generateOTP(){
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  localStorage.setItem("albukhr_otp_code", code);
+  localStorage.setItem("albukhr_otp_expiry", Date.now() + 2*60*1000); // 2 mins
+  return code;
+}
+
+function verifyOTP(input){
+  const saved = localStorage.getItem("albukhr_otp_code");
+  const expiry = parseInt(localStorage.getItem("albukhr_otp_expiry"));
+
+  if(!saved || !expiry) return false;
+  if(Date.now() > expiry) return false;
+
+  return input === saved;
+   }
