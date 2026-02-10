@@ -27,3 +27,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   }
 
 });
+
+document.getElementById("acceptPoliciesBtn")?.addEventListener("click",()=>{
+  acceptPolicies();
+  alert("Policies accepted successfully.");
+});
