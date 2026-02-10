@@ -58,3 +58,13 @@ function canTransact(){
   if(s.cooldownUntil && Date.now() < s.cooldownUntil) return false;
   return true;
 }
+
+function toggle2FA(enable){
+  const s = JSON.parse(localStorage.getItem("albukhr_settings")) || {};
+  s.twoFA = enable;
+  localStorage.setItem("albukhr_settings", JSON.stringify(s));
+}
+
+localStorage.setItem("albukhr_settings", JSON.stringify({
+  twoFA: true
+}));
