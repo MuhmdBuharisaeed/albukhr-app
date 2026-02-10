@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>My Escrow</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{font-family:Arial;background:#f5f7fa}
+.header{background:#0f7a3d;color:#fff;padding:14px;text-align:center}
+.card{background:#fff;margin:14px;padding:14px;border-radius:12px}
+.row{border-bottom:1px solid #eee;padding:8px 0;font-size:14px}
+.badge{padding:4px 8px;border-radius:6px;font-size:12px}
+.locked{background:#f1c40f}
+.released{background:#2ecc71;color:#fff}
+.refunded{background:#e74c3c;color:#fff}
+</style>
+</head>
+
+<body>
+<div class="header">🔒 My Escrow Funds</div>
+
+<div class="card" id="escrowList"></div>
+
+<script src="/js/settings/settings-core.js"></script>
+<script src="/js/core/albukhr-core.js"></script>
+<script src="/js/wallet/wallet-core.js"></script>
+<script src="/js/wallet/wallet-escrow.js"></script>
+<script src="/escrow/escrow-user-ui.js"></script>
+</body>
+</html>
