@@ -2,73 +2,203 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ALBUKHR Wallet</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr Wallet</title>
+
+<link rel="stylesheet" href="style.css">
 
 <style>
-body{font-family:Arial;background:#f4f6f8;margin:0}
+body{background:#f4f7f6;font-family:system-ui;margin:0}
+
 .header{
-  padding:16px;
   background:#0f7a3d;
   color:#fff;
-  font-weight:bold;
-  text-align:center
+  padding:16px;
+  font-weight:700;
+  text-align:center;
 }
+
+.section{padding:16px}
+
 .card{
   background:#fff;
-  margin:16px;
+  border-radius:16px;
   padding:16px;
-  border-radius:16px
+  margin-bottom:14px;
 }
+
 .balance{
   font-size:26px;
-  font-weight:bold;
-  color:#0f7a3d
+  font-weight:800;
+  color:#0f7a3d;
 }
+
+.sub{
+  font-size:12px;
+  color:#666;
+  margin-top:4px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  margin-top:8px;
+  font-size:13px;
+}
+
+.btn-group{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
 .btn{
-  display:block;
-  width:100%;
+  flex:1;
   padding:12px;
-  margin-top:10px;
   border:none;
   border-radius:12px;
-  font-size:15px;
-  font-weight:bold
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
 }
-.send{background:#0f7a3d;color:#fff}
-.receive{background:#eaf7ef;color:#0f7a3d}
+
+.btn.secondary{
+  background:#eaf6ee;
+  color:#0f7a3d;
+}
+
+.btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
 .tx{
-  font-size:13px;
   border-bottom:1px solid #eee;
-  padding:8px 0
+  padding:8px 0;
+  font-size:13px;
 }
-small{color:#777}
+
+.tx small{
+  color:#777;
+  font-size:11px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">💼 ALBUKHR Wallet</div>
-
-<div class="card">
-  <small>Available Balance</small>
-  <div class="balance" id="walletBalance">--</div>
-
-  <button class="btn receive" id="receiveBtn">Receive</button>
-  <button class="btn send" id="sendBtn">Send</button>
+<div class="header">
+  💰 ALBUKHR WALLET
 </div>
 
-<div class="card">
-  <h4>Transactions</h4>
-  <div id="txList"></div>
-</div>
+<section class="section">
 
-<!-- LOAD ORDER -->
-<script src="/js/settings/settings-core.js"></script>
-<script src="/js/core/albukhr-core.js"></script>
+  <!-- BALANCE CARD -->
+  <div class="card">
+    <div class="balance" id="walletBalance">0 PI</div>
+    <div class="sub">Available Balance</div>
 
-<script src="/js/wallet/wallet-core.js"></script>
-<script src="/js/wallet/wallet-ui.js"></script>
+    <div class="row">
+      <div>Locked</div>
+      <div id="walletLocked">0 PI</div>
+    </div>
+
+    <div class="row">
+      <div>Rewards</div>
+      <div id="walletRewards">0 PI</div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn" onclick="openReceive()">Receive</button>
+      <button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
+    </div>
+  </div>
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="card">
+    <h4>Transaction History</h4>
+    <div id="txList"></div>
+  </div>
+
+</section>
+
+<!-- Load Wallet Core -->
+<script src="wallet-core.js"></script>
+
+<script>
+
+/* ===========================
+   INIT WALLET
+=========================== */
+
+function renderWallet(){
+  const wallet = getWallet();
+
+  document.getElementById("walletBalance").innerText =
+    wallet.balance.toFixed(2) + " PI";
+
+  document.getElementById("walletLocked").innerText =
+    wallet.locked.toFixed(2) + " PI";
+
+  document.getElementById("walletRewards").innerText =
+    wallet.rewards.toFixed(2) + " PI";
+
+  renderTransactions(wallet.transactions);
+}
+
+function renderTransactions(list){
+  const box = document.getElementById("txList");
+  box.innerHTML = "";
+
+  if(!list.length){
+    box.innerHTML = "<small>No transactions yet</small>";
+    return;
+  }
+
+  list.slice().reverse().forEach(tx=>{
+    const div = document.createElement("div");
+    div.className = "tx";
+
+    div.innerHTML = `
+      <b>${tx.type.toUpperCase()}</b> — ${tx.amount || 0} PI<br>
+      <small>${new Date(tx.at).toLocaleString()}</small>
+    `;
+
+    box.appendChild(div);
+  });
+}
+
+/* ===========================
+   RECEIVE
+=========================== */
+
+function openReceive(){
+  const amount = prompt("Enter amount to receive (test credit):");
+  if(!amount) return;
+
+  walletReceive(parseFloat(amount), "manual_credit");
+  renderWallet();
+}
+
+/* ===========================
+   WITHDRAW
+=========================== */
+
+function openWithdraw(){
+  const amount = prompt("Enter amount to withdraw:");
+  if(!amount) return;
+
+  const address = prompt("Enter your Pi wallet address:");
+  if(!address) return;
+
+  walletRequestWithdraw(parseFloat(amount), address);
+  renderWallet();
+}
+
+renderWallet();
+
+</script>
 
 </body>
 </html>
