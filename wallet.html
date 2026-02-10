@@ -33,11 +33,7 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
   color:#0f7a3d;
 }
 
-.sub{
-  font-size:12px;
-  color:#666;
-  margin-top:4px;
-}
+.sub{font-size:12px;color:#666;margin-top:4px}
 
 .row{
   display:flex;
@@ -68,10 +64,7 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
   color:#0f7a3d;
 }
 
-.btn:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
 .tx{
   border-bottom:1px solid #eee;
@@ -79,22 +72,60 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
   font-size:13px;
 }
 
-.tx small{
-  color:#777;
-  font-size:11px;
+.tx small{color:#777;font-size:11px}
+
+/* ================= MODAL ================= */
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+
+.modal{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  width:90%;
+  max-width:400px;
+}
+
+.modal h3{
+  margin-top:0;
+  color:#0f7a3d;
+}
+
+.modal input{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  margin-bottom:10px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+}
+
+.close-btn{
+  background:#ddd;
+  color:#333;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  💰 ALBUKHR WALLET
-</div>
+<div class="header">💰 ALBUKHR WALLET</div>
 
 <section class="section">
 
-  <!-- BALANCE CARD -->
+  <!-- BALANCE -->
   <div class="card">
     <div class="balance" id="walletBalance">0 PI</div>
     <div class="sub">Available Balance</div>
@@ -115,7 +146,7 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
     </div>
   </div>
 
-  <!-- TRANSACTION HISTORY -->
+  <!-- HISTORY -->
   <div class="card">
     <h4>Transaction History</h4>
     <div id="txList"></div>
@@ -123,81 +154,103 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 
 </section>
 
-<!-- Load Wallet Core -->
+<!-- RECEIVE MODAL -->
+<div class="modal-overlay" id="receiveModal">
+  <div class="modal">
+    <h3>Receive PI</h3>
+    <input type="number" id="receiveAmount" placeholder="Enter amount">
+    <div class="modal-actions">
+      <button class="btn" onclick="confirmReceive()">Confirm</button>
+      <button class="btn close-btn" onclick="closeModals()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal-overlay" id="withdrawModal">
+  <div class="modal">
+    <h3>Withdraw PI</h3>
+    <input type="number" id="withdrawAmount" placeholder="Amount">
+    <input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
+    <div class="modal-actions">
+      <button class="btn" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn close-btn" onclick="closeModals()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script src="wallet-core.js"></script>
 
 <script>
-
-/* ===========================
-   INIT WALLET
-=========================== */
+/* ================= INIT ================= */
 
 function renderWallet(){
   const wallet = getWallet();
 
-  document.getElementById("walletBalance").innerText =
-    wallet.balance.toFixed(2) + " PI";
-
-  document.getElementById("walletLocked").innerText =
-    wallet.locked.toFixed(2) + " PI";
-
-  document.getElementById("walletRewards").innerText =
-    wallet.rewards.toFixed(2) + " PI";
+  walletBalance.innerText = wallet.balance.toFixed(2)+" PI";
+  walletLocked.innerText = wallet.locked.toFixed(2)+" PI";
+  walletRewards.innerText = wallet.rewards.toFixed(2)+" PI";
 
   renderTransactions(wallet.transactions);
 }
 
 function renderTransactions(list){
-  const box = document.getElementById("txList");
-  box.innerHTML = "";
-
+  txList.innerHTML = "";
   if(!list.length){
-    box.innerHTML = "<small>No transactions yet</small>";
+    txList.innerHTML="<small>No transactions yet</small>";
     return;
   }
 
   list.slice().reverse().forEach(tx=>{
-    const div = document.createElement("div");
-    div.className = "tx";
-
-    div.innerHTML = `
-      <b>${tx.type.toUpperCase()}</b> — ${tx.amount || 0} PI<br>
+    const div=document.createElement("div");
+    div.className="tx";
+    div.innerHTML=`
+      <b>${tx.type.toUpperCase()}</b> — ${tx.amount||0} PI<br>
       <small>${new Date(tx.at).toLocaleString()}</small>
     `;
-
-    box.appendChild(div);
+    txList.appendChild(div);
   });
 }
 
-/* ===========================
-   RECEIVE
-=========================== */
+/* ================= MODAL CONTROL ================= */
 
 function openReceive(){
-  const amount = prompt("Enter amount to receive (test credit):");
-  if(!amount) return;
+  receiveModal.style.display="flex";
+}
 
-  walletReceive(parseFloat(amount), "manual_credit");
+function openWithdraw(){
+  withdrawModal.style.display="flex";
+}
+
+function closeModals(){
+  receiveModal.style.display="none";
+  withdrawModal.style.display="none";
+}
+
+/* ================= ACTIONS ================= */
+
+function confirmReceive(){
+  const amt=parseFloat(receiveAmount.value);
+  if(!amt || amt<=0) return alert("Invalid amount");
+
+  walletReceive(amt,"manual_credit");
+  closeModals();
   renderWallet();
 }
 
-/* ===========================
-   WITHDRAW
-=========================== */
+function confirmWithdraw(){
+  const amt=parseFloat(withdrawAmount.value);
+  const addr=withdrawAddress.value.trim();
 
-function openWithdraw(){
-  const amount = prompt("Enter amount to withdraw:");
-  if(!amount) return;
+  if(!amt||amt<=0||!addr)
+    return alert("Enter valid amount and address");
 
-  const address = prompt("Enter your Pi wallet address:");
-  if(!address) return;
-
-  walletRequestWithdraw(parseFloat(amount), address);
+  walletRequestWithdraw(amt,addr);
+  closeModals();
   renderWallet();
 }
 
 renderWallet();
-
 </script>
 
 </body>
