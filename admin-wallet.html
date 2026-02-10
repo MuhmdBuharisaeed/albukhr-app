@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin – Wallet Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{font-family:Arial;background:#f4f6f8;margin:0}
+.header{
+  background:#1e1e1e;
+  color:#fff;
+  padding:14px;
+  font-weight:bold;
+  text-align:center
+}
+.card{
+  background:#fff;
+  margin:16px;
+  padding:16px;
+  border-radius:16px
+}
+.stat{
+  font-size:22px;
+  font-weight:bold
+}
+.btn{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  margin-top:10px;
+  width:100%
+}
+.lock{background:#c0392b;color:#fff}
+.unlock{background:#27ae60;color:#fff}
+.tx{
+  font-size:13px;
+  border-bottom:1px solid #eee;
+  padding:8px 0
+}
+small{color:#666}
+</style>
+</head>
+
+<body>
+
+<div class="header">🔐 Admin – Wallet Monitor</div>
+
+<div class="card">
+  <small>Total Balance</small>
+  <div class="stat" id="adminBalance">--</div>
+
+  <small>Status</small>
+  <div id="walletStatus">--</div>
+
+  <button class="btn lock" id="lockWalletBtn">Lock Wallet</button>
+  <button class="btn unlock" id="unlockWalletBtn">Unlock Wallet</button>
+</div>
+
+<div class="card">
+  <h4>Recent Transactions</h4>
+  <div id="adminTxList"></div>
+</div>
+
+<!-- LOAD ORDER (CRITICAL) -->
+<script src="/js/settings/settings-core.js"></script>
+<script src="/js/core/albukhr-core.js"></script>
+
+<script src="/js/admin/admin-core.js"></script>
+<script src="/js/wallet/wallet-core.js"></script>
+<script src="/js/admin/admin-wallet.js"></script>
+
+</body>
+</html>
