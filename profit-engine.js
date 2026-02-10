@@ -44,3 +44,10 @@ function distributeProjectProfit(projectId, totalProfit){
 
   alert("Profit distributed successfully.");
 }
+
+walletReceive(payouts.investors,"internal_profit");
+
+creditTreasury(payouts.treasury);
+creditProjectReserve(projectId,payouts.reserve);
+creditOperations(payouts.operations);
+creditCommunity(payouts.community);
