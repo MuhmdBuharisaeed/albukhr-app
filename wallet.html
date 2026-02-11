@@ -9,113 +9,22 @@
 
 <style>
 body{background:#f4f7f6;font-family:system-ui;margin:0}
-
-.header{
-  background:#0f7a3d;
-  color:#fff;
-  padding:16px;
-  font-weight:700;
-  text-align:center;
-}
-
+.header{background:#0f7a3d;color:#fff;padding:16px;font-weight:700;text-align:center}
 .section{padding:16px}
-
-.card{
-  background:#fff;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:14px;
-}
-
-.balance{
-  font-size:26px;
-  font-weight:800;
-  color:#0f7a3d;
-}
-
+.card{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px}
+.balance{font-size:26px;font-weight:800;color:#0f7a3d}
 .sub{font-size:12px;color:#666;margin-top:4px}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  margin-top:8px;
-  font-size:13px;
-}
-
-.btn-group{
-  display:flex;
-  gap:10px;
-  margin-top:14px;
-}
-
-.btn{
-  flex:1;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:#0f7a3d;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.btn.secondary{
-  background:#eaf6ee;
-  color:#0f7a3d;
-}
-
-.btn:disabled{opacity:.5;cursor:not-allowed}
-
-.tx{
-  border-bottom:1px solid #eee;
-  padding:8px 0;
-  font-size:13px;
-}
-
+.row{display:flex;justify-content:space-between;margin-top:8px;font-size:13px}
+.btn-group{display:flex;gap:10px;margin-top:14px}
+.btn{flex:1;padding:12px;border:none;border-radius:12px;background:#0f7a3d;color:#fff;font-weight:700;cursor:pointer}
+.btn.secondary{background:#eaf6ee;color:#0f7a3d}
+.tx{border-bottom:1px solid #eee;padding:8px 0;font-size:13px}
 .tx small{color:#777;font-size:11px}
-
-/* ================= MODAL ================= */
-
-.modal-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000;
-}
-
-.modal{
-  background:#fff;
-  border-radius:16px;
-  padding:20px;
-  width:90%;
-  max-width:400px;
-}
-
-.modal h3{
-  margin-top:0;
-  color:#0f7a3d;
-}
-
-.modal input{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  margin-bottom:10px;
-}
-
-.modal-actions{
-  display:flex;
-  gap:10px;
-}
-
-.close-btn{
-  background:#ddd;
-  color:#333;
-}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal{background:#fff;border-radius:16px;padding:20px;width:90%;max-width:400px}
+.modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-bottom:10px}
+.modal-actions{display:flex;gap:10px}
+.close-btn{background:#ddd;color:#333}
 </style>
 </head>
 
@@ -125,160 +34,150 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 
 <section class="section">
 
-  <!-- BALANCE -->
-  <div class="card">
-    <div class="balance" id="walletBalance">0 PI</div>
-    <div class="sub">Available Balance</div>
+<div class="card">
+<div class="balance" id="available">0 PI</div>
+<div class="sub">Available Reward Balance</div>
 
-    <div class="row">
-      <div>Locked</div>
-      <div id="walletLocked">0 PI</div>
-    </div>
+<div class="row">
+<div>Total Staked</div>
+<div id="totalStake">0 PI</div>
+</div>
 
-    <div class="row">
-      <div>Rewards</div>
-      <div id="walletRewards">0 PI</div>
-    </div>
+<div class="row">
+<div>Total Rewards</div>
+<div id="totalReward">0 PI</div>
+</div>
 
-    <div class="btn-group">
-      <button class="btn" onclick="openReceive()">Receive</button>
-      <button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
-    </div>
-  </div>
+<div class="row">
+<div>Total Withdrawn</div>
+<div id="withdrawn">0 PI</div>
+</div>
 
-  <!-- HISTORY -->
-  <div class="card">
-    <h4>Transaction History</h4>
-    <div id="txList"></div>
-  </div>
+<div class="btn-group">
+<button class="btn" onclick="openReceive()">Receive</button>
+<button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
+</div>
+</div>
+
+<div class="card">
+<h4>Transaction History</h4>
+<div id="txList"></div>
+</div>
 
 </section>
 
 <!-- RECEIVE MODAL -->
 <div class="modal-overlay" id="receiveModal">
-  <div class="modal">
-    <h3>Receive PI</h3>
-    <input type="number" id="receiveAmount" placeholder="Enter amount">
-    <div class="modal-actions">
-      <button class="btn" onclick="confirmReceive()">Confirm</button>
-      <button class="btn close-btn" onclick="closeModals()">Cancel</button>
-    </div>
-  </div>
+<div class="modal">
+<h3>Receive PI</h3>
+<input type="number" id="receiveAmount" placeholder="Enter amount">
+<div class="modal-actions">
+<button class="btn" onclick="confirmReceive()">Confirm</button>
+<button class="btn close-btn" onclick="closeModals()">Cancel</button>
+</div>
+</div>
 </div>
 
 <!-- WITHDRAW MODAL -->
 <div class="modal-overlay" id="withdrawModal">
-  <div class="modal">
-    <h3>Withdraw PI</h3>
-    <input type="number" id="withdrawAmount" placeholder="Amount">
-    <input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
-    <div class="modal-actions">
-      <button class="btn" onclick="confirmWithdraw()">Confirm</button>
-      <button class="btn close-btn" onclick="closeModals()">Cancel</button>
-    </div>
-  </div>
+<div class="modal">
+<h3>Withdraw PI</h3>
+<input type="number" id="withdrawAmount" placeholder="Amount">
+<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
+<div class="modal-actions">
+<button class="btn" onclick="confirmWithdraw()">Confirm</button>
+<button class="btn close-btn" onclick="closeModals()">Cancel</button>
+</div>
+</div>
 </div>
 
 <script src="wallet-core.js"></script>
-<script src="internal-project-engine.js"></script>
-<script src="external-project-engine.js"></script>
-<script src="project-unified-engine.js"></script>
 <script src="wallet-ledger.js"></script>
 <script src="staking-engine.js"></script>
-<script src="staking-engine.js"></script>
 <script src="reward-engine.js"></script>
-  
+
 <script>
-/* ================= INIT ================= */
+/* ================= RENDER ================= */
 
 function renderWallet(){
-  const wallet = getWallet();
 
-  walletBalance.innerText = wallet.balance.toFixed(2)+" PI";
-  walletLocked.innerText = wallet.locked.toFixed(2)+" PI";
-  walletRewards.innerText = wallet.rewards.toFixed(2)+" PI";
+totalStake.innerText = getTotalStake().toFixed(2)+" PI";
+totalReward.innerText = getTotalRewards().toFixed(2)+" PI";
+withdrawn.innerText = getTotalWithdrawn().toFixed(2)+" PI";
+available.innerText = getAvailableReward().toFixed(2)+" PI";
 
-  renderTransactions(wallet.transactions);
+renderHistory();
 }
 
-function renderTransactions(list){
-  txList.innerHTML = "";
-  if(!list.length){
-    txList.innerHTML="<small>No transactions yet</small>";
-    return;
-  }
+function renderHistory(){
 
-  list.slice().reverse().forEach(tx=>{
-    const div=document.createElement("div");
-    div.className="tx";
-    div.innerHTML=`
-      <b>${tx.type.toUpperCase()}</b> — ${tx.amount||0} PI<br>
-      <small>${new Date(tx.at).toLocaleString()}</small>
-    `;
-    txList.appendChild(div);
-  });
+const list = getLedger();
+txList.innerHTML="";
+
+if(!list.length){
+txList.innerHTML="<small>No transactions yet</small>";
+return;
 }
 
-/* ================= MODAL CONTROL ================= */
-
-function openReceive(){
-  receiveModal.style.display="flex";
+list.slice().reverse().forEach(tx=>{
+const div=document.createElement("div");
+div.className="tx";
+div.innerHTML=`
+<b>${tx.type.toUpperCase()}</b> — ${tx.amount} PI<br>
+${tx.address ? "Wallet: "+tx.address+"<br>" : ""}
+<small>${new Date(tx.at).toLocaleString()}</small>
+`;
+txList.appendChild(div);
+});
 }
 
-function openWithdraw(){
-  withdrawModal.style.display="flex";
-}
+/* ================= MODAL ================= */
 
+function openReceive(){ receiveModal.style.display="flex"; }
+function openWithdraw(){ withdrawModal.style.display="flex"; }
 function closeModals(){
-  receiveModal.style.display="none";
-  withdrawModal.style.display="none";
+receiveModal.style.display="none";
+withdrawModal.style.display="none";
 }
 
 /* ================= ACTIONS ================= */
 
 function confirmReceive(){
-  const amt=parseFloat(receiveAmount.value);
-  if(!amt || amt<=0) return alert("Invalid amount");
 
-  walletReceive(amt,"manual_credit");
-  closeModals();
-  renderWallet();
+const amt=parseFloat(receiveAmount.value);
+if(!amt||amt<=0) return alert("Invalid amount");
+
+ledgerAdd({
+type:"receive",
+amount:amt,
+at:Date.now()
+});
+
+closeModals();
+renderWallet();
 }
 
 function confirmWithdraw(){
 
-  const amt=parseFloat(withdrawAmount.value);
-  const addr=withdrawAddress.value.trim();
+const amt=parseFloat(withdrawAmount.value);
+const addr=withdrawAddress.value.trim();
 
-  if(!amt||amt<=0||!addr)
-    return alert("Enter valid amount and address");
+if(!amt||amt<=0||!addr)
+return alert("Enter valid amount and address");
 
-  if(is2FAEnabled()){
-    const otp = generateOTP();
-    alert("Your OTP code (demo): "+otp);
+if(amt>getAvailableReward())
+return alert("Insufficient reward balance");
 
-    const userInput = prompt("Enter 6-digit OTP:");
+ledgerAdd({
+type:"withdraw",
+amount:amt,
+address:addr,
+at:Date.now()
+});
 
-    if(!verifyOTP(userInput)){
-      alert("Invalid or expired OTP");
-      return;
-    }
-  }
-
-function renderWallet(){
-
-  totalStake.innerText = getTotalStake().toFixed(2) + " Pi";
-  totalReward.innerText = getTotalRewards().toFixed(2) + " Pi";
-  withdrawn.innerText = getTotalWithdrawn().toFixed(2) + " Pi";
-  available.innerText = getAvailableReward().toFixed(2) + " Pi";
-
-  renderHistory();
-                                 }
-  
-  walletRequestWithdraw(amt,addr);
-  closeModals();
-  renderWallet();
-  }
+closeModals();
+renderWallet();
+}
 
 renderWallet();
 </script>
