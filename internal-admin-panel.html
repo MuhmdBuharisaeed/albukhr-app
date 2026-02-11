@@ -180,6 +180,20 @@ function rejectProject(id){
   }
 }
 
+function approve(id){
+
+  updateInternalStatus(id,"internal_approved");
+
+  const registryList = getInternalProjects();
+  const registryProject = registryList.find(p => p.id === id);
+
+  if(registryProject){
+     createInternalLiveProject(registryProject);
+  }
+
+  renderAdmin();
+                                 }
+  
 function changeStage(id,stage){
   if(stage){
     updateInternalStage(id,stage);
