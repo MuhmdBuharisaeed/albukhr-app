@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Albukhr Internal Projects</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <h1>ALBUKHR • Internal Projects</h1>
+</header>
+
+<section style="padding:16px">
+  <div id="projectList"></div>
+</section>
+
+<script src="internal-project-engine.js"></script>
+
+<script>
+const container = document.getElementById("projectList");
+
+function renderInternalProjects(){
+
+  const list = getInternalLiveProjects();
+
+  if(!list.length){
+    container.innerHTML = "<p>No active internal projects yet.</p>";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  list.forEach(p=>{
+
+    const div = document.createElement("div");
+    div.style.background="#fff";
+    div.style.padding="14px";
+    div.style.marginBottom="12px";
+    div.style.borderRadius="12px";
+
+    div.innerHTML = `
+      <h3>${p.name}</h3>
+      <small>${p.category}</small><br><br>
+
+      Duration: ${p.durationDays} days<br>
+      Reward Rate: ${p.rewardRate * 100}%<br>
+      Total Staked: ${p.totalStaked} Pi<br>
+      Status: ${p.status}
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+renderInternalProjects();
+</script>
+
+</body>
+</html>
