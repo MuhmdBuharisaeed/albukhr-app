@@ -56,5 +56,50 @@ function renderInternalProjects(){
 renderInternalProjects();
 </script>
 
+<script src="internal-core-seed.js"></script>
+<script src="staking-engine.js"></script>
+<script src="reward-engine.js"></script>
+<script src="wallet-core.js"></script>
+
+<script>
+
+seedInternalCoreProjects();
+
+function renderInternalProjects(){
+
+  const list = getAllInternalProjects();
+  const container = document.getElementById("projectList");
+  container.innerHTML = "";
+
+  list.forEach(p=>{
+
+    const div = document.createElement("div");
+    div.className="card";
+    div.innerHTML = `
+      <h3>${p.name}</h3>
+      <small>${p.category}</small>
+      <div>Reward Rate: ${p.rewardRate * 100}%</div>
+      <div>Duration: ${p.durationDays} days</div>
+      <button onclick="stakeNow('${p.id}')">Stake</button>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+function stakeNow(projectId){
+
+  const amount = prompt("Enter amount to stake:");
+  if(!amount || amount<=0) return;
+
+  addStake(projectId, parseFloat(amount));
+
+  alert("Stake successful");
+}
+
+renderInternalProjects();
+
+</script>
+  
 </body>
 </html>
