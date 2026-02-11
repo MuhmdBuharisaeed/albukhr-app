@@ -80,6 +80,8 @@ small{color:#666;font-size:12px}
      EXTERNAL ENGINE
 ============================= -->
 <script src="staking-external.js"></script>
+<script src="staking-external.js"></script>
+<script src="external-project-engine.js"></script>
 
 <script>
 const box = document.getElementById("pendingList");
@@ -150,6 +152,20 @@ function rejectProject(id){
   loadPending();
 }
 
+function approveExternal(projectId){
+
+  updateExternalStatus(projectId,"approved");
+
+  const registryList = getExternalProjects();
+  const registryProject = registryList.find(p => p.projectId === projectId);
+
+  if(registryProject){
+     createExternalLiveProject(registryProject);
+  }
+
+  renderExternalAdmin();
+  }
+  
 loadPending();
 </script>
 
