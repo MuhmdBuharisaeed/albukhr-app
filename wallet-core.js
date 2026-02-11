@@ -1,174 +1,57 @@
-/* =====================================
-   ALBUKHR WALLET CORE ENGINE
-   ===================================== */
+/* ===============================
+   ALBUKHR WALLET LEDGER SYSTEM
+================================ */
 
-const WALLET_KEY = "albukhr_wallet_core";
+const LEDGER_KEY = "albukhr_wallet_ledger";
 
-/* DEFAULT WALLET STATE */
-const defaultWallet = {
-  balance: 0,
-  currency: "PI",        // PI | USDT | future
-  status: "active",      // active | locked
-  transactions: [],
-  createdAt: Date.now(),
-  updatedAt: Date.now()
-};
-
-/* INIT WALLET */
-function initWallet(){
-  if(!localStorage.getItem(WALLET_KEY)){
-    localStorage.setItem(
-      WALLET_KEY,
-      JSON.stringify(defaultWallet)
-    );
-  }
+/* GET LEDGER */
+function getLedger(){
+  return JSON.parse(localStorage.getItem(LEDGER_KEY)) || [];
 }
 
-/* GET WALLET */
-function getWallet(){
-  try{
-    return {
-      ...defaultWallet,
-      ...JSON.parse(localStorage.getItem(WALLET_KEY))
-    };
-  }catch{
-    return { ...defaultWallet };
-  }
+/* SAVE LEDGER */
+function saveLedger(list){
+  localStorage.setItem(LEDGER_KEY, JSON.stringify(list));
 }
 
-/* SAVE WALLET */
-function saveWallet(wallet){
-  wallet.updatedAt = Date.now();
-  localStorage.setItem(WALLET_KEY, JSON.stringify(wallet));
-}
+/* ADD TRANSACTION */
+function addTransaction(type, project, amount, walletAddress){
+  const list = getLedger();
 
-/* SECURITY CHECK */
-function walletCanOperate(){
-  const gate = albukhrCanProceed("wallet");
-  if(!gate.allowed){
-    return gate;
-  }
-
-  const wallet = getWallet();
-  if(wallet.status === "locked"){
-    return {
-      allowed:false,
-      message:"Wallet is temporarily locked for security review."
-    };
-  }
-
-  return { allowed:true };
-}
-
-/* OPEN WALLET */
-function openWallet(){
-  const check = walletCanOperate();
-  if(!check.allowed){
-    alert(check.message);
-    return null;
-  }
-
-  initWallet();
-  return getWallet();
-}
-
-/* BALANCE */
-function getWalletBalance(){
-  const check = walletCanOperate();
-  if(!check.allowed){
-    alert(check.message);
-    return null;
-  }
-  return getWallet().balance;
-}
-
-/* RECEIVE FUNDS (SYSTEM / ESCROW / FUTURE) */
-function walletReceive(amount, source="system"){
-  const check = walletCanOperate();
-  if(!check.allowed){
-    alert(check.message);
-    return;
-  }
-
-  if(amount <= 0) return;
-
-  const wallet = getWallet();
-  wallet.balance += amount;
-
-  wallet.transactions.push({
-    type:"receive",
-    amount,
-    source,
-    at:Date.now()
+  list.push({
+    id: "TX-" + Date.now(),
+    type,
+    project,
+    amount: parseFloat(amount),
+    wallet: walletAddress,
+    createdAt: Date.now()
   });
 
-  saveWallet(wallet);
-}
-
-/* SEND FUNDS (FUTURE – USER CONFIRMATION REQUIRED) */
-function walletSend(amount, destination){
-  const check = walletCanOperate();
-  if(!check.allowed){
-    alert(check.message);
-    return;
-  }
-
-  const wallet = getWallet();
-
-  if(amount <= 0){
-    alert("Invalid amount.");
-    return;
-  }
-
-  if(wallet.balance < amount){
-    alert("Insufficient balance.");
-    return;
-  }
-
-  wallet.balance -= amount;
-
-  wallet.transactions.push({
-    type:"send",
-    amount,
-    destination,
-    at:Date.now()
-  });
-
-  saveWallet(wallet);
-}
-
-/* TRANSACTION HISTORY */
-function getWalletTransactions(){
-  const check = walletCanOperate();
-  if(!check.allowed){
-    alert(check.message);
-    return [];
-  }
-  return getWallet().transactions;
+  saveLedger(list);
 }
 
 /* ===============================
-   2FA ENGINE (Simple Secure Layer)
+   CALCULATIONS
 ================================ */
 
-function is2FAEnabled(){
-  const settings = JSON.parse(localStorage.getItem("albukhr_settings")) || {};
-  return settings.twoFA === true;
+function getTotalStake(){
+  return getLedger()
+    .filter(t=>t.type==="stake")
+    .reduce((sum,t)=>sum+t.amount,0);
 }
 
-function generateOTP(){
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  localStorage.setItem("albukhr_otp_code", code);
-  localStorage.setItem("albukhr_otp_expiry", Date.now() + 2*60*1000); // 2 mins
-  return code;
+function getTotalRewards(){
+  return getLedger()
+    .filter(t=>t.type==="reward")
+    .reduce((sum,t)=>sum+t.amount,0);
 }
 
-function verifyOTP(input){
-  const saved = localStorage.getItem("albukhr_otp_code");
-  const expiry = parseInt(localStorage.getItem("albukhr_otp_expiry"));
+function getTotalWithdrawn(){
+  return getLedger()
+    .filter(t=>t.type==="withdraw")
+    .reduce((sum,t)=>sum+t.amount,0);
+}
 
-  if(!saved || !expiry) return false;
-  if(Date.now() > expiry) return false;
-
-  return input === saved;
-   }
+function getAvailableReward(){
+  return getTotalRewards() - getTotalWithdrawn();
+}
