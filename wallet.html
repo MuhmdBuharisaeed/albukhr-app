@@ -258,6 +258,16 @@ function confirmWithdraw(){
     }
   }
 
+function renderWallet(){
+
+  totalStake.innerText = getTotalStake().toFixed(2) + " Pi";
+  totalReward.innerText = getTotalRewards().toFixed(2) + " Pi";
+  withdrawn.innerText = getTotalWithdrawn().toFixed(2) + " Pi";
+  available.innerText = getAvailableReward().toFixed(2) + " Pi";
+
+  renderHistory();
+                                 }
+  
   walletRequestWithdraw(amt,addr);
   closeModals();
   renderWallet();
