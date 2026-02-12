@@ -144,3 +144,49 @@ function getMergedHistory(){
 function clearWalletLedger(){
   localStorage.removeItem(LEDGER_KEY);
 }
+
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v3";
+
+function getWithdrawals(){
+  return JSON.parse(localStorage.getItem(WITHDRAW_KEY)) || [];
+}
+
+function saveWithdrawals(list){
+  localStorage.setItem(WITHDRAW_KEY, JSON.stringify(list));
+}
+
+function getTotalWithdrawn(){
+  return getWithdrawals()
+    .reduce((sum,t)=>sum+t.amount,0);
+}
+
+function requestWithdraw(amount, walletAddress){
+
+  amount = parseFloat(amount);
+
+  if(amount <= 0)
+    return { error:"Invalid amount" };
+
+  if(!walletAddress)
+    return { error:"Wallet address required" };
+
+  const totals = getTotals(); // daga staking.js
+  const available = totals.totalReward - getTotalWithdrawn();
+
+  if(amount > available)
+    return { error:"Insufficient balance" };
+
+  const tx = {
+    id: "WD-" + Date.now(),
+    type: "Withdraw",
+    amount,
+    walletAddress,
+    timestamp: Date.now()
+  };
+
+  const list = getWithdrawals();
+  list.push(tx);
+  saveWithdrawals(list);
+
+  return tx;
+}
