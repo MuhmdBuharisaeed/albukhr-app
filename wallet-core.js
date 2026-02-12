@@ -1,16 +1,20 @@
 /* =========================================
-   ALBUKHR WALLET CORE v2 (Ledger System)
+   ALBUKHR WALLET CORE v3 (Single Source of Truth)
    Semi-Custodial | PI SDK Ready
 ========================================= */
 
-const LEDGER_KEY = "albukhr_wallet_ledger_v2";
+const LEDGER_KEY = "albukhr_wallet_ledger_v3";
 
 /* =========================================
    LEDGER BASE
 ========================================= */
 
 function getLedger(){
-  return JSON.parse(localStorage.getItem(LEDGER_KEY)) || [];
+  try{
+    return JSON.parse(localStorage.getItem(LEDGER_KEY)) || [];
+  }catch(e){
+    return [];
+  }
 }
 
 function saveLedger(list){
@@ -18,26 +22,29 @@ function saveLedger(list){
 }
 
 /* =========================================
-   ADD TRANSACTION (UNIFIED FORMAT)
+   ADD TRANSACTION (UNIFIED STRUCTURE)
 ========================================= */
 
 function addTransaction({
-  type,            
-  source="internal", 
+  type,
+  source="internal",
   projectId=null,
   amount=0,
   walletAddress=null,
   status="completed",
   reference=null
 }){
-  if(!type || !amount) return false;
+
+  amount = parseFloat(amount);
+
+  if(!type || isNaN(amount) || amount <= 0) return false;
 
   const tx = {
     id: "TX-" + Date.now() + "-" + Math.floor(Math.random()*1000),
     type,
     source,
     projectId,
-    amount: parseFloat(amount),
+    amount,
     walletAddress,
     status,
     reference,
@@ -55,46 +62,62 @@ function addTransaction({
    FILTER HELPERS
 ========================================= */
 
+function getCompleted(){
+  return getLedger().filter(t=>t.status==="completed");
+}
+
 function getByType(type){
-  return getLedger().filter(t=>t.type===type && t.status==="completed");
+  return getCompleted().filter(t=>t.type===type);
 }
 
 function getByProject(projectId){
-  return getLedger().filter(t=>t.projectId===projectId && t.status==="completed");
+  return getCompleted().filter(t=>t.projectId===projectId);
 }
 
 /* =========================================
-   CALCULATIONS
+   CALCULATIONS (Single Truth)
 ========================================= */
 
 function getTotalStake(){
-  return getByType("stake").reduce((sum,t)=>sum+t.amount,0);
+  return getByType("stake")
+    .reduce((sum,t)=>sum+t.amount,0);
 }
 
 function getTotalRewards(){
-  return getByType("reward").reduce((sum,t)=>sum+t.amount,0);
+  return getByType("reward")
+    .reduce((sum,t)=>sum+t.amount,0);
 }
 
 function getTotalWithdrawn(){
-  return getByType("withdraw").reduce((sum,t)=>sum+t.amount,0);
+  return getByType("withdraw")
+    .reduce((sum,t)=>sum+t.amount,0);
 }
 
 function getTotalReceived(){
-  return getByType("receive").reduce((sum,t)=>sum+t.amount,0);
+  return getByType("receive")
+    .reduce((sum,t)=>sum+t.amount,0);
 }
 
 /* =========================================
-   WALLET BALANCE LOGIC
+   BALANCE LOGIC
 ========================================= */
 
-function getLockedBalance(){ return getTotalStake(); }
-function getRewardBalance(){ return getTotalRewards() - getTotalWithdrawn(); }
-function getAvailableBalance(){ return getRewardBalance(); }
+function getLockedBalance(){
+  return getTotalStake();
+}
+
+function getRewardBalance(){
+  return getTotalRewards() - getTotalWithdrawn();
+}
+
+function getAvailableBalance(){
+  return Math.max(getRewardBalance(), 0);
+}
 
 function getWalletSummary(){
   return {
     locked: getLockedBalance(),
-    rewards: getRewardBalance(),
+    totalRewards: getTotalRewards(),
     withdrawn: getTotalWithdrawn(),
     received: getTotalReceived(),
     available: getAvailableBalance()
@@ -102,69 +125,55 @@ function getWalletSummary(){
 }
 
 /* =========================================
-   WITHDRAW VALIDATION
+   SAFE OPERATIONS
 ========================================= */
 
 function requestWithdraw(amount, walletAddress){
+
   amount = parseFloat(amount);
-  if(amount <= 0) return {error:"Invalid amount"};
-  if(amount > getAvailableBalance()) return {error:"Insufficient reward balance"};
-  if(typeof canTransact === "function" && !canTransact()) return {error:"Transactions currently locked"};
+
+  if(isNaN(amount) || amount <= 0)
+    return {error:"Invalid amount"};
+
+  if(amount > getAvailableBalance())
+    return {error:"Insufficient reward balance"};
+
+  if(typeof canTransact === "function" && !canTransact())
+    return {error:"Transactions locked"};
 
   return addTransaction({
     type:"withdraw",
-    amount,
     walletAddress,
-    status:"completed"
+    amount
   });
 }
 
-/* =========================================
-   RECEIVE CREDIT
-========================================= */
-
-function creditReceive(amount, source="system"){
-  if(amount <= 0) return false;
+function creditReceive(amount){
   return addTransaction({
     type:"receive",
-    source,
-    amount,
-    status:"completed"
+    source:"external",
+    amount
   });
 }
 
-/* =========================================
-   PROJECT STAKE ENTRY
-========================================= */
-
-function recordStake(projectId, amount, source="internal"){
-  if(amount <= 0) return false;
+function recordStake(projectId, amount){
   return addTransaction({
     type:"stake",
     projectId,
-    source,
-    amount,
-    status:"completed"
+    amount
   });
 }
 
-/* =========================================
-   REWARD ENTRY
-========================================= */
-
 function recordReward(projectId, amount){
-  if(amount <= 0) return false;
   return addTransaction({
     type:"reward",
     projectId,
-    amount,
-    projectId,
-    status:"completed"
+    amount
   });
 }
 
 /* =========================================
-   DEBUG / DEV HELPER
+   DEV TOOLS
 ========================================= */
 
 function clearWalletLedger(){
@@ -174,4 +183,4 @@ function clearWalletLedger(){
 
 function printWalletLedger(){
   console.table(getLedger());
-     }
+}
