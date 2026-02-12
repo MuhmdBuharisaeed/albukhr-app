@@ -24,10 +24,9 @@ body{
   margin-bottom:8px;
   display:flex;
   align-items:center;
-  gap:8px; /* rage spacing */
+  gap:8px;
 }
 
-/* ICON – RAGE GIRMA */
 .project-icon{
   font-size:16px;
   width:26px;
@@ -41,12 +40,19 @@ body{
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
+
+.withdraw-status{color:#c0392b}
+.address{
+  font-size:10px;
+  color:#999;
+  margin-top:2px;
+  word-break:break-all
+}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>All Transactions</span>
@@ -59,11 +65,12 @@ body{
 
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
-  
+
 <script>
+
 const txList = document.getElementById("txList");
 
-/* ✅ HUKUMA ICON MAP */
+/* ICON MAP */
 const ICONS = {
   Raheem:   "💊",
   Hauwal:   "🌽",
@@ -74,89 +81,94 @@ const ICONS = {
   Labbaika: "🍞"
 };
 
-function renderTransactions(){
+function loadTransactions(){
 
-  const container = document.getElementById("txContainer");
-  container.innerHTML = "";
+  txList.innerHTML = "";
 
-  /* ===== STAKES (Tsohon tsarin) ===== */
+  /* ================= STAKE DATA ================= */
+
   const stakes = getStakes()
     .filter(s => s.status === "Successful")
     .map(s => ({
       type: "stake",
       project: s.project,
-      amount: s.amount,
-      timestamp: s.timestamp
+      amount: Number(s.amount),
+      timestamp: s.timestamp || s.date || Date.now()
     }));
 
-  /* ===== WITHDRAWALS (Sabon daga wallet) ===== */
-  let withdraws = [];
-  if(typeof getWithdrawals === "function"){
-    withdraws = getWithdrawals();
-  }
+  /* ================= WITHDRAW DATA ================= */
 
-  const mappedWithdraws = withdraws.map(w => ({
-    type: "withdraw",
-    amount: w.amount,
-    wallet: w.walletAddress,
-    timestamp: w.timestamp
-  }));
+  const withdraws = getLedger()
+    .filter(t => t.type === "withdraw" && t.status === "completed")
+    .map(t => ({
+      type: "withdraw",
+      project: "Wallet",
+      amount: Number(t.amount),
+      walletAddress: t.walletAddress,
+      timestamp: t.createdAt
+    }));
 
-  /* ===== MERGE & SORT ===== */
-  const allTx = [...stakes, ...mappedWithdraws]
-    .sort((a,b)=>b.timestamp - a.timestamp);
+  /* ================= MERGE ================= */
+
+  const allTx = [...stakes, ...withdraws]
+    .sort((a,b)=> b.timestamp - a.timestamp);
 
   if(allTx.length === 0){
-    container.innerHTML =
-      "<p style='font-size:13px;color:#777'>No transactions yet</p>";
+    txList.innerHTML =
+      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  /* ===== RENDER ===== */
+  /* ================= RENDER ================= */
+
   allTx.forEach(tx=>{
 
-    const div = document.createElement("div");
-    div.className = "home-tx"; // muna amfani da existing style
+    const dateObj = new Date(tx.timestamp);
+    const date = dateObj.toLocaleDateString();
+    const time = dateObj.toLocaleTimeString();
 
-    const date = new Date(tx.timestamp).toLocaleString();
+    const div = document.createElement("div");
+    div.className = "project-tx";
 
     if(tx.type === "stake"){
 
       div.innerHTML = `
-        <div class="home-icon">📦</div>
-        <div class="home-body">
-          <div class="home-title">${tx.project} Stake</div>
-          <div class="home-date">${date}</div>
+        <div class="project-icon">
+          ${ICONS[tx.project] || "📦"}
         </div>
-        <div class="home-right">
-          <div class="home-amount">${tx.amount} Pi</div>
-          <div class="home-status success">Successful</div>
+
+        <div class="project-body">
+          <div class="project-title">${tx.project} Stake</div>
+          <div class="project-date">${date} • ${time}</div>
+        </div>
+
+        <div class="project-right">
+          <div class="project-amount">${tx.amount.toFixed(2)} Pi</div>
+          <div class="project-status">Successful</div>
         </div>
       `;
 
-    } else {
+    } else if(tx.type === "withdraw"){
 
       div.innerHTML = `
-        <div class="home-icon">💸</div>
-        <div class="home-body">
-          <div class="home-title">Reward Withdraw</div>
-          <div class="home-date">${date}</div>
-          <div style="font-size:11px;color:#777">
-            Wallet: ${tx.wallet}
-          </div>
+        <div class="project-icon">💸</div>
+
+        <div class="project-body">
+          <div class="project-title">Reward Withdrawal</div>
+          <div class="project-date">${date} • ${time}</div>
+          <div class="address">Wallet: ${tx.walletAddress}</div>
         </div>
-        <div class="home-right">
-          <div class="home-amount">-${tx.amount} Pi</div>
-          <div class="home-status success">Completed</div>
+
+        <div class="project-right">
+          <div class="project-amount">-${tx.amount.toFixed(2)} Pi</div>
+          <div class="project-status withdraw-status">Withdrawn</div>
         </div>
       `;
     }
 
-    container.appendChild(div);
+    txList.appendChild(div);
   });
 }
-
-window.addEventListener("DOMContentLoaded", renderTransactions);
 
 loadTransactions();
 </script>
