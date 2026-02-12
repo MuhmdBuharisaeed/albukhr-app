@@ -95,31 +95,35 @@ function renderWallet(){
 
 function renderHistory(){
 
-  const list = getMergedHistory();
-  txList.innerHTML = "";
+  const list = getWithdrawals()
+    .sort((a,b)=>b.timestamp-a.timestamp);
+
+  txList.innerHTML="";
 
   if(!list.length){
-    txList.innerHTML = "<small>No transactions yet</small>";
+    txList.innerHTML="<small>No withdrawals yet</small>";
     return;
   }
 
   list.forEach(tx=>{
-    const div = document.createElement("div");
-    div.className="tx";
 
-    if(tx.type === "stake"){
-      div.innerHTML = `
-        <b>STAKE</b> — ${tx.amount} PI<br>
-        Project: ${tx.project}<br>
-        <small>${new Date(tx.createdAt).toLocaleString()}</small>
-      `;
-    }else{
-      div.innerHTML = `
-        <b>WITHDRAW</b> — ${tx.amount} PI<br>
-        Wallet: ${tx.walletAddress}<br>
-        <small>${new Date(tx.createdAt).toLocaleString()}</small>
-      `;
-    }
+    const div = document.createElement("div");
+    div.className="home-tx";
+
+    div.innerHTML = `
+      <div class="home-icon">💸</div>
+      <div class="home-body">
+        <div class="home-title">Reward Withdraw</div>
+        <div class="home-date">${new Date(tx.timestamp).toLocaleString()}</div>
+        <div style="font-size:11px;color:#888">
+          Wallet: ${tx.walletAddress}
+        </div>
+      </div>
+      <div class="home-right">
+        <div class="home-amount">-${tx.amount} Pi</div>
+        <div class="home-status success">Completed</div>
+      </div>
+    `;
 
     txList.appendChild(div);
   });
