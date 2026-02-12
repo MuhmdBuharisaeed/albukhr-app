@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Wallet</title>
-
+<title>Albukhr Wallet Demo</title>
 <link rel="stylesheet" href="style.css">
 
 <style>
@@ -27,13 +26,13 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 .close-btn{background:#ddd;color:#333}
 </style>
 </head>
-
 <body>
 
-<div class="header">💰 ALBUKHR WALLET</div>
+<div class="header">💰 ALBUKHR WALLET DEMO</div>
 
 <section class="section">
 
+<!-- WALLET SUMMARY -->
 <div class="card">
 <div class="balance" id="available">0 PI</div>
 <div class="sub">Available Reward Balance</div>
@@ -59,6 +58,7 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 </div>
 </div>
 
+<!-- TRANSACTION HISTORY -->
 <div class="card">
 <h4>Transaction History</h4>
 <div id="txList"></div>
@@ -91,88 +91,112 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 </div>
 </div>
 
-<!-- ==================== SCRIPTS ==================== -->
-<script src="wallet-core.js"></script>
-<script src="wallet-withdraw.js"></script>
-<script src="staking-engine.js"></script>
-<script src="reward-engine.js"></script>
-
 <script>
-/* ================== LOAD ALBUKHR CORE PROJECTS ================== */
-const albukhrCoreProjects = [
-  { projectId: "AZMAN", name: "Azman Features Makers Lab", staked: 55, rewards: 9.6 },
-  { projectId: "LAIBAIKA", name: "Laibaika Bakery Center", staked: 40, rewards: 6.2 },
-  { projectId: "BASHAGRO", name: "Bash Agro", staked: 75, rewards: 12.5 },
-  { projectId: "URBANMOB", name: "Urban Mobility", staked: 30, rewards: 5.0 },
-  { projectId: "KHAIRAT", name: "Khairat Organic Fertilizer", staked: 50, rewards: 8.0 },
-  { projectId: "HAUWAL", name: "Hauwal Sumonviter", staked: 60, rewards: 10.0 },
-  { projectId: "RAHEEM", name: "Raheem Pharmacy", staked: 15, rewards: 2.4 }
+/* ===============================
+   WALLET LEDGER SYSTEM
+================================ */
+
+const LEDGER_KEY = "albukhr_wallet_ledger_demo";
+
+function getLedger(){ return JSON.parse(localStorage.getItem(LEDGER_KEY))||[]; }
+function saveLedger(list){ localStorage.setItem(LEDGER_KEY, JSON.stringify(list)); }
+
+function addTransaction({type, source="internal", projectId=null, amount=0, walletAddress=null, status="completed"}){
+    if(!type||!amount) return false;
+    const tx = { id:"TX-"+Date.now()+"-"+Math.floor(Math.random()*1000), type, source, projectId, amount, walletAddress, status, createdAt:Date.now() };
+    const list = getLedger(); list.push(tx); saveLedger(list);
+    return tx;
+}
+
+function getByType(type){ return getLedger().filter(t=>t.type===type&&t.status==="completed"); }
+function getByProject(projectId){ return getLedger().filter(t=>t.projectId===projectId); }
+
+function getTotalStake(){ return getByType("stake").reduce((sum,t)=>sum+t.amount,0); }
+function getTotalRewards(){ return getByType("reward").reduce((sum,t)=>sum+t.amount,0); }
+function getTotalWithdrawn(){ return getByType("withdraw").reduce((sum,t)=>sum+t.amount,0); }
+function getTotalReceived(){ return getByType("receive").reduce((sum,t)=>sum+t.amount,0); }
+
+function getAvailableBalance(){ return getTotalRewards()-getTotalWithdrawn(); }
+
+/* ===============================
+   PROJECTS
+================================ */
+
+const internalProjects = [
+    {projectId:"P1", name:"Azman Features Makers Lab", staked:55, rewards:9.6},
+    {projectId:"P2", name:"Laibaika Bakery Center", staked:50, rewards:8.2},
+    {projectId:"P3", name:"Bash Agro", staked:40, rewards:5.5},
+    {projectId:"P4", name:"Urban Mobility", staked:70, rewards:12.3},
+    {projectId:"P5", name:"Khairat Organic Fertilizer", staked:60, rewards:10.0},
+    {projectId:"P6", name:"Hauwal Sumonviter", staked:30, rewards:4.8},
+    {projectId:"P7", name:"Raheem Pharmacy", staked:45, rewards:7.2}
 ];
 
-/* Auto-record all core projects to wallet ledger */
-albukhrCoreProjects.forEach(p=>{
-  if(!getByProject(p.projectId).length){
-    recordStake(p.projectId, p.staked, "internal");
-  }
-  if(p.rewards && p.rewards>0){
-    recordReward(p.projectId, p.rewards);
-  }
-});
+function syncInternalProjects(){
+    internalProjects.forEach(p=>{
+        if(!getByProject(p.projectId).length){
+            if(p.staked>0) addTransaction({type:"stake", projectId:p.projectId, amount:p.staked});
+            if(p.rewards>0) addTransaction({type:"reward", projectId:p.projectId, amount:p.rewards});
+        }
+    });
+}
 
-/* ================== RENDER WALLET ================== */
+/* ===============================
+   WALLET UI
+================================ */
+
 function renderWallet(){
-  totalStake.innerText = getTotalStake().toFixed(2)+" PI";
-  totalReward.innerText = getTotalRewards().toFixed(2)+" PI";
-  withdrawn.innerText = getTotalWithdrawn().toFixed(2)+" PI";
-  available.innerText = getAvailableReward().toFixed(2)+" PI";
-  renderHistory();
+    totalStake.innerText=getTotalStake().toFixed(2)+" PI";
+    totalReward.innerText=getTotalRewards().toFixed(2)+" PI";
+    withdrawn.innerText=getTotalWithdrawn().toFixed(2)+" PI";
+    available.innerText=getAvailableBalance().toFixed(2)+" PI";
+    renderTransactions();
 }
 
-function renderHistory(){
-  const list = getLedger();
-  txList.innerHTML="";
-  if(!list.length){
-    txList.innerHTML="<small>No transactions yet</small>";
-    return;
-  }
-  list.slice().reverse().forEach(tx=>{
-    const div=document.createElement("div");
-    div.className="tx";
-    div.innerHTML=`
-      <b>${tx.type.toUpperCase()}</b> — ${tx.amount} PI<br>
-      ${tx.walletAddress ? "Wallet: "+tx.walletAddress+"<br>" : ""}
-      <small>${new Date(tx.createdAt).toLocaleString()}</small>
-    `;
-    txList.appendChild(div);
-  });
+function renderTransactions(){
+    const list = getLedger(); txList.innerHTML="";
+    if(!list.length){ txList.innerHTML="<small>No transactions yet</small>"; return; }
+    list.slice().reverse().forEach(tx=>{
+        const div=document.createElement("div");
+        div.className="tx";
+        div.innerHTML=`<b>${tx.type.toUpperCase()}</b> — ${tx.amount} PI<br>${tx.projectId?"Project: "+tx.projectId+"<br>":""}${tx.walletAddress?"Wallet: "+tx.walletAddress+"<br>":""}<small>${new Date(tx.createdAt).toLocaleString()}</small>`;
+        txList.appendChild(div);
+    });
 }
 
-/* ================= MODAL CONTROL ================== */
+/* ===============================
+   MODALS
+================================ */
+
 function openReceive(){ receiveModal.style.display="flex"; }
 function openWithdraw(){ withdrawModal.style.display="flex"; }
 function closeModals(){ receiveModal.style.display="none"; withdrawModal.style.display="none"; }
 
-/* ================= WALLET ACTIONS ================== */
+/* ===============================
+   MODAL ACTIONS
+================================ */
+
 function confirmReceive(){
-  const amt=parseFloat(receiveAmount.value);
-  if(!amt||amt<=0) return alert("Invalid amount");
-  creditReceive(amt,"manual_credit");
-  closeModals();
-  renderWallet();
+    const amt=parseFloat(receiveAmount.value);
+    if(!amt||amt<=0) return alert("Invalid amount");
+    addTransaction({type:"receive", amount:amt, source:"system"});
+    closeModals(); renderWallet();
 }
 
 function confirmWithdraw(){
-  const amt=parseFloat(withdrawAmount.value);
-  const addr=withdrawAddress.value.trim();
-  if(!amt||amt<=0||!addr) return alert("Enter valid amount and address");
-  if(amt>getAvailableBalance()) return alert("Insufficient reward balance");
-  const res = requestWithdraw(amt, addr);
-  if(res.error) return alert(res.error);
-  closeModals();
-  renderWallet();
+    const amt=parseFloat(withdrawAmount.value);
+    const addr=withdrawAddress.value.trim();
+    if(!amt||amt<=0||!addr) return alert("Enter valid amount and wallet address");
+    if(amt>getAvailableBalance()) return alert("Insufficient reward balance");
+    addTransaction({type:"withdraw", amount:amt, walletAddress:addr});
+    closeModals(); renderWallet();
 }
 
-/* ================= INIT ================== */
+/* ===============================
+   INIT
+================================ */
+
+syncInternalProjects();
 renderWallet();
 </script>
 
