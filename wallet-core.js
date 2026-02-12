@@ -22,15 +22,14 @@ function saveLedger(list){
 ========================================= */
 
 function addTransaction({
-  type,            // stake | reward | withdraw | receive
-  source="internal", // internal | external | system
+  type,            
+  source="internal", 
   projectId=null,
   amount=0,
   walletAddress=null,
-  status="completed", // pending | completed | failed
-  reference=null      // future: PI txHash
+  status="completed",
+  reference=null
 }){
-
   if(!type || !amount) return false;
 
   const tx = {
@@ -61,7 +60,7 @@ function getByType(type){
 }
 
 function getByProject(projectId){
-  return getLedger().filter(t=>t.projectId===projectId);
+  return getLedger().filter(t=>t.projectId===projectId && t.status==="completed");
 }
 
 /* =========================================
@@ -69,40 +68,28 @@ function getByProject(projectId){
 ========================================= */
 
 function getTotalStake(){
-  return getByType("stake")
-    .reduce((sum,t)=>sum+t.amount,0);
+  return getByType("stake").reduce((sum,t)=>sum+t.amount,0);
 }
 
 function getTotalRewards(){
-  return getByType("reward")
-    .reduce((sum,t)=>sum+t.amount,0);
+  return getByType("reward").reduce((sum,t)=>sum+t.amount,0);
 }
 
 function getTotalWithdrawn(){
-  return getByType("withdraw")
-    .reduce((sum,t)=>sum+t.amount,0);
+  return getByType("withdraw").reduce((sum,t)=>sum+t.amount,0);
 }
 
 function getTotalReceived(){
-  return getByType("receive")
-    .reduce((sum,t)=>sum+t.amount,0);
+  return getByType("receive").reduce((sum,t)=>sum+t.amount,0);
 }
 
 /* =========================================
    WALLET BALANCE LOGIC
 ========================================= */
 
-function getLockedBalance(){
-  return getTotalStake();
-}
-
-function getRewardBalance(){
-  return getTotalRewards() - getTotalWithdrawn();
-}
-
-function getAvailableBalance(){
-  return getRewardBalance();
-}
+function getLockedBalance(){ return getTotalStake(); }
+function getRewardBalance(){ return getTotalRewards() - getTotalWithdrawn(); }
+function getAvailableBalance(){ return getRewardBalance(); }
 
 function getWalletSummary(){
   return {
@@ -119,16 +106,10 @@ function getWalletSummary(){
 ========================================= */
 
 function requestWithdraw(amount, walletAddress){
-
   amount = parseFloat(amount);
-
-  if(amount<=0) return {error:"Invalid amount"};
-
-  if(amount > getAvailableBalance())
-    return {error:"Insufficient reward balance"};
-
-  if(typeof canTransact === "function" && !canTransact())
-    return {error:"Transactions currently locked"};
+  if(amount <= 0) return {error:"Invalid amount"};
+  if(amount > getAvailableBalance()) return {error:"Insufficient reward balance"};
+  if(typeof canTransact === "function" && !canTransact()) return {error:"Transactions currently locked"};
 
   return addTransaction({
     type:"withdraw",
@@ -143,6 +124,7 @@ function requestWithdraw(amount, walletAddress){
 ========================================= */
 
 function creditReceive(amount, source="system"){
+  if(amount <= 0) return false;
   return addTransaction({
     type:"receive",
     source,
@@ -156,6 +138,7 @@ function creditReceive(amount, source="system"){
 ========================================= */
 
 function recordStake(projectId, amount, source="internal"){
+  if(amount <= 0) return false;
   return addTransaction({
     type:"stake",
     projectId,
@@ -170,10 +153,25 @@ function recordStake(projectId, amount, source="internal"){
 ========================================= */
 
 function recordReward(projectId, amount){
+  if(amount <= 0) return false;
   return addTransaction({
     type:"reward",
     projectId,
     amount,
+    projectId,
     status:"completed"
   });
+}
+
+/* =========================================
+   DEBUG / DEV HELPER
+========================================= */
+
+function clearWalletLedger(){
+  localStorage.removeItem(LEDGER_KEY);
+  console.log("Wallet ledger cleared");
+}
+
+function printWalletLedger(){
+  console.table(getLedger());
      }
