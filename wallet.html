@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Wallet Demo</title>
-<link rel="stylesheet" href="style.css">
+<title>Albukhr Wallet</title>
 
 <style>
 body{background:#f4f7f6;font-family:system-ui;margin:0}
@@ -19,20 +18,20 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 .btn.secondary{background:#eaf6ee;color:#0f7a3d}
 .tx{border-bottom:1px solid #eee;padding:8px 0;font-size:13px}
 .tx small{color:#777;font-size:11px}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
 .modal{background:#fff;border-radius:16px;padding:20px;width:90%;max-width:400px}
 .modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-bottom:10px}
 .modal-actions{display:flex;gap:10px}
 .close-btn{background:#ddd;color:#333}
 </style>
 </head>
+
 <body>
 
-<div class="header">💰 ALBUKHR WALLET DEMO</div>
+<div class="header">💰 ALBUKHR WALLET</div>
 
 <section class="section">
 
-<!-- WALLET SUMMARY -->
 <div class="card">
 <div class="balance" id="available">0 PI</div>
 <div class="sub">Available Reward Balance</div>
@@ -53,12 +52,10 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 </div>
 
 <div class="btn-group">
-<button class="btn" onclick="openReceive()">Receive</button>
 <button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
 </div>
 </div>
 
-<!-- TRANSACTION HISTORY -->
 <div class="card">
 <h4>Transaction History</h4>
 <div id="txList"></div>
@@ -66,19 +63,6 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 
 </section>
 
-<!-- RECEIVE MODAL -->
-<div class="modal-overlay" id="receiveModal">
-<div class="modal">
-<h3>Receive PI</h3>
-<input type="number" id="receiveAmount" placeholder="Enter amount">
-<div class="modal-actions">
-<button class="btn" onclick="confirmReceive()">Confirm</button>
-<button class="btn close-btn" onclick="closeModals()">Cancel</button>
-</div>
-</div>
-</div>
-
-<!-- WITHDRAW MODAL -->
 <div class="modal-overlay" id="withdrawModal">
 <div class="modal">
 <h3>Withdraw PI</h3>
@@ -91,260 +75,80 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 </div>
 </div>
 
+<script src="staking.js"></script>
+<script src="staking-external.js"></script>
+<script src="wallet-core.js"></script>
+
 <script>
-
-/* =========================================
-   WALLET LEDGER CORE
-========================================= */
-
-const LEDGER_KEY = "albukhr_wallet_full_ecosystem";
-
-function getLedger(){
-  return JSON.parse(localStorage.getItem(LEDGER_KEY)) || [];
-}
-
-function saveLedger(list){
-  localStorage.setItem(LEDGER_KEY, JSON.stringify(list));
-}
-
-function addTransaction({
-  type,
-  source="internal",
-  projectId=null,
-  amount=0,
-  walletAddress=null,
-  status="completed"
-}){
-
-  if(!type || !amount) return false;
-
-  const tx = {
-    id: "TX-" + Date.now() + "-" + Math.floor(Math.random()*1000),
-    type,
-    source,
-    projectId,
-    amount: parseFloat(amount),
-    walletAddress,
-    status,
-    createdAt: Date.now()
-  };
-
-  const list = getLedger();
-  list.push(tx);
-  saveLedger(list);
-
-  return tx;
-}
-
-/* =========================================
-   CALCULATIONS
-========================================= */
-
-function getByType(type){
-  return getLedger().filter(t=>t.type===type && t.status==="completed");
-}
-
-function getByProject(projectId){
-  return getLedger().filter(t=>t.projectId===projectId);
-}
-
-function getTotalStake(){
-  return getByType("stake").reduce((sum,t)=>sum+t.amount,0);
-}
-
-function getTotalRewards(){
-  return getByType("reward").reduce((sum,t)=>sum+t.amount,0);
-}
-
-function getTotalWithdrawn(){
-  return getByType("withdraw").reduce((sum,t)=>sum+t.amount,0);
-}
-
-function getAvailableBalance(){
-  return getTotalRewards() - getTotalWithdrawn();
-}
-
-/* =========================================
-   INTERNAL PROJECTS (CORE 7)
-========================================= */
-
-const internalProjects = [
-  {id:"AZMAN", name:"Azman Features Makers Lab", stake:55, reward:9.6},
-  {id:"LAIBAIKA", name:"Laibaika Bakery Center", stake:50, reward:8.2},
-  {id:"BASHAGRO", name:"Bash Agro", stake:40, reward:5.5},
-  {id:"URBAN", name:"Urban Mobility", stake:70, reward:12.3},
-  {id:"KHAIRAT", name:"Khairat Organic Fertilizer", stake:60, reward:10.0},
-  {id:"HAUWAL", name:"Hauwal Sumonviter", stake:30, reward:4.8},
-  {id:"RAHEEM", name:"Raheem Pharmacy", stake:45, reward:7.2}
-];
-
-function syncInternalProjects(){
-
-  internalProjects.forEach(p=>{
-
-    if(!getByProject(p.id).length){
-
-      if(p.stake > 0){
-        addTransaction({
-          type:"stake",
-          source:"internal",
-          projectId:p.id,
-          amount:p.stake
-        });
-      }
-
-      if(p.reward > 0){
-        addTransaction({
-          type:"reward",
-          source:"internal",
-          projectId:p.id,
-          amount:p.reward
-        });
-      }
-
-    }
-
-  });
-
-}
-
-/* =========================================
-   EXTERNAL PROJECTS (APPROVED ONLY)
-========================================= */
-
-function getExternalProjects(){
-  return JSON.parse(localStorage.getItem("albukhr_external_projects")) || [];
-}
-
-function syncExternalProjects(){
-
-  const approved = getExternalProjects()
-    .filter(p=>p.status==="approved");
-
-  approved.forEach(p=>{
-
-    if(!getByProject(p.projectId).length){
-
-      if(p.staked && p.staked > 0){
-        addTransaction({
-          type:"stake",
-          source:"external",
-          projectId:p.projectId,
-          amount:p.staked
-        });
-      }
-
-      if(p.rewards && p.rewards > 0){
-        addTransaction({
-          type:"reward",
-          source:"external",
-          projectId:p.projectId,
-          amount:p.rewards
-        });
-      }
-
-    }
-
-  });
-
-}
-
-/* =========================================
-   UI RENDER
-========================================= */
 
 function renderWallet(){
 
-  totalStake.innerText = getTotalStake().toFixed(2)+" PI";
-  totalReward.innerText = getTotalRewards().toFixed(2)+" PI";
-  withdrawn.innerText = getTotalWithdrawn().toFixed(2)+" PI";
-  available.innerText = getAvailableBalance().toFixed(2)+" PI";
+  const summary = getWalletSummary();
 
-  renderTransactions();
+  totalStake.innerText = summary.totalStake.toFixed(2) + " PI";
+  totalReward.innerText = summary.totalReward.toFixed(2) + " PI";
+  withdrawn.innerText = summary.withdrawn.toFixed(2) + " PI";
+  available.innerText = summary.available.toFixed(2) + " PI";
+
+  renderHistory();
 }
 
-function renderTransactions(){
+function renderHistory(){
 
-  const list = getLedger();
-  txList.innerHTML="";
+  const list = getMergedHistory();
+  txList.innerHTML = "";
 
   if(!list.length){
-    txList.innerHTML="<small>No transactions yet</small>";
+    txList.innerHTML = "<small>No transactions yet</small>";
     return;
   }
 
-  list.slice().reverse().forEach(tx=>{
-
+  list.forEach(tx=>{
     const div = document.createElement("div");
     div.className="tx";
 
-    div.innerHTML = `
-      <b>${tx.type.toUpperCase()}</b> — ${tx.amount} PI<br>
-      ${tx.projectId ? "Project: "+tx.projectId+"<br>" : ""}
-      ${tx.walletAddress ? "Wallet: "+tx.walletAddress+"<br>" : ""}
-      <small>${new Date(tx.createdAt).toLocaleString()}</small>
-    `;
+    if(tx.type === "stake"){
+      div.innerHTML = `
+        <b>STAKE</b> — ${tx.amount} PI<br>
+        Project: ${tx.project}<br>
+        <small>${new Date(tx.createdAt).toLocaleString()}</small>
+      `;
+    }else{
+      div.innerHTML = `
+        <b>WITHDRAW</b> — ${tx.amount} PI<br>
+        Wallet: ${tx.walletAddress}<br>
+        <small>${new Date(tx.createdAt).toLocaleString()}</small>
+      `;
+    }
 
     txList.appendChild(div);
-
   });
-
 }
 
-/* =========================================
-   ACTIONS
-========================================= */
-
-function openReceive(){ receiveModal.style.display="flex"; }
-function openWithdraw(){ withdrawModal.style.display="flex"; }
+function openWithdraw(){
+  withdrawModal.style.display="flex";
+}
 
 function closeModals(){
-  receiveModal.style.display="none";
   withdrawModal.style.display="none";
-}
-
-function confirmReceive(){
-
-  const amt=parseFloat(receiveAmount.value);
-  if(!amt || amt<=0) return alert("Invalid amount");
-
-  addTransaction({
-    type:"receive",
-    source:"system",
-    amount:amt
-  });
-
-  closeModals();
-  renderWallet();
 }
 
 function confirmWithdraw(){
 
-  const amt=parseFloat(withdrawAmount.value);
-  const addr=withdrawAddress.value.trim();
+  const amt = parseFloat(withdrawAmount.value);
+  const addr = withdrawAddress.value.trim();
 
-  if(!amt || amt<=0 || !addr)
-    return alert("Enter valid amount and wallet address");
+  const res = requestWithdraw(amt, addr);
 
-  if(amt > getAvailableBalance())
-    return alert("Insufficient reward balance");
-
-  addTransaction({
-    type:"withdraw",
-    amount:amt,
-    walletAddress:addr
-  });
+  if(res.error){
+    alert(res.error);
+    return;
+  }
 
   closeModals();
   renderWallet();
 }
 
-/* =========================================
-   INIT SYSTEM
-========================================= */
-
-syncInternalProjects();
-syncExternalProjects();
 renderWallet();
 
 </script>
