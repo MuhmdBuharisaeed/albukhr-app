@@ -1,118 +1,94 @@
 /* =========================================
-   ALBUKHR STAKING ENGINE (UNIFIED)
+   ALBUKHR STAKING ENGINE (Maturity Based)
 ========================================= */
 
-const STAKE_KEY = "albukhr_user_stakes";
+const STAKE_KEY = "albukhr_user_stakes_v1";
 
-/* =========================================
-   GET USER STAKES
-========================================= */
+/* GET ALL USER STAKES */
 function getUserStakes(){
   return JSON.parse(localStorage.getItem(STAKE_KEY)) || [];
 }
 
+/* SAVE STAKES */
 function saveUserStakes(list){
   localStorage.setItem(STAKE_KEY, JSON.stringify(list));
 }
 
 /* =========================================
-   STAKE INTO PROJECT
+   CREATE NEW STAKE
 ========================================= */
 
-function stakeIntoProject(projectId, amount, userWallet){
+function stakeInProject(projectId, amount){
 
-  amount = Number(amount);
+  const project = getInternalProject(projectId);
+  if(!project) return alert("Project not found");
 
-  if(!amount || amount <= 0){
-    return { success:false, message:"Invalid stake amount" };
-  }
+  if(amount <= 0) return alert("Invalid stake amount");
 
-  if(typeof getProjectById !== "function"){
-    return { success:false, message:"Project engine not loaded" };
-  }
-
-  const project = getProjectById(projectId);
-
-  if(!project){
-    return { success:false, message:"Project not found" };
-  }
-
-  // Only approved/live projects
-  if(project.status !== "approved" && project.status !== "live"){
-    return { success:false, message:"Project not open for staking" };
-  }
-
-  // =============================
-  // UPDATE PROJECT TOTAL STAKE
-  // =============================
-
-  project.totalStaked = Number(project.totalStaked || 0) + amount;
-
-  updateProjectTotal(projectId, project.totalStaked);
-
-  // =============================
-  // SAVE USER STAKE RECORD
-  // =============================
-
-  const stakeRecord = {
-    stakeId: "STK-" + Date.now(),
+  const stake = {
+    id: "STK-" + Date.now(),
     projectId,
-    projectName: project.projectName || project.title,
-    type: project.type,
-    amount,
-    wallet: userWallet,
-    date: Date.now(),
-    status: "active"
+    amount: parseFloat(amount),
+    rewardRate: project.rewardRate,
+    durationDays: project.durationDays,
+    startDate: Date.now(),
+    endDate: Date.now() + (project.durationDays * 86400000),
+    rewardCalculated: false
   };
 
-  const userStakes = getUserStakes();
-  userStakes.push(stakeRecord);
-  saveUserStakes(userStakes);
+  const stakes = getUserStakes();
+  stakes.push(stake);
+  saveUserStakes(stakes);
 
-  // =============================
-  // ADD TO WALLET LEDGER
-  // =============================
+  /* Record in ledger */
+  addTransaction("stake", projectId, amount, "internal");
 
-  if(typeof addLedgerEntry === "function"){
-    addLedgerEntry({
-      type: "stake",
-      projectId,
-      amount,
-      direction: "out",
-      wallet: userWallet,
-      date: Date.now()
-    });
-  }
-
-  return { success:true, message:"Stake successful" };
+  alert("Stake successful");
 }
 
 /* =========================================
-   UPDATE PROJECT TOTAL
-   (Internal + External compatible)
+   CALCULATE REWARD WHEN MATURED
 ========================================= */
 
-function updateProjectTotal(projectId, total){
+function processMaturedStakes(){
 
-  // INTERNAL
-  if(typeof getInternalLiveProjects === "function"){
-    let internal = getInternalLiveProjects();
-    internal.forEach(p=>{
-      if(p.projectId === projectId){
-        p.totalStaked = total;
-      }
-    });
-    localStorage.setItem("albukhr_internal_live", JSON.stringify(internal));
-  }
+  const stakes = getUserStakes();
+  let updated = false;
 
-  // EXTERNAL
-  if(typeof getExternalLiveProjects === "function"){
-    let external = getExternalLiveProjects();
-    external.forEach(p=>{
-      if(p.projectId === projectId){
-        p.totalStaked = total;
-      }
-    });
-    localStorage.setItem("albukhr_external_live", JSON.stringify(external));
+  stakes.forEach(stake=>{
+
+    if(!stake.rewardCalculated && Date.now() >= stake.endDate){
+
+      const reward = stake.amount * stake.rewardRate;
+
+      addTransaction("reward", stake.projectId, reward, "internal");
+
+      stake.rewardCalculated = true;
+      updated = true;
+    }
+
+  });
+
+  if(updated){
+    saveUserStakes(stakes);
   }
 }
+
+/* =========================================
+   AUTO CALCULATE TOTAL LOCKED
+========================================= */
+
+function getTotalLocked(){
+
+  return getUserStakes()
+    .filter(s=>Date.now() < s.endDate)
+    .reduce((sum,s)=>sum + s.amount,0);
+}
+
+/* =========================================
+   USER STAKE HISTORY
+========================================= */
+
+function getStakeHistory(){
+  return getUserStakes();
+            }
