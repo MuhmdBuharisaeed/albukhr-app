@@ -1,57 +1,179 @@
-/* ===============================
-   ALBUKHR WALLET LEDGER SYSTEM
-================================ */
+/* =========================================
+   ALBUKHR WALLET CORE v2 (Ledger System)
+   Semi-Custodial | PI SDK Ready
+========================================= */
 
-const LEDGER_KEY = "albukhr_wallet_ledger";
+const LEDGER_KEY = "albukhr_wallet_ledger_v2";
 
-/* GET LEDGER */
+/* =========================================
+   LEDGER BASE
+========================================= */
+
 function getLedger(){
   return JSON.parse(localStorage.getItem(LEDGER_KEY)) || [];
 }
 
-/* SAVE LEDGER */
 function saveLedger(list){
   localStorage.setItem(LEDGER_KEY, JSON.stringify(list));
 }
 
-/* ADD TRANSACTION */
-function addTransaction(type, project, amount, walletAddress){
-  const list = getLedger();
+/* =========================================
+   ADD TRANSACTION (UNIFIED FORMAT)
+========================================= */
 
-  list.push({
-    id: "TX-" + Date.now(),
+function addTransaction({
+  type,            // stake | reward | withdraw | receive
+  source="internal", // internal | external | system
+  projectId=null,
+  amount=0,
+  walletAddress=null,
+  status="completed", // pending | completed | failed
+  reference=null      // future: PI txHash
+}){
+
+  if(!type || !amount) return false;
+
+  const tx = {
+    id: "TX-" + Date.now() + "-" + Math.floor(Math.random()*1000),
     type,
-    project,
+    source,
+    projectId,
     amount: parseFloat(amount),
-    wallet: walletAddress,
+    walletAddress,
+    status,
+    reference,
     createdAt: Date.now()
-  });
+  };
 
+  const list = getLedger();
+  list.push(tx);
   saveLedger(list);
+
+  return tx;
 }
 
-/* ===============================
+/* =========================================
+   FILTER HELPERS
+========================================= */
+
+function getByType(type){
+  return getLedger().filter(t=>t.type===type && t.status==="completed");
+}
+
+function getByProject(projectId){
+  return getLedger().filter(t=>t.projectId===projectId);
+}
+
+/* =========================================
    CALCULATIONS
-================================ */
+========================================= */
 
 function getTotalStake(){
-  return getLedger()
-    .filter(t=>t.type==="stake")
+  return getByType("stake")
     .reduce((sum,t)=>sum+t.amount,0);
 }
 
 function getTotalRewards(){
-  return getLedger()
-    .filter(t=>t.type==="reward")
+  return getByType("reward")
     .reduce((sum,t)=>sum+t.amount,0);
 }
 
 function getTotalWithdrawn(){
-  return getLedger()
-    .filter(t=>t.type==="withdraw")
+  return getByType("withdraw")
     .reduce((sum,t)=>sum+t.amount,0);
 }
 
-function getAvailableReward(){
+function getTotalReceived(){
+  return getByType("receive")
+    .reduce((sum,t)=>sum+t.amount,0);
+}
+
+/* =========================================
+   WALLET BALANCE LOGIC
+========================================= */
+
+function getLockedBalance(){
+  return getTotalStake();
+}
+
+function getRewardBalance(){
   return getTotalRewards() - getTotalWithdrawn();
 }
+
+function getAvailableBalance(){
+  return getRewardBalance();
+}
+
+function getWalletSummary(){
+  return {
+    locked: getLockedBalance(),
+    rewards: getRewardBalance(),
+    withdrawn: getTotalWithdrawn(),
+    received: getTotalReceived(),
+    available: getAvailableBalance()
+  };
+}
+
+/* =========================================
+   WITHDRAW VALIDATION
+========================================= */
+
+function requestWithdraw(amount, walletAddress){
+
+  amount = parseFloat(amount);
+
+  if(amount<=0) return {error:"Invalid amount"};
+
+  if(amount > getAvailableBalance())
+    return {error:"Insufficient reward balance"};
+
+  if(typeof canTransact === "function" && !canTransact())
+    return {error:"Transactions currently locked"};
+
+  return addTransaction({
+    type:"withdraw",
+    amount,
+    walletAddress,
+    status:"completed"
+  });
+}
+
+/* =========================================
+   RECEIVE CREDIT
+========================================= */
+
+function creditReceive(amount, source="system"){
+  return addTransaction({
+    type:"receive",
+    source,
+    amount,
+    status:"completed"
+  });
+}
+
+/* =========================================
+   PROJECT STAKE ENTRY
+========================================= */
+
+function recordStake(projectId, amount, source="internal"){
+  return addTransaction({
+    type:"stake",
+    projectId,
+    source,
+    amount,
+    status:"completed"
+  });
+}
+
+/* =========================================
+   REWARD ENTRY
+========================================= */
+
+function recordReward(projectId, amount){
+  return addTransaction({
+    type:"reward",
+    projectId,
+    amount,
+    status:"completed"
+  });
+     }
