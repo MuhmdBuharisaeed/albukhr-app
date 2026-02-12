@@ -1,94 +1,31 @@
-/* =========================================
+/* ===============================
    ALBUKHR REWARD ENGINE
-========================================= */
+   Auto-sync with Wallet Ledger
+================================ */
 
-const REWARD_KEY = "albukhr_rewards_paid";
+function giveReward(projectId, amount){
+    amount = parseFloat(amount);
+    if(!projectId || amount <= 0) return false;
 
-/* =========================================
-   CALCULATE REWARD FOR ONE STAKE
-========================================= */
+    // Record reward in Wallet Ledger
+    const tx = recordReward(projectId, amount);
 
-function calculateStakeReward(stake){
-
-  const now = Date.now();
-  const days = (now - stake.date) / (1000 * 60 * 60 * 24);
-
-  const apr = getProjectAPR(stake.projectId);
-
-  if(!apr) return 0;
-
-  const reward = (stake.amount * apr * days) / 365;
-
-  return Number(reward.toFixed(6));
+    console.log("Reward recorded:", tx);
+    return tx;
 }
 
-/* =========================================
-   GET PROJECT APR
-========================================= */
-
-function getProjectAPR(projectId){
-
-  if(typeof getProjectById !== "function") return 0;
-
-  const project = getProjectById(projectId);
-
-  if(!project) return 0;
-
-  // default APR fallback
-  return Number(project.apr || (project.type === "internal" ? 0.12 : 0.18));
-}
-
-/* =========================================
-   CALCULATE ALL USER REWARDS
-========================================= */
-
-function calculateAllRewards(){
-
-  if(typeof getUserStakes !== "function") return 0;
-
-  const stakes = getUserStakes();
-
-  let totalReward = 0;
-
-  stakes.forEach(stake=>{
-    if(stake.status === "active"){
-      totalReward += calculateStakeReward(stake);
-    }
-  });
-
-  return Number(totalReward.toFixed(6));
-}
-
-/* =========================================
-   CLAIM REWARDS
-========================================= */
-
-function claimRewards(userWallet){
-
-  const totalReward = calculateAllRewards();
-
-  if(totalReward <= 0){
-    return { success:false, message:"No rewards available" };
-  }
-
-  // Add to wallet ledger
-  if(typeof addLedgerEntry === "function"){
-    addLedgerEntry({
-      type:"reward",
-      amount: totalReward,
-      direction:"in",
-      wallet: userWallet,
-      date: Date.now()
+// Auto-sync rewards for all projects
+function syncProjectRewards(projects){
+    projects.forEach(p=>{
+        if(p.rewards && p.rewards > 0){
+            recordReward(p.projectId, p.rewards);
+        }
     });
-  }
+}
 
-  // Mark stakes as claimed checkpoint
-  const stakes = getUserStakes();
-  stakes.forEach(stake=>{
-    stake.date = Date.now(); // reset timer
-  });
-
-  saveUserStakes(stakes);
-
-  return { success:true, amount:totalReward };
+// Get reward balance for a project
+function getProjectReward(projectId){
+    return getByProject(projectId)
+        .filter(t=>t.type==="reward")
+        .reduce((sum,t)=>sum+t.amount,0);
 }
