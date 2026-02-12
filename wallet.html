@@ -25,11 +25,6 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 .modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-bottom:10px}
 .modal-actions{display:flex;gap:10px}
 .close-btn{background:#ddd;color:#333}
-.type{font-weight:700}
-.stake{color:#0f7a3d}
-.reward{color:#0a58ca}
-.withdraw{color:#c0392b}
-.receive{color:#6c757d}
 </style>
 </head>
 
@@ -74,7 +69,7 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 <!-- RECEIVE MODAL -->
 <div class="modal-overlay" id="receiveModal">
 <div class="modal">
-<h3>Receive PI (Manual Test)</h3>
+<h3>Receive PI</h3>
 <input type="number" id="receiveAmount" placeholder="Enter amount">
 <div class="modal-actions">
 <button class="btn" onclick="confirmReceive()">Confirm</button>
@@ -86,7 +81,7 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 <!-- WITHDRAW MODAL -->
 <div class="modal-overlay" id="withdrawModal">
 <div class="modal">
-<h3>Withdraw Reward</h3>
+<h3>Withdraw PI</h3>
 <input type="number" id="withdrawAmount" placeholder="Amount">
 <input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
 <div class="modal-actions">
@@ -96,112 +91,90 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 </div>
 </div>
 
-<script src="wallet-ledger.js"></script>
+<!-- ==================== SCRIPTS ==================== -->
+<script src="wallet-core.js"></script>
+<script src="wallet-withdraw.js"></script>
 <script src="staking-engine.js"></script>
 <script src="reward-engine.js"></script>
 
 <script>
+/* ================== LOAD ALBUKHR CORE PROJECTS ================== */
+const albukhrCoreProjects = [
+  { projectId: "AZMAN", name: "Azman Features Makers Lab", staked: 55, rewards: 9.6 },
+  { projectId: "LAIBAIKA", name: "Laibaika Bakery Center", staked: 40, rewards: 6.2 },
+  { projectId: "BASHAGRO", name: "Bash Agro", staked: 75, rewards: 12.5 },
+  { projectId: "URBANMOB", name: "Urban Mobility", staked: 30, rewards: 5.0 },
+  { projectId: "KHAIRAT", name: "Khairat Organic Fertilizer", staked: 50, rewards: 8.0 },
+  { projectId: "HAUWAL", name: "Hauwal Sumonviter", staked: 60, rewards: 10.0 },
+  { projectId: "RAHEEM", name: "Raheem Pharmacy", staked: 15, rewards: 2.4 }
+];
 
-/* ================= RENDER ================= */
+/* Auto-record all core projects to wallet ledger */
+albukhrCoreProjects.forEach(p=>{
+  if(!getByProject(p.projectId).length){
+    recordStake(p.projectId, p.staked, "internal");
+  }
+  if(p.rewards && p.rewards>0){
+    recordReward(p.projectId, p.rewards);
+  }
+});
 
+/* ================== RENDER WALLET ================== */
 function renderWallet(){
-
-document.getElementById("totalStake").innerText =
-getTotalStake().toFixed(2)+" PI";
-
-document.getElementById("totalReward").innerText =
-getTotalRewards().toFixed(2)+" PI";
-
-document.getElementById("withdrawn").innerText =
-getTotalWithdrawn().toFixed(2)+" PI";
-
-document.getElementById("available").innerText =
-getAvailableReward().toFixed(2)+" PI";
-
-renderHistory();
+  totalStake.innerText = getTotalStake().toFixed(2)+" PI";
+  totalReward.innerText = getTotalRewards().toFixed(2)+" PI";
+  withdrawn.innerText = getTotalWithdrawn().toFixed(2)+" PI";
+  available.innerText = getAvailableReward().toFixed(2)+" PI";
+  renderHistory();
 }
-
-/* ================= HISTORY ================= */
 
 function renderHistory(){
-
-const list = getLedger();
-const txList = document.getElementById("txList");
-txList.innerHTML="";
-
-if(!list.length){
-txList.innerHTML="<small>No transactions yet</small>";
-return;
+  const list = getLedger();
+  txList.innerHTML="";
+  if(!list.length){
+    txList.innerHTML="<small>No transactions yet</small>";
+    return;
+  }
+  list.slice().reverse().forEach(tx=>{
+    const div=document.createElement("div");
+    div.className="tx";
+    div.innerHTML=`
+      <b>${tx.type.toUpperCase()}</b> — ${tx.amount} PI<br>
+      ${tx.walletAddress ? "Wallet: "+tx.walletAddress+"<br>" : ""}
+      <small>${new Date(tx.createdAt).toLocaleString()}</small>
+    `;
+    txList.appendChild(div);
+  });
 }
 
-list.slice().reverse().forEach(tx=>{
+/* ================= MODAL CONTROL ================== */
+function openReceive(){ receiveModal.style.display="flex"; }
+function openWithdraw(){ withdrawModal.style.display="flex"; }
+function closeModals(){ receiveModal.style.display="none"; withdrawModal.style.display="none"; }
 
-const div=document.createElement("div");
-div.className="tx";
-
-let typeClass = tx.type;
-
-div.innerHTML=`
-<div class="type ${typeClass}">
-${tx.type.toUpperCase()} — ${tx.amount.toFixed(2)} PI
-</div>
-${tx.project ? "Project: "+tx.project+"<br>" : ""}
-${tx.wallet ? "Wallet: "+tx.wallet+"<br>" : ""}
-<small>${new Date(tx.createdAt).toLocaleString()}</small>
-`;
-
-txList.appendChild(div);
-});
-}
-
-/* ================= MODAL ================= */
-
-function openReceive(){
-document.getElementById("receiveModal").style.display="flex";
-}
-
-function openWithdraw(){
-document.getElementById("withdrawModal").style.display="flex";
-}
-
-function closeModals(){
-document.getElementById("receiveModal").style.display="none";
-document.getElementById("withdrawModal").style.display="none";
-}
-
-/* ================= ACTIONS ================= */
-
+/* ================= WALLET ACTIONS ================== */
 function confirmReceive(){
-
-const amt=parseFloat(document.getElementById("receiveAmount").value);
-if(!amt||amt<=0) return alert("Invalid amount");
-
-addTransaction("receive","manual",amt,"internal");
-
-closeModals();
-renderWallet();
+  const amt=parseFloat(receiveAmount.value);
+  if(!amt||amt<=0) return alert("Invalid amount");
+  creditReceive(amt,"manual_credit");
+  closeModals();
+  renderWallet();
 }
 
 function confirmWithdraw(){
-
-const amt=parseFloat(document.getElementById("withdrawAmount").value);
-const addr=document.getElementById("withdrawAddress").value.trim();
-
-if(!amt||amt<=0||!addr)
-return alert("Enter valid amount and address");
-
-if(amt>getAvailableReward())
-return alert("Insufficient reward balance");
-
-addTransaction("withdraw","reward_pool",amt,addr);
-
-closeModals();
-renderWallet();
+  const amt=parseFloat(withdrawAmount.value);
+  const addr=withdrawAddress.value.trim();
+  if(!amt||amt<=0||!addr) return alert("Enter valid amount and address");
+  if(amt>getAvailableBalance()) return alert("Insufficient reward balance");
+  const res = requestWithdraw(amt, addr);
+  if(res.error) return alert(res.error);
+  closeModals();
+  renderWallet();
 }
 
+/* ================= INIT ================== */
 renderWallet();
-
 </script>
 
 </body>
-  </html>
+</html>
