@@ -137,40 +137,99 @@ const ICONS = {
 
 /* LOAD HOME DATA */
 function loadHome(){
-  const totals = getTotals();
-  homeStake.innerText = totals.totalStake.toFixed(2) + " Pi";
-  homeReward.innerText = totals.totalReward.toFixed(2) + " Pi";
 
+  /* ===== ORIGINAL TOTALS (ba mu taɓa su ba) ===== */
+  const totals = getTotals();
+
+  /* ===== SABON: Withdraw Support ===== */
+  let withdrawn = 0;
+  if(typeof getTotalWithdrawn === "function"){
+    withdrawn = getTotalWithdrawn();
+  }
+
+  const netReward = totals.totalReward - withdrawn;
+
+  /* ===== DISPLAY (structure bai canza ba) ===== */
+  homeStake.innerText =
+    totals.totalStake.toFixed(2) + " Pi";
+
+  homeReward.innerText =
+    netReward.toFixed(2) + " Pi";
+
+  /* ===== ORIGINAL STAKE LOGIC ===== */
   const box = document.getElementById("homeTx");
   box.innerHTML = "";
 
   const stakes = getStakes()
-    .filter(s => s.status === "Successful")
-    .slice(-2)
-    .reverse();
+    .filter(s => s.status === "Successful");
 
-  if(stakes.length === 0){
+  /* ===== SABON: Withdraw Merge ===== */
+  let withdraws = [];
+  if(typeof getWithdrawals === "function"){
+    withdraws = getWithdrawals();
+  }
+
+  const combined = [
+    ...stakes.map(s=>({
+      type:"stake",
+      project:s.project,
+      amount:s.amount,
+      timestamp:s.timestamp
+    })),
+    ...withdraws.map(w=>({
+      type:"withdraw",
+      amount:w.amount,
+      wallet:w.walletAddress,
+      timestamp:w.timestamp
+    }))
+  ]
+  .sort((a,b)=>b.timestamp - a.timestamp)
+  .slice(0,2);
+
+  if(combined.length === 0){
     box.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  stakes.forEach(s=>{
-    const t = formatDateTime(s);
+  combined.forEach(tx=>{
 
     const div = document.createElement("div");
     div.className = "home-tx";
-    div.innerHTML = `
-      <div class="home-icon">${ICONS[s.project] || "📦"}</div>
-      <div class="home-body">
-        <div class="home-title">${s.project} Stake</div>
-        <div class="home-date">${t.date} • ${t.time}</div>
-      </div>
-      <div class="home-right">
-        <div class="home-amount">${s.amount} Pi</div>
-        <div class="home-status success">Successful</div>
-      </div>
-    `;
+
+    if(tx.type === "stake"){
+
+      const t = new Date(tx.timestamp);
+
+      div.innerHTML = `
+        <div class="home-icon">${ICONS[tx.project] || "📦"}</div>
+        <div class="home-body">
+          <div class="home-title">${tx.project} Stake</div>
+          <div class="home-date">${t.toLocaleString()}</div>
+        </div>
+        <div class="home-right">
+          <div class="home-amount">${tx.amount} Pi</div>
+          <div class="home-status success">Successful</div>
+        </div>
+      `;
+
+    } else {
+
+      const t = new Date(tx.timestamp);
+
+      div.innerHTML = `
+        <div class="home-icon">💸</div>
+        <div class="home-body">
+          <div class="home-title">Reward Withdraw</div>
+          <div class="home-date">${t.toLocaleString()}</div>
+        </div>
+        <div class="home-right">
+          <div class="home-amount">-${tx.amount} Pi</div>
+          <div class="home-status success">Completed</div>
+        </div>
+      `;
+    }
+
     box.appendChild(div);
   });
 }
