@@ -4,152 +4,215 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr Wallet</title>
+<link rel="stylesheet" href="style.css">
 
 <style>
-body{background:#f4f7f6;font-family:system-ui;margin:0}
-.header{background:#0f7a3d;color:#fff;padding:16px;font-weight:700;text-align:center}
+body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .section{padding:16px}
-.card{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px}
-.balance{font-size:26px;font-weight:800;color:#0f7a3d}
-.sub{font-size:12px;color:#666;margin-top:4px}
-.row{display:flex;justify-content:space-between;margin-top:8px;font-size:13px}
-.btn-group{display:flex;gap:10px;margin-top:14px}
-.btn{flex:1;padding:12px;border:none;border-radius:12px;background:#0f7a3d;color:#fff;font-weight:700;cursor:pointer}
-.btn.secondary{background:#eaf6ee;color:#0f7a3d}
-.tx{border-bottom:1px solid #eee;padding:8px 0;font-size:13px}
-.tx small{color:#777;font-size:11px}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
-.modal{background:#fff;border-radius:16px;padding:20px;width:90%;max-width:400px}
-.modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-bottom:10px}
-.modal-actions{display:flex;gap:10px}
-.close-btn{background:#ddd;color:#333}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+}
+
+.balance-main{
+  font-size:24px;
+  font-weight:bold;
+  color:#0f7a3d;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  margin-top:6px;
+  font-size:13px;
+}
+
+.btn-group{display:flex;gap:8px;margin-top:12px}
+.btn{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn.secondary{
+  background:#eaf6ee;
+  color:#0f7a3d;
+}
+
+/* HISTORY STYLE (match transactions page) */
+.project-tx{
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.project-icon{font-size:16px;width:26px;text-align:center}
+.project-body{flex:1}
+.project-title{font-size:14px;font-weight:600}
+.project-date{font-size:11px;color:#777}
+.project-right{text-align:right}
+.project-amount{font-size:14px;font-weight:bold}
+.project-status{font-size:11px;color:#d9534f}
 </style>
 </head>
 
 <body>
 
-<div class="header">💰 ALBUKHR WALLET</div>
+<header class="header">
+  <span>💰 Albukhr Wallet</span>
+</header>
 
 <section class="section">
 
 <div class="card">
-<div class="balance" id="available">0 PI</div>
-<div class="sub">Available Reward Balance</div>
+  <div class="balance-main" id="availableBalance">0.00 PI</div>
+  <div style="font-size:12px;color:#777">Available Rewards</div>
 
-<div class="row">
-<div>Total Staked</div>
-<div id="totalStake">0 PI</div>
+  <div class="row">
+    <span>Locked (Staking)</span>
+    <span id="lockedBalance">0.00 PI</span>
+  </div>
+
+  <div class="row">
+    <span>Gross Rewards</span>
+    <span id="grossRewards">0.00 PI</span>
+  </div>
+
+  <div class="row">
+    <span>Total Withdrawn</span>
+    <span id="totalWithdrawn">0.00 PI</span>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
+  </div>
 </div>
 
-<div class="row">
-<div>Total Rewards</div>
-<div id="totalReward">0 PI</div>
-</div>
-
-<div class="row">
-<div>Total Withdrawn</div>
-<div id="withdrawn">0 PI</div>
-</div>
-
-<div class="btn-group">
-<button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
-</div>
-</div>
-
-<div class="card">
-<h4>Transaction History</h4>
-<div id="txList"></div>
-</div>
+<div id="withdrawHistory"></div>
 
 </section>
 
-<div class="modal-overlay" id="withdrawModal">
-<div class="modal">
-<h3>Withdraw PI</h3>
-<input type="number" id="withdrawAmount" placeholder="Amount">
-<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
-<div class="modal-actions">
-<button class="btn" onclick="confirmWithdraw()">Confirm</button>
-<button class="btn close-btn" onclick="closeModals()">Cancel</button>
-</div>
-</div>
+<!-- WITHDRAW MODAL -->
+<div id="withdrawModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center">
+  <div style="background:#fff;padding:18px;border-radius:14px;width:90%;max-width:380px">
+    <h3 style="margin-top:0">Withdraw Rewards</h3>
+    <input type="number" id="withdrawAmount" placeholder="Amount" style="width:100%;padding:10px;margin-bottom:8px">
+    <input type="text" id="withdrawAddress" placeholder="Pi Wallet Address" style="width:100%;padding:10px;margin-bottom:10px">
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <script src="staking.js"></script>
-<script src="staking-external.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
+
+/* ========= RENDER ========= */
 
 function renderWallet(){
 
   const summary = getWalletSummary();
 
-  totalStake.innerText = summary.totalStake.toFixed(2) + " PI";
-  totalReward.innerText = summary.totalReward.toFixed(2) + " PI";
-  withdrawn.innerText = summary.withdrawn.toFixed(2) + " PI";
-  available.innerText = summary.available.toFixed(2) + " PI";
+  availableBalance.innerText = summary.available.toFixed(2) + " PI";
+  lockedBalance.innerText = summary.locked.toFixed(2) + " PI";
+  grossRewards.innerText = summary.grossRewards.toFixed(2) + " PI";
+  totalWithdrawn.innerText = summary.withdrawn.toFixed(2) + " PI";
 
-  renderHistory();
+  renderWithdrawHistory();
 }
 
-function renderHistory(){
+/* ========= WITHDRAW HISTORY ONLY ========= */
 
-  const list = getWithdrawals()
-    .sort((a,b)=>b.timestamp-a.timestamp);
+function renderWithdrawHistory(){
 
-  txList.innerHTML="";
+  const tx = getWalletTx()
+    .filter(t => t.type === "withdraw")
+    .slice()
+    .reverse();
 
-  if(!list.length){
-    txList.innerHTML="<small>No withdrawals yet</small>";
+  const box = document.getElementById("withdrawHistory");
+  box.innerHTML = "";
+
+  if(tx.length === 0){
+    box.innerHTML = "<p style='font-size:12px;color:#777'>No withdrawals yet</p>";
     return;
   }
 
-  list.forEach(tx=>{
+  tx.forEach(t=>{
+
+    const d = new Date(t.timestamp);
 
     const div = document.createElement("div");
-    div.className="home-tx";
+    div.className = "project-tx";
 
     div.innerHTML = `
-      <div class="home-icon">💸</div>
-      <div class="home-body">
-        <div class="home-title">Reward Withdraw</div>
-        <div class="home-date">${new Date(tx.timestamp).toLocaleString()}</div>
-        <div style="font-size:11px;color:#888">
-          Wallet: ${tx.walletAddress}
+      <div class="project-icon">💸</div>
+
+      <div class="project-body">
+        <div class="project-title">Reward Withdrawal</div>
+        <div class="project-date">
+          ${d.toLocaleDateString()} • ${d.toLocaleTimeString()}
+          <br>
+          Wallet: ${t.walletAddress}
         </div>
       </div>
-      <div class="home-right">
-        <div class="home-amount">-${tx.amount} Pi</div>
-        <div class="home-status success">Completed</div>
+
+      <div class="project-right">
+        <div class="project-amount">-${Number(t.amount).toFixed(2)} PI</div>
+        <div class="project-status">Completed</div>
       </div>
     `;
 
-    txList.appendChild(div);
+    box.appendChild(div);
   });
 }
 
+/* ========= WITHDRAW ========= */
+
 function openWithdraw(){
-  withdrawModal.style.display="flex";
+  document.getElementById("withdrawModal").style.display="flex";
 }
 
-function closeModals(){
-  withdrawModal.style.display="none";
+function closeWithdraw(){
+  document.getElementById("withdrawModal").style.display="none";
 }
 
 function confirmWithdraw(){
 
-  const amt = parseFloat(withdrawAmount.value);
-  const addr = withdrawAddress.value.trim();
+  const amt = parseFloat(document.getElementById("withdrawAmount").value);
+  const addr = document.getElementById("withdrawAddress").value.trim();
 
-  const res = requestWithdraw(amt, addr);
-
-  if(res.error){
-    alert(res.error);
+  if(!amt || amt <= 0){
+    alert("Invalid amount");
     return;
   }
 
-  closeModals();
+  if(!addr){
+    alert("Wallet address required");
+    return;
+  }
+
+  const result = withdrawRewards(amt, addr);
+
+  if(!result.success){
+    alert(result.message);
+    return;
+  }
+
+  closeWithdraw();
   renderWallet();
 }
 
@@ -158,4 +221,4 @@ renderWallet();
 </script>
 
 </body>
-</html>
+  </html>
