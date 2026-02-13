@@ -1,118 +1,115 @@
 /* =========================================
-   ALBUKHR WALLET CORE v4 (CLEAN)
-   Single Source of Truth
+   ALBUKHR WALLET CORE v4
+   Source of Truth = staking.js
+   Wallet = Withdraw Layer Only
 ========================================= */
 
-const WITHDRAW_KEY = "albukhr_withdrawals";
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v4";
 
-/* ===============================
-   STORAGE HELPERS
-=================================*/
+/* =========================================
+   STORAGE
+========================================= */
 
-function getWithdrawals() {
+function getWithdrawals(){
   return JSON.parse(localStorage.getItem(WITHDRAW_KEY)) || [];
 }
 
-function saveWithdrawals(data) {
-  localStorage.setItem(WITHDRAW_KEY, JSON.stringify(data));
+function saveWithdrawals(list){
+  localStorage.setItem(WITHDRAW_KEY, JSON.stringify(list));
 }
 
-/* ===============================
-   WALLET SUMMARY
-=================================*/
+/* =========================================
+   EXTERNAL DATA (staking.js)
+========================================= */
 
-function getWalletSummary() {
+function getExternalTotals(){
+  if(typeof getTotals === "function"){
+    return getTotals();
+  }
+  return { totalStake:0, totalReward:0 };
+}
 
-  // total staked daga staking system
-  const stakes = getExternalStakes ? getExternalStakes() : [];
-  const totalStake = stakes.reduce((sum, s) => sum + Number(s.amount), 0);
+/* =========================================
+   CALCULATIONS
+========================================= */
 
-  // total rewards daga staking calculator
-  const totalReward = typeof calculateRewards === "function"
-    ? calculateRewards()
-    : 0;
+function getTotalStake(){
+  return getExternalTotals().totalStake || 0;
+}
 
-  // total withdrawn
-  const withdrawals = getWithdrawals();
-  const withdrawn = withdrawals.reduce((sum, w) => sum + Number(w.amount), 0);
+function getGrossRewards(){
+  return getExternalTotals().totalReward || 0;
+}
 
-  // available balance
-  const available = totalReward;
+function getTotalWithdrawn(){
+  return getWithdrawals()
+    .reduce((sum,t)=>sum + Number(t.amount), 0);
+}
 
+/* NET REWARD (after withdraw) */
+function getNetRewards(){
+  return getGrossRewards() - getTotalWithdrawn();
+}
+
+function getAvailableBalance(){
+  return getNetRewards();
+}
+
+function getWalletSummary(){
   return {
-    totalStake,
-    totalReward,
-    withdrawn,
-    available
+    locked: getTotalStake(),
+    grossRewards: getGrossRewards(),
+    withdrawn: getTotalWithdrawn(),
+    rewards: getNetRewards(),
+    available: getAvailableBalance()
   };
 }
 
-/* ===============================
-   REQUEST WITHDRAW
-=================================*/
+/* =========================================
+   WITHDRAW REQUEST
+========================================= */
 
-function requestWithdraw(amount, walletAddress) {
+function requestWithdraw(amount, walletAddress){
 
-  const amt = Number(amount);
+  amount = parseFloat(amount);
 
-  if (!amt || amt <= 0) {
-    return { error: "Invalid amount" };
-  }
+  if(amount <= 0)
+    return { error:"Invalid amount" };
 
-  if (!walletAddress || walletAddress.length < 10) {
-    return { error: "Invalid wallet address" };
-  }
+  if(!walletAddress)
+    return { error:"Wallet address required" };
 
-  const summary = getWalletSummary();
+  if(amount > getAvailableBalance())
+    return { error:"Insufficient reward balance" };
 
-  if (amt > summary.available) {
-    return { error: "Insufficient reward balance" };
-  }
-
-  // Rage rewards kai tsaye daga staking system
-  if (typeof reduceRewards === "function") {
-    reduceRewards(amt);
-  }
-
-  // Ajiye withdrawal
-  const withdrawals = getWithdrawals();
-
-  withdrawals.push({
-    id: "wd_" + Date.now(),
+  const tx = {
+    id: "WD-" + Date.now(),
     type: "withdraw",
-    amount: amt,
+    amount,
     walletAddress,
-    timestamp: Date.now()
-  });
+    createdAt: Date.now()
+  };
 
-  saveWithdrawals(withdrawals);
+  const list = getWithdrawals();
+  list.push(tx);
+  saveWithdrawals(list);
 
-  return { success: true };
+  return tx;
 }
 
-/* ===============================
-   MERGED HISTORY (INDEX USE)
-=================================*/
+/* =========================================
+   HISTORY (Withdraw Only)
+========================================= */
 
-function getMergedHistory() {
+function getWithdrawHistory(){
+  return getWithdrawals()
+    .sort((a,b)=>b.createdAt - a.createdAt);
+}
 
-  const stakingTx = getExternalStakes
-    ? getExternalStakes().map(s => ({
-        id: s.id,
-        type: "stake",
-        amount: s.amount,
-        createdAt: s.createdAt
-      }))
-    : [];
+/* =========================================
+   DEV
+========================================= */
 
-  const withdrawTx = getWithdrawals().map(w => ({
-    id: w.id,
-    type: "withdraw",
-    amount: w.amount,
-    walletAddress: w.walletAddress,
-    createdAt: w.timestamp
-  }));
-
-  return [...stakingTx, ...withdrawTx]
-    .sort((a, b) => b.createdAt - a.createdAt);
+function clearWalletLedger(){
+  localStorage.removeItem(WITHDRAW_KEY);
 }
