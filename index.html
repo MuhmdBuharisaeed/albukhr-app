@@ -269,23 +269,7 @@ setTimeout(() => {
 }, 18000); /* 18s = welcomeMove animation time */
 </script>
 
-<script>
-/* ======================================
-   ALBUKHR – AUTO REFRESH SECURITY
-====================================== */
-
-/* refresh page every 2 minuts */
-setInterval(() => {
-  location.reload();
-}, 30000);
-
-/* refresh immediately if user returns to tab */
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    location.reload();
-  }
-});
-</script>
+<script src="refresh-engine.js"></script>
   
 </body>
-    </html>
+</html>
