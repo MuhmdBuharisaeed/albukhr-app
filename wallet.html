@@ -85,14 +85,27 @@ function renderWallet(){
 
   const summary = getWalletSummary();
 
-  // FIXED mapping
-  totalStake.innerText = (summary.totalStake || 0).toFixed(2) + " PI";
-  totalReward.innerText = (summary.totalReward || 0).toFixed(2) + " PI";
-  withdrawn.innerText = (summary.withdrawn || 0).toFixed(2) + " PI";
-  available.innerText = (summary.available || 0).toFixed(2) + " PI";
+  // Support both old & new wallet-core structure
+  const totalStakeValue =
+      summary.totalStake ?? summary.locked ?? 0;
+
+  const totalRewardValue =
+      summary.totalReward ?? summary.rewards ?? 0;
+
+  totalStake.innerText =
+      Number(totalStakeValue).toFixed(2) + " PI";
+
+  totalReward.innerText =
+      Number(totalRewardValue).toFixed(2) + " PI";
+
+  withdrawn.innerText =
+      Number(summary.withdrawn || 0).toFixed(2) + " PI";
+
+  available.innerText =
+      Number(summary.available || 0).toFixed(2) + " PI";
 
   renderHistory();
-}
+  }
 
 function renderHistory(){
 
