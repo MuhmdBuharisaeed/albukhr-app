@@ -163,14 +163,18 @@ function loadHome(){
     }));
 
   /* ===== WITHDRAW TX ===== */
-  const withdrawTx = typeof getWithdrawHistory === "function"
-    ? getWithdrawHistory().map(w => ({
-        type:"withdraw",
-        amount:w.amount,
-        walletAddress:w.walletAddress,
-        timestamp:w.timestamp
-      }))
-    : [];
+let withdrawTx = [];
+
+if (typeof getWithdrawHistory === "function") {
+  const raw = getWithdrawHistory() || [];
+
+  withdrawTx = raw.map(w => ({
+    type: "withdraw",
+    amount: Number(w.amount) || 0,
+    walletAddress: w.walletAddress || "External Wallet",
+    timestamp: w.timestamp || w.date || Date.now()
+  }));
+}
 
   const merged = [...stakeTx, ...withdrawTx]
     .sort((a,b)=>b.timestamp - a.timestamp)
