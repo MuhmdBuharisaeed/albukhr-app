@@ -5,203 +5,164 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr Wallet</title>
 
-<link rel="stylesheet" href="style.css">
-
 <style>
-body{
-  background:#f5f7f6;
-  font-family:Arial;
-  padding-bottom:90px;
-}
-
+body{background:#f4f7f6;font-family:system-ui;margin:0}
+.header{background:#0f7a3d;color:#fff;padding:16px;font-weight:700;text-align:center}
 .section{padding:16px}
-
-/* SUMMARY CARD */
-.wallet-card{
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:14px;
-}
-
-.wallet-row{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:6px;
-  font-size:14px;
-}
-
-.wallet-big{
-  font-size:20px;
-  font-weight:bold;
-}
-
-/* BUTTON */
-.btn{
-  background:#0f7a3d;
-  color:#fff;
-  border:none;
-  padding:10px;
-  border-radius:8px;
-  width:100%;
-  margin-top:10px;
-  cursor:pointer;
-}
-
-/* TRANSACTION */
-.tx-card{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.tx-icon{
-  font-size:16px;
-  width:26px;
-  text-align:center;
-}
-
-.tx-body{flex:1}
-.tx-title{font-size:14px;font-weight:600}
-.tx-date{font-size:11px;color:#777}
-.tx-address{font-size:11px;color:#555}
-
-.tx-right{text-align:right}
-.tx-amount{font-size:14px;font-weight:bold;color:#c0392b}
+.card{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px}
+.balance{font-size:26px;font-weight:800;color:#0f7a3d}
+.sub{font-size:12px;color:#666;margin-top:4px}
+.row{display:flex;justify-content:space-between;margin-top:8px;font-size:13px}
+.btn-group{display:flex;gap:10px;margin-top:14px}
+.btn{flex:1;padding:12px;border:none;border-radius:12px;background:#0f7a3d;color:#fff;font-weight:700;cursor:pointer}
+.btn.secondary{background:#eaf6ee;color:#0f7a3d}
+.tx{border-bottom:1px solid #eee;padding:8px 0;font-size:13px}
+.tx small{color:#777;font-size:11px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:16px;padding:20px;width:90%;max-width:400px}
+.modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-bottom:10px}
+.modal-actions{display:flex;gap:10px}
+.close-btn{background:#ddd;color:#333}
 </style>
 </head>
 
 <body>
 
-<header class="header">
-  <div class="header-left">
-    <span>Albukhr Wallet</span>
-  </div>
-</header>
+<div class="header">💰 ALBUKHR WALLET</div>
 
 <section class="section">
 
-  <!-- SUMMARY -->
-  <div class="wallet-card">
-    <div class="wallet-row">
-      <span>Locked Staking</span>
-      <span id="locked">0.00 PI</span>
-    </div>
+<div class="card">
+<div class="balance" id="available">0 PI</div>
+<div class="sub">Available Reward Balance</div>
 
-    <div class="wallet-row">
-      <span>Total Rewards</span>
-      <span id="rewards">0.00 PI</span>
-    </div>
+<div class="row">
+<div>Total Staked</div>
+<div id="totalStake">0 PI</div>
+</div>
 
-    <div class="wallet-row">
-      <span>Total Withdrawn</span>
-      <span id="withdrawn">0.00 PI</span>
-    </div>
+<div class="row">
+<div>Total Rewards</div>
+<div id="totalReward">0 PI</div>
+</div>
 
-    <hr>
+<div class="row">
+<div>Total Withdrawn</div>
+<div id="withdrawn">0 PI</div>
+</div>
 
-    <div class="wallet-row wallet-big">
-      <span>Available</span>
-      <span id="available">0.00 PI</span>
-    </div>
+<div class="btn-group">
+<button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
+</div>
+</div>
 
-    <button class="btn" onclick="handleWithdraw()">Withdraw</button>
-  </div>
-
-  <!-- WITHDRAW HISTORY -->
-  <h4 style="margin-bottom:8px;">Withdraw History</h4>
-  <div id="withdrawList"></div>
+<div class="card">
+<h4>Transaction History</h4>
+<div id="txList"></div>
+</div>
 
 </section>
 
+<div class="modal-overlay" id="withdrawModal">
+<div class="modal">
+<h3>Withdraw PI</h3>
+<input type="number" id="withdrawAmount" placeholder="Amount">
+<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
+<div class="modal-actions">
+<button class="btn" onclick="confirmWithdraw()">Confirm</button>
+<button class="btn close-btn" onclick="closeModals()">Cancel</button>
+</div>
+</div>
+</div>
+
 <script src="staking.js"></script>
+<script src="staking-external.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
-const lockedEl = document.getElementById("locked");
-const rewardsEl = document.getElementById("rewards");
-const withdrawnEl = document.getElementById("withdrawn");
-const availableEl = document.getElementById("available");
-const withdrawList = document.getElementById("withdrawList");
 
-/* LOAD SUMMARY */
-function loadWallet(){
+function renderWallet(){
 
   const summary = getWalletSummary();
 
-  lockedEl.textContent = summary.locked.toFixed(2) + " PI";
-  rewardsEl.textContent = summary.rewards.toFixed(2) + " PI";
-  withdrawnEl.textContent = summary.withdrawn.toFixed(2) + " PI";
-  availableEl.textContent = summary.available.toFixed(2) + " PI";
+  // FIXED mapping
+  totalStake.innerText = (summary.totalStake || 0).toFixed(2) + " PI";
+  totalReward.innerText = (summary.totalReward || 0).toFixed(2) + " PI";
+  withdrawn.innerText = (summary.withdrawn || 0).toFixed(2) + " PI";
+  available.innerText = (summary.available || 0).toFixed(2) + " PI";
 
-  loadWithdrawHistory();
+  renderHistory();
 }
 
-/* LOAD WITHDRAW HISTORY */
-function loadWithdrawHistory(){
+function renderHistory(){
 
-  const list = getWithdrawHistory();
-  withdrawList.innerHTML = "";
+  const list = getWithdrawals()
+    .sort((a,b)=> (b.timestamp || b.createdAt) - (a.timestamp || a.createdAt));
 
-  if(list.length === 0){
-    withdrawList.innerHTML =
-      "<p style='font-size:12px;color:#777'>No withdraw transactions yet</p>";
+  txList.innerHTML="";
+
+  if(!list.length){
+    txList.innerHTML="<small>No withdrawals yet</small>";
     return;
   }
 
-  list.forEach(w=>{
+  list.forEach(tx=>{
 
-    const d = new Date(w.createdAt);
-    const date = d.toLocaleDateString();
-    const time = d.toLocaleTimeString();
+    const time = tx.timestamp || tx.createdAt;
 
     const div = document.createElement("div");
-    div.className = "tx-card";
+    div.className="home-tx";
 
     div.innerHTML = `
-      <div class="tx-icon">💸</div>
-
-      <div class="tx-body">
-        <div class="tx-title">Withdraw</div>
-        <div class="tx-date">${date} • ${time}</div>
-        <div class="tx-address">To: ${w.walletAddress}</div>
+      <div class="home-icon">💸</div>
+      <div class="home-body">
+        <div class="home-title">Reward Withdraw</div>
+        <div class="home-date">${new Date(time).toLocaleString()}</div>
+        <div style="font-size:11px;color:#888">
+          Wallet: ${tx.walletAddress}
+        </div>
       </div>
-
-      <div class="tx-right">
-        <div class="tx-amount">- ${Number(w.amount).toFixed(2)} PI</div>
+      <div class="home-right">
+        <div class="home-amount">-${Number(tx.amount).toFixed(2)} Pi</div>
+        <div class="home-status success">Completed</div>
       </div>
     `;
 
-    withdrawList.appendChild(div);
+    txList.appendChild(div);
   });
 }
 
-/* WITHDRAW ACTION */
-function handleWithdraw(){
+function openWithdraw(){
+  withdrawModal.style.display="flex";
+}
 
-  const amount = prompt("Enter amount to withdraw:");
-  if(!amount) return;
+function closeModals(){
+  withdrawModal.style.display="none";
+}
 
-  const address = prompt("Enter wallet address:");
-  if(!address) return;
+function confirmWithdraw(){
 
-  const result = requestWithdraw(amount, address);
+  const amt = parseFloat(withdrawAmount.value);
+  const addr = withdrawAddress.value.trim();
 
-  if(result.error){
-    alert(result.error);
+  const res = requestWithdraw(amt, addr);
+
+  if(res.error){
+    alert(res.error);
     return;
   }
 
-  alert("Withdraw successful!");
-  loadWallet();
+  // Clear inputs after success
+  withdrawAmount.value = "";
+  withdrawAddress.value = "";
+
+  closeModals();
+  renderWallet();
 }
 
-loadWallet();
+renderWallet();
+
 </script>
 
 </body>
-</html>
+  </html>
