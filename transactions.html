@@ -23,30 +23,62 @@ body{
   padding:10px 12px;
   margin-bottom:8px;
   display:flex;
-  align-items:center;
+  align-items:flex-start;   /* gyara overflow */
   gap:8px;
+  overflow:hidden;          /* kare wucewa waje */
 }
 
+/* ICON */
 .project-icon{
   font-size:16px;
   width:26px;
+  min-width:26px;           /* kar ya matse */
   text-align:center
 }
 
-.project-body{flex:1}
-.project-title{font-size:14px;font-weight:600}
-.project-date{font-size:11px;color:#777}
+.project-body{
+  flex:1;
+  min-width:0;              /* VERY IMPORTANT (fix overflow bug) */
+}
 
-.project-right{text-align:right}
-.project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
+.project-title{
+  font-size:14px;
+  font-weight:600;
+  word-break:break-word;
+}
 
-.withdraw-status{color:#c0392b}
-.address{
-  font-size:10px;
-  color:#999;
-  margin-top:2px;
-  word-break:break-all
+.project-date{
+  font-size:11px;
+  color:#777;
+}
+
+/* ADDRESS SAFE WRAP */
+.project-body div:last-child{
+  font-size:11px;
+  color:#777;
+  word-break:break-all;
+  overflow-wrap:anywhere;
+}
+
+/* RIGHT SIDE */
+.project-right{
+  text-align:right;
+  min-width:80px;           /* kare yankewar amount */
+}
+
+.project-amount{
+  font-size:14px;
+  font-weight:bold;
+  white-space:nowrap;       /* kar ya rabu */
+}
+
+.project-status{
+  font-size:11px;
+  color:#0f7a3d;
+}
+
+.withdraw-status{
+  color:#c0392b;
 }
 </style>
 </head>
