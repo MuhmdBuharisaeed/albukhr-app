@@ -269,7 +269,35 @@ setTimeout(() => {
 }, 18000); /* 18s = welcomeMove animation time */
 </script>
 
-<script src="refresh-engine.js"></script>
+<script>
+/* ======================================
+   ALBUKHR – INDEX SMART REFRESH
+   Welcome-safe version
+====================================== */
+
+(function(){
+
+  const WELCOME_DURATION = 18000;   // 18 seconds
+  const REFRESH_INTERVAL = 120000;  // 2 minutes
+
+  function softRefresh(){
+    if(typeof loadHome === "function"){
+      loadHome();
+    } else {
+      location.reload();
+    }
+  }
+
+  /* jira welcome ya gama */
+  setTimeout(() => {
+
+    /* fara interval */
+    setInterval(softRefresh, REFRESH_INTERVAL);
+
+  }, WELCOME_DURATION);
+
+})();
+ </script>
   
 </body>
 </html>
