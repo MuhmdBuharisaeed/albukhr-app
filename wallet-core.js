@@ -1,192 +1,131 @@
-/* =========================================
-   ALBUKHR WALLET CORE v3
-   Source of Truth = staking.js
-   Wallet = Withdraw Layer Only
-========================================= */
+/* ==========================================
+   ALBUKHR WALLET CORE (PRODUCTION SAFE)
+   Financially Correct Accounting Model
+========================================== */
 
-const LEDGER_KEY = "albukhr_wallet_withdrawals_v3";
+/* ========= STORAGE ========= */
 
-/* =========================================
-   LEDGER (Withdraw Only)
-========================================= */
-
-function getLedger(){
-  return JSON.parse(localStorage.getItem(LEDGER_KEY)) || [];
+function getWalletTx(){
+  return JSON.parse(localStorage.getItem("albukhr_wallet_tx") || "[]");
 }
 
-function saveLedger(list){
-  localStorage.setItem(LEDGER_KEY, JSON.stringify(list));
+function saveWalletTx(data){
+  localStorage.setItem("albukhr_wallet_tx", JSON.stringify(data));
 }
 
-function addWithdraw({ amount, walletAddress }){
+/* ========= HELPERS ========= */
 
-  if(!amount || amount <= 0) return false;
-
-  const tx = {
-    id: "WD-" + Date.now() + "-" + Math.floor(Math.random()*1000),
-    type: "withdraw",
-    amount: parseFloat(amount),
-    walletAddress,
-    status: "completed",
-    createdAt: Date.now()
-  };
-
-  const list = getLedger();
-  list.push(tx);
-  saveLedger(list);
-
-  return tx;
+function getByType(type){
+  return getWalletTx().filter(t => t.type === type);
 }
 
-/* =========================================
-   EXTERNAL DATA (FROM staking.js)
-========================================= */
+/* ========= CORE TOTALS ========= */
 
-function getExternalTotals(){
+/* LOCKED STAKING (from staking.js) */
+function getLockedBalance(){
   if(typeof getTotals === "function"){
-    return getTotals();
+    return getTotals().totalStake || 0;
   }
-  return { totalStake: 0, totalReward: 0 };
+  return 0;
 }
 
-function getExternalStakes(){
-  if(typeof getStakes === "function"){
-    return getStakes();
-  }
-  return [];
+/* ===== REWARDS ===== */
+
+/* GROSS REWARDS (duk reward da aka samu) */
+function getGrossRewards(){
+  return getByType("reward")
+    .reduce((sum,t)=> sum + Number(t.amount), 0);
 }
 
-/* =========================================
-   CALCULATIONS
-========================================= */
-
-function getTotalStake(){
-  return getExternalTotals().totalStake || 0;
-}
-
-function getTotalRewards(){
-  return getExternalTotals().totalReward || 0;
-}
-
+/* TOTAL WITHDRAWN */
 function getTotalWithdrawn(){
-  return getLedger()
-    .reduce((sum,t)=>sum+t.amount,0);
+  return getByType("withdraw")
+    .reduce((sum,t)=> sum + Number(t.amount), 0);
 }
 
-function getAvailableBalance(){
-  return getTotalRewards() - getTotalWithdrawn();
+/* NET REWARDS (after withdraw) */
+function getNetRewards(){
+  const net = getGrossRewards() - getTotalWithdrawn();
+  return net < 0 ? 0 : net;
 }
+
+/* AVAILABLE REWARDS (cannot exceed net) */
+function getAvailableBalance(){
+  return getNetRewards();
+}
+
+/* RECEIVED (external deposit if any) */
+function getTotalReceived(){
+  return getByType("receive")
+    .reduce((sum,t)=> sum + Number(t.amount), 0);
+}
+
+/* ========= WALLET SUMMARY ========= */
 
 function getWalletSummary(){
   return {
-    totalStake: getTotalStake(),
-    totalReward: getTotalRewards(),
-    withdrawn: getTotalWithdrawn(),
-    available: getAvailableBalance()
+    locked: getLockedBalance(),        // staking locked
+    grossRewards: getGrossRewards(),   // total earned
+    withdrawn: getTotalWithdrawn(),    // total withdrawn
+    rewards: getNetRewards(),          // net rewards
+    available: getAvailableBalance(),  // available rewards
+    received: getTotalReceived()
   };
 }
 
-/* =========================================
-   WITHDRAW REQUEST
-========================================= */
+/* ========= RECORD REWARD (Called by staking system) ========= */
 
-function requestWithdraw(amount, walletAddress){
+function recordReward(amount, project){
+  const data = getWalletTx();
 
-  amount = parseFloat(amount);
-
-  if(amount <= 0)
-    return { error: "Invalid amount" };
-
-  if(!walletAddress)
-    return { error: "Wallet address required" };
-
-  if(amount > getAvailableBalance())
-    return { error: "Insufficient reward balance" };
-
-  return addWithdraw({
-    amount,
-    walletAddress
-  });
-}
-
-/* =========================================
-   MERGED TRANSACTION HISTORY
-========================================= */
-
-function getMergedHistory(){
-
-  const stakingTx = getExternalStakes()
-    .filter(s => s.status === "Successful")
-    .map(s => ({
-      id: "ST-" + s.timestamp,
-      type: "stake",
-      project: s.project,
-      amount: s.amount,
-      createdAt: s.timestamp
-    }));
-
-  const withdrawTx = getLedger().map(w => ({
-    id: w.id,
-    type: "withdraw",
-    amount: w.amount,
-    walletAddress: w.walletAddress,
-    createdAt: w.createdAt
-  }));
-
-  return [...stakingTx, ...withdrawTx]
-    .sort((a,b)=>b.createdAt - a.createdAt);
-}
-
-/* =========================================
-   DEV HELPERS
-========================================= */
-
-function clearWalletLedger(){
-  localStorage.removeItem(LEDGER_KEY);
-}
-
-const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v3";
-
-function getWithdrawals(){
-  return JSON.parse(localStorage.getItem(WITHDRAW_KEY)) || [];
-}
-
-function saveWithdrawals(list){
-  localStorage.setItem(WITHDRAW_KEY, JSON.stringify(list));
-}
-
-function getTotalWithdrawn(){
-  return getWithdrawals()
-    .reduce((sum,t)=>sum+t.amount,0);
-}
-
-function requestWithdraw(amount, walletAddress){
-
-  amount = parseFloat(amount);
-
-  if(amount <= 0)
-    return { error:"Invalid amount" };
-
-  if(!walletAddress)
-    return { error:"Wallet address required" };
-
-  const totals = getTotals(); // daga staking.js
-  const available = totals.totalReward - getTotalWithdrawn();
-
-  if(amount > available)
-    return { error:"Insufficient balance" };
-
-  const tx = {
-    id: "WD-" + Date.now(),
-    type: "Withdraw",
-    amount,
-    walletAddress,
+  data.push({
+    id: Date.now(),
+    type: "reward",
+    amount: Number(amount),
+    project: project || "Albukhr",
+    status: "Successful",
     timestamp: Date.now()
+  });
+
+  saveWalletTx(data);
+}
+
+/* ========= WITHDRAW FUNCTION ========= */
+
+function withdrawRewards(amount, walletAddress){
+
+  amount = Number(amount);
+
+  if(amount <= 0){
+    return { success:false, message:"Invalid amount" };
+  }
+
+  if(amount > getAvailableBalance()){
+    return { success:false, message:"Insufficient rewards" };
+  }
+
+  const data = getWalletTx();
+
+  data.push({
+    id: Date.now(),
+    type: "withdraw",
+    amount: amount,
+    walletAddress: walletAddress || "N/A",
+    status: "Successful",
+    timestamp: Date.now()
+  });
+
+  saveWalletTx(data);
+
+  return { success:true };
+}
+
+/* ========= FORMAT DATE ========= */
+
+function formatWalletDate(tx){
+  const d = new Date(tx.timestamp);
+  return {
+    date: d.toLocaleDateString(),
+    time: d.toLocaleTimeString()
   };
-
-  const list = getWithdrawals();
-  list.push(tx);
-  saveWithdrawals(list);
-
-  return tx;
 }
