@@ -220,7 +220,7 @@ function renderWallet(){
     Number(summary.locked || 0).toFixed(2) + " PI";
 
   totalReward.innerText =
-    Number(summary.grossRewards || 0).toFixed(2) + " PI";
+  Number(summary.rewards || 0).toFixed(2) + " PI";
 
   withdrawn.innerText =
     Number(summary.withdrawn || 0).toFixed(2) + " PI";
