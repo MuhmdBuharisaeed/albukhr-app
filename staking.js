@@ -1,6 +1,6 @@
 // =======================================
-// ALBUKHR STAKING ENGINE v3 (UNIFIED)
-// Internal + External + Wallet Ready
+// ALBUKHR STAKING ENGINE v3.1 (HARDENED)
+// Internal + External + Wallet Compatible
 // =======================================
 
 const INTERNAL_KEY = "albukhr_stakes";
@@ -11,7 +11,8 @@ const EXTERNAL_KEY = "albukhr_external_projects";
 ====================================== */
 function _safeParse(key){
   try{
-    return JSON.parse(localStorage.getItem(key)) || [];
+    const data = JSON.parse(localStorage.getItem(key));
+    return Array.isArray(data) ? data : [];
   }catch{
     return [];
   }
@@ -22,61 +23,38 @@ function _save(key,data){
 }
 
 /* ======================================
-   PROJECT RULES (INTERNAL)
+   PROJECT RULES
 ====================================== */
 const PROJECT_RULES = {
-  Raheem:   { minStake: 10 },
-  Hauwal:   { minStake: 20 },
-  Barsh:    { minStake: 100 },
-  Khairat:  { minStake: 50 },
-  Urban:    { minStake: 150 },
-  Labbaika: { minStake: 30 }
+  Raheem:{minStake:10},
+  Hauwal:{minStake:20},
+  Barsh:{minStake:100},
+  Khairat:{minStake:50},
+  Urban:{minStake:150},
+  Labbaika:{minStake:30}
 };
 
 function getMinStake(project){
-  return PROJECT_RULES[project]?.minStake || 0;
+  return PROJECT_RULES?.[project]?.minStake || 0;
 }
 
 /* ======================================
-   REWARD RATES (INTERNAL)
+   REWARD RATES
 ====================================== */
 function getRate(project,duration){
 
-  if(project === "Raheem"){
-    return duration === 30 ? 0.01 :
-           duration === 60 ? 0.025 :
-           0.05;
-  }
+  const d = Number(duration);
 
-  if(project === "Hauwal"){
-    return duration === 30 ? 0.02 :
-           duration === 60 ? 0.04 :
-           0.08;
-  }
+  const table = {
+    Raheem:{30:0.01,60:0.025,90:0.05},
+    Hauwal:{30:0.02,60:0.04,90:0.08},
+    Khairat:{30:0.025,60:0.05,90:0.09},
+    Barsh:{30:0.03,60:0.06,90:0.10},
+    Labbaika:{30:0.02,60:0.045,90:0.075},
+    Urban:{30:0.12,60:0.12,90:0.12}
+  };
 
-  if(project === "Khairat"){
-    return duration === 30 ? 0.025 :
-           duration === 60 ? 0.05 :
-           0.09;
-  }
-
-  if(project === "Barsh"){
-    return duration === 30 ? 0.03 :
-           duration === 60 ? 0.06 :
-           0.10;
-  }
-
-  if(project === "Labbaika"){
-    return duration === 30 ? 0.02 :
-           duration === 60 ? 0.045 :
-           0.075;
-  }
-
-  if(project === "Urban"){
-    return 0.12;
-  }
-
-  return 0;
+  return table?.[project]?.[d] || 0;
 }
 
 /* ======================================
@@ -86,24 +64,29 @@ function addStake({project,amount,duration}){
 
   const safeAmount   = Number(amount);
   const safeDuration = Number(duration);
-  const rate         = getRate(project,safeDuration);
 
-  if(!project || isNaN(safeAmount) || safeAmount<=0){
+  if(!project || isNaN(safeAmount) || safeAmount <= 0){
     return false;
   }
 
+  if(safeAmount < getMinStake(project)){
+    return false;
+  }
+
+  const rate   = getRate(project,safeDuration);
   const reward = safeAmount * rate;
+
   const stakes = _safeParse(INTERNAL_KEY);
 
   stakes.push({
-    id: "ST-" + Date.now(),
+    id:"ST-"+Date.now(),
     project,
-    amount: safeAmount,
-    duration: safeDuration,
-    reward: Number(reward) || 0,
-    status: "Successful",
-    timestamp: Date.now(),
-    type: "internal"
+    amount:safeAmount,
+    duration:safeDuration,
+    reward:Number(reward)||0,
+    status:"Successful",
+    timestamp:Date.now(),
+    type:"internal"
   });
 
   _save(INTERNAL_KEY,stakes);
@@ -111,31 +94,47 @@ function addStake({project,amount,duration}){
 }
 
 /* ======================================
-   EXTERNAL PROJECTS (ADMIN APPROVAL)
+   EXTERNAL PROJECTS
 ====================================== */
 function getExternalProjects(){
   return _safeParse(EXTERNAL_KEY);
 }
 
 function addExternalStake(data){
+
   const projects = _safeParse(EXTERNAL_KEY);
 
   projects.push({
-    id: "EX-" + Date.now(),
-    project: data.project,
-    amount: Number(data.amount) || 0,
-    duration: Number(data.duration) || 0,
-    reward: Number(data.reward) || 0,
-    status: "pending",   // pending | approved | rejected
-    timestamp: Date.now(),
-    type: "external"
+    id:"EX-"+Date.now(),
+    project:data.project || "External",
+    amount:Number(data.amount)||0,
+    duration:Number(data.duration)||0,
+    reward:Number(data.reward)||0,
+    status:"pending",
+    timestamp:Date.now(),
+    type:"external"
   });
 
   _save(EXTERNAL_KEY,projects);
 }
 
+/* OPTIONAL ADMIN APPROVAL */
+function approveExternalStake(id){
+
+  const projects = _safeParse(EXTERNAL_KEY);
+
+  const updated = projects.map(p=>{
+    if(p.id === id){
+      return {...p,status:"approved"};
+    }
+    return p;
+  });
+
+  _save(EXTERNAL_KEY,updated);
+}
+
 /* ======================================
-   MERGED STAKES (INTERNAL + APPROVED)
+   MERGED STAKES
 ====================================== */
 function getAllStakesMerged(){
 
@@ -150,24 +149,29 @@ function getAllStakesMerged(){
     }));
 
   return [...internal,...external]
+    .map(s=>({
+      ...s,
+      timestamp:s.timestamp || Date.now()
+    }))
     .sort((a,b)=>b.timestamp - a.timestamp);
 }
 
 /* ======================================
-   TOTALS (MERGED)
+   TOTALS
 ====================================== */
 function getTotals(){
 
   const all = getAllStakesMerged();
-  let totalStake = 0;
+
+  let totalStake  = 0;
   let totalReward = 0;
 
   all.forEach(s=>{
-    totalStake  += Number(s.amount) || 0;
-    totalReward += Number(s.reward) || 0;
+    totalStake  += Number(s.amount)||0;
+    totalReward += Number(s.reward)||0;
   });
 
-  return { totalStake,totalReward };
+  return {totalStake,totalReward};
 }
 
 /* ======================================
@@ -182,11 +186,11 @@ function getProjectTotals(project){
   let reward = 0;
 
   filtered.forEach(s=>{
-    stake  += Number(s.amount) || 0;
-    reward += Number(s.reward) || 0;
+    stake  += Number(s.amount)||0;
+    reward += Number(s.reward)||0;
   });
 
-  return { stake,reward,stakes:filtered };
+  return {stake,reward,stakes:filtered};
 }
 
 /* ======================================
@@ -201,8 +205,8 @@ function formatDateTime(obj){
   }
 
   return{
-    date: d.toLocaleDateString("en-GB"),
-    time: d.toLocaleTimeString("en-GB",{
+    date:d.toLocaleDateString("en-GB"),
+    time:d.toLocaleTimeString("en-GB",{
       hour:"2-digit",
       minute:"2-digit",
       second:"2-digit"
@@ -211,7 +215,7 @@ function formatDateTime(obj){
 }
 
 /* ======================================
-   LEGACY WRAPPERS (DO NOT REMOVE)
+   LEGACY WRAPPERS
 ====================================== */
 function getStakes(){ return getAllStakesMerged(); }
 function getInternalTotals(){ return getTotals(); }
