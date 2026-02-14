@@ -470,28 +470,3 @@ body{
   from{opacity:0;transform:translate(-50%,-10px)}
   to{opacity:1;transform:translate(-50%,0)}
 }
-
-/* FULL HEIGHT LAYOUT */
-body{
-  margin:0;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-
-/* FIXED TOP SECTION */
-.wallet-fixed-top{
-  background:#fff;
-  z-index:10;
-  padding-bottom:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
-}
-
-/* SCROLLABLE BODY ONLY */
-.wallet-scroll-body{
-  flex:1;
-  overflow-y:auto;
-  padding:15px;
-  background:#f5f7f6;
-   }
