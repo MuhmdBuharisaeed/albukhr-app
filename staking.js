@@ -1,6 +1,6 @@
 // ===============================
-// ALBUKHR STAKING ENGINE (STABLE)
-// Internal Projects Only
+// ALBUKHR STAKING ENGINE v2 (CLEAN)
+// Source of Truth – Internal Only
 // ===============================
 
 const STORAGE_KEY = "albukhr_stakes";
@@ -9,9 +9,9 @@ const STORAGE_KEY = "albukhr_stakes";
    STORAGE CORE
 ================================ */
 function _getAllStakes(){
-  try {
+  try{
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
+  }catch{
     return [];
   }
 }
@@ -21,15 +21,15 @@ function _saveAllStakes(stakes){
 }
 
 /* ===============================
-   PROJECT RULES (INTERNAL)
+   PROJECT RULES
 ================================ */
 const PROJECT_RULES = {
-  Raheem:   { minStake: 10 },
-  Hauwal:   { minStake: 20 },
-  Barsh:    { minStake: 100 },
-  Khairat:  { minStake: 50 },
-  Urban:    { minStake: 150 },
-  Labbaika: { minStake: 30 }
+  Raheem:   { minStake:10 },
+  Hauwal:   { minStake:20 },
+  Barsh:    { minStake:100 },
+  Khairat:  { minStake:50 },
+  Urban:    { minStake:150 },
+  Labbaika: { minStake:30 }
 };
 
 function getMinStake(project){
@@ -37,77 +37,55 @@ function getMinStake(project){
 }
 
 /* ===============================
-   REWARD RATES (INTERNAL)
+   REWARD RATES
 ================================ */
 function getRate(project, duration){
 
-  if(project === "Raheem"){
-    return duration === 30 ? 0.01 :
-           duration === 60 ? 0.025 :
-           0.05;
-  }
+  const d = Number(duration);
 
-  if(project === "Hauwal"){
-    return duration === 30 ? 0.02 :
-           duration === 60 ? 0.04 :
-           0.08;
-  }
+  const table = {
+    Raheem:   {30:0.01, 60:0.025, 90:0.05},
+    Hauwal:   {30:0.02, 60:0.04,  90:0.08},
+    Khairat:  {30:0.025,60:0.05,  90:0.09},
+    Barsh:    {30:0.03, 60:0.06,  90:0.10},
+    Labbaika: {30:0.02, 60:0.045, 90:0.075},
+    Urban:    {30:0.12, 60:0.12,  90:0.12}
+  };
 
-  if(project === "Khairat"){
-    return duration === 30 ? 0.025 :
-           duration === 60 ? 0.05 :
-           0.09;
-  }
-
-  if(project === "Barsh"){
-    return duration === 30 ? 0.03 :
-           duration === 60 ? 0.06 :
-           0.10;
-  }
-
-  if(project === "Labbaika"){
-    return duration === 30 ? 0.02 :
-           duration === 60 ? 0.045 :
-           0.075;
-  }
-
-  if(project === "Urban"){
-    return 0.12;
-  }
-
-  return 0;
+  return table[project]?.[d] || 0;
 }
 
 /* ===============================
-   ADD STAKE (NO CHANGE)
+   ADD STAKE (ENGINE ENFORCED)
 ================================ */
 function addStake({ project, amount, duration }){
 
   const safeAmount   = Number(amount);
   const safeDuration = Number(duration);
-  const rate         = getRate(project, safeDuration);
 
   if(
     !project ||
     isNaN(safeAmount) ||
     isNaN(safeDuration) ||
-    safeAmount <= 0
+    safeAmount <= 0 ||
+    safeAmount < getMinStake(project)
   ){
     return false;
   }
 
+  const rate   = getRate(project, safeDuration);
   const reward = safeAmount * rate;
 
   const stakes = _getAllStakes();
 
   stakes.push({
-    id: Date.now(),
-    project,              // 🔑 INTERNAL PROJECT NAME
+    id: "ST-" + Date.now() + "-" + Math.floor(Math.random()*1000),
+    project,
     amount: safeAmount,
     duration: safeDuration,
     reward: Number(reward) || 0,
     status: "Successful",
-    timestamp: Date.now(), // 🔑 unified timestamp
+    timestamp: Date.now(),
     type: "internal"
   });
 
@@ -116,12 +94,12 @@ function addStake({ project, amount, duration }){
 }
 
 /* ===============================
-   TOTALS (INDEX HOME)
+   TOTALS
 ================================ */
 function getTotals(){
 
   const stakes = _getAllStakes();
-  let totalStake = 0;
+  let totalStake  = 0;
   let totalReward = 0;
 
   stakes.forEach(s=>{
@@ -135,21 +113,7 @@ function getTotals(){
 }
 
 /* ===============================
-   INTERNAL TOTALS (BRIDGE)
-================================ */
-function getInternalTotals(){
-  return getTotals();
-}
-
-/* ===============================
-   INTERNAL STAKES (BRIDGE)
-================================ */
-function getInternalStakes(){
-  return _getAllStakes().filter(s => s.type === "internal");
-}
-
-/* ===============================
-   PROJECT TOTALS (Raheem etc.)
+   PROJECT TOTALS
 ================================ */
 function getProjectTotals(project){
 
@@ -157,7 +121,7 @@ function getProjectTotals(project){
     s => s.project === project && s.status === "Successful"
   );
 
-  let stake = 0;
+  let stake  = 0;
   let reward = 0;
 
   filtered.forEach(s=>{
@@ -169,12 +133,12 @@ function getProjectTotals(project){
 }
 
 /* ===============================
-   DATE / TIME FORMATTER
+   DATE FORMATTER
 ================================ */
 function formatDateTime(obj){
 
   const ts = obj?.timestamp || Date.now();
-  const d = new Date(ts);
+  const d  = new Date(ts);
 
   if(isNaN(d)){
     return { date:"--", time:"--" };
@@ -182,22 +146,29 @@ function formatDateTime(obj){
 
   return {
     date: d.toLocaleDateString("en-GB"),
-    time: d.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit"
+    time: d.toLocaleTimeString("en-GB",{
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit"
     })
   };
 }
 
 /* ===============================
-   LEGACY API (DO NOT REMOVE)
+   LEGACY API
 ================================ */
 function getStakes(){
   return _getAllStakes();
-     }
+}
 
-/* INTERNAL WRAPPERS */
-function addInternalStake(p){ return addStake(p); }
-function getInternalTotals(){ return getTotals(); }
-function getInternalProjectTotals(p){ return getProjectTotals(p); }
+function addInternalStake(p){
+  return addStake(p);
+}
+
+function getInternalTotals(){
+  return getTotals();
+}
+
+function getInternalProjectTotals(p){
+  return getProjectTotals(p);
+}
