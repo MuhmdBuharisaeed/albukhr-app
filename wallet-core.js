@@ -1,21 +1,17 @@
 /* =========================================
-   ALBUKHR WALLET CORE v6
-   Fully Defensive + Stable Totals
-   Compatible with staking v3
+   ALBUKHR WALLET CORE v4.1 (STABLE)
+   Source of Truth = staking.js
+   Wallet = Withdraw Layer Only
 ========================================= */
 
-const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v6";
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v4";
 
 /* =========================================
    STORAGE
 ========================================= */
 
 function getWithdrawals(){
-  try{
-    return JSON.parse(localStorage.getItem(WITHDRAW_KEY)) || [];
-  }catch{
-    return [];
-  }
+  return JSON.parse(localStorage.getItem(WITHDRAW_KEY)) || [];
 }
 
 function saveWithdrawals(list){
@@ -23,54 +19,48 @@ function saveWithdrawals(list){
 }
 
 /* =========================================
-   SAFE STAKE ACCESS
+   DAILY WITHDRAW LIMIT (PER PROJECT)
 ========================================= */
 
-function getAllStakesSafe(){
+const DAILY_LIMIT = {
+  Raheem: 50,
+  Hauwal: 100,
+  Barsh: 300,
+  Khairat: 150,
+  Urban: 500,
+  Labbaika: 80,
+  default: 50
+};
 
-  if(typeof getAllStakesMerged === "function"){
-    return getAllStakesMerged();
+/* =========================================
+   EXTERNAL DATA (staking.js)
+========================================= */
+
+function getExternalTotals(){
+  if(typeof getTotals === "function"){
+    return getTotals();
   }
-
-  if(typeof getStakes === "function"){
-    return getStakes();
-  }
-
-  return [];
+  return { totalStake:0, totalReward:0 };
 }
 
 /* =========================================
-   TOTAL CALCULATIONS (LOCAL SAFE)
+   CALCULATIONS
 ========================================= */
 
-function calculateTotalsFromStakes(){
-
-  const stakes = getAllStakesSafe();
-
-  let totalStake = 0;
-  let totalReward = 0;
-
-  stakes.forEach(s=>{
-    totalStake  += Number(s.amount) || 0;
-    totalReward += Number(s.reward) || 0;
-  });
-
-  return { totalStake, totalReward };
-}
-
 function getTotalStake(){
-  return calculateTotalsFromStakes().totalStake;
+  return getExternalTotals().totalStake || 0;
 }
 
 function getGrossRewards(){
-  return calculateTotalsFromStakes().totalReward;
+  return getExternalTotals().totalReward || 0;
 }
 
 function getTotalWithdrawn(){
   return getWithdrawals()
-    .reduce((sum,t)=> sum + Number(t.amount || 0),0);
+    .reduce((sum,t)=> sum + (Number(t.amount) || 0), 0);
 }
 
+/* NET REWARD (after withdraw) */
 function getNetRewards(){
   return getGrossRewards() - getTotalWithdrawn();
 }
@@ -81,39 +71,47 @@ function getAvailableBalance(){
 
 function getWalletSummary(){
   return {
-    totalStake: getTotalStake(),
-    totalReward: getNetRewards(),   // NET display
+    locked: getTotalStake(),
+    grossRewards: getGrossRewards(),
     withdrawn: getTotalWithdrawn(),
+    rewards: getNetRewards(),
     available: getAvailableBalance()
   };
 }
 
 /* =========================================
-   WITHDRAW REQUEST (SAFE)
+   WITHDRAW REQUEST
 ========================================= */
 
 function requestWithdraw(amount, walletAddress){
 
-  amount = Number(amount);
+  amount = parseFloat(amount);
 
-  if(!amount || isNaN(amount) || amount <= 0){
-    return { error:"Enter valid amount greater than 0" };
-  }
+  if(amount <= 0)
+    return { error:"Invalid amount" };
 
-  if(!walletAddress){
+  if(!walletAddress)
     return { error:"Wallet address required" };
-  }
 
-  if(amount > getAvailableBalance()){
+  if(amount > getAvailableBalance())
     return { error:"Insufficient reward balance" };
-  }
 
+  const now = Date.now();
+
+const todayTotal = getTodayWithdrawTotal();
+const limit = DAILY_LIMIT.default;
+
+if(todayTotal + amount > limit){
+  return { error: "Daily withdraw limit reached" };
+}
+   
   const tx = {
-    id: "WD-" + Date.now(),
+    id: "WD-" + now,
     type: "withdraw",
     amount,
     walletAddress,
-    createdAt: Date.now()
+    timestamp: now,     // ← STANDARDIZED FIELD
+    createdAt: now      // ← backward compatibility
   };
 
   const list = getWithdrawals();
@@ -124,12 +122,17 @@ function requestWithdraw(amount, walletAddress){
 }
 
 /* =========================================
-   HISTORY
+   HISTORY (Withdraw Only)
 ========================================= */
 
 function getWithdrawHistory(){
+
   return getWithdrawals()
-    .sort((a,b)=>b.createdAt - a.createdAt);
+    .map(tx => ({
+      ...tx,
+      timestamp: tx.timestamp || tx.createdAt || Date.now()
+    }))
+    .sort((a,b)=> b.timestamp - a.timestamp);
 }
 
 /* =========================================
@@ -138,4 +141,13 @@ function getWithdrawHistory(){
 
 function clearWalletLedger(){
   localStorage.removeItem(WITHDRAW_KEY);
+}
+
+function getTodayWithdrawTotal(){
+
+  const today = new Date().toDateString();
+
+  return getWithdrawals()
+    .filter(tx => new Date(tx.createdAt).toDateString() === today)
+    .reduce((sum,tx)=> sum + Number(tx.amount),0);
 }
