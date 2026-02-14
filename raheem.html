@@ -156,7 +156,9 @@ function confirmStake(){
   const ok = addStake({
     project: "Raheem",
     amount: amount,
-    duration: duration
+    duration: duration,
+    status: "Successful",
+    timestamp: Date.now()
   });
 
   if(!ok){
@@ -173,7 +175,7 @@ function confirmStake(){
   closeModal();
   successModal.style.display = "flex";
   loadRaheem();
-}
+          }
 
 /* DASHBOARD */
 function loadRaheem(){
@@ -212,7 +214,6 @@ function loadRaheem(){
 loadRaheem();
 </script>
 
-<script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
