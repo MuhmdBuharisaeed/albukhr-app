@@ -1,5 +1,5 @@
 /* =========================================
-   ALBUKHR WALLET CORE v4
+   ALBUKHR WALLET CORE v4.1 (STABLE)
    Source of Truth = staking.js
    Wallet = Withdraw Layer Only
 ========================================= */
@@ -43,7 +43,7 @@ function getGrossRewards(){
 
 function getTotalWithdrawn(){
   return getWithdrawals()
-    .reduce((sum,t)=>sum + Number(t.amount), 0);
+    .reduce((sum,t)=> sum + (Number(t.amount) || 0), 0);
 }
 
 /* NET REWARD (after withdraw) */
@@ -82,12 +82,15 @@ function requestWithdraw(amount, walletAddress){
   if(amount > getAvailableBalance())
     return { error:"Insufficient reward balance" };
 
+  const now = Date.now();
+
   const tx = {
-    id: "WD-" + Date.now(),
+    id: "WD-" + now,
     type: "withdraw",
     amount,
     walletAddress,
-    createdAt: Date.now()
+    timestamp: now,     // ← STANDARDIZED FIELD
+    createdAt: now      // ← backward compatibility
   };
 
   const list = getWithdrawals();
@@ -102,8 +105,13 @@ function requestWithdraw(amount, walletAddress){
 ========================================= */
 
 function getWithdrawHistory(){
+
   return getWithdrawals()
-    .sort((a,b)=>b.createdAt - a.createdAt);
+    .map(tx => ({
+      ...tx,
+      timestamp: tx.timestamp || tx.createdAt || Date.now()
+    }))
+    .sort((a,b)=> b.timestamp - a.timestamp);
 }
 
 /* =========================================
