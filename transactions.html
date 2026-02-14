@@ -112,92 +112,47 @@ const ICONS = {
   Labbaika: "🍞"
 };
 
+<script>
 function loadTransactions(){
 
+  const txList = document.getElementById("txList");
   txList.innerHTML = "";
 
-  /* ===== STAKE TRANSACTIONS ===== */
-  const stakeTx = getStakes()
-    .filter(s => s.status === "Successful")
-    .map(s => ({
-      type: "stake",
-      project: s.project,
-      amount: Number(s.amount),
-      timestamp: s.timestamp
-    }));
-
-  /* ===== WITHDRAW TRANSACTIONS ===== */
-  let withdrawTx = [];
-
-  if(typeof getWithdrawHistory === "function"){
-    const raw = getWithdrawHistory() || [];
-
-    withdrawTx = raw.map(w => ({
-      type: "withdraw",
-      amount: Number(w.amount),
-      walletAddress: w.walletAddress || "External Wallet",
-      timestamp: w.timestamp || Date.now()
-    }));
+  if(typeof getStakes !== "function"){
+    txList.innerHTML = "No transactions yet";
+    return;
   }
 
-  /* ===== MERGE + SORT ===== */
-  const merged = [...stakeTx, ...withdrawTx]
-    .sort((a,b)=>b.timestamp - a.timestamp);
+  const transactions = getStakes();
 
-  if(merged.length === 0){
+  if(!transactions.length){
     txList.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  merged.forEach(tx=>{
+  transactions.forEach(tx=>{
 
     const div = document.createElement("div");
     div.className = "project-tx";
 
-    if(tx.type === "stake"){
+    const t = formatDateTime({timestamp:tx.timestamp});
 
-      const t = formatDateTime({ timestamp:tx.timestamp });
+    div.innerHTML = `
+      <div class="project-icon">📦</div>
 
-      div.innerHTML = `
-        <div class="project-icon">
-          ${ICONS[tx.project] || "📦"}
+      <div class="project-body">
+        <div class="project-title">${tx.project} Stake</div>
+        <div class="project-date">${t.date} • ${t.time}</div>
+      </div>
+
+      <div class="project-right">
+        <div class="project-amount">
+          ${Number(tx.amount).toFixed(2)} Pi
         </div>
-
-        <div class="project-body">
-          <div class="project-title">${tx.project} Stake</div>
-          <div class="project-date">${t.date} • ${t.time}</div>
-        </div>
-
-        <div class="project-right">
-          <div class="project-amount">${tx.amount.toFixed(2)} Pi</div>
-          <div class="project-status">Successful</div>
-        </div>
-      `;
-
-    } else {
-
-      const d = new Date(tx.timestamp);
-
-      div.innerHTML = `
-        <div class="project-icon">💸</div>
-
-        <div class="project-body">
-          <div class="project-title">Reward Withdraw</div>
-          <div class="project-date">
-            ${d.toLocaleDateString()} • ${d.toLocaleTimeString()}
-          </div>
-          <div style="font-size:11px;color:#777">
-            Wallet: ${tx.walletAddress}
-          </div>
-        </div>
-
-        <div class="project-right">
-          <div class="project-amount">-${tx.amount.toFixed(2)} Pi</div>
-          <div class="project-status">Completed</div>
-        </div>
-      `;
-    }
+        <div class="project-status">Successful</div>
+      </div>
+    `;
 
     txList.appendChild(div);
   });
