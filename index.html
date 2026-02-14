@@ -140,9 +140,9 @@ function loadHome(){
   const totals = getTotals();
 
   // NET REWARD (after withdraw)
-  const withdrawn = typeof getTotalWithdrawn === "function"
-    ? getTotalWithdrawn()
-    : 0;
+  const withdrawn = (typeof getWithdrawals === "function")
+  ? (getWithdrawals() || []).reduce((sum,w)=>sum + (Number(w.amount)||0),0)
+  : 0;
 
   const netReward = totals.totalReward - withdrawn;
 
@@ -153,28 +153,29 @@ function loadHome(){
   box.innerHTML = "";
 
   /* ===== STAKE TX ===== */
-  const stakeTx = getStakes()
-    .filter(s => s.status === "Successful")
-    .map(s => ({
-      type:"stake",
-      project:s.project,
-      amount:s.amount,
-      timestamp:s.timestamp
-    }));
+const stakeTx = (typeof getStakes === "function" ? getStakes() : [])
+  .filter(s => s.status === "Successful")
+  .map(s => ({
+    type:"stake",
+    project:s.project,
+    amount:Number(s.amount) || 0,
+    timestamp:s.timestamp || Date.now()
+  }));
 
   /* ===== WITHDRAW TX ===== */
 let withdrawTx = [];
 
-if (typeof getWithdrawHistory === "function") {
-  const raw = getWithdrawHistory() || [];
+if (typeof getWithdrawals === "function") {
+
+  const raw = getWithdrawals() || [];
 
   withdrawTx = raw.map(w => ({
     type: "withdraw",
     amount: Number(w.amount) || 0,
     walletAddress: w.walletAddress || "External Wallet",
-    timestamp: w.timestamp || w.date || Date.now()
+    timestamp: w.timestamp || Date.now()
   }));
-}
+  }
 
   const merged = [...stakeTx, ...withdrawTx]
     .sort((a,b)=>b.timestamp - a.timestamp)
