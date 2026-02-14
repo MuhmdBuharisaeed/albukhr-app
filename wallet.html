@@ -6,23 +6,149 @@
 <title>Albukhr Wallet</title>
 
 <style>
-body{background:#f4f7f6;font-family:system-ui;margin:0}
-.header{background:#0f7a3d;color:#fff;padding:16px;font-weight:700;text-align:center}
-.section{padding:16px}
-.card{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px}
-.balance{font-size:26px;font-weight:800;color:#0f7a3d}
-.sub{font-size:12px;color:#666;margin-top:4px}
-.row{display:flex;justify-content:space-between;margin-top:8px;font-size:13px}
-.btn-group{display:flex;gap:10px;margin-top:14px}
-.btn{flex:1;padding:12px;border:none;border-radius:12px;background:#0f7a3d;color:#fff;font-weight:700;cursor:pointer}
-.btn.secondary{background:#eaf6ee;color:#0f7a3d}
-.tx{border-bottom:1px solid #eee;padding:8px 0;font-size:13px}
-.tx small{color:#777;font-size:11px}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
-.modal{background:#fff;border-radius:16px;padding:20px;width:90%;max-width:400px}
-.modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-bottom:10px}
-.modal-actions{display:flex;gap:10px}
-.close-btn{background:#ddd;color:#333}
+body{
+  background:#f4f7f6;
+  font-family:system-ui;
+  margin:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* FIXED HEADER */
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:16px;
+  font-weight:700;
+  text-align:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+/* MAIN CONTAINER */
+.section{
+  padding:16px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* SUMMARY CARD (FIXED AREA) */
+.summary-card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+  flex-shrink:0;
+}
+
+.balance{
+  font-size:26px;
+  font-weight:800;
+  color:#0f7a3d;
+}
+
+.sub{
+  font-size:12px;
+  color:#666;
+  margin-top:4px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  margin-top:8px;
+  font-size:13px;
+}
+
+.btn-group{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+.btn{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn.secondary{
+  background:#eaf6ee;
+  color:#0f7a3d;
+}
+
+/* SCROLLABLE HISTORY ONLY */
+.history-card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.history-scroll{
+  overflow-y:auto;
+  margin-top:10px;
+  padding-right:4px;
+}
+
+.tx{
+  border-bottom:1px solid #eee;
+  padding:8px 0;
+  font-size:13px;
+}
+
+.tx small{
+  color:#777;
+  font-size:11px;
+}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  width:90%;
+  max-width:400px;
+}
+
+.modal input{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  margin-bottom:10px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+}
+
+.close-btn{
+  background:#ddd;
+  color:#333;
+}
 </style>
 </head>
 
@@ -32,47 +158,52 @@ body{background:#f4f7f6;font-family:system-ui;margin:0}
 
 <section class="section">
 
-<div class="card">
-<div class="balance" id="available">0 PI</div>
-<div class="sub">Available Reward Balance</div>
+<!-- FIXED SUMMARY -->
+<div class="summary-card">
 
-<div class="row">
-<div>Total Staked</div>
-<div id="totalStake">0 PI</div>
+  <div class="balance" id="available">0 PI</div>
+  <div class="sub">Available Reward Balance</div>
+
+  <div class="row">
+    <div>Total Staked</div>
+    <div id="totalStake">0 PI</div>
+  </div>
+
+  <div class="row">
+    <div>Total Rewards</div>
+    <div id="totalReward">0 PI</div>
+  </div>
+
+  <div class="row">
+    <div>Total Withdrawn</div>
+    <div id="withdrawn">0 PI</div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
+  </div>
+
 </div>
 
-<div class="row">
-<div>Total Rewards</div>
-<div id="totalReward">0 PI</div>
-</div>
-
-<div class="row">
-<div>Total Withdrawn</div>
-<div id="withdrawn">0 PI</div>
-</div>
-
-<div class="btn-group">
-<button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
-</div>
-</div>
-
-<div class="card">
-<h4>Transaction History</h4>
-<div id="txList"></div>
+<!-- SCROLLABLE HISTORY -->
+<div class="history-card">
+  <h4>Transaction History</h4>
+  <div class="history-scroll" id="txList"></div>
 </div>
 
 </section>
 
+<!-- MODAL -->
 <div class="modal-overlay" id="withdrawModal">
-<div class="modal">
-<h3>Withdraw PI</h3>
-<input type="number" id="withdrawAmount" placeholder="Amount">
-<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
-<div class="modal-actions">
-<button class="btn" onclick="confirmWithdraw()">Confirm</button>
-<button class="btn close-btn" onclick="closeModals()">Cancel</button>
-</div>
-</div>
+  <div class="modal">
+    <h3>Withdraw PI</h3>
+    <input type="number" id="withdrawAmount" placeholder="Amount">
+    <input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
+    <div class="modal-actions">
+      <button class="btn" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn close-btn" onclick="closeModals()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <script src="staking.js"></script>
@@ -85,33 +216,24 @@ function renderWallet(){
 
   const summary = getWalletSummary();
 
-  // Support both old & new wallet-core structure
-  const totalStakeValue =
-      summary.totalStake ?? summary.locked ?? 0;
-
-  const totalRewardValue =
-      summary.totalReward ?? summary.rewards ?? 0;
-
   totalStake.innerText =
-      Number(totalStakeValue).toFixed(2) + " PI";
+    Number(summary.locked || 0).toFixed(2) + " PI";
 
   totalReward.innerText =
-      Number(totalRewardValue).toFixed(2) + " PI";
+    Number(summary.grossRewards || 0).toFixed(2) + " PI";
 
   withdrawn.innerText =
-      Number(summary.withdrawn || 0).toFixed(2) + " PI";
+    Number(summary.withdrawn || 0).toFixed(2) + " PI";
 
   available.innerText =
-      Number(summary.available || 0).toFixed(2) + " PI";
+    Number(summary.available || 0).toFixed(2) + " PI";
 
   renderHistory();
-  }
+}
 
 function renderHistory(){
 
-  const list = getWithdrawals()
-    .sort((a,b)=> (b.timestamp || b.createdAt) - (a.timestamp || a.createdAt));
-
+  const list = getWithdrawHistory();
   txList.innerHTML="";
 
   if(!list.length){
@@ -121,24 +243,15 @@ function renderHistory(){
 
   list.forEach(tx=>{
 
-    const time = tx.timestamp || tx.createdAt;
-
     const div = document.createElement("div");
-    div.className="home-tx";
+    div.className="tx";
 
     div.innerHTML = `
-      <div class="home-icon">💸</div>
-      <div class="home-body">
-        <div class="home-title">Reward Withdraw</div>
-        <div class="home-date">${new Date(time).toLocaleString()}</div>
-        <div style="font-size:11px;color:#888">
-          Wallet: ${tx.walletAddress}
-        </div>
-      </div>
-      <div class="home-right">
-        <div class="home-amount">-${Number(tx.amount).toFixed(2)} Pi</div>
-        <div class="home-status success">Completed</div>
-      </div>
+      <div><strong>Reward Withdraw</strong></div>
+      <div>- ${Number(tx.amount).toFixed(2)} PI</div>
+      <small>${new Date(tx.createdAt).toLocaleString()}</small>
+      <br>
+      <small>Wallet: ${tx.walletAddress}</small>
     `;
 
     txList.appendChild(div);
@@ -165,9 +278,8 @@ function confirmWithdraw(){
     return;
   }
 
-  // Clear inputs after success
-  withdrawAmount.value = "";
-  withdrawAddress.value = "";
+  withdrawAmount.value="";
+  withdrawAddress.value="";
 
   closeModals();
   renderWallet();
@@ -177,27 +289,5 @@ renderWallet();
 
 </script>
 
-<script>
-function loadWalletTotals(){
-
-  if(typeof getTotals !== "function") return;
-
-  const totals = getTotals();
-
-  const stakeEl  = document.getElementById("walletTotalStake");
-  const rewardEl = document.getElementById("walletTotalReward");
-
-  if(stakeEl){
-    stakeEl.textContent = totals.totalStake.toFixed(2) + " Pi";
-  }
-
-  if(rewardEl){
-    rewardEl.textContent = totals.totalReward.toFixed(2) + " Pi";
-  }
-}
-
-loadWalletTotals();
-</script>
-  
 </body>
-  </html>
+</html>
