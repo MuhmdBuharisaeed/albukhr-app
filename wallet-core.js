@@ -19,6 +19,20 @@ function saveWithdrawals(list){
 }
 
 /* =========================================
+   DAILY WITHDRAW LIMIT (PER PROJECT)
+========================================= */
+
+const DAILY_LIMIT = {
+  Raheem: 50,
+  Hauwal: 100,
+  Barsh: 300,
+  Khairat: 150,
+  Urban: 500,
+  Labbaika: 80,
+  default: 50
+};
+
+/* =========================================
    EXTERNAL DATA (staking.js)
 ========================================= */
 
@@ -84,6 +98,13 @@ function requestWithdraw(amount, walletAddress){
 
   const now = Date.now();
 
+const todayTotal = getTodayWithdrawTotal();
+const limit = DAILY_LIMIT.default;
+
+if(todayTotal + amount > limit){
+  return { error: "Daily withdraw limit reached" };
+}
+   
   const tx = {
     id: "WD-" + now,
     type: "withdraw",
@@ -120,4 +141,13 @@ function getWithdrawHistory(){
 
 function clearWalletLedger(){
   localStorage.removeItem(WITHDRAW_KEY);
+}
+
+function getTodayWithdrawTotal(){
+
+  const today = new Date().toDateString();
+
+  return getWithdrawals()
+    .filter(tx => new Date(tx.createdAt).toDateString() === today)
+    .reduce((sum,tx)=> sum + Number(tx.amount),0);
 }
