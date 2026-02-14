@@ -97,7 +97,9 @@ input,select{
 
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
-    <button class="btn secondary" onclick="history.back()">Back</button>
+    <button class="btn" onclick="goToWithdraw()">
+  💸 Withdraw
+    </button>
   </div>
 
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
@@ -226,5 +228,33 @@ function load(){
 load();
 </script>
 
+<script src="staking.js"></script>
+<script src="wallet-core.js"></script>
+
+<script>
+function goToWithdraw(){
+
+  if(typeof getTotals !== "function"){
+    alert("Wallet system not ready");
+    return;
+  }
+
+  const totals = getTotals();
+  const withdrawn = typeof getTotalWithdrawn === "function"
+    ? getTotalWithdrawn()
+    : 0;
+
+  const available = totals.totalReward - withdrawn;
+
+  if(available <= 0){
+    alert("No available rewards to withdraw.");
+    return;
+  }
+
+  // direct user to wallet
+  window.location.href = "wallet.html";
+}
+</script>
+  
 </body>
         </html>
