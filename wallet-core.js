@@ -1,10 +1,15 @@
 /* =========================================
-   ALBUKHR WALLET CORE v5 (ECOSYSTEM SAFE)
+   ALBUKHR WALLET CORE v6 (DAILY CONTROL)
    Source of Truth = staking.js
    Wallet = Withdraw Layer Only
 ========================================= */
 
-const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v5";
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v6";
+
+/* ===== DAILY RULES ===== */
+const DAILY_LIMIT_COUNT  = 1;        // 1 withdraw per 24h
+const DAILY_LIMIT_AMOUNT = 50;       // max 50 Pi per 24h
+const DAILY_WINDOW_MS    = 24 * 60 * 60 * 1000;
 
 /* =========================================
    SAFE STORAGE
@@ -58,18 +63,15 @@ function getTotalWithdrawn(){
     .reduce((sum,t)=> sum + (Number(t.amount) || 0), 0);
 }
 
-/* NET REWARD (after withdraw) */
 function getNetRewards(){
   const net = getGrossRewards() - getTotalWithdrawn();
   return net < 0 ? 0 : net;
 }
 
-/* AVAILABLE BALANCE */
 function getAvailableBalance(){
   return getNetRewards();
 }
 
-/* MASTER SUMMARY (Wallet Compatible Old + New UI) */
 function getWalletSummary(){
 
   const totalStake   = getTotalStake();
@@ -78,35 +80,67 @@ function getWalletSummary(){
   const netRewards   = getNetRewards();
 
   return {
-
-    /* NEW STRUCTURE */
     locked: totalStake,
     grossRewards: grossRewards,
     withdrawn: withdrawn,
     rewards: netRewards,
     available: netRewards,
 
-    /* BACKWARD COMPATIBILITY */
+    /* backward compatibility */
     totalStake: totalStake,
     totalReward: netRewards
   };
 }
 
 /* =========================================
-   WITHDRAW RULE ENGINE
+   DAILY LIMIT ENGINE
+========================================= */
+
+function _getWithdrawsLast24h(){
+
+  const now = Date.now();
+
+  return getWithdrawals().filter(tx=>{
+    const time = tx.timestamp || tx.createdAt || 0;
+    return (now - time) <= DAILY_WINDOW_MS;
+  });
+}
+
+function _dailyCountExceeded(){
+  return _getWithdrawsLast24h().length >= DAILY_LIMIT_COUNT;
+}
+
+function _dailyAmountExceeded(amount){
+
+  const totalToday = _getWithdrawsLast24h()
+    .reduce((sum,tx)=> sum + (Number(tx.amount)||0),0);
+
+  return (totalToday + amount) > DAILY_LIMIT_AMOUNT;
+}
+
+/* =========================================
+   WITHDRAW REQUEST
 ========================================= */
 
 function requestWithdraw(amount,walletAddress){
 
   amount = parseFloat(amount);
 
-  /* BLOCK ZERO / INVALID */
+  /* BASIC VALIDATION */
   if(isNaN(amount) || amount <= 0){
     return { error:"Invalid withdraw amount" };
   }
 
   if(!walletAddress || walletAddress.trim()===""){
     return { error:"Wallet address required" };
+  }
+
+  if(_dailyCountExceeded()){
+    return { error:"Daily withdraw limit reached (1 per 24h)" };
+  }
+
+  if(_dailyAmountExceeded(amount)){
+    return { error:`Daily max withdraw is ${DAILY_LIMIT_AMOUNT} Pi` };
   }
 
   const available = getAvailableBalance();
