@@ -7,7 +7,7 @@
 const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v6";
 
 /* ===== DAILY RULES ===== */
-const DAILY_LIMIT_COUNT  = 1;        // 1 withdraw per 24h
+const DAILY_LIMIT_COUNT  = 10;        // 10 withdraw per 24h
 const DAILY_LIMIT_AMOUNT = 50;       // max 50 Pi per 24h
 const DAILY_WINDOW_MS    = 24 * 60 * 60 * 1000;
 
