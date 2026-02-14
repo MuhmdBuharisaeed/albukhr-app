@@ -1,28 +1,16 @@
 /* =========================================
-   ALBUKHR WALLET CORE v4.1 (STABLE)
+   ALBUKHR WALLET CORE v5
+   Project-Aware + Daily Limit + Audit Safe
    Source of Truth = staking.js
-   Wallet = Withdraw Layer Only
 ========================================= */
 
-const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v4";
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v5";
 
 /* =========================================
-   STORAGE
+   PER-PROJECT DAILY LIMIT POLICY
 ========================================= */
 
-function getWithdrawals(){
-  return JSON.parse(localStorage.getItem(WITHDRAW_KEY)) || [];
-}
-
-function saveWithdrawals(list){
-  localStorage.setItem(WITHDRAW_KEY, JSON.stringify(list));
-}
-
-/* =========================================
-   DAILY WITHDRAW LIMIT (PER PROJECT)
-========================================= */
-
-const DAILY_LIMIT = {
+const PROJECT_DAILY_LIMIT = {
   Raheem: 50,
   Hauwal: 100,
   Barsh: 300,
@@ -31,6 +19,22 @@ const DAILY_LIMIT = {
   Labbaika: 80,
   default: 50
 };
+
+/* =========================================
+   STORAGE
+========================================= */
+
+function getWithdrawals(){
+  try{
+    return JSON.parse(localStorage.getItem(WITHDRAW_KEY)) || [];
+  }catch{
+    return [];
+  }
+}
+
+function saveWithdrawals(list){
+  localStorage.setItem(WITHDRAW_KEY, JSON.stringify(list));
+}
 
 /* =========================================
    EXTERNAL DATA (staking.js)
@@ -43,8 +47,18 @@ function getExternalTotals(){
   return { totalStake:0, totalReward:0 };
 }
 
+function getAllStakesSafe(){
+  if(typeof getAllStakesMerged === "function"){
+    return getAllStakesMerged();
+  }
+  if(typeof getStakes === "function"){
+    return getStakes();
+  }
+  return [];
+}
+
 /* =========================================
-   CALCULATIONS
+   CORE CALCULATIONS
 ========================================= */
 
 function getTotalStake(){
@@ -57,10 +71,10 @@ function getGrossRewards(){
 
 function getTotalWithdrawn(){
   return getWithdrawals()
-    .reduce((sum,t)=> sum + (Number(t.amount) || 0), 0);
+    .reduce((sum,t)=> sum + Number(t.amount || 0),0);
 }
 
-/* NET REWARD (after withdraw) */
+/* NET REWARD */
 function getNetRewards(){
   return getGrossRewards() - getTotalWithdrawn();
 }
@@ -69,49 +83,152 @@ function getAvailableBalance(){
   return getNetRewards();
 }
 
+/* =========================================
+   PROJECT REWARD POOL (FIFO ENGINE)
+========================================= */
+
+function buildProjectRewardPool(){
+
+  const stakes = getAllStakesSafe();
+  const withdrawals = getWithdrawals();
+
+  const pool = {};
+
+  /* 1️⃣ Collect rewards per project */
+  stakes.forEach(s=>{
+    if(!pool[s.project]){
+      pool[s.project] = {
+        reward:0,
+        withdrawn:0
+      };
+    }
+    pool[s.project].reward += Number(s.reward) || 0;
+  });
+
+  /* 2️⃣ Apply previous withdrawals FIFO */
+  withdrawals.forEach(w=>{
+    if(!w.breakdown) return;
+
+    w.breakdown.forEach(b=>{
+      if(pool[b.project]){
+        pool[b.project].withdrawn += Number(b.amount) || 0;
+      }
+    });
+  });
+
+  return pool;
+}
+
+/* =========================================
+   DAILY WITHDRAW TRACKER
+========================================= */
+
+function getTodayWithdrawByProject(project){
+
+  const today = new Date().toDateString();
+
+  return getWithdrawals()
+    .filter(tx =>
+      new Date(tx.createdAt).toDateString() === today
+    )
+    .reduce((sum,tx)=>{
+      const part = (tx.breakdown || [])
+        .filter(b=>b.project===project)
+        .reduce((s,b)=>s+Number(b.amount||0),0);
+      return sum + part;
+    },0);
+}
+
+/* =========================================
+   WALLET SUMMARY
+========================================= */
+
 function getWalletSummary(){
   return {
-    locked: getTotalStake(),
-    grossRewards: getGrossRewards(),
+    totalStake: getTotalStake(),
+    totalReward: getNetRewards(),  // NET mode
     withdrawn: getTotalWithdrawn(),
-    rewards: getNetRewards(),
     available: getAvailableBalance()
   };
 }
 
 /* =========================================
-   WITHDRAW REQUEST
+   WITHDRAW REQUEST (PROJECT-AWARE)
 ========================================= */
 
 function requestWithdraw(amount, walletAddress){
 
-  amount = parseFloat(amount);
+  amount = Number(amount);
 
-  if(amount <= 0)
-    return { error:"Invalid amount" };
+  /* ===== BASIC VALIDATION ===== */
 
-  if(!walletAddress)
+  if(!amount || isNaN(amount) || amount <= 0){
+    return { error:"Enter valid amount greater than 0" };
+  }
+
+  if(!walletAddress){
     return { error:"Wallet address required" };
+  }
 
-  if(amount > getAvailableBalance())
+  if(amount > getAvailableBalance()){
     return { error:"Insufficient reward balance" };
+  }
 
-  const now = Date.now();
+  /* ===== BUILD POOL ===== */
 
-const todayTotal = getTodayWithdrawTotal();
-const limit = DAILY_LIMIT.default;
+  const pool = buildProjectRewardPool();
+  const breakdown = [];
 
-if(todayTotal + amount > limit){
-  return { error: "Daily withdraw limit reached" };
-}
-   
+  let remaining = amount;
+
+  /* FIFO DISTRIBUTION */
+  for(const project in pool){
+
+    if(remaining <= 0) break;
+
+    const available =
+      pool[project].reward - pool[project].withdrawn;
+
+    if(available <= 0) continue;
+
+    const dailyLimit =
+      PROJECT_DAILY_LIMIT[project] ||
+      PROJECT_DAILY_LIMIT.default;
+
+    const todayUsed =
+      getTodayWithdrawByProject(project);
+
+    if(todayUsed >= dailyLimit){
+      return { error:`Daily limit reached for ${project}` };
+    }
+
+    const usable = Math.min(available, remaining);
+
+    if(todayUsed + usable > dailyLimit){
+      return { error:`${project} daily limit exceeded` };
+    }
+
+    breakdown.push({
+      project,
+      amount: usable
+    });
+
+    remaining -= usable;
+  }
+
+  if(remaining > 0){
+    return { error:"Withdraw exceeds allowed project limits" };
+  }
+
+  /* ===== SAVE TX ===== */
+
   const tx = {
-    id: "WD-" + now,
+    id: "WD-" + Date.now(),
     type: "withdraw",
     amount,
     walletAddress,
-    timestamp: now,     // ← STANDARDIZED FIELD
-    createdAt: now      // ← backward compatibility
+    breakdown,           // 🔑 project-aware tracking
+    createdAt: Date.now()
   };
 
   const list = getWithdrawals();
@@ -122,32 +239,18 @@ if(todayTotal + amount > limit){
 }
 
 /* =========================================
-   HISTORY (Withdraw Only)
+   HISTORY
 ========================================= */
 
 function getWithdrawHistory(){
-
   return getWithdrawals()
-    .map(tx => ({
-      ...tx,
-      timestamp: tx.timestamp || tx.createdAt || Date.now()
-    }))
-    .sort((a,b)=> b.timestamp - a.timestamp);
+    .sort((a,b)=>b.createdAt - a.createdAt);
 }
 
 /* =========================================
-   DEV
+   DEV TOOL
 ========================================= */
 
 function clearWalletLedger(){
   localStorage.removeItem(WITHDRAW_KEY);
-}
-
-function getTodayWithdrawTotal(){
-
-  const today = new Date().toDateString();
-
-  return getWithdrawals()
-    .filter(tx => new Date(tx.createdAt).toDateString() === today)
-    .reduce((sum,tx)=> sum + Number(tx.amount),0);
 }
