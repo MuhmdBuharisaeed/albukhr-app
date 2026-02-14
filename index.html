@@ -165,21 +165,22 @@ const stakeTx = (typeof getStakes === "function" ? getStakes() : [])
   /* ===== WITHDRAW TX ===== */
 let withdrawTx = [];
 
-if (typeof getWithdrawals === "function") {
+if (typeof getWithdrawHistory === "function") {
 
-  const raw = getWithdrawals() || [];
+  const raw = getWithdrawHistory() || [];
 
   withdrawTx = raw.map(w => ({
     type: "withdraw",
     amount: Number(w.amount) || 0,
     walletAddress: w.walletAddress || "External Wallet",
-    timestamp: w.timestamp || Date.now()
+
+    // IMPORTANT FIX
+    timestamp: w.createdAt || w.timestamp || Date.now()
   }));
-  }
+}
 
   const merged = [...stakeTx, ...withdrawTx]
-    .sort((a,b)=>b.timestamp - a.timestamp)
-    .slice(0,2);
+    .sort((a,b)=> (b.timestamp || 0) - (a.timestamp || 0))
 
   if(merged.length === 0){
     box.innerHTML =
