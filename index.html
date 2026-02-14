@@ -292,6 +292,28 @@ setTimeout(() => {
 
 })();
  </script>
+
+<script>
+function loadHomeTotals(){
+
+  if(typeof getTotals !== "function") return;
+
+  const totals = getTotals();
+
+  const stakeEl  = document.getElementById("totalStake");
+  const rewardEl = document.getElementById("totalReward");
+
+  if(stakeEl){
+    stakeEl.textContent = totals.totalStake.toFixed(2) + " Pi";
+  }
+
+  if(rewardEl){
+    rewardEl.textContent = totals.totalReward.toFixed(2) + " Pi";
+  }
+}
+
+loadHomeTotals();
+</script>  
   
 </body>
 </html>
