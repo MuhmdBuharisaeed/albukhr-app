@@ -7,42 +7,35 @@
 
 <style>
 body{
-  background:#f4f7f6;
-  font-family:system-ui;
   margin:0;
-  height:100vh;
+  font-family:system-ui;
+  background:#f4f7f6;
   display:flex;
   flex-direction:column;
+  height:100vh;
+  overflow:hidden;
 }
 
-/* FIXED HEADER */
 .header{
   background:#0f7a3d;
   color:#fff;
   padding:16px;
   font-weight:700;
   text-align:center;
-  position:sticky;
-  top:0;
-  z-index:10;
+  flex-shrink:0;
 }
 
-/* MAIN CONTAINER */
-.section{
+.top-section{
   padding:16px;
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
+  background:#f4f7f6;
+  flex-shrink:0;
 }
 
-/* SUMMARY CARD (FIXED AREA) */
-.summary-card{
+.card{
   background:#fff;
   border-radius:16px;
   padding:16px;
   margin-bottom:14px;
-  flex-shrink:0;
 }
 
 .balance{
@@ -64,14 +57,7 @@ body{
   font-size:13px;
 }
 
-.btn-group{
-  display:flex;
-  gap:10px;
-  margin-top:14px;
-}
-
 .btn{
-  flex:1;
   padding:12px;
   border:none;
   border-radius:12px;
@@ -79,33 +65,19 @@ body{
   color:#fff;
   font-weight:700;
   cursor:pointer;
+  width:100%;
+  margin-top:14px;
 }
 
-.btn.secondary{
-  background:#eaf6ee;
-  color:#0f7a3d;
-}
-
-/* SCROLLABLE HISTORY ONLY */
-.history-card{
-  background:#fff;
-  border-radius:16px;
-  padding:16px;
+.history-section{
   flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-
-.history-scroll{
   overflow-y:auto;
-  margin-top:10px;
-  padding-right:4px;
+  padding:16px;
 }
 
 .tx{
   border-bottom:1px solid #eee;
-  padding:8px 0;
+  padding:10px 0;
   font-size:13px;
 }
 
@@ -114,7 +86,6 @@ body{
   font-size:11px;
 }
 
-/* MODAL */
 .modal-overlay{
   position:fixed;
   inset:0;
@@ -140,6 +111,12 @@ body{
   margin-bottom:10px;
 }
 
+.preview{
+  font-size:13px;
+  margin-bottom:10px;
+  color:#555;
+}
+
 .modal-actions{
   display:flex;
   gap:10px;
@@ -156,58 +133,46 @@ body{
 
 <div class="header">💰 ALBUKHR WALLET</div>
 
-<section class="section">
+<div class="top-section">
+  <div class="card">
+    <div class="balance" id="available">0 PI</div>
+    <div class="sub">Available Reward Balance</div>
 
-<!-- FIXED SUMMARY -->
-<div class="summary-card">
+    <div class="row"><div>Total Staked</div><div id="totalStake">0 PI</div></div>
+    <div class="row"><div>Total Rewards</div><div id="totalReward">0 PI</div></div>
+    <div class="row"><div>Total Withdrawn</div><div id="withdrawn">0 PI</div></div>
 
-  <div class="balance" id="available">0 PI</div>
-  <div class="sub">Available Reward Balance</div>
-
-  <div class="row">
-    <div>Total Staked</div>
-    <div id="totalStake">0 PI</div>
-  </div>
-
-  <div class="row">
-    <div>Total Rewards</div>
-    <div id="totalReward">0 PI</div>
-  </div>
-
-  <div class="row">
-    <div>Total Withdrawn</div>
-    <div id="withdrawn">0 PI</div>
-  </div>
-
-  <div class="btn-group">
-    <button class="btn secondary" onclick="openWithdraw()">Withdraw</button>
-  </div>
-
-</div>
-
-<!-- SCROLLABLE HISTORY -->
-<div class="history-card">
-  <h4>Transaction History</h4>
-  <div class="history-scroll" id="txList"></div>
-</div>
-
-</section>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="withdrawModal">
-  <div class="modal">
-    <h3>Withdraw PI</h3>
-    <input type="number" id="withdrawAmount" placeholder="Amount">
-    <input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
-    <div class="modal-actions">
-      <button class="btn" onclick="confirmWithdraw()">Confirm</button>
-      <button class="btn close-btn" onclick="closeModals()">Cancel</button>
+    <div class="sub" style="margin-top:8px;color:#999">
+      Daily Limit: 50 Pi • Withdraw Fee: 1%
     </div>
+
+    <button class="btn" onclick="openWithdraw()">Withdraw</button>
   </div>
+</div>
+
+<div class="history-section">
+  <div class="card">
+    <h4>Transaction History</h4>
+    <div id="txList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="withdrawModal">
+<div class="modal">
+<h3>Withdraw PI</h3>
+<input type="number" id="withdrawAmount" placeholder="Amount" oninput="previewWithdraw()">
+<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
+
+<div class="preview" id="previewBox"></div>
+
+<div class="modal-actions">
+<button class="btn" onclick="confirmWithdraw()">Confirm</button>
+<button class="btn close-btn" onclick="closeModals()">Cancel</button>
+</div>
+</div>
 </div>
 
 <script src="staking.js"></script>
-<script src="staking-external.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
@@ -216,17 +181,10 @@ function renderWallet(){
 
   const summary = getWalletSummary();
 
-  totalStake.innerText =
-    Number(summary.locked || 0).toFixed(2) + " PI";
-
-  totalReward.innerText =
-  Number(summary.rewards || 0).toFixed(2) + " PI";
-
-  withdrawn.innerText =
-    Number(summary.withdrawn || 0).toFixed(2) + " PI";
-
-  available.innerText =
-    Number(summary.available || 0).toFixed(2) + " PI";
+  totalStake.innerText = Number(summary.totalStake || 0).toFixed(2) + " PI";
+  totalReward.innerText = Number(summary.grossRewards || 0).toFixed(2) + " PI";
+  withdrawn.innerText = Number(summary.withdrawn || 0).toFixed(2) + " PI";
+  available.innerText = Number(summary.available || 0).toFixed(2) + " PI";
 
   renderHistory();
 }
@@ -243,19 +201,39 @@ function renderHistory(){
 
   list.forEach(tx=>{
 
-    const div = document.createElement("div");
+    const div=document.createElement("div");
     div.className="tx";
 
-    div.innerHTML = `
-      <div><strong>Reward Withdraw</strong></div>
-      <div>- ${Number(tx.amount).toFixed(2)} PI</div>
-      <small>${new Date(tx.createdAt).toLocaleString()}</small>
-      <br>
+    div.innerHTML=`
+      <div><strong>- ${Number(tx.amount).toFixed(2)} PI</strong></div>
+      <small>
+        Fee: ${Number(tx.fee||0).toFixed(2)} PI |
+        Received: ${Number(tx.net||0).toFixed(2)} PI
+      </small><br>
+      <small>${new Date(tx.timestamp).toLocaleString()}</small><br>
       <small>Wallet: ${tx.walletAddress}</small>
     `;
 
     txList.appendChild(div);
   });
+}
+
+function previewWithdraw(){
+
+  const amt = parseFloat(withdrawAmount.value);
+
+  if(!amt || amt<=0){
+    previewBox.innerHTML="";
+    return;
+  }
+
+  const fee = amt * 0.01;
+  const net = amt - fee;
+
+  previewBox.innerHTML = `
+    Fee (1%): ${fee.toFixed(2)} PI <br>
+    You will receive: ${net.toFixed(2)} PI
+  `;
 }
 
 function openWithdraw(){
@@ -280,6 +258,7 @@ function confirmWithdraw(){
 
   withdrawAmount.value="";
   withdrawAddress.value="";
+  previewBox.innerHTML="";
 
   closeModals();
   renderWallet();
@@ -290,4 +269,4 @@ renderWallet();
 </script>
 
 </body>
-</html>
+  </html>
