@@ -5,241 +5,183 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Raheem Pharmacy</title>
 
-<link rel="stylesheet" href="style.css">
-
 <style>
-body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-.section{padding:16px}
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
-.stat-card span{display:block;color:#666;font-size:14px}
-.stat-card strong{font-size:18px;margin-top:6px;display:block}
-.btns{display:flex;gap:12px;margin-top:12px}
-.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-.short-info{background:#fff;border-radius:14px;padding:14px;margin-top:14px;font-size:14px;color:#444;line-height:1.6}
-.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
-.project-icon{font-size:18px}
-.project-body{flex:1}
-.project-title{font-size:14px;font-weight:600}
-.project-date{font-size:11px;color:#777}
-.project-right{text-align:right}
-.project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
-.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
-label{margin-top:12px;display:block}
-input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
-.success{text-align:center}
-.success h3{color:#0f7a3d;margin-bottom:8px}
+body{
+  background:#f5f7f6;
+  font-family:system-ui;
+  margin:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* FIXED HEADER */
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:16px;
+  font-weight:700;
+  text-align:center;
+  flex-shrink:0;
+}
+
+/* FIXED SUMMARY */
+.project-summary{
+  padding:16px;
+  background:#f5f7f6;
+  flex-shrink:0;
+}
+
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+}
+
+.stat{
+  display:flex;
+  justify-content:space-between;
+  margin-top:8px;
+  font-size:14px;
+}
+
+.stat strong{
+  color:#0f7a3d;
+}
+
+.btn-group{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+.btn{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary{
+  background:#0f7a3d;
+  color:#fff;
+}
+
+.secondary{
+  background:#eaf6ee;
+  color:#0f7a3d;
+}
+
+/* SCROLL AREA */
+.history-container{
+  flex:1;
+  overflow-y:auto;
+  padding:0 16px 16px 16px;
+}
+
+.tx{
+  border-bottom:1px solid #eee;
+  padding:10px 0;
+  font-size:13px;
+}
+
+.tx small{
+  color:#777;
+  font-size:11px;
+}
 </style>
 </head>
 
 <body>
 
-<header class="header">
-  <div class="header-left">
-    <span>💊 Raheem Pharmacy</span>
-  </div>
-  <div class="header-right" onclick="openInfo()">ℹ️</div>
-</header>
+<div class="header">💊 Raheem Pharmacy</div>
 
-<section class="section">
+<div class="project-summary">
+  <div class="card">
 
-  <div class="stats">
-    <div class="stat-card">
-      <span>Your Stake</span>
+    <div class="stat">
+      <div>Your Stake</div>
       <strong id="rStake">0.00 Pi</strong>
     </div>
-    <div class="stat-card">
-      <span>Your Reward</span>
+
+    <div class="stat">
+      <div>Your Reward</div>
       <strong id="rReward">0.00 Pi</strong>
     </div>
-  </div>
 
-  <div class="short-info">
-    <strong>Raheem Pharmacy</strong> is an ALBUKHR healthcare project focused on
-    improving access to essential medicines through transparent,
-    community-driven staking.
-  </div>
-
-  <div class="btns">
-    <button class="btn primary" onclick="openModal()">Stake</button>
-    <button onclick="goToWithdraw()" class="btn secondary">
-  💸 Withdraw Rewards
-    </button>
-  </div>
-
-  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
-  <div id="raheemHistory"></div>
-
-</section>
-
-<!-- STAKE MODAL -->
-<div class="modal" id="stakeModal">
-  <div class="modal-box">
-    <h3>Stake in Raheem</h3>
-
-    <label>Amount (Pi)</label>
-    <input type="number" id="amountInput" placeholder="Enter amount">
-
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
-    </small>
-
-    <label>Duration</label>
-    <select id="durationSelect">
-      <option value="30">30 Days</option>
-      <option value="60">60 Days</option>
-      <option value="90">90 Days</option>
-    </select>
-
-    <div class="btns" style="margin-top:16px">
-      <button class="btn primary" onclick="confirmStake()">Confirm</button>
-      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+    <div class="btn-group">
+      <button class="btn primary" onclick="openStake()">Stake</button>
+      <button class="btn secondary" onclick="goToWithdraw()">Withdraw</button>
     </div>
+
   </div>
 </div>
 
-<!-- SUCCESS -->
-<div class="modal" id="successModal">
-  <div class="modal-box success">
-    <h3>Stake Successful</h3>
-    <p id="successText"></p>
-    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
+<div class="history-container">
+  <div class="card">
+    <h4>Transaction History</h4>
+    <div id="raheemHistory"></div>
   </div>
 </div>
 
-<!-- INFO -->
-<div class="modal" id="infoModal">
-  <div class="modal-box">
-    <h3>About Raheem Pharmacy</h3>
-    <p style="font-size:14px;color:#444;line-height:1.6">
-      Raheem Pharmacy strengthens pharmaceutical supply chains
-      and community healthcare access through sustainable investment.
-    </p>
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
-  </div>
-</div>
-
-<!-- INTERNAL STAKING ENGINE (STABLE) -->
 <script src="staking.js"></script>
+<script src="wallet-core.js"></script>
 
 <script>
-const stakeModal   = document.getElementById("stakeModal");
-const successModal = document.getElementById("successModal");
-const infoModal    = document.getElementById("infoModal");
 
-function openModal(){
-  stakeModal.style.display = "flex";
-  minHint.innerText = "Minimum stake: " + getMinStake("Raheem") + " Pi";
-}
-
-function closeModal(){ stakeModal.style.display = "none"; }
-function closeSuccess(){ successModal.style.display = "none"; }
-function openInfo(){ infoModal.style.display = "flex"; }
-function closeInfo(){ infoModal.style.display = "none"; }
-
-/* ✅ FIXED — MATCHES OLD STAKING.JS EXACTLY */
-function confirmStake(){
-
-  const amount   = Number(amountInput.value);
-  const duration = Number(durationSelect.value);
-  const min      = getMinStake("Raheem");
-
-  if(isNaN(amount) || amount < min){
-    alert("Minimum stake is " + min + " Pi");
-    return;
-  }
-
-  const ok = addStake({
-    project: "Raheem",
-    amount: amount,
-    duration: duration,
-    status: "Successful",
-    timestamp: Date.now()
-  });
-
-  if(!ok){
-    alert("Stake failed. Please try again.");
-    return;
-  }
-
-  const reward = amount * getRate("Raheem", duration);
-
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days and earned ${reward.toFixed(2)} Pi`;
-
-  amountInput.value = "";
-  closeModal();
-  successModal.style.display = "flex";
-  loadRaheem();
-          }
-
-/* DASHBOARD */
-function loadRaheem(){
+function loadProject(){
 
   const data = getProjectTotals("Raheem");
 
-  rStake.innerText  = data.stake.toFixed(2) + " Pi";
-  rReward.innerText = data.reward.toFixed(2) + " Pi";
+  rStake.innerText =
+    data.stake.toFixed(2) + " Pi";
 
-  raheemHistory.innerHTML = "";
+  rReward.innerText =
+    data.reward.toFixed(2) + " Pi";
 
-  if(data.stakes.length === 0){
+  raheemHistory.innerHTML="";
+
+  if(!data.stakes.length){
     raheemHistory.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+      "<small>No transactions yet</small>";
     return;
   }
 
   data.stakes.slice().reverse().forEach(s=>{
+
     const t = formatDateTime(s);
-    raheemHistory.innerHTML += `
-      <div class="project-tx">
-        <div class="project-icon">💊</div>
-        <div class="project-body">
-          <div class="project-title">Raheem Stake</div>
-          <div class="project-date">${t.date} • ${t.time}</div>
-        </div>
-        <div class="project-right">
-          <div class="project-amount">${s.amount} Pi</div>
-          <div class="project-status">Successful</div>
-        </div>
-      </div>
+
+    const div = document.createElement("div");
+    div.className="tx";
+
+    div.innerHTML = `
+      <div><strong>Stake:</strong> ${s.amount.toFixed(2)} Pi</div>
+      <small>${t.date} • ${t.time}</small>
     `;
+
+    raheemHistory.appendChild(div);
   });
 }
 
-loadRaheem();
-</script>
-
-<script src="wallet-core.js"></script>
-
-<script>
+/* Redirect to wallet withdraw */
 function goToWithdraw(){
 
-  if(typeof getTotals !== "function"){
-    alert("Wallet system not ready");
-    return;
-  }
+  const summary = getWalletSummary();
 
-  const totals = getTotals();
-  const withdrawn = typeof getTotalWithdrawn === "function"
-    ? getTotalWithdrawn()
-    : 0;
-
-  const available = totals.totalReward - withdrawn;
-
-  if(available <= 0){
+  if(summary.available <= 0){
     alert("No available rewards to withdraw.");
     return;
   }
 
-  // direct user to wallet
   window.location.href = "wallet.html";
 }
+
+loadProject();
+
 </script>
-  
+
 </body>
-                                  </html>
+</html>
