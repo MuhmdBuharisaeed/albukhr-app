@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +15,7 @@ body{
   height:100vh;
 }
 
+/* ===== FIXED HEADER ===== */
 .header{
   background:#0f7a3d;
   color:#fff;
@@ -24,6 +25,7 @@ body{
   flex-shrink:0;
 }
 
+/* ===== FIXED SUMMARY ===== */
 .summary{
   background:#fff;
   padding:16px;
@@ -32,298 +34,347 @@ body{
 }
 
 .balance{
-  font-size:24px;
+  font-size:26px;
   font-weight:800;
   color:#0f7a3d;
 }
 
+.sub{font-size:12px;color:#666;margin-top:4px}
+
 .row{
   display:flex;
   justify-content:space-between;
-  font-size:13px;
   margin-top:6px;
+  font-size:13px;
 }
 
-.withdraw-btn{
-  margin-top:12px;
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:#0f7a3d;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.tabs{
-  display:flex;
-  background:#fff;
-  border-bottom:1px solid #eee;
-  flex-shrink:0;
-}
-
-.tab{
-  flex:1;
-  padding:12px;
-  text-align:center;
-  cursor:pointer;
-  font-weight:600;
-}
-
-.tab.active{
-  border-bottom:3px solid #0f7a3d;
-  color:#0f7a3d;
-}
-
+/* ===== SCROLL AREA ONLY ===== */
 .scroll-area{
   flex:1;
   overflow-y:auto;
   padding:16px;
 }
 
-/* Recent style */
-.tx-card{
+/* PROJECT CARD */
+.project-card{
   background:#fff;
-  padding:12px;
   border-radius:14px;
-  margin-bottom:10px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.project-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+}
+
+.project-title{
+  font-weight:700;
+}
+
+.project-body{
+  margin-top:10px;
+  display:none;
+}
+
+.btn{
+  padding:8px 12px;
+  border:none;
+  border-radius:10px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  font-size:12px;
+}
+
+/* ===== RECENT STYLE TX ===== */
+.tx{
   display:flex;
   align-items:center;
-  gap:10px;
+  justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+  font-size:13px;
+}
+
+.tx-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
 
 .tx-icon{
-  font-size:20px;
-}
-
-.tx-body{
-  flex:1;
-}
-
-.tx-title{
-  font-size:14px;
-  font-weight:600;
-}
-
-.tx-date{
-  font-size:11px;
-  color:#777;
+  font-size:16px;
 }
 
 .tx-right{
   text-align:right;
 }
 
-.tx-amount{
-  font-size:14px;
-  font-weight:700;
+.tx small{
+  display:block;
+  color:#777;
+  font-size:11px;
 }
 
-.tx-green{color:#0f7a3d;}
-.tx-red{color:#c0392b;}
+/* MODAL */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal{
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  width:90%;
+  max-width:400px;
+}
+
+.modal input{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">ALBUKHR WALLET</div>
+<div class="header">💰 ALBUKHR WALLET</div>
 
 <div class="summary">
   <div class="balance" id="available">0.00 Pi</div>
+  <div class="sub">Available Reward Balance</div>
 
   <div class="row">
     <div>Total Staked</div>
-    <div id="totalStake">0.00</div>
+    <div id="totalStake">0.00 Pi</div>
   </div>
 
   <div class="row">
-    <div>Total Rewards</div>
-    <div id="totalReward">0.00</div>
+    <div>Total Rewards (Gross)</div>
+    <div id="totalReward">0.00 Pi</div>
   </div>
 
   <div class="row">
     <div>Total Withdrawn</div>
-    <div id="withdrawn">0.00</div>
+    <div id="withdrawn">0.00 Pi</div>
   </div>
-
-  <button class="withdraw-btn" onclick="goWithdraw()">
-    Withdraw Rewards
-  </button>
 </div>
 
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('overview',this)">Overview</div>
-  <div class="tab" onclick="switchTab('tx',this)">Transactions</div>
+<div class="scroll-area" id="projectContainer"></div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal-overlay" id="withdrawModal">
+<div class="modal">
+<h3 id="modalProject">Withdraw</h3>
+
+<input type="number" id="withdrawAmount" placeholder="Amount">
+<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
+
+<div class="modal-actions">
+<button class="btn" onclick="confirmWithdraw()">Confirm</button>
+<button class="btn" style="background:#ccc;color:#333"
+onclick="closeModal()">Cancel</button>
 </div>
 
-<div class="scroll-area" id="contentArea"></div>
+<p style="font-size:11px;margin-top:10px;color:#777">
+Fee: 1% • Daily Limit: 50 Pi
+</p>
+
+</div>
+</div>
 
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
 
-let currentTab = "overview";
+let activeProject = null;
 
-/* ICON MAP (Expandable for future projects) */
+/* ===== ICON MAPPER ===== */
 function getProjectIcon(name){
-  const icons = {
-    "Raheem":"💊",
-    "KUK":"🏗️",
-    "Default":"🏢"
-  };
-  return icons[name] || icons["Default"];
+  if(name.toLowerCase().includes("raheem")) return "💊";
+  if(name.toLowerCase().includes("farm")) return "🌾";
+  if(name.toLowerCase().includes("tech")) return "💻";
+  return "🏢";
 }
 
-function switchTab(tab,el){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  el.classList.add("active");
-  currentTab = tab;
-  renderContent();
+/* ===== LOAD WALLET ===== */
+function renderWallet(){
+
+  const summary = getWalletSummary();
+
+  totalStake.innerText =
+    summary.totalStake.toFixed(2) + " Pi";
+
+  totalReward.innerText =
+    summary.grossRewards.toFixed(2) + " Pi";
+
+  withdrawn.innerText =
+    summary.withdrawn.toFixed(2) + " Pi";
+
+  available.innerText =
+    summary.available.toFixed(2) + " Pi";
+
+  renderProjects();
 }
 
-function renderSummary(){
-  const s = getWalletSummary();
+/* ===== PROJECT CARDS ===== */
+function renderProjects(){
 
-  totalStake.innerText  = s.totalStake.toFixed(2)+" Pi";
-  totalReward.innerText = s.grossRewards.toFixed(2)+" Pi";
-  withdrawn.innerText   = s.withdrawn.toFixed(2)+" Pi";
-  available.innerText   = s.available.toFixed(2)+" Pi";
-}
+  const container = document.getElementById("projectContainer");
+  container.innerHTML="";
 
-/* WITHDRAW BUTTON */
-function goWithdraw(){
-  if(typeof openWithdrawModal === "function"){
-    openWithdrawModal();
-  }else{
-    alert("Withdraw system not ready");
-  }
-}
-
-/* OVERVIEW */
-function renderOverview(area){
   const projects = getProjectWalletBreakdown();
 
   if(!projects.length){
-    area.innerHTML="<small>No staking activity yet</small>";
+    container.innerHTML="<small>No staking activity yet</small>";
     return;
   }
 
   projects.forEach(p=>{
-    area.innerHTML += `
-      <div class="tx-card">
-        <div class="tx-icon">${getProjectIcon(p.project)}</div>
-        <div class="tx-body">
-          <div class="tx-title">${p.project}</div>
-          <div class="tx-date">
-            Stake: ${p.stake.toFixed(2)} Pi
+
+    const card = document.createElement("div");
+    card.className="project-card";
+
+    card.innerHTML = `
+      <div class="project-header" onclick="toggleBody(this)">
+        <div class="project-title">
+          ${getProjectIcon(p.project)} ${p.project}
+        </div>
+        <div>${p.netReward.toFixed(2)} Pi</div>
+      </div>
+
+      <div class="project-body">
+
+        <div class="row">
+          <div>Staked</div>
+          <div>${p.stake.toFixed(2)} Pi</div>
+        </div>
+
+        <div class="row">
+          <div>Gross Reward</div>
+          <div>${p.grossReward.toFixed(2)} Pi</div>
+        </div>
+
+        <div class="row">
+          <div>Withdrawn</div>
+          <div>${p.withdrawn.toFixed(2)} Pi</div>
+        </div>
+
+        <button class="btn"
+          style="margin-top:10px"
+          onclick="openWithdraw('${p.project}')">
+          Withdraw
+        </button>
+
+        <div id="history-${p.project}"></div>
+      </div>
+    `;
+
+    container.appendChild(card);
+    renderProjectHistory(p.project);
+  });
+}
+
+/* ===== EXPAND TOGGLE ===== */
+function toggleBody(el){
+  const body = el.nextElementSibling;
+  body.style.display =
+    body.style.display==="block" ? "none":"block";
+}
+
+/* ===== PROJECT HISTORY (NEWEST FIRST) ===== */
+function renderProjectHistory(project){
+
+  const div = document.getElementById("history-"+project);
+  if(!div) return;
+
+  const history = getWithdrawHistory()
+    .filter(tx=>tx.project===project)
+    .sort((a,b)=>b.timestamp-a.timestamp);
+
+  if(!history.length){
+    div.innerHTML="<small>No withdrawals yet</small>";
+    return;
+  }
+
+  div.innerHTML="";
+
+  history.forEach(tx=>{
+    div.innerHTML += `
+      <div class="tx">
+        <div class="tx-left">
+          <div class="tx-icon">${getProjectIcon(project)}</div>
+          <div>
+            Withdraw
+            <small>${new Date(tx.timestamp).toLocaleString()}</small>
           </div>
         </div>
         <div class="tx-right">
-          <div class="tx-amount tx-green">
-            ${p.netReward.toFixed(2)} Pi
-          </div>
-          <div class="tx-date">Available Reward</div>
+          -${tx.grossAmount.toFixed(2)} Pi
+          <small>
+            Fee: ${tx.fee.toFixed(2)} |
+            Received: ${tx.received.toFixed(2)}
+          </small>
         </div>
       </div>
     `;
   });
 }
 
-/* GLOBAL TRANSACTIONS */
-function renderTransactions(area){
+/* ===== WITHDRAW ===== */
+function openWithdraw(project){
+  activeProject = project;
+  modalProject.innerText = "Withdraw from " + project;
+  withdrawModal.style.display="flex";
+}
 
-  let stakeHistory = [];
-  if(typeof getStakeHistory === "function"){
-    stakeHistory = getStakeHistory();
-  }
+function closeModal(){
+  withdrawModal.style.display="none";
+}
 
-  const withdrawHistory = getWithdrawHistory();
+function confirmWithdraw(){
 
-  const merged = [
-    ...stakeHistory.map(s=>({
-      type:"stake",
-      project:s.project,
-      amount:s.amount,
-      timestamp:s.timestamp
-    })),
-    ...withdrawHistory.map(w=>({
-      type:"withdraw",
-      project:w.project,
-      gross:w.grossAmount,
-      fee:w.fee,
-      received:w.received,
-      timestamp:w.timestamp
-    }))
-  ];
+  const amt = withdrawAmount.value;
+  const addr = withdrawAddress.value;
 
-  merged.sort((a,b)=> b.timestamp - a.timestamp);
+  const res = requestWithdraw({
+    project:activeProject,
+    amount:amt,
+    walletAddress:addr
+  });
 
-  if(!merged.length){
-    area.innerHTML="<small>No transactions yet</small>";
+  if(res.error){
+    alert(res.error);
     return;
   }
 
-  merged.forEach(tx=>{
-
-    const icon = getProjectIcon(tx.project);
-    const date = new Date(tx.timestamp).toLocaleString();
-
-    if(tx.type==="stake"){
-      area.innerHTML += `
-        <div class="tx-card">
-          <div class="tx-icon">${icon}</div>
-          <div class="tx-body">
-            <div class="tx-title">${tx.project} Stake</div>
-            <div class="tx-date">${date}</div>
-          </div>
-          <div class="tx-right">
-            <div class="tx-amount tx-green">
-              +${tx.amount.toFixed(2)} Pi
-            </div>
-          </div>
-        </div>
-      `;
-    }else{
-      area.innerHTML += `
-        <div class="tx-card">
-          <div class="tx-icon">${icon}</div>
-          <div class="tx-body">
-            <div class="tx-title">${tx.project} Withdraw</div>
-            <div class="tx-date">
-              Fee: ${tx.fee.toFixed(2)} Pi<br>
-              Received: ${tx.received.toFixed(2)} Pi<br>
-              ${date}
-            </div>
-          </div>
-          <div class="tx-right">
-            <div class="tx-amount tx-red">
-              -${tx.gross.toFixed(2)} Pi
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-  });
+  withdrawAmount.value="";
+  withdrawAddress.value="";
+  closeModal();
+  renderWallet();
 }
 
-function renderContent(){
-  const area = document.getElementById("contentArea");
-  area.innerHTML="";
-
-  if(currentTab==="overview"){
-    renderOverview(area);
-  }else{
-    renderTransactions(area);
-  }
-}
-
-renderSummary();
-renderContent();
+renderWallet();
 
 </script>
 
 </body>
-</html>
+  </html>
