@@ -10,115 +10,57 @@
 <style>
 body{
   margin:0;
-  background:#f5f7f6;
   font-family:Arial;
-  padding-bottom:90px;
-}
-
-/* HEADER */
-.header{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  height:60px;
-  background:#0f7a3d;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 16px;
-  font-weight:bold;
-  z-index:1000;
-}
-
-/* FIXED TOP CONTENT */
-.fixed-top{
-  position:fixed;
-  top:60px;
-  left:0;
-  right:0;
   background:#f5f7f6;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* HEADER FIXED */
+.header{
+  flex-shrink:0;
+}
+
+/* TOP FIXED AREA */
+.fixed-top{
   padding:16px;
-  z-index:999;
+  flex-shrink:0;
+  background:#f5f7f6;
 }
 
 /* STATS */
-.stats{
-  display:flex;
-  gap:12px;
-  margin-bottom:14px;
-}
-
-.stat-card{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
-  padding:16px;
-  text-align:center;
-}
-
-.stat-card span{
-  display:block;
-  color:#666;
-  font-size:14px;
-}
-
-.stat-card strong{
-  font-size:18px;
-  margin-top:6px;
-  display:block;
-}
+.stats{display:flex;gap:12px;margin:16px 0}
+.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
+.stat-card span{display:block;color:#666;font-size:14px}
+.stat-card strong{font-size:18px;margin-top:6px;display:block}
 
 /* INFO */
 .short-info{
   background:#fff;
-  border-radius:12px;
-  padding:12px;
-  font-size:13px;
+  border-radius:14px;
+  padding:14px;
+  margin-top:14px;
+  font-size:14px;
   color:#444;
-  line-height:1.5;
-  margin-bottom:14px;
+  line-height:1.6
 }
 
 /* BUTTONS */
-.btns{
-  display:flex;
-  gap:12px;
-}
-
-.btn{
-  flex:1;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  font-weight:bold;
-  font-size:16px;
-}
-
-.primary{
-  background:#0f7a3d;
-  color:#fff;
-}
-
-.secondary{
-  background:#fff;
-  border:1px solid #0f7a3d;
-  color:#0f7a3d;
-}
+.btns{display:flex;gap:12px;margin-top:12px}
+.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
+.primary{background:#0f7a3d;color:#fff}
+.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
 /* SCROLL AREA */
 .scroll-area{
-  position:fixed;
-  top:340px;
-  bottom:0;
-  left:0;
-  right:0;
+  flex:1;
   overflow-y:auto;
   padding:16px;
 }
 
-/* TRANSACTION CARD */
+/* TRANSACTIONS */
 .project-tx{
   background:#fff;
   border-radius:12px;
@@ -126,48 +68,55 @@ body{
   margin-bottom:8px;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:10px
+}
+.project-icon{font-size:18px}
+.project-body{flex:1}
+.project-title{font-size:14px;font-weight:600}
+.project-date{font-size:11px;color:#777}
+.project-right{text-align:right}
+.project-amount{font-size:14px;font-weight:bold}
+.project-status{font-size:11px;color:#0f7a3d}
+
+/* MODALS */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000
+}
+.modal-box{
+  background:#fff;
+  width:90%;
+  max-width:420px;
+  padding:20px;
+  border-radius:16px
 }
 
-.project-icon{
-  font-size:18px;
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px
 }
-
-.project-body{
-  flex:1;
-}
-
-.project-title{
-  font-size:14px;
-  font-weight:600;
-}
-
-.project-date{
-  font-size:11px;
-  color:#777;
-}
-
-.project-right{
-  text-align:right;
-}
-
-.project-amount{
-  font-size:14px;
-  font-weight:bold;
-}
-
-.project-status{
-  font-size:11px;
-  color:#0f7a3d;
-}
+label{margin-top:12px;display:block}
+.success{text-align:center}
+.success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
 </head>
 
 <body>
 
 <header class="header">
-  <div>🌾 Barsh Agro</div>
-  <div style="cursor:pointer" onclick="openInfo()">ℹ️</div>
+  <div class="header-left">
+    <span>🌾 Barsh Agro</span>
+  </div>
+  <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
 <div class="fixed-top">
@@ -195,18 +144,58 @@ body{
     </button>
   </div>
 
+  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
+
 </div>
 
 <div class="scroll-area">
-  <h3 style="font-size:15px;margin-bottom:10px">Transaction History</h3>
   <div id="barshHistory"></div>
 </div>
 
-<!-- MODALS remain unchanged -->
+<!-- MODALS UNCHANGED -->
+
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
+const stakeModal = document.getElementById("stakeModal");
+const successModal = document.getElementById("successModal");
+const infoModal = document.getElementById("infoModal");
+
+function openModal(){
+  stakeModal.style.display="flex";
+  minHint.innerText = "Minimum stake: " + getMinStake("Barsh") + " Pi";
+}
+function closeModal(){ stakeModal.style.display="none"; }
+function closeSuccess(){ successModal.style.display="none"; }
+function openInfo(){ infoModal.style.display="flex"; }
+function closeInfo(){ infoModal.style.display="none"; }
+
+function confirmStake(){
+  const amount = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+  const min = getMinStake("Barsh");
+
+  if(isNaN(amount) || amount <= 0){
+    alert("Please enter a valid amount");
+    return;
+  }
+
+  if(amount < min){
+    alert("Minimum stake is " + min + " Pi");
+    return;
+  }
+
+  addStake({ project:"Barsh", amount, duration });
+
+  successText.innerText =
+    `You staked ${amount} Pi for ${duration} days in Barsh Agro.`;
+
+  closeModal();
+  successModal.style.display="flex";
+  load();
+}
+
 function load(){
   const data = getProjectTotals("Barsh");
 
@@ -215,30 +204,33 @@ function load(){
 
   barshHistory.innerHTML = "";
 
-  if(data.stakes.length === 0){
+  if(!data.stakes || data.stakes.length === 0){
     barshHistory.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  data.stakes.slice().reverse().forEach(s=>{
-    const t = formatDateTime(s);
-
-    const div = document.createElement("div");
-    div.className="project-tx";
-    div.innerHTML=`
-      <div class="project-icon">🌾</div>
-      <div class="project-body">
-        <div class="project-title">Barsh Stake</div>
-        <div class="project-date">${t.date} • ${t.time}</div>
-      </div>
-      <div class="project-right">
-        <div class="project-amount">${s.amount} Pi</div>
-        <div class="project-status">Successful</div>
-      </div>
-    `;
-    barshHistory.appendChild(div);
-  });
+  /* REAL LATEST FIRST SORT */
+  data.stakes
+    .slice()
+    .sort((a,b)=>(b.timestamp||0)-(a.timestamp||0))
+    .forEach(s=>{
+      const t = formatDateTime(s);
+      const div = document.createElement("div");
+      div.className="project-tx";
+      div.innerHTML=`
+        <div class="project-icon">🌾</div>
+        <div class="project-body">
+          <div class="project-title">Barsh Stake</div>
+          <div class="project-date">${t.date} • ${t.time}</div>
+        </div>
+        <div class="project-right">
+          <div class="project-amount">${Number(s.amount).toFixed(2)} Pi</div>
+          <div class="project-status">Successful</div>
+        </div>
+      `;
+      barshHistory.appendChild(div);
+    });
 }
 
 function goToWithdraw(){
@@ -246,19 +238,6 @@ function goToWithdraw(){
     alert("Wallet system not ready");
     return;
   }
-
-  const totals = getTotals();
-  const withdrawn = typeof getTotalWithdrawn === "function"
-    ? getTotalWithdrawn()
-    : 0;
-
-  const available = totals.totalReward - withdrawn;
-
-  if(available <= 0){
-    alert("No available rewards to withdraw.");
-    return;
-  }
-
   window.location.href = "wallet.html";
 }
 
