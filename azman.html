@@ -3,247 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Azman Futures Makers Lab</title>
+<title>Project</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-.section{padding:16px}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f5f7f6;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+/* ===== FIXED HEADER ===== */
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:16px;
+  font-weight:700;
+  text-align:center;
+  flex-shrink:0;
+}
+
+/* ===== FIXED TOP SECTION ===== */
+.fixed-top{
+  background:#f5f7f6;
+  padding:16px;
+  flex-shrink:0;
+}
 
 /* STATS */
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{
-  flex:1;background:#fff;border-radius:14px;
-  padding:16px;text-align:center
+.stats{
+  display:flex;
+  gap:12px;
+  margin-bottom:14px;
 }
-.stat-card span{display:block;color:#666;font-size:14px}
-.stat-card strong{font-size:18px;margin-top:6px;display:block}
 
-/* BUTTONS */
-.btns{display:flex;gap:12px;margin-top:12px}
-.btn{
-  flex:1;padding:14px;border-radius:12px;border:none;
-  font-weight:bold;font-size:16px
+.stat-card{
+  flex:1;
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
 }
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
+
+.stat-card span{
+  font-size:13px;
+  color:#666;
+}
+
+.stat-card strong{
+  display:block;
+  margin-top:6px;
+  font-size:16px;
+}
 
 /* INFO */
 .short-info{
-  background:#fff;border-radius:14px;padding:14px;
-  margin-top:14px;font-size:14px;color:#444;line-height:1.6
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  font-size:13px;
+  color:#444;
+  margin-bottom:14px;
 }
 
-/* TRANSACTIONS */
+/* BUTTONS */
+.btns{
+  display:flex;
+  gap:10px;
+}
+
+.btn{
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  font-weight:bold;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.primary{background:#0f7a3d;color:#fff;}
+.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d;}
+
+/* ===== SCROLL HISTORY ONLY ===== */
+.history-section{
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+}
+
 .project-tx{
-  background:#fff;border-radius:12px;padding:10px 12px;
-  margin-bottom:8px;display:flex;align-items:center;gap:10px
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
-.project-icon{font-size:18px}
-.project-body{flex:1}
-.project-title{font-size:14px;font-weight:600}
-.project-date{font-size:11px;color:#777}
-.project-right{text-align:right}
-.project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
 
-/* MODALS */
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.4);
-  display:none;align-items:center;justify-content:center;z-index:1000
-}
-.modal-box{
-  background:#fff;width:90%;max-width:420px;
-  padding:20px;border-radius:16px
-}
-label{margin-top:12px;display:block}
-input,select{
-  width:100%;padding:12px;margin-top:6px;
-  border-radius:10px;border:1px solid #ccc;font-size:16px
-}
-.success{text-align:center}
-.success h3{color:#0f7a3d;margin-bottom:8px}
+.project-icon{font-size:18px;}
+.project-body{flex:1;}
+.project-title{font-size:14px;font-weight:600;}
+.project-date{font-size:11px;color:#777;}
+.project-right{text-align:right;}
+.project-amount{font-size:14px;font-weight:bold;}
+.project-status{font-size:11px;color:#0f7a3d;}
+
 </style>
 </head>
 
 <body>
 
-<header class="header">
-  <div class="header-left">
-    <span>🧪 Azman Futures Makers Lab</span>
-  </div>
-  <div class="header-right" onclick="openInfo()">ℹ️</div>
-</header>
+<div class="header" id="projectHeader"></div>
 
-<section class="section">
+<div class="fixed-top">
 
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
-      <strong id="aStake">0.00 Pi</strong>
+      <strong id="pStake">0.00 Pi</strong>
     </div>
     <div class="stat-card">
       <span>Your Reward</span>
-      <strong id="aReward">0.00 Pi</strong>
+      <strong id="pReward">0.00 Pi</strong>
     </div>
   </div>
 
-  <div class="short-info">
-    <strong>Azman Futures Makers Lab</strong> is ALBUKHR’s long-term
-    science, technology, and innovation project focused on future invention,
-    research labs, and engineering capacity building.
-  </div>
+  <div class="short-info" id="projectInfo"></div>
 
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
-    <button onclick="goToWithdraw()" class="btn secondary">
-  💸 Withdraw Rewards
+    <button class="btn secondary" onclick="goToWithdraw()">
+      💸 Withdraw Rewards
     </button>
   </div>
 
-  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
-  <div id="azmanHistory"></div>
-
-</section>
-
-<!-- STAKE MODAL -->
-<div class="modal" id="stakeModal">
-  <div class="modal-box">
-    <h3>Stake in Azman</h3>
-
-    <label>Amount (Pi)</label>
-    <input type="number" id="amountInput" min="0">
-
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
-    </small>
-
-    <label>Duration</label>
-    <select id="durationSelect">
-      <option value="180">180 Days</option>
-      <option value="365">365 Days</option>
-      <option value="430">430 Days</option>
-    </select>
-
-    <div class="btns" style="margin-top:16px">
-      <button class="btn primary" onclick="confirmStake()">Confirm</button>
-      <button class="btn secondary" onclick="closeModal()">Cancel</button>
-    </div>
-  </div>
 </div>
 
-<!-- SUCCESS -->
-<div class="modal" id="successModal">
-  <div class="modal-box success">
-    <h3>Stake Successful</h3>
-    <p id="successText"></p>
-    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
-  </div>
+<div class="history-section">
+  <h3 style="font-size:14px;margin-bottom:10px">
+    Transaction History
+  </h3>
+  <div id="projectHistory"></div>
 </div>
-
-<!-- INFO -->
-<div class="modal" id="infoModal">
-  <div class="modal-box">
-    <h3>About Azman Futures Makers Lab</h3>
-    <p style="font-size:14px;line-height:1.6;color:#444">
-      Azman is ALBUKHR’s flagship innovation ecosystem supporting research,
-      prototyping, advanced training, and long-term technology development.
-      <br><br>
-      The project operates strictly on long-term staking to ensure stability,
-      discipline, and sustainable innovation growth.
-    </p>
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
-  </div>
-</div>
-
-<script src="staking.js"></script>
-<script>
-const stakeModal = document.getElementById("stakeModal");
-const successModal = document.getElementById("successModal");
-const infoModal = document.getElementById("infoModal");
-
-function openModal(){
-  stakeModal.style.display="flex";
-  minHint.innerText = "Minimum stake: " + getMinStake("Azman") + " Pi";
-}
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
-
-function confirmStake(){
-  const amount = Number(amountInput.value);
-  const duration = Number(durationSelect.value);
-  const min = getMinStake("Azman");
-
-  if(!amount || amount < min){
-    alert("Minimum stake is " + min + " Pi");
-    return;
-  }
-
-  addStake({ project:"Azman", amount, duration });
-
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in Azman Futures Lab.`;
-
-  closeModal();
-  successModal.style.display="flex";
-  load();
-}
-
-function load(){
-  const data = getProjectTotals("Azman");
-
-  aStake.innerText = (data.stake || 0).toFixed(2) + " Pi";
-  aReward.innerText = (data.reward || 0).toFixed(2) + " Pi";
-
-  azmanHistory.innerHTML = "";
-
-  if(data.stakes.length === 0){
-    azmanHistory.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
-    return;
-  }
-
-  data.stakes.slice().reverse().forEach(s=>{
-    const t = formatDateTime(s);
-    const div = document.createElement("div");
-    div.className="project-tx";
-    div.innerHTML=`
-      <div class="project-icon">🧪</div>
-      <div class="project-body">
-        <div class="project-title">Azman Stake</div>
-        <div class="project-date">${t.date} • ${t.time}</div>
-      </div>
-      <div class="project-right">
-        <div class="project-amount">${s.amount} Pi</div>
-        <div class="project-status">Successful</div>
-      </div>
-    `;
-    azmanHistory.appendChild(div);
-  });
-}
-
-load();
-</script>
 
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
-function goToWithdraw(){
 
-  if(typeof getTotals !== "function"){
-    alert("Wallet system not ready");
+/* ===== CHANGE ONLY THESE TWO ===== */
+const PROJECT_NAME = "Azman Futures Makaers Lab";
+const PROJECT_ICON = "🧪";
+
+/* SET HEADER + INFO */
+projectHeader.innerText = PROJECT_ICON + " " + PROJECT_NAME;
+projectInfo.innerText =
+  PROJECT_NAME + " is an official ALBUKHR ecosystem project.";
+
+/* LOAD DATA */
+function loadProject(){
+
+  const data = getProjectTotals(PROJECT_NAME);
+
+  pStake.innerText  = data.stake.toFixed(2) + " Pi";
+  pReward.innerText = data.reward.toFixed(2) + " Pi";
+
+  projectHistory.innerHTML = "";
+
+  if(!data.stakes.length){
+    projectHistory.innerHTML =
+      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  const totals = getTotals();
-  const withdrawn = typeof getTotalWithdrawn === "function"
-    ? getTotalWithdrawn()
-    : 0;
+  /* NEWEST FIRST */
+  data.stakes
+    .slice()
+    .sort((a,b)=>b.timestamp-a.timestamp)
+    .forEach(s=>{
 
+      const date = new Date(s.timestamp).toLocaleString();
+
+      projectHistory.innerHTML += `
+        <div class="project-tx">
+          <div class="project-icon">${PROJECT_ICON}</div>
+          <div class="project-body">
+            <div class="project-title">
+              ${PROJECT_NAME} Stake
+            </div>
+            <div class="project-date">
+              ${date}
+            </div>
+          </div>
+          <div class="project-right">
+            <div class="project-amount">
+              ${s.amount.toFixed(2)} Pi
+            </div>
+            <div class="project-status">
+              Successful
+            </div>
+          </div>
+        </div>
+      `;
+    });
+}
+
+function goToWithdraw(){
+
+  const totals = getTotals();
+  const withdrawn = getTotalWithdrawn();
   const available = totals.totalReward - withdrawn;
 
   if(available <= 0){
@@ -251,10 +225,12 @@ function goToWithdraw(){
     return;
   }
 
-  // direct user to wallet
-  window.location.href = "wallet.html";
+  window.location.href="wallet.html";
 }
+
+loadProject();
+
 </script>
-  
+
 </body>
-        </html>
+</html>
