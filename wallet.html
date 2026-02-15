@@ -44,6 +44,18 @@ body{
   margin-top:6px;
 }
 
+.withdraw-btn{
+  margin-top:12px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
 .tabs{
   display:flex;
   background:#fff;
@@ -70,54 +82,46 @@ body{
   padding:16px;
 }
 
-/* PROJECT CARD */
-.project-card{
+/* Recent style */
+.tx-card{
   background:#fff;
+  padding:12px;
   border-radius:14px;
-  padding:14px;
-  margin-bottom:14px;
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-.project-header{
-  display:flex;
-  justify-content:space-between;
-  cursor:pointer;
+.tx-icon{
+  font-size:20px;
+}
+
+.tx-body{
+  flex:1;
+}
+
+.tx-title{
+  font-size:14px;
+  font-weight:600;
+}
+
+.tx-date{
+  font-size:11px;
+  color:#777;
+}
+
+.tx-right{
+  text-align:right;
+}
+
+.tx-amount{
+  font-size:14px;
   font-weight:700;
 }
 
-.project-body{
-  display:none;
-  margin-top:10px;
-}
-
-.btn{
-  padding:8px 12px;
-  border:none;
-  border-radius:10px;
-  background:#0f7a3d;
-  color:#fff;
-  font-size:12px;
-  cursor:pointer;
-}
-
-/* TRANSACTIONS */
-.tx{
-  background:#fff;
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:10px;
-  font-size:13px;
-}
-
-.tx small{
-  color:#777;
-  display:block;
-  margin-top:4px;
-  font-size:11px;
-}
-
-.tx.stake{border-left:4px solid #0f7a3d;}
-.tx.withdraw{border-left:4px solid #c0392b;}
+.tx-green{color:#0f7a3d;}
+.tx-red{color:#c0392b;}
 </style>
 </head>
 
@@ -127,18 +131,25 @@ body{
 
 <div class="summary">
   <div class="balance" id="available">0.00 Pi</div>
+
   <div class="row">
     <div>Total Staked</div>
     <div id="totalStake">0.00</div>
   </div>
+
   <div class="row">
     <div>Total Rewards</div>
     <div id="totalReward">0.00</div>
   </div>
+
   <div class="row">
     <div>Total Withdrawn</div>
     <div id="withdrawn">0.00</div>
   </div>
+
+  <button class="withdraw-btn" onclick="goWithdraw()">
+    Withdraw Rewards
+  </button>
 </div>
 
 <div class="tabs">
@@ -155,6 +166,16 @@ body{
 
 let currentTab = "overview";
 
+/* ICON MAP (Expandable for future projects) */
+function getProjectIcon(name){
+  const icons = {
+    "Raheem":"💊",
+    "KUK":"🏗️",
+    "Default":"🏢"
+  };
+  return icons[name] || icons["Default"];
+}
+
 function switchTab(tab,el){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   el.classList.add("active");
@@ -162,28 +183,26 @@ function switchTab(tab,el){
   renderContent();
 }
 
-function renderWalletSummary(){
+function renderSummary(){
   const s = getWalletSummary();
-  totalStake.innerText = s.totalStake.toFixed(2)+" Pi";
+
+  totalStake.innerText  = s.totalStake.toFixed(2)+" Pi";
   totalReward.innerText = s.grossRewards.toFixed(2)+" Pi";
-  withdrawn.innerText = s.withdrawn.toFixed(2)+" Pi";
-  available.innerText = s.available.toFixed(2)+" Pi";
+  withdrawn.innerText   = s.withdrawn.toFixed(2)+" Pi";
+  available.innerText   = s.available.toFixed(2)+" Pi";
 }
 
-function renderContent(){
-  const area = document.getElementById("contentArea");
-  area.innerHTML="";
-
-  if(currentTab==="overview"){
-    renderProjects(area);
+/* WITHDRAW BUTTON */
+function goWithdraw(){
+  if(typeof openWithdrawModal === "function"){
+    openWithdrawModal();
   }else{
-    renderGlobalTransactions(area);
+    alert("Withdraw system not ready");
   }
 }
 
-/* ===== PROJECT OVERVIEW ===== */
-function renderProjects(area){
-
+/* OVERVIEW */
+function renderOverview(area){
   const projects = getProjectWalletBreakdown();
 
   if(!projects.length){
@@ -192,32 +211,28 @@ function renderProjects(area){
   }
 
   projects.forEach(p=>{
-    const card = document.createElement("div");
-    card.className="project-card";
-
-    card.innerHTML=`
-      <div class="project-header" onclick="toggleBody(this)">
-        <div>${p.project}</div>
-        <div>${p.netReward.toFixed(2)} Pi</div>
-      </div>
-      <div class="project-body">
-        <div class="row"><div>Stake</div><div>${p.stake.toFixed(2)}</div></div>
-        <div class="row"><div>Gross Reward</div><div>${p.grossReward.toFixed(2)}</div></div>
-        <div class="row"><div>Withdrawn</div><div>${p.withdrawn.toFixed(2)}</div></div>
+    area.innerHTML += `
+      <div class="tx-card">
+        <div class="tx-icon">${getProjectIcon(p.project)}</div>
+        <div class="tx-body">
+          <div class="tx-title">${p.project}</div>
+          <div class="tx-date">
+            Stake: ${p.stake.toFixed(2)} Pi
+          </div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount tx-green">
+            ${p.netReward.toFixed(2)} Pi
+          </div>
+          <div class="tx-date">Available Reward</div>
+        </div>
       </div>
     `;
-
-    area.appendChild(card);
   });
 }
 
-function toggleBody(el){
-  const body = el.nextElementSibling;
-  body.style.display = body.style.display==="block"?"none":"block";
-}
-
-/* ===== GLOBAL LEDGER ===== */
-function renderGlobalTransactions(area){
+/* GLOBAL TRANSACTIONS */
+function renderTransactions(area){
 
   let stakeHistory = [];
   if(typeof getStakeHistory === "function"){
@@ -251,33 +266,61 @@ function renderGlobalTransactions(area){
   }
 
   merged.forEach(tx=>{
+
+    const icon = getProjectIcon(tx.project);
+    const date = new Date(tx.timestamp).toLocaleString();
+
     if(tx.type==="stake"){
       area.innerHTML += `
-        <div class="tx stake">
-          +${tx.amount.toFixed(2)} Pi Staked
-          <small>
-          Project: ${tx.project}<br>
-          ${new Date(tx.timestamp).toLocaleString()}
-          </small>
+        <div class="tx-card">
+          <div class="tx-icon">${icon}</div>
+          <div class="tx-body">
+            <div class="tx-title">${tx.project} Stake</div>
+            <div class="tx-date">${date}</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount tx-green">
+              +${tx.amount.toFixed(2)} Pi
+            </div>
+          </div>
         </div>
       `;
     }else{
       area.innerHTML += `
-        <div class="tx withdraw">
-          -${tx.gross.toFixed(2)} Pi Withdraw
-          <small>
-          Project: ${tx.project}<br>
-          Fee: ${tx.fee.toFixed(2)} Pi<br>
-          Received: ${tx.received.toFixed(2)} Pi<br>
-          ${new Date(tx.timestamp).toLocaleString()}
-          </small>
+        <div class="tx-card">
+          <div class="tx-icon">${icon}</div>
+          <div class="tx-body">
+            <div class="tx-title">${tx.project} Withdraw</div>
+            <div class="tx-date">
+              Fee: ${tx.fee.toFixed(2)} Pi<br>
+              Received: ${tx.received.toFixed(2)} Pi<br>
+              ${date}
+            </div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount tx-red">
+              -${tx.gross.toFixed(2)} Pi
+            </div>
+          </div>
         </div>
       `;
     }
+
   });
 }
 
-renderWalletSummary();
+function renderContent(){
+  const area = document.getElementById("contentArea");
+  area.innerHTML="";
+
+  if(currentTab==="overview"){
+    renderOverview(area);
+  }else{
+    renderTransactions(area);
+  }
+}
+
+renderSummary();
 renderContent();
 
 </script>
