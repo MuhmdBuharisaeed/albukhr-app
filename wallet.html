@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +15,6 @@ body{
   height:100vh;
 }
 
-/* ===== FIXED HEADER ===== */
 .header{
   background:#0f7a3d;
   color:#fff;
@@ -25,7 +24,6 @@ body{
   flex-shrink:0;
 }
 
-/* ===== FIXED SUMMARY ===== */
 .summary{
   background:#fff;
   padding:16px;
@@ -34,21 +32,38 @@ body{
 }
 
 .balance{
-  font-size:26px;
+  font-size:24px;
   font-weight:800;
   color:#0f7a3d;
 }
 
-.sub{font-size:12px;color:#666;margin-top:4px}
-
 .row{
   display:flex;
   justify-content:space-between;
-  margin-top:6px;
   font-size:13px;
+  margin-top:6px;
 }
 
-/* ===== SCROLL AREA ONLY ===== */
+.tabs{
+  display:flex;
+  background:#fff;
+  border-bottom:1px solid #eee;
+  flex-shrink:0;
+}
+
+.tab{
+  flex:1;
+  padding:12px;
+  text-align:center;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.tab.active{
+  border-bottom:3px solid #0f7a3d;
+  color:#0f7a3d;
+}
+
 .scroll-area{
   flex:1;
   overflow-y:auto;
@@ -66,17 +81,13 @@ body{
 .project-header{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   cursor:pointer;
-}
-
-.project-title{
   font-weight:700;
 }
 
 .project-body{
-  margin-top:10px;
   display:none;
+  margin-top:10px;
 }
 
 .btn{
@@ -85,253 +96,189 @@ body{
   border-radius:10px;
   background:#0f7a3d;
   color:#fff;
-  font-weight:600;
+  font-size:12px;
   cursor:pointer;
-  font-size:12px;
 }
 
-/* TRANSACTION */
+/* TRANSACTIONS */
 .tx{
-  border-bottom:1px solid #eee;
-  padding:8px 0;
-  font-size:12px;
-}
-
-.tx small{color:#777;font-size:11px}
-
-/* MODAL */
-.modal-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-
-.modal{
   background:#fff;
-  padding:20px;
-  border-radius:14px;
-  width:90%;
-  max-width:400px;
-}
-
-.modal input{
-  width:100%;
-  padding:10px;
+  padding:12px;
+  border-radius:12px;
   margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #ddd;
+  font-size:13px;
 }
 
-.modal-actions{
-  display:flex;
-  gap:10px;
+.tx small{
+  color:#777;
+  display:block;
+  margin-top:4px;
+  font-size:11px;
 }
+
+.tx.stake{border-left:4px solid #0f7a3d;}
+.tx.withdraw{border-left:4px solid #c0392b;}
 </style>
 </head>
 
 <body>
 
-<div class="header">💰 ALBUKHR WALLET</div>
+<div class="header">ALBUKHR WALLET</div>
 
 <div class="summary">
   <div class="balance" id="available">0.00 Pi</div>
-  <div class="sub">Available Reward Balance</div>
-
   <div class="row">
     <div>Total Staked</div>
-    <div id="totalStake">0.00 Pi</div>
+    <div id="totalStake">0.00</div>
   </div>
-
   <div class="row">
-    <div>Total Rewards (Gross)</div>
-    <div id="totalReward">0.00 Pi</div>
+    <div>Total Rewards</div>
+    <div id="totalReward">0.00</div>
   </div>
-
   <div class="row">
     <div>Total Withdrawn</div>
-    <div id="withdrawn">0.00 Pi</div>
+    <div id="withdrawn">0.00</div>
   </div>
 </div>
 
-<div class="scroll-area" id="projectContainer">
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview',this)">Overview</div>
+  <div class="tab" onclick="switchTab('tx',this)">Transactions</div>
 </div>
 
-<!-- WITHDRAW MODAL -->
-<div class="modal-overlay" id="withdrawModal">
-<div class="modal">
-<h3 id="modalProject">Withdraw</h3>
-
-<input type="number" id="withdrawAmount" placeholder="Amount">
-<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
-
-<div class="modal-actions">
-<button class="btn" onclick="confirmWithdraw()">Confirm</button>
-<button class="btn" style="background:#ccc;color:#333"
-onclick="closeModal()">Cancel</button>
-</div>
-
-<p style="font-size:11px;margin-top:10px;color:#777">
-Fee: 1% • Daily Limit: 50 Pi
-</p>
-
-</div>
-</div>
+<div class="scroll-area" id="contentArea"></div>
 
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
 
-let activeProject = null;
+let currentTab = "overview";
 
-/* ===== LOAD WALLET ===== */
-function renderWallet(){
-
-  const summary = getWalletSummary();
-
-  totalStake.innerText =
-    summary.totalStake.toFixed(2) + " Pi";
-
-  totalReward.innerText =
-    summary.grossRewards.toFixed(2) + " Pi";
-
-  withdrawn.innerText =
-    summary.withdrawn.toFixed(2) + " Pi";
-
-  available.innerText =
-    summary.available.toFixed(2) + " Pi";
-
-  renderProjects();
+function switchTab(tab,el){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  currentTab = tab;
+  renderContent();
 }
 
-/* ===== PROJECT CARDS ===== */
-function renderProjects(){
+function renderWalletSummary(){
+  const s = getWalletSummary();
+  totalStake.innerText = s.totalStake.toFixed(2)+" Pi";
+  totalReward.innerText = s.grossRewards.toFixed(2)+" Pi";
+  withdrawn.innerText = s.withdrawn.toFixed(2)+" Pi";
+  available.innerText = s.available.toFixed(2)+" Pi";
+}
 
-  const container = document.getElementById("projectContainer");
-  container.innerHTML="";
+function renderContent(){
+  const area = document.getElementById("contentArea");
+  area.innerHTML="";
+
+  if(currentTab==="overview"){
+    renderProjects(area);
+  }else{
+    renderGlobalTransactions(area);
+  }
+}
+
+/* ===== PROJECT OVERVIEW ===== */
+function renderProjects(area){
 
   const projects = getProjectWalletBreakdown();
 
   if(!projects.length){
-    container.innerHTML="<small>No staking activity yet</small>";
+    area.innerHTML="<small>No staking activity yet</small>";
     return;
   }
 
   projects.forEach(p=>{
-
     const card = document.createElement("div");
     card.className="project-card";
 
-    card.innerHTML = `
+    card.innerHTML=`
       <div class="project-header" onclick="toggleBody(this)">
-        <div class="project-title">${p.project}</div>
+        <div>${p.project}</div>
         <div>${p.netReward.toFixed(2)} Pi</div>
       </div>
-
       <div class="project-body">
-        <div class="row">
-          <div>Staked</div>
-          <div>${p.stake.toFixed(2)} Pi</div>
-        </div>
-        <div class="row">
-          <div>Gross Reward</div>
-          <div>${p.grossReward.toFixed(2)} Pi</div>
-        </div>
-        <div class="row">
-          <div>Withdrawn</div>
-          <div>${p.withdrawn.toFixed(2)} Pi</div>
-        </div>
-
-        <button class="btn"
-          style="margin-top:10px"
-          onclick="openWithdraw('${p.project}')">
-          Withdraw from ${p.project}
-        </button>
-
-        <div id="history-${p.project}"></div>
+        <div class="row"><div>Stake</div><div>${p.stake.toFixed(2)}</div></div>
+        <div class="row"><div>Gross Reward</div><div>${p.grossReward.toFixed(2)}</div></div>
+        <div class="row"><div>Withdrawn</div><div>${p.withdrawn.toFixed(2)}</div></div>
       </div>
     `;
 
-    container.appendChild(card);
-
-    renderProjectHistory(p.project);
+    area.appendChild(card);
   });
 }
 
-/* ===== EXPAND TOGGLE ===== */
 function toggleBody(el){
   const body = el.nextElementSibling;
-  body.style.display =
-    body.style.display==="block" ? "none":"block";
+  body.style.display = body.style.display==="block"?"none":"block";
 }
 
-/* ===== PROJECT HISTORY ===== */
-function renderProjectHistory(project){
+/* ===== GLOBAL LEDGER ===== */
+function renderGlobalTransactions(area){
 
-  const div = document.getElementById("history-"+project);
-  if(!div) return;
+  let stakeHistory = [];
+  if(typeof getStakeHistory === "function"){
+    stakeHistory = getStakeHistory();
+  }
 
-  const history = getWithdrawHistory()
-    .filter(tx=>tx.project===project);
+  const withdrawHistory = getWithdrawHistory();
 
-  if(!history.length){
-    div.innerHTML="<small>No withdrawals yet</small>";
+  const merged = [
+    ...stakeHistory.map(s=>({
+      type:"stake",
+      project:s.project,
+      amount:s.amount,
+      timestamp:s.timestamp
+    })),
+    ...withdrawHistory.map(w=>({
+      type:"withdraw",
+      project:w.project,
+      gross:w.grossAmount,
+      fee:w.fee,
+      received:w.received,
+      timestamp:w.timestamp
+    }))
+  ];
+
+  merged.sort((a,b)=> b.timestamp - a.timestamp);
+
+  if(!merged.length){
+    area.innerHTML="<small>No transactions yet</small>";
     return;
   }
 
-  div.innerHTML="";
-
-  history.forEach(tx=>{
-    div.innerHTML += `
-      <div class="tx">
-        -${tx.grossAmount.toFixed(2)} Pi
-        <small>
-        Fee: ${tx.fee.toFixed(2)} |
-        Received: ${tx.received.toFixed(2)} |
-        ${new Date(tx.timestamp).toLocaleString()}
-        </small>
-      </div>
-    `;
+  merged.forEach(tx=>{
+    if(tx.type==="stake"){
+      area.innerHTML += `
+        <div class="tx stake">
+          +${tx.amount.toFixed(2)} Pi Staked
+          <small>
+          Project: ${tx.project}<br>
+          ${new Date(tx.timestamp).toLocaleString()}
+          </small>
+        </div>
+      `;
+    }else{
+      area.innerHTML += `
+        <div class="tx withdraw">
+          -${tx.gross.toFixed(2)} Pi Withdraw
+          <small>
+          Project: ${tx.project}<br>
+          Fee: ${tx.fee.toFixed(2)} Pi<br>
+          Received: ${tx.received.toFixed(2)} Pi<br>
+          ${new Date(tx.timestamp).toLocaleString()}
+          </small>
+        </div>
+      `;
+    }
   });
 }
 
-/* ===== WITHDRAW ===== */
-function openWithdraw(project){
-  activeProject = project;
-  modalProject.innerText = "Withdraw from " + project;
-  withdrawModal.style.display="flex";
-}
-
-function closeModal(){
-  withdrawModal.style.display="none";
-}
-
-function confirmWithdraw(){
-
-  const amt = withdrawAmount.value;
-  const addr = withdrawAddress.value;
-
-  const res = requestWithdraw({
-    project:activeProject,
-    amount:amt,
-    walletAddress:addr
-  });
-
-  if(res.error){
-    alert(res.error);
-    return;
-  }
-
-  withdrawAmount.value="";
-  withdrawAddress.value="";
-  closeModal();
-  renderWallet();
-}
-
-renderWallet();
+renderWalletSummary();
+renderContent();
 
 </script>
 
