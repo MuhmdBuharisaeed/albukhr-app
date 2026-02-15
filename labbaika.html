@@ -8,18 +8,57 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-.section{padding:16px}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f5f7f6;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+/* HEADER FIXED */
+.header{
+  flex-shrink:0;
+}
+
+/* TOP FIXED AREA */
+.fixed-area{
+  padding:16px;
+  flex-shrink:0;
+  background:#f5f7f6;
+}
+
+/* STATS */
 .stats{display:flex;gap:12px;margin:16px 0}
 .stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
-.short-info{background:#fff;border-radius:12px;padding:12px;font-size:13px;color:#444;line-height:1.5;margin-bottom:14px}
+
+/* INFO */
+.short-info{
+  background:#fff;border-radius:12px;padding:12px;
+  font-size:13px;color:#444;line-height:1.5;margin-bottom:14px
+}
+
+/* BUTTONS */
 .btns{display:flex;gap:12px;margin-top:12px}
 .btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+
+/* SCROLL AREA */
+.scroll-area{
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+}
+
+/* TRANSACTIONS */
+.project-tx{
+  background:#fff;border-radius:12px;padding:10px 12px;
+  margin-bottom:8px;display:flex;align-items:center;gap:10px
+}
 .project-icon{font-size:18px}
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
@@ -27,10 +66,21 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
-.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
+
+/* MODALS */
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);
+  display:none;align-items:center;justify-content:center;z-index:1000
+}
+.modal-box{
+  background:#fff;width:90%;max-width:420px;
+  padding:20px;border-radius:16px
+}
 label{margin-top:12px;display:block}
-input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
+input,select{
+  width:100%;padding:12px;margin-top:6px;
+  border-radius:10px;border:1px solid #ccc;font-size:16px
+}
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
@@ -45,7 +95,7 @@ input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1p
   <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
-<section class="section">
+<div class="fixed-area">
 
   <div class="stats">
     <div class="stat-card">
@@ -67,14 +117,17 @@ input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1p
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button onclick="goToWithdraw()" class="btn secondary">
-  💸 Withdraw Rewards
+      💸 Withdraw Rewards
     </button>
   </div>
 
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
-  <div id="labbaikaHistory"></div>
 
-</section>
+</div>
+
+<div class="scroll-area">
+  <div id="labbaikaHistory"></div>
+</div>
 
 <!-- STAKE MODAL -->
 <div class="modal" id="stakeModal">
@@ -117,8 +170,7 @@ input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1p
     <h3>About Labbaika Bakery</h3>
     <p style="font-size:14px;color:#444;line-height:1.6">
       Labbaika Bakery Center modernizes bread and flour-based food production
-      within Albukhr Investment Limited, ensuring hygiene, efficiency,
-      consistent quality, and stable daily-demand revenue.
+      within Albukhr Investment Limited.
     </p>
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
   </div>
@@ -178,34 +230,36 @@ function load(){
     return;
   }
 
-  data.stakes.slice().reverse().forEach(s=>{
-    const t = formatDateTime(s);
-    const div = document.createElement("div");
-    div.className="project-tx";
-    div.innerHTML=`
-      <div class="project-icon">🍞</div>
-      <div class="project-body">
-        <div class="project-title">Labbaika Stake</div>
-        <div class="project-date">${t.date} • ${t.time}</div>
-      </div>
-      <div class="project-right">
-        <div class="project-amount">${s.amount} Pi</div>
-        <div class="project-status">Successful</div>
-      </div>
-    `;
-    labbaikaHistory.appendChild(div);
-  });
+  /* LATEST FIRST — REAL SORT */
+  data.stakes
+    .slice()
+    .sort((a,b)=>b.timestamp - a.timestamp)
+    .forEach(s=>{
+      const t = formatDateTime(s);
+      const div = document.createElement("div");
+      div.className="project-tx";
+      div.innerHTML=`
+        <div class="project-icon">🍞</div>
+        <div class="project-body">
+          <div class="project-title">Labbaika Stake</div>
+          <div class="project-date">${t.date} • ${t.time}</div>
+        </div>
+        <div class="project-right">
+          <div class="project-amount">${s.amount} Pi</div>
+          <div class="project-status">Successful</div>
+        </div>
+      `;
+      labbaikaHistory.appendChild(div);
+    });
 }
 
 load();
 </script>
 
-<script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
 function goToWithdraw(){
-
   if(typeof getTotals !== "function"){
     alert("Wallet system not ready");
     return;
@@ -223,10 +277,9 @@ function goToWithdraw(){
     return;
   }
 
-  // direct user to wallet
   window.location.href = "wallet.html";
 }
 </script>
-  
+
 </body>
 </html>
