@@ -8,18 +8,74 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-.section{padding:16px}
+body{
+  background:#f5f7f6;
+  padding-bottom:90px;
+  font-family:Arial;
+  margin:0;
+}
+
+/* ===== FIXED HEADER ===== */
+.header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  background:#fff;
+  z-index:1000;
+}
+
+/* ===== FIXED TOP SECTION ===== */
+.fixed-top{
+  position:fixed;
+  top:60px;
+  left:0;
+  right:0;
+  background:#f5f7f6;
+  z-index:999;
+  padding:16px;
+}
+
 .stats{display:flex;gap:12px;margin:16px 0}
 .stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
+
 .btns{display:flex;gap:12px;margin-top:12px}
 .btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-.short-info{background:#fff;border-radius:14px;padding:14px;margin-top:14px;font-size:14px;color:#444;line-height:1.6}
-.project-tx{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+
+.short-info{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-top:14px;
+  font-size:14px;
+  color:#444;
+  line-height:1.6
+}
+
+/* ===== SCROLL AREA ===== */
+.scroll-area{
+  position:fixed;
+  top:320px;
+  bottom:0;
+  left:0;
+  right:0;
+  overflow-y:auto;
+  padding:16px;
+}
+
+.project-tx{
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:10px
+}
 .project-icon{font-size:18px}
 .project-body{flex:1}
 .project-title{font-size:14px;font-weight:600}
@@ -27,10 +83,42 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
-.info-indicator{display:flex;align-items:center;gap:6px;font-size:13px;color:#0f7a3d;cursor:pointer}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
-.modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
-input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:16px}
+
+.info-indicator{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  color:#0f7a3d;
+  cursor:pointer
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000
+}
+.modal-box{
+  background:#fff;
+  width:90%;
+  max-width:420px;
+  padding:20px;
+  border-radius:16px
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px
+}
+
 label{margin-top:12px;display:block}
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
@@ -46,7 +134,8 @@ label{margin-top:12px;display:block}
   <div class="header-right info-indicator" onclick="openInfo()">ℹ️</div>
 </header>
 
-<section class="section">
+<!-- FIXED CONTENT -->
+<div class="fixed-top">
 
   <div class="stats">
     <div class="stat-card">
@@ -67,16 +156,20 @@ label{margin-top:12px;display:block}
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button onclick="goToWithdraw()" class="btn secondary">
-  💸 Withdraw Rewards
+      💸 Withdraw Rewards
     </button>
   </div>
 
-  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
+</div>
+
+<!-- SCROLLABLE TRANSACTIONS -->
+<div class="scroll-area">
+  <h3 style="font-size:15px">Transaction History</h3>
   <div id="barshHistory"></div>
+</div>
 
-</section>
-
-<!-- STAKE MODAL -->
+<!-- MODALS (UNCHANGED) -->
+<!-- Stake Modal -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
     <h3>Stake in Barsh Agro</h3>
@@ -124,6 +217,8 @@ label{margin-top:12px;display:block}
 </div>
 
 <script src="staking.js"></script>
+<script src="wallet-core.js"></script>
+
 <script>
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
@@ -177,6 +272,7 @@ function load(){
     return;
   }
 
+  /* Latest First */
   data.stakes.slice().reverse().forEach(s=>{
     const t = formatDateTime(s);
 
@@ -197,36 +293,12 @@ function load(){
   });
 }
 
+function goToWithdraw(){
+  window.location.href = "wallet.html";
+}
+
 load();
 </script>
 
-<script src="staking.js"></script>
-<script src="wallet-core.js"></script>
-
-<script>
-function goToWithdraw(){
-
-  if(typeof getTotals !== "function"){
-    alert("Wallet system not ready");
-    return;
-  }
-
-  const totals = getTotals();
-  const withdrawn = typeof getTotalWithdrawn === "function"
-    ? getTotalWithdrawn()
-    : 0;
-
-  const available = totals.totalReward - withdrawn;
-
-  if(available <= 0){
-    alert("No available rewards to withdraw.");
-    return;
-  }
-
-  // direct user to wallet
-  window.location.href = "wallet.html";
-}
-</script>
-  
 </body>
 </html>
