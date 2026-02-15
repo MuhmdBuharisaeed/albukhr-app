@@ -201,22 +201,18 @@ function renderHistory(){
 
   list.forEach(tx=>{
 
-    const div=document.createElement("div");
-    div.className="tx";
+  const div = document.createElement("div");
+  div.className="tx";
 
-    div.innerHTML=`
-      <div><strong>- ${Number(tx.amount).toFixed(2)} PI</strong></div>
-      <small>
-        Fee: ${Number(tx.fee||0).toFixed(2)} PI |
-        Received: ${Number(tx.net||0).toFixed(2)} PI
-      </small><br>
-      <small>${new Date(tx.timestamp).toLocaleString()}</small><br>
-      <small>Wallet: ${tx.walletAddress}</small>
-    `;
+  div.innerHTML = `
+    <div><strong>Withdraw:</strong> -${tx.amount.toFixed(2)} Pi</div>
+    <div>Fee (1%): ${tx.fee.toFixed(2)} Pi</div>
+    <div>Received: ${tx.net.toFixed(2)} Pi</div>
+    <small>${new Date(tx.timestamp).toLocaleString()}</small>
+  `;
 
-    txList.appendChild(div);
-  });
-}
+  txList.appendChild(div);
+});
 
 function previewWithdraw(){
 
