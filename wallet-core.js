@@ -1,15 +1,15 @@
 /* =========================================
-   ALBUKHR WALLET CORE v6 (DAILY CONTROL)
+   ALBUKHR WALLET CORE v7 (FEE + DAILY 50)
    Source of Truth = staking.js
    Wallet = Withdraw Layer Only
 ========================================= */
 
-const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v6";
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v7";
 
-/* ===== DAILY RULES ===== */
-const DAILY_LIMIT_COUNT  = 10;        // 10 withdraw per 24h
-const DAILY_LIMIT_AMOUNT = 50;       // max 50 Pi per 24h
+/* ===== RULES ===== */
+const DAILY_LIMIT_AMOUNT = 50;       // Max 50 Pi per 24h
 const DAILY_WINDOW_MS    = 24 * 60 * 60 * 1000;
+const WITHDRAW_FEE_RATE  = 0.01;   // 1% Fee
 
 /* =========================================
    SAFE STORAGE
@@ -93,7 +93,7 @@ function getWalletSummary(){
 }
 
 /* =========================================
-   DAILY LIMIT ENGINE
+   DAILY LIMIT ENGINE (AMOUNT ONLY)
 ========================================= */
 
 function _getWithdrawsLast24h(){
@@ -104,10 +104,6 @@ function _getWithdrawsLast24h(){
     const time = tx.timestamp || tx.createdAt || 0;
     return (now - time) <= DAILY_WINDOW_MS;
   });
-}
-
-function _dailyCountExceeded(){
-  return _getWithdrawsLast24h().length >= DAILY_LIMIT_COUNT;
 }
 
 function _dailyAmountExceeded(amount){
@@ -126,7 +122,6 @@ function requestWithdraw(amount,walletAddress){
 
   amount = parseFloat(amount);
 
-  /* BASIC VALIDATION */
   if(isNaN(amount) || amount <= 0){
     return { error:"Invalid withdraw amount" };
   }
@@ -135,12 +130,8 @@ function requestWithdraw(amount,walletAddress){
     return { error:"Wallet address required" };
   }
 
-  if(_dailyCountExceeded()){
-    return { error:"Daily withdraw limit reached (1 per 24h)" };
-  }
-
   if(_dailyAmountExceeded(amount)){
-    return { error:`Daily max withdraw is ${DAILY_LIMIT_AMOUNT} Pi` };
+    return { error:`Daily withdraw limit is ${DAILY_LIMIT_AMOUNT} Pi per 24h` };
   }
 
   const available = getAvailableBalance();
@@ -149,12 +140,18 @@ function requestWithdraw(amount,walletAddress){
     return { error:"Insufficient reward balance" };
   }
 
+  /* ===== FEE CALCULATION ===== */
+  const fee        = amount * WITHDRAW_FEE_RATE;
+  const netAmount  = amount - fee;
+
   const now = Date.now();
 
   const tx = {
     id: "WD-" + now,
     type: "withdraw",
-    amount: Number(amount),
+    amount: Number(amount),       // gross
+    fee: Number(fee),
+    net: Number(netAmount),       // user receives
     walletAddress: walletAddress.trim(),
     timestamp: now,
     createdAt: now
