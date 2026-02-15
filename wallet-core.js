@@ -122,7 +122,7 @@ function getTodayWithdrawTotal(){
 }
 
 /* =========================================
-   WITHDRAW REQUEST
+   WITHDRAW REQUEST (FIXED FEE STORAGE)
 ========================================= */
 
 function requestWithdraw(amount, walletAddress){
@@ -146,17 +146,17 @@ function requestWithdraw(amount, walletAddress){
     return { error:`Daily limit exceeded (${settings.dailyLimit} Pi)` };
   }
 
-  const fee = amount * settings.withdrawFeeRate;
-  const net = amount - fee;
+  const fee = Number((amount * settings.withdrawFeeRate).toFixed(6));
+  const net = Number((amount - fee).toFixed(6));
 
   const now = Date.now();
 
   const tx = {
     id: "WD-" + now,
     type: "withdraw",
-    amount,
-    fee,
-    net,
+    amount: Number(amount),
+    fee: fee,
+    net: net,
     walletAddress,
     timestamp: now
   };
@@ -185,13 +185,38 @@ function getWalletSummary(){
 }
 
 /* =========================================
-   HISTORY
+   HISTORY (AUTO FIX OLD RECORDS)
 ========================================= */
 
 function getWithdrawHistory(){
+
+  const settings = getWalletSettings();
+
   return getWithdrawals()
+    .map(tx => {
+
+      const amount = Number(tx.amount) || 0;
+
+      // 🔁 auto repair old withdrawals
+      const fee = tx.fee !== undefined
+        ? Number(tx.fee)
+        : Number((amount * settings.withdrawFeeRate).toFixed(6));
+
+      const net = tx.net !== undefined
+        ? Number(tx.net)
+        : Number((amount - fee).toFixed(6));
+
+      return {
+        ...tx,
+        amount,
+        fee,
+        net,
+        timestamp: tx.timestamp || tx.createdAt || Date.now()
+      };
+
+    })
     .sort((a,b)=> b.timestamp - a.timestamp);
-}
+          }
 
 /* =========================================
    DEV
