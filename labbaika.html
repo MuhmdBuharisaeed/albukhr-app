@@ -177,6 +177,8 @@ input,select{
 </div>
 
 <script src="staking.js"></script>
+<script src="wallet-core.js"></script>
+
 <script>
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
@@ -192,21 +194,22 @@ function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
 function confirmStake(){
+
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
   const min = getMinStake("Labbaika");
 
-  if(isNaN(amount) || amount <= 0){
-    alert("Please enter a valid amount");
-    return;
-  }
-
-  if(amount < min){
+  if(!amount || amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  addStake({ project:"Labbaika", amount, duration });
+  const ok = addStake({ project:"Labbaika", amount, duration });
+
+  if(!ok){
+    alert("Stake failed.");
+    return;
+  }
 
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days in Labbaika Bakery.`;
@@ -216,69 +219,157 @@ function confirmStake(){
   load();
 }
 
+/* ===============================
+   CAPITAL WITHDRAW
+================================ */
+function withdrawCapital(stakeId){
+
+  if(typeof withdrawStakeCapital !== "function"){
+    alert("Capital withdraw not available.");
+    return;
+  }
+
+  const res = withdrawStakeCapital(stakeId);
+
+  if(res?.error){
+    alert(res.error);
+    return;
+  }
+
+  load();
+}
+
+/* ===============================
+   LOAD + MERGED HISTORY
+================================ */
 function load(){
+
   const data = getProjectTotals("Labbaika");
 
-  lStake.innerText = data.stake.toFixed(2) + " Pi";
-  lReward.innerText = data.reward.toFixed(2) + " Pi";
+  /* ===== LIVE REWARD ===== */
+  let reward = 0;
+  data.stakes.forEach(s=>{
+    reward += Number(s.remainingReward ?? s.reward) || 0;
+  });
+
+  lStake.innerText  = (data.stake || 0).toFixed(2) + " Pi";
+  lReward.innerText = reward.toFixed(2) + " Pi";
 
   labbaikaHistory.innerHTML = "";
 
-  if(data.stakes.length === 0){
+  const merged = [];
+
+  /* ===== STAKES ===== */
+  data.stakes.forEach(s=>{
+    merged.push({
+      type:"stake",
+      data:s,
+      timestamp:s.timestamp
+    });
+  });
+
+  /* ===== WITHDRAWALS ===== */
+  getWithdrawHistory()
+    .filter(tx=>tx.project==="Labbaika")
+    .forEach(tx=>{
+      merged.push({
+        type:"withdraw",
+        data:tx,
+        timestamp:tx.timestamp
+      });
+    });
+
+  if(merged.length === 0){
     labbaikaHistory.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  /* LATEST FIRST — REAL SORT */
-  data.stakes
-    .slice()
+  merged
     .sort((a,b)=>b.timestamp - a.timestamp)
-    .forEach(s=>{
-      const t = formatDateTime(s);
-      const div = document.createElement("div");
-      div.className="project-tx";
-      div.innerHTML=`
-        <div class="project-icon">🍞</div>
-        <div class="project-body">
-          <div class="project-title">Labbaika Stake</div>
-          <div class="project-date">${t.date} • ${t.time}</div>
-        </div>
-        <div class="project-right">
-          <div class="project-amount">${s.amount} Pi</div>
-          <div class="project-status">Successful</div>
-        </div>
-      `;
-      labbaikaHistory.appendChild(div);
+    .forEach(item=>{
+
+      if(item.type==="stake"){
+
+        const s = item.data;
+        const t = formatDateTime(s);
+
+        let capitalButton = "";
+
+        if(s.matured && !s.capitalWithdrawn){
+          capitalButton = `
+            <button 
+              onclick="withdrawCapital('${s.id}')"
+              style="margin-top:4px;font-size:10px;padding:4px 6px">
+              Withdraw Capital
+            </button>
+          `;
+        }
+
+        const div = document.createElement("div");
+        div.className="project-tx";
+        div.innerHTML=`
+          <div class="project-icon">🍞</div>
+          <div class="project-body">
+            <div class="project-title">Stake</div>
+            <div class="project-date">${t.date} • ${t.time}</div>
+            ${capitalButton}
+          </div>
+          <div class="project-right">
+            <div class="project-amount">
+              +${Number(s.amount).toFixed(2)} Pi
+            </div>
+            <div class="project-status">
+              ${s.capitalWithdrawn ? "Capital Withdrawn" : "Staked"}
+            </div>
+          </div>
+        `;
+        labbaikaHistory.appendChild(div);
+      }
+
+      if(item.type==="withdraw"){
+
+        const tx = item.data;
+
+        const div = document.createElement("div");
+        div.className="project-tx";
+        div.innerHTML=`
+          <div class="project-icon">🍞</div>
+          <div class="project-body">
+            <div class="project-title">Reward Withdrawal</div>
+            <div class="project-date">
+              ${new Date(tx.timestamp).toLocaleString()}
+            </div>
+          </div>
+          <div class="project-right">
+            <div class="project-amount" style="color:#c0392b">
+              -${tx.grossAmount.toFixed(2)} Pi
+            </div>
+            <div class="project-status">Withdrawn</div>
+          </div>
+        `;
+        labbaikaHistory.appendChild(div);
+      }
+
     });
 }
 
-load();
-</script>
-
-<script src="wallet-core.js"></script>
-
-<script>
+/* ===============================
+   WALLET NAVIGATION
+================================ */
 function goToWithdraw(){
-  if(typeof getTotals !== "function"){
-    alert("Wallet system not ready");
-    return;
-  }
 
-  const totals = getTotals();
-  const withdrawn = typeof getTotalWithdrawn === "function"
-    ? getTotalWithdrawn()
-    : 0;
+  const summary = getWalletSummary();
 
-  const available = totals.totalReward - withdrawn;
-
-  if(available <= 0){
+  if(summary.available <= 0){
     alert("No available rewards to withdraw.");
     return;
   }
 
   window.location.href = "wallet.html";
 }
+
+load();
 </script>
 
 </body>
