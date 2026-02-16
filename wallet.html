@@ -259,169 +259,278 @@ Fee: 1% • Daily Limit: 50 Pi
 
 <script>
 
+"use strict";
+
+/* =========================================
+   RUNTIME STATE
+========================================= */
+
 let activeProject = null;
+let isProcessing = false;
+
+/* =========================================
+   SAFE UTILITIES
+========================================= */
+
+function safeNumber(n){
+  const x = Number(n);
+  return isNaN(x) ? 0 : x;
+}
+
+function sanitizeText(str){
+  return String(str).replace(/[<>]/g,"");
+}
+
+function formatPi(n){
+  return safeNumber(n).toFixed(2) + " Pi";
+}
+
+function validateAddress(addr){
+  if(!addr) return false;
+  if(addr.length < 20) return false;
+  return /^[a-zA-Z0-9]+$/.test(addr);
+}
+
+/* =========================================
+   ICON MAP (IMMUTABLE)
+========================================= */
+
+const PROJECT_ICONS = Object.freeze({
+  raheem:"💊",
+  barsh:"🌾",
+  azman:"🧪",
+  khairat:"♻️",
+  urban:"🚍",
+  hauwal:"🌽",
+  labbaika:"🍞"
+});
 
 function getProjectIcon(name){
-  if(name.toLowerCase().includes("raheem")) return "💊";
-  if(name.toLowerCase().includes("barsh")) return "🌾";
-  if(name.toLowerCase().includes("azman")) return "🧪";
-  if(name.toLowerCase().includes("khairat")) return "♻️";
-  if(name.toLowerCase().includes("urban")) return "🚍";
-  if(name.toLowerCase().includes("hauwal")) return "🌽";
-  if(name.toLowerCase().includes("labbaika")) return "🍞";
+  if(!name) return "🏢";
+  const key = name.toLowerCase();
+  for(const k in PROJECT_ICONS){
+    if(key.includes(k)) return PROJECT_ICONS[k];
+  }
   return "🏢";
 }
 
+/* =========================================
+   WALLET RENDER
+========================================= */
+
 function renderWallet(){
+
+  if(typeof getWalletSummary !== "function") return;
+
   const summary = getWalletSummary();
-  totalStake.innerText = summary.totalStake.toFixed(2) + " Pi";
-  totalReward.innerText = summary.grossRewards.toFixed(2) + " Pi";
-  withdrawn.innerText = summary.withdrawn.toFixed(2) + " Pi";
-  available.innerText = summary.available.toFixed(2) + " Pi";
+
+  document.getElementById("totalStake").innerText =
+    formatPi(summary.totalStake);
+
+  document.getElementById("totalReward").innerText =
+    formatPi(summary.grossRewards);
+
+  document.getElementById("withdrawn").innerText =
+    formatPi(summary.withdrawn);
+
+  document.getElementById("available").innerText =
+    formatPi(summary.available);
+
   renderProjects();
 }
 
+/* =========================================
+   PROJECT RENDER
+========================================= */
+
 function renderProjects(){
 
+  if(typeof getProjectWalletBreakdown !== "function") return;
+
   const container = document.getElementById("projectContainer");
-  container.innerHTML="";
+  container.innerHTML = "";
 
   const projects = getProjectWalletBreakdown();
 
-  if(!projects.length){
-    container.innerHTML="<small>No staking activity yet</small>";
+  if(!projects || !projects.length){
+    container.innerHTML = "<small>No staking activity yet</small>";
     return;
   }
 
   projects.forEach(p=>{
 
     const card = document.createElement("div");
-    card.className="project-card";
+    card.className = "project-card";
+
+    const safeProject = sanitizeText(p.project);
 
     card.innerHTML = `
-      <div class="project-header" onclick="toggleBody(this)">
+      <div class="project-header">
         <div class="project-title">
           <div class="project-icon">
-            ${getProjectIcon(p.project)}
+            ${getProjectIcon(safeProject)}
           </div>
-          ${p.project}
+          ${safeProject}
         </div>
-        <div>${p.netReward.toFixed(2)} Pi</div>
+        <div>${formatPi(p.netReward)}</div>
       </div>
 
       <div class="project-body">
 
         <div class="row">
           <div>Staked</div>
-          <div>${p.stake.toFixed(2)} Pi</div>
+          <div>${formatPi(p.stake)}</div>
         </div>
 
         <div class="row">
           <div>Gross Reward</div>
-          <div>${p.grossReward.toFixed(2)} Pi</div>
+          <div>${formatPi(p.grossReward)}</div>
         </div>
 
         <div class="row">
           <div>Withdrawn</div>
-          <div>${p.withdrawn.toFixed(2)} Pi</div>
+          <div>${formatPi(p.withdrawn)}</div>
         </div>
 
-        <button class="btn"
-          style="margin-top:10px"
-          onclick="openWithdraw('${p.project}')">
+        <button class="btn withdraw-btn">
           Withdraw
         </button>
 
-        <div id="history-${p.project}"></div>
+        <div class="history"></div>
+
       </div>
     `;
 
     container.appendChild(card);
-    renderProjectHistory(p.project);
+
+    const header = card.querySelector(".project-header");
+    const body = card.querySelector(".project-body");
+    const btn = card.querySelector(".withdraw-btn");
+
+    header.addEventListener("click",()=>{
+      body.style.display =
+        body.style.display === "block" ? "none" : "block";
+    });
+
+    btn.addEventListener("click",()=>{
+      openWithdraw(safeProject);
+    });
+
+    renderProjectHistory(safeProject, card.querySelector(".history"));
   });
 }
 
-function toggleBody(el){
-  const body = el.nextElementSibling;
-  body.style.display =
-    body.style.display==="block" ? "none":"block";
-}
+/* =========================================
+   HISTORY
+========================================= */
 
-function renderProjectHistory(project){
+function renderProjectHistory(project, div){
 
-  const div = document.getElementById("history-"+project);
-  if(!div) return;
+  if(typeof getWithdrawHistory !== "function") return;
 
   const history = getWithdrawHistory()
     .filter(tx=>tx.project===project)
     .sort((a,b)=>b.timestamp-a.timestamp);
 
   if(!history.length){
-    div.innerHTML="<small>No withdrawals yet</small>";
+    div.innerHTML = "<small>No withdrawals yet</small>";
     return;
   }
 
-  div.innerHTML="";
+  div.innerHTML = "";
 
   history.forEach(tx=>{
-    div.innerHTML += `
-      <div class="tx">
-        <div class="tx-left">
-          <div class="tx-icon">
-            ${getProjectIcon(project)}
-          </div>
-          <div>
-            Withdraw
-            <small>${new Date(tx.timestamp).toLocaleString()}</small>
-          </div>
-        </div>
-        <div class="tx-right">
-          -${tx.grossAmount.toFixed(2)} Pi
-          <small>
-            Fee: ${tx.fee.toFixed(2)} |
-            Received: ${tx.received.toFixed(2)}
-          </small>
+
+    const row = document.createElement("div");
+    row.className = "tx";
+
+    row.innerHTML = `
+      <div class="tx-left">
+        <div class="tx-icon">${getProjectIcon(project)}</div>
+        <div>
+          Withdraw
+          <small>${new Date(tx.timestamp).toLocaleString()}</small>
         </div>
       </div>
+      <div class="tx-right">
+        -${formatPi(tx.grossAmount)}
+        <small>
+          Fee: ${formatPi(tx.fee)} |
+          Received: ${formatPi(tx.received)}
+        </small>
+      </div>
     `;
+
+    div.appendChild(row);
   });
 }
 
+/* =========================================
+   WITHDRAW FLOW (HARDENED)
+========================================= */
+
 function openWithdraw(project){
   activeProject = project;
-  modalProject.innerText = "Withdraw from " + project;
-  withdrawModal.style.display="flex";
+  document.getElementById("modalProject").innerText =
+    "Withdraw from " + sanitizeText(project);
+  document.getElementById("withdrawModal").style.display = "flex";
 }
 
 function closeModal(){
-  withdrawModal.style.display="none";
+  document.getElementById("withdrawModal").style.display = "none";
 }
 
 function confirmWithdraw(){
 
-window.dispatchEvent(new Event("walletUpdated"));
-  
-  const amt = withdrawAmount.value;
-  const addr = withdrawAddress.value;
+  if(isProcessing) return;
+
+  const amountInput = document.getElementById("withdrawAmount");
+  const addressInput = document.getElementById("withdrawAddress");
+
+  const amount = safeNumber(amountInput.value);
+  const address = sanitizeText(addressInput.value.trim());
+
+  if(!activeProject)
+    return alert("Project not selected");
+
+  if(amount <= 0)
+    return alert("Invalid amount");
+
+  if(!validateAddress(address))
+    return alert("Invalid wallet address");
+
+  if(typeof requestWithdraw !== "function")
+    return alert("Withdraw engine not available");
+
+  isProcessing = true;
 
   const res = requestWithdraw({
-    project:activeProject,
-    amount:amt,
-    walletAddress:addr
+    project: activeProject,
+    amount,
+    walletAddress: address
   });
 
   if(res.error){
-    alert(res.error);
-    return;
+    isProcessing = false;
+    return alert(res.error);
   }
 
-  withdrawAmount.value="";
-  withdrawAddress.value="";
+  amountInput.value = "";
+  addressInput.value = "";
+
   closeModal();
   renderWallet();
+
+  isProcessing = false;
 }
 
-renderWallet();
+/* =========================================
+   SAFE INIT
+========================================= */
+
+document.addEventListener("DOMContentLoaded",()=>{
+  renderWallet();
+});
 
 </script>
 
