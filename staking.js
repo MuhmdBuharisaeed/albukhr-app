@@ -1,10 +1,11 @@
 // =======================================
-// ALBUKHR STAKING ENGINE v3.1 (HARDENED)
+// ALBUKHR STAKING ENGINE v3.2 (EXTENDED SAFE)
 // Internal + External + Wallet Compatible
 // =======================================
 
 const INTERNAL_KEY = "albukhr_stakes";
 const EXTERNAL_KEY = "albukhr_external_projects";
+const WITHDRAW_KEY = "albukhr_withdrawals";
 
 /* ======================================
    STORAGE CORE
@@ -84,12 +85,95 @@ function addStake({project,amount,duration}){
     amount:safeAmount,
     duration:safeDuration,
     reward:Number(reward)||0,
+    remainingReward:Number(reward)||0,
+    withdrawnReward:0,
+    capitalWithdrawn:false,
     status:"Successful",
     timestamp:Date.now(),
     type:"internal"
   });
 
   _save(INTERNAL_KEY,stakes);
+  return true;
+}
+
+/* ======================================
+   MATURITY CHECK
+====================================== */
+function isStakeMatured(stake){
+
+  const now = Date.now();
+  const end = stake.timestamp + (stake.duration * 24 * 60 * 60 * 1000);
+
+  return now >= end;
+}
+
+/* ======================================
+   WITHDRAW REWARD FROM PROJECT
+====================================== */
+function withdrawProjectReward(project,amount){
+
+  const stakes = _safeParse(INTERNAL_KEY);
+  const safeAmount = Number(amount);
+
+  if(!safeAmount || safeAmount <= 0){
+    return {error:"Invalid amount"};
+  }
+
+  let remaining = safeAmount;
+  let updated = false;
+
+  const newStakes = stakes.map(s=>{
+
+    if(s.project !== project) return s;
+    if(remaining <= 0) return s;
+
+    const available = Number(s.remainingReward)||0;
+
+    if(available <= 0) return s;
+
+    const deduction = Math.min(available,remaining);
+
+    remaining -= deduction;
+    updated = true;
+
+    return {
+      ...s,
+      remainingReward: available - deduction,
+      withdrawnReward:(Number(s.withdrawnReward)||0)+deduction
+    };
+  });
+
+  if(!updated){
+    return {error:"No available reward"};
+  }
+
+  _save(INTERNAL_KEY,newStakes);
+  return {success:true};
+}
+
+/* ======================================
+   WITHDRAW CAPITAL IF MATURED
+====================================== */
+function withdrawCapital(stakeId){
+
+  const stakes = _safeParse(INTERNAL_KEY);
+
+  const updated = stakes.map(s=>{
+
+    if(s.id !== stakeId) return s;
+
+    if(!isStakeMatured(s)){
+      return s;
+    }
+
+    return {
+      ...s,
+      capitalWithdrawn:true
+    };
+  });
+
+  _save(INTERNAL_KEY,updated);
   return true;
 }
 
@@ -118,7 +202,6 @@ function addExternalStake(data){
   _save(EXTERNAL_KEY,projects);
 }
 
-/* OPTIONAL ADMIN APPROVAL */
 function approveExternalStake(id){
 
   const projects = _safeParse(EXTERNAL_KEY);
@@ -157,7 +240,7 @@ function getAllStakesMerged(){
 }
 
 /* ======================================
-   TOTALS
+   TOTALS (UPDATED FOR REMAINING REWARD)
 ====================================== */
 function getTotals(){
 
@@ -168,14 +251,14 @@ function getTotals(){
 
   all.forEach(s=>{
     totalStake  += Number(s.amount)||0;
-    totalReward += Number(s.reward)||0;
+    totalReward += Number(s.remainingReward ?? s.reward)||0;
   });
 
   return {totalStake,totalReward};
 }
 
 /* ======================================
-   PROJECT TOTALS
+   PROJECT TOTALS (UPDATED)
 ====================================== */
 function getProjectTotals(project){
 
@@ -186,8 +269,10 @@ function getProjectTotals(project){
   let reward = 0;
 
   filtered.forEach(s=>{
-    stake  += Number(s.amount)||0;
-    reward += Number(s.reward)||0;
+    if(!s.capitalWithdrawn){
+      stake += Number(s.amount)||0;
+    }
+    reward += Number(s.remainingReward ?? s.reward)||0;
   });
 
   return {stake,reward,stakes:filtered};
