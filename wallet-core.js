@@ -1,9 +1,9 @@
 /* =========================================
-   ALBUKHR WALLET CORE v5 (PROJECT AWARE)
+   ALBUKHR WALLET CORE v6 (SYNCED WITH ENGINE 3.2)
    Internal + External Unified
 ========================================= */
 
-const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v5";
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v6";
 const SETTINGS_KEY = "albukhr_wallet_settings";
 
 /* =========================================
@@ -12,8 +12,8 @@ const SETTINGS_KEY = "albukhr_wallet_settings";
 
 function getWalletSettings(){
   const def = {
-    feePercent: 1,        // 1%
-    dailyLimit: 50        // 50 Pi per day
+    feePercent: 1,
+    dailyLimit: 50
   };
   return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || def;
 }
@@ -35,7 +35,7 @@ function saveWithdrawals(list){
 }
 
 /* =========================================
-   PROJECT BREAKDOWN (CORE)
+   PROJECT BREAKDOWN (SYNCED WITH REMAINING REWARD)
 ========================================= */
 
 function getProjectWalletBreakdown(){
@@ -50,6 +50,7 @@ function getProjectWalletBreakdown(){
   const map = {};
 
   stakes.forEach(s=>{
+
     if(!map[s.project]){
       map[s.project] = {
         project: s.project,
@@ -59,18 +60,22 @@ function getProjectWalletBreakdown(){
       };
     }
 
-    map[s.project].stake += Number(s.amount) || 0;
-    map[s.project].grossReward += Number(s.reward) || 0;
+    if(!s.capitalWithdrawn){
+      map[s.project].stake += Number(s.amount) || 0;
+    }
+
+    map[s.project].grossReward += 
+      Number(s.remainingReward ?? s.reward) || 0;
   });
 
   withdrawals.forEach(w=>{
     if(!map[w.project]) return;
-    map[w.project].withdrawn += Number(w.grossAmount || w.amount) || 0;
+    map[w.project].withdrawn += Number(w.grossAmount || 0) || 0;
   });
 
   return Object.values(map).map(p=>({
     ...p,
-    netReward: p.grossReward - p.withdrawn
+    netReward: p.grossReward
   }));
 }
 
@@ -83,21 +88,19 @@ function getWalletSummary(){
   const projects = getProjectWalletBreakdown();
 
   let totalStake = 0;
-  let grossRewards = 0;
-  let withdrawn = 0;
+  let rewards = 0;
 
   projects.forEach(p=>{
     totalStake += p.stake;
-    grossRewards += p.grossReward;
-    withdrawn += p.withdrawn;
+    rewards += p.netReward;
   });
 
   return {
     totalStake,
-    grossRewards,
-    withdrawn,
-    rewards: grossRewards - withdrawn,
-    available: grossRewards - withdrawn
+    grossRewards: rewards,
+    withdrawn: 0,
+    rewards,
+    available: rewards
   };
 }
 
@@ -115,7 +118,7 @@ function getTodayWithdrawTotal(){
 }
 
 /* =========================================
-   WITHDRAW (PROJECT SPECIFIC)
+   WITHDRAW (PROJECT SPECIFIC + ENGINE SYNC)
 ========================================= */
 
 function requestWithdraw({project, amount, walletAddress}){
@@ -142,10 +145,21 @@ function requestWithdraw({project, amount, walletAddress}){
     return { error:"Insufficient project reward balance" };
 
   if(getTodayWithdrawTotal() + amount > settings.dailyLimit)
-    return { error:"Daily limit exceeded (50 Pi)" };
+    return { error:"Daily limit exceeded" };
 
   const fee = (amount * settings.feePercent) / 100;
   const received = amount - fee;
+
+  /* ==========================
+     ENGINE REWARD DEDUCTION
+  ========================== */
+
+  if(typeof withdrawProjectReward === "function"){
+    const result = withdrawProjectReward(project, amount);
+    if(result?.error){
+      return result;
+    }
+  }
 
   const now = Date.now();
 
@@ -156,7 +170,8 @@ function requestWithdraw({project, amount, walletAddress}){
     fee,
     received,
     walletAddress,
-    timestamp: now
+    timestamp: now,
+    type: "withdrawal"
   };
 
   const list = getWithdrawals();
@@ -164,6 +179,42 @@ function requestWithdraw({project, amount, walletAddress}){
   saveWithdrawals(list);
 
   return tx;
+}
+
+/* =========================================
+   PROJECT LEVEL HISTORY (FOR PROJECT PAGE)
+========================================= */
+
+function getProjectWithdrawHistory(project){
+
+  return getWithdrawals()
+    .filter(w=>w.project===project)
+    .sort((a,b)=>b.timestamp - a.timestamp);
+}
+
+/* =========================================
+   MERGED PROJECT HISTORY (Stake + Withdraw)
+========================================= */
+
+function getProjectFullHistory(project){
+
+  const stakes = 
+    typeof getInternalProjectTotals === "function"
+      ? getInternalProjectTotals(project).stakes || []
+      : [];
+
+  const withdrawals = getProjectWithdrawHistory(project);
+
+  const mappedWithdrawals = withdrawals.map(w=>({
+    id: w.id,
+    project: w.project,
+    amount: w.grossAmount,
+    type: "withdrawal",
+    timestamp: w.timestamp
+  }));
+
+  return [...stakes, ...mappedWithdrawals]
+    .sort((a,b)=> b.timestamp - a.timestamp);
 }
 
 /* =========================================
@@ -181,4 +232,4 @@ function getWithdrawHistory(){
 
 function clearWalletLedger(){
   localStorage.removeItem(WITHDRAW_KEY);
-     }
+  }
