@@ -39,7 +39,7 @@ body{
 /* ===== SCROLLABLE HISTORY ===== */
 .history-area{
   position:fixed;
-  top:300px;
+  top:320px;
   bottom:0;
   left:0;
   right:0;
@@ -64,7 +64,9 @@ body{
 .project-date{font-size:11px;color:#777}
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
+.project-status{font-size:11px}
+.success-status{color:#0f7a3d}
+.withdraw-status{color:#c0392b}
 .info-indicator{display:flex;align-items:center;gap:6px;font-size:13px;color:#0f7a3d;cursor:pointer}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:2000}
 .modal-box{background:#fff;width:90%;max-width:420px;padding:20px;border-radius:16px}
@@ -84,7 +86,6 @@ label{margin-top:12px;display:block}
   <div class="header-right info-indicator" onclick="openInfo()">ℹ️</div>
 </header>
 
-<!-- FIXED SECTION -->
 <div class="fixed-area">
 
   <div class="stats">
@@ -114,11 +115,9 @@ label{margin-top:12px;display:block}
 
 </div>
 
-<!-- SCROLL AREA -->
 <div class="history-area" id="khairatHistory"></div>
 
-
-<!-- MODALS (UNCHANGED) -->
+<!-- MODALS (UNCHANGED STRUCTURE) -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
     <h3>Stake in Khairat</h3>
@@ -180,6 +179,8 @@ function closeSuccess(){ successModal.style.display="none"; }
 function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
+function safe(n){ return Number(n || 0).toFixed(2); }
+
 function confirmStake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
@@ -208,35 +209,45 @@ function confirmStake(){
 function load(){
   const data = getProjectTotals("Khairat");
 
-  kStake.innerText = data.stake.toFixed(2) + " Pi";
-  kReward.innerText = data.reward.toFixed(2) + " Pi";
+  kStake.innerText = safe(data.stake) + " Pi";
+  kReward.innerText = safe(data.reward) + " Pi";
 
   khairatHistory.innerHTML = "";
 
-  if(data.stakes.length === 0){
+  if(!data.stakes || data.stakes.length === 0){
     khairatHistory.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  data.stakes.slice().reverse().forEach(s=>{
-    const t = formatDateTime(s);
+  data.stakes
+    .slice()
+    .sort((a,b)=>(b.timestamp||0)-(a.timestamp||0))
+    .forEach(s=>{
+      const t = formatDateTime(s);
+      const isWithdraw = s.type === "withdraw";
 
-    const div = document.createElement("div");
-    div.className="project-tx";
-    div.innerHTML=`
-      <div class="project-icon">♻️</div>
-      <div class="project-body">
-        <div class="project-title">Khairat Stake</div>
-        <div class="project-date">${t.date} • ${t.time}</div>
-      </div>
-      <div class="project-right">
-        <div class="project-amount">${s.amount} Pi</div>
-        <div class="project-status">Successful</div>
-      </div>
-    `;
-    khairatHistory.appendChild(div);
-  });
+      const div = document.createElement("div");
+      div.className="project-tx";
+      div.innerHTML=`
+        <div class="project-icon">${isWithdraw ? "💸" : "♻️"}</div>
+        <div class="project-body">
+          <div class="project-title">
+            ${isWithdraw ? "Khairat Withdrawal" : "Khairat Stake"}
+          </div>
+          <div class="project-date">${t.date} • ${t.time}</div>
+        </div>
+        <div class="project-right">
+          <div class="project-amount">
+            ${isWithdraw ? "-" : ""}${Number(s.amount).toFixed(2)} Pi
+          </div>
+          <div class="project-status ${isWithdraw ? "withdraw-status" : "success-status"}">
+            ${isWithdraw ? "Withdrawn" : "Successful"}
+          </div>
+        </div>
+      `;
+      khairatHistory.appendChild(div);
+    });
 }
 
 load();
