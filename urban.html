@@ -72,7 +72,9 @@ body{
 .project-date{font-size:11px;color:#777}
 .project-right{text-align:right}
 .project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
+.project-status{font-size:11px}
+.success-status{color:#0f7a3d}
+.withdraw-status{color:#c0392b}
 
 /* MODALS */
 .modal{
@@ -198,6 +200,8 @@ function closeSuccess(){ successModal.style.display="none"; }
 function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
+function safe(n){ return Number(n || 0).toFixed(2); }
+
 function confirmStake(){
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
@@ -226,8 +230,8 @@ function confirmStake(){
 function load(){
   const data = getProjectTotals("Urban");
 
-  uStake.innerText = data.stake.toFixed(2) + " Pi";
-  uReward.innerText = data.reward.toFixed(2) + " Pi";
+  uStake.innerText = safe(data.stake) + " Pi";
+  uReward.innerText = safe(data.reward) + " Pi";
 
   urbanHistory.innerHTML = "";
 
@@ -243,17 +247,25 @@ function load(){
     .forEach(s=>{
       const t = formatDateTime(s);
 
+      const isWithdraw = s.type === "withdraw";
+
       const div = document.createElement("div");
       div.className="project-tx";
       div.innerHTML=`
-        <div class="project-icon">🚍</div>
+        <div class="project-icon">${isWithdraw ? "💸" : "🚍"}</div>
         <div class="project-body">
-          <div class="project-title">Urban Stake</div>
+          <div class="project-title">
+            ${isWithdraw ? "Urban Withdrawal" : "Urban Stake"}
+          </div>
           <div class="project-date">${t.date} • ${t.time}</div>
         </div>
         <div class="project-right">
-          <div class="project-amount">${Number(s.amount).toFixed(2)} Pi</div>
-          <div class="project-status">Successful</div>
+          <div class="project-amount">
+            ${isWithdraw ? "-" : ""}${Number(s.amount).toFixed(2)} Pi
+          </div>
+          <div class="project-status ${isWithdraw ? "withdraw-status" : "success-status"}">
+            ${isWithdraw ? "Withdrawn" : "Successful"}
+          </div>
         </div>
       `;
       urbanHistory.appendChild(div);
@@ -261,11 +273,6 @@ function load(){
 }
 
 function goToWithdraw(){
-  if(typeof getTotals !== "function"){
-    alert("Wallet system not ready");
-    return;
-  }
-
   const totals = getTotals();
   const withdrawn = typeof getTotalWithdrawn === "function"
     ? getTotalWithdrawn()
@@ -285,4 +292,4 @@ load();
 </script>
 
 </body>
-</html>
+    </html>
