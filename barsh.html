@@ -67,7 +67,7 @@ label{margin-top:12px;display:block}
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button onclick="goToWithdraw()" class="btn secondary">
-  💸 Withdraw Rewards
+      💸 Withdraw Rewards
     </button>
   </div>
 
@@ -76,7 +76,7 @@ label{margin-top:12px;display:block}
 
 </section>
 
-<!-- STAKE MODAL -->
+<!-- MODALS (UNCHANGED) -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
     <h3>Stake in Barsh Agro</h3>
@@ -102,7 +102,6 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- SUCCESS -->
 <div class="modal" id="successModal">
   <div class="modal-box success">
     <h3>Stake Successful</h3>
@@ -111,7 +110,6 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- INFO -->
 <div class="modal" id="infoModal">
   <div class="modal-box">
     <h3>About Barsh Agro</h3>
@@ -124,6 +122,8 @@ label{margin-top:12px;display:block}
 </div>
 
 <script src="staking.js"></script>
+<script src="wallet-core.js"></script>
+
 <script>
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
@@ -171,41 +171,36 @@ function load(){
 
   barshHistory.innerHTML = "";
 
-  if(data.stakes.length === 0){
+  if(!data.stakes || data.stakes.length === 0){
     barshHistory.innerHTML =
       "<p style='font-size:12px;color:#777'>No transactions yet</p>";
     return;
   }
 
-  data.stakes.slice().reverse().forEach(s=>{
-    const t = formatDateTime(s);
+  data.stakes
+    .slice()
+    .sort((a,b)=>(b.timestamp||0)-(a.timestamp||0))
+    .forEach(s=>{
+      const t = formatDateTime(s);
 
-    const div = document.createElement("div");
-    div.className="project-tx";
-    div.innerHTML=`
-      <div class="project-icon">🌾</div>
-      <div class="project-body">
-        <div class="project-title">Barsh Stake</div>
-        <div class="project-date">${t.date} • ${t.time}</div>
-      </div>
-      <div class="project-right">
-        <div class="project-amount">${s.amount} Pi</div>
-        <div class="project-status">Successful</div>
-      </div>
-    `;
-    barshHistory.appendChild(div);
-  });
+      const div = document.createElement("div");
+      div.className="project-tx";
+      div.innerHTML=`
+        <div class="project-icon">🌾</div>
+        <div class="project-body">
+          <div class="project-title">Barsh Stake</div>
+          <div class="project-date">${t.date} • ${t.time}</div>
+        </div>
+        <div class="project-right">
+          <div class="project-amount">${Number(s.amount).toFixed(2)} Pi</div>
+          <div class="project-status">Successful</div>
+        </div>
+      `;
+      barshHistory.appendChild(div);
+    });
 }
 
-load();
-</script>
-
-<script src="staking.js"></script>
-<script src="wallet-core.js"></script>
-
-<script>
 function goToWithdraw(){
-
   if(typeof getTotals !== "function"){
     alert("Wallet system not ready");
     return;
@@ -223,10 +218,11 @@ function goToWithdraw(){
     return;
   }
 
-  // direct user to wallet
   window.location.href = "wallet.html";
 }
+
+load();
 </script>
-  
+
 </body>
 </html>
