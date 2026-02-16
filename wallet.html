@@ -72,8 +72,25 @@ body{
 
 .project-title{
   font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
 
+/* ===== NEW ICON STYLE ===== */
+.project-icon{
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f0faf4;
+  border-radius:50%;
+  font-size:16px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* BODY */
 .project-body{
   margin-top:10px;
   display:none;
@@ -107,7 +124,15 @@ body{
 }
 
 .tx-icon{
-  font-size:16px;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f0faf4;
+  border-radius:50%;
+  font-size:14px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
 }
 
 .tx-right{
@@ -207,7 +232,6 @@ Fee: 1% • Daily Limit: 50 Pi
 
 let activeProject = null;
 
-/* ===== ICON MAPPER ===== */
 function getProjectIcon(name){
   if(name.toLowerCase().includes("raheem")) return "💊";
   if(name.toLowerCase().includes("barsh")) return "🌾";
@@ -219,27 +243,18 @@ function getProjectIcon(name){
   return "🏢";
 }
 
-/* ===== LOAD WALLET ===== */
 function renderWallet(){
 
   const summary = getWalletSummary();
 
-  totalStake.innerText =
-    summary.totalStake.toFixed(2) + " Pi";
-
-  totalReward.innerText =
-    summary.grossRewards.toFixed(2) + " Pi";
-
-  withdrawn.innerText =
-    summary.withdrawn.toFixed(2) + " Pi";
-
-  available.innerText =
-    summary.available.toFixed(2) + " Pi";
+  totalStake.innerText = summary.totalStake.toFixed(2) + " Pi";
+  totalReward.innerText = summary.grossRewards.toFixed(2) + " Pi";
+  withdrawn.innerText = summary.withdrawn.toFixed(2) + " Pi";
+  available.innerText = summary.available.toFixed(2) + " Pi";
 
   renderProjects();
 }
 
-/* ===== PROJECT CARDS ===== */
 function renderProjects(){
 
   const container = document.getElementById("projectContainer");
@@ -260,7 +275,10 @@ function renderProjects(){
     card.innerHTML = `
       <div class="project-header" onclick="toggleBody(this)">
         <div class="project-title">
-          ${getProjectIcon(p.project)} ${p.project}
+          <div class="project-icon">
+            ${getProjectIcon(p.project)}
+          </div>
+          ${p.project}
         </div>
         <div>${p.netReward.toFixed(2)} Pi</div>
       </div>
@@ -297,14 +315,12 @@ function renderProjects(){
   });
 }
 
-/* ===== EXPAND TOGGLE ===== */
 function toggleBody(el){
   const body = el.nextElementSibling;
   body.style.display =
     body.style.display==="block" ? "none":"block";
 }
 
-/* ===== PROJECT HISTORY (NEWEST FIRST) ===== */
 function renderProjectHistory(project){
 
   const div = document.getElementById("history-"+project);
@@ -325,7 +341,9 @@ function renderProjectHistory(project){
     div.innerHTML += `
       <div class="tx">
         <div class="tx-left">
-          <div class="tx-icon">${getProjectIcon(project)}</div>
+          <div class="tx-icon">
+            ${getProjectIcon(project)}
+          </div>
           <div>
             Withdraw
             <small>${new Date(tx.timestamp).toLocaleString()}</small>
@@ -343,7 +361,6 @@ function renderProjectHistory(project){
   });
 }
 
-/* ===== WITHDRAW ===== */
 function openWithdraw(project){
   activeProject = project;
   modalProject.innerText = "Withdraw from " + project;
