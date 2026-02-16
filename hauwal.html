@@ -8,43 +8,56 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
-
-/* PAGE CONTENT */
-.section{padding:16px}
-
-.stats{
-  display:flex;
-  gap:12px;
-  margin:16px 0
+body{
+  background:#f5f7f6;
+  font-family:Arial;
+  margin:0;
+  padding:0;
+  overflow:hidden;
 }
 
-.stat-card{
-  flex:1;
-  background:#fff;
-  border-radius:14px;
+/* FIXED HEADER */
+.header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+}
+
+/* FIXED CONTENT AREA */
+.fixed-area{
+  position:fixed;
+  top:60px;
+  left:0;
+  right:0;
+  background:#f5f7f6;
   padding:16px;
-  text-align:center
+  z-index:900;
 }
 
+/* SCROLLABLE HISTORY */
+.history-area{
+  position:fixed;
+  top:300px;
+  bottom:0;
+  left:0;
+  right:0;
+  overflow-y:auto;
+  padding:16px;
+}
+
+/* EXISTING DESIGN */
+.stats{display:flex;gap:12px;margin:16px 0}
+.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
 .stat-card span{display:block;color:#666;font-size:14px}
 .stat-card strong{font-size:18px;margin-top:6px;display:block}
 
 .btns{display:flex;gap:12px;margin-top:12px}
-
-.btn{
-  flex:1;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  font-weight:bold;
-  font-size:16px
-}
-
+.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
 .primary{background:#0f7a3d;color:#fff}
 .secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
 
-/* SHORT INFO */
 .short-info{
   background:#fff;
   border-radius:14px;
@@ -55,7 +68,6 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
   line-height:1.6
 }
 
-/* TRANSACTIONS */
 .project-tx{
   background:#fff;
   border-radius:12px;
@@ -74,7 +86,6 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
 .project-amount{font-size:14px;font-weight:bold}
 .project-status{font-size:11px;color:#0f7a3d}
 
-/* INFO INDICATOR */
 .info-indicator{
   display:flex;
   align-items:center;
@@ -84,7 +95,6 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
   cursor:pointer
 }
 
-/* MODAL */
 .modal{
   position:fixed;
   inset:0;
@@ -92,7 +102,7 @@ body{background:#f5f7f6;padding-bottom:90px;font-family:Arial}
   display:none;
   align-items:center;
   justify-content:center;
-  z-index:1000
+  z-index:2000
 }
 
 .modal-box{
@@ -113,8 +123,6 @@ input,select{
 }
 
 label{margin-top:12px;display:block}
-
-/* SUCCESS */
 .success{text-align:center}
 .success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
@@ -122,20 +130,16 @@ label{margin-top:12px;display:block}
 
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <span>🌽 Hauwal Sumonviter</span>
   </div>
-
-  <div class="header-right info-indicator" onclick="openInfo()">
-    <span>ℹ️</span>
-  </div>
+  <div class="header-right info-indicator" onclick="openInfo()">ℹ️</div>
 </header>
 
-<section class="section">
+<!-- FIXED AREA -->
+<div class="fixed-area">
 
-  <!-- STATS -->
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -147,28 +151,27 @@ label{margin-top:12px;display:block}
     </div>
   </div>
 
-  <!-- SHORT INFO -->
   <div class="short-info">
     <strong>Hauwal Sumonviter</strong> is an ALBUKHR agro-processing project
     focused on transforming traditional maize processing into a modern,
     hygienic, and scalable production system.
   </div>
-  
-  <!-- ACTIONS -->
+
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button onclick="goToWithdraw()" class="btn secondary">
-  💸 Withdraw Rewards
+      💸 Withdraw Rewards
     </button>
   </div>
 
-  <!-- HISTORY -->
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
-  <div id="hauwalHistory"></div>
 
-</section>
+</div>
 
-<!-- STAKE MODAL -->
+<!-- SCROLL AREA -->
+<div class="history-area" id="hauwalHistory"></div>
+
+<!-- MODALS -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
     <h3>Stake in Hauwal</h3>
@@ -176,8 +179,8 @@ label{margin-top:12px;display:block}
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: 100 Pi
+    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
+      Minimum stake: --
     </small>
 
     <label>Duration</label>
@@ -194,7 +197,6 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- SUCCESS MODAL -->
 <div class="modal" id="successModal">
   <div class="modal-box success">
     <h3>Stake Successful</h3>
@@ -203,32 +205,24 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<!-- FULL INFO MODAL -->
 <div class="modal" id="infoModal">
   <div class="modal-box">
     <h3>About Hauwal Sumonviter</h3>
     <p style="font-size:14px;line-height:1.6;color:#444">
-      Hauwal Sumonviter is an ALBUKHR food and agro-processing initiative aimed
-      at modernizing local maize milling into a clean, efficient, and
-      commercially viable operation.
-      <br><br>
-      Funds are used for modern milling equipment, hygiene systems,
-      packaging, storage, and distribution infrastructure.
-      <br><br>
-      The project creates employment, improves food quality, and strengthens
-      community-based agricultural value chains.
+      Hauwal modernizes maize milling into a clean, efficient,
+      and commercially viable agro-processing system.
     </p>
-
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
   </div>
 </div>
 
 <script src="staking.js"></script>
+<script src="wallet-core.js"></script>
+
 <script>
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 const infoModal = document.getElementById("infoModal");
-const minHint = document.querySelector("small");
 
 function openModal(){
   stakeModal.style.display="flex";
@@ -246,7 +240,7 @@ function confirmStake(){
   const duration = Number(durationSelect.value);
   const min = getMinStake("Hauwal");
 
-  if(!amount || amount < min){
+  if(isNaN(amount) || amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
   }
@@ -261,9 +255,7 @@ function confirmStake(){
   load();
 }
 
-function safe(num){
-  return Number(num || 0).toFixed(2);
-}
+function safe(n){ return Number(n || 0).toFixed(2); }
 
 function load(){
   const data = getProjectTotals("Hauwal");
@@ -283,8 +275,8 @@ function load(){
     const t = formatDateTime(s);
 
     const div = document.createElement("div");
-    div.className = "project-tx";
-    div.innerHTML = `
+    div.className="project-tx";
+    div.innerHTML=`
       <div class="project-icon">🌽</div>
       <div class="project-body">
         <div class="project-title">Hauwal Stake</div>
@@ -300,19 +292,8 @@ function load(){
 }
 
 load();
-      </script>
 
-<script src="staking.js"></script>
-<script src="wallet-core.js"></script>
-
-<script>
 function goToWithdraw(){
-
-  if(typeof getTotals !== "function"){
-    alert("Wallet system not ready");
-    return;
-  }
-
   const totals = getTotals();
   const withdrawn = typeof getTotalWithdrawn === "function"
     ? getTotalWithdrawn()
@@ -325,10 +306,9 @@ function goToWithdraw(){
     return;
   }
 
-  // direct user to wallet
   window.location.href = "wallet.html";
 }
 </script>
-  
+
 </body>
-      </html>
+</html>
