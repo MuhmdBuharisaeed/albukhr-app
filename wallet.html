@@ -9,37 +9,29 @@
 body{
   margin:0;
   font-family:system-ui;
-  background:#f4f7f6;
-  display:flex;
-  flex-direction:column;
-  height:100vh;
+  background:#f5f7f6;
 }
 
-/* ===== FIXED HEADER ===== */
 .header{
   background:#0f7a3d;
   color:#fff;
-  padding:16px;
-  font-weight:700;
+  padding:18px;
   text-align:center;
-  flex-shrink:0;
+  font-weight:700;
+  font-size:18px;
 }
 
-/* ===== FIXED SUMMARY ===== */
 .summary{
   background:#fff;
   padding:16px;
   border-bottom:1px solid #eee;
-  flex-shrink:0;
 }
 
 .balance{
-  font-size:26px;
+  font-size:28px;
   font-weight:800;
   color:#0f7a3d;
 }
-
-.sub{font-size:12px;color:#666;margin-top:4px}
 
 .row{
   display:flex;
@@ -48,134 +40,47 @@ body{
   font-size:13px;
 }
 
-/* ===== SCROLL AREA ===== */
-.scroll-area{
-  flex:1;
-  overflow-y:auto;
+.container{
   padding:16px;
 }
 
-/* ===== PROJECT CARD ===== */
-.project-card{
+.card{
   background:#fff;
-  border-radius:16px;
   padding:14px;
+  border-radius:14px;
   margin-bottom:16px;
-  box-shadow:0 6px 18px rgba(15,122,61,0.06);
-  transition:all .25s ease;
+  box-shadow:0 4px 14px rgba(0,0,0,0.05);
 }
 
-.project-card:hover{
-  transform:translateY(-2px);
-  box-shadow:0 10px 24px rgba(15,122,61,0.12);
-}
-
-.project-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  cursor:pointer;
-}
-
-.project-title{
-  font-weight:700;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:14px;
-}
-
-/* ===== PREMIUM ICON ===== */
-.project-icon{
-  width:36px;
-  height:36px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  font-size:16px;
-  background:linear-gradient(135deg,#e6f7ee,#f3fff8);
-  box-shadow:
-    0 4px 12px rgba(15,122,61,0.15),
-    inset 0 0 6px rgba(255,255,255,0.7);
-  transition:all .3s ease;
-}
-
-.project-card:hover .project-icon{
-  transform:scale(1.08);
-}
-
-/* ===== BODY ===== */
-.project-body{
-  margin-top:12px;
-  display:none;
-  animation:fadeIn .25s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(-4px)}
-  to{opacity:1;transform:translateY(0)}
+.card h4{
+  margin:0 0 8px 0;
 }
 
 .btn{
-  padding:9px 14px;
+  padding:8px 12px;
   border:none;
-  border-radius:12px;
+  border-radius:10px;
   background:#0f7a3d;
   color:#fff;
-  font-weight:600;
   cursor:pointer;
   font-size:12px;
-  transition:all .2s ease;
+  margin-top:8px;
 }
 
-.btn:hover{
-  background:#0c5f2f;
-  transform:scale(1.03);
+.btn.secondary{
+  background:#ccc;
+  color:#333;
 }
 
-/* ===== TX STYLE ===== */
 .tx{
+  border-top:1px solid #eee;
+  padding:8px 0;
+  font-size:12px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  padding:12px 0;
-  border-bottom:1px solid #f1f1f1;
-  font-size:13px;
 }
 
-.tx-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.tx-icon{
-  width:30px;
-  height:30px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  font-size:14px;
-  background:linear-gradient(135deg,#e6f7ee,#f3fff8);
-  box-shadow:0 3px 10px rgba(15,122,61,0.12);
-}
-
-.tx-right{
-  text-align:right;
-  font-weight:600;
-}
-
-.tx small{
-  display:block;
-  color:#777;
-  font-size:11px;
-  font-weight:400;
-}
-
-/* ===== MODAL ===== */
-.modal-overlay{
+.modal{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.4);
@@ -184,45 +89,32 @@ body{
   justify-content:center;
 }
 
-.modal{
+.modal-box{
   background:#fff;
-  padding:20px;
-  border-radius:14px;
+  padding:18px;
   width:90%;
-  max-width:400px;
+  max-width:380px;
+  border-radius:12px;
 }
 
 .modal input{
   width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #ddd;
-}
-
-.modal-actions{
-  display:flex;
-  gap:10px;
+  padding:8px;
+  margin-bottom:8px;
 }
 </style>
 </head>
-
 <body>
 
 <div class="header">💰 ALBUKHR WALLET</div>
 
 <div class="summary">
   <div class="balance" id="available">0.00 Pi</div>
-  <div class="sub">Available Reward Balance</div>
+  <div style="font-size:12px;color:#666">Available Reward</div>
 
   <div class="row">
-    <div>Total Staked</div>
+    <div>Total Stake</div>
     <div id="totalStake">0.00 Pi</div>
-  </div>
-
-  <div class="row">
-    <div>Total Rewards (Gross)</div>
-    <div id="totalReward">0.00 Pi</div>
   </div>
 
   <div class="row">
@@ -231,26 +123,16 @@ body{
   </div>
 </div>
 
-<div class="scroll-area" id="projectContainer"></div>
+<div class="container" id="projects"></div>
 
-<!-- WITHDRAW MODAL -->
-<div class="modal-overlay" id="withdrawModal">
-<div class="modal">
-<h3 id="modalProject">Withdraw</h3>
-
-<input type="number" id="withdrawAmount" placeholder="Amount">
-<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
-
-<div class="modal-actions">
-<button class="btn" onclick="confirmWithdraw()">Confirm</button>
-<button class="btn" style="background:#ccc;color:#333"
-onclick="closeModal()">Cancel</button>
-</div>
-
-<p style="font-size:11px;margin-top:10px;color:#777">
-Fee: 1% • Daily Limit: 50 Pi
-</p>
-
+<!-- Withdraw Modal -->
+<div class="modal" id="withdrawModal">
+<div class="modal-box">
+  <h3 id="modalTitle">Withdraw</h3>
+  <input type="number" id="withdrawAmount" placeholder="Amount">
+  <input type="text" id="withdrawAddress" placeholder="Wallet Address">
+  <button class="btn" onclick="confirmWithdraw()">Confirm</button>
+  <button class="btn secondary" onclick="closeModal()">Cancel</button>
 </div>
 </div>
 
@@ -261,70 +143,36 @@ Fee: 1% • Daily Limit: 50 Pi
 
 let activeProject = null;
 
-/* ============================= */
-/* SAFE ICON                     */
-/* ============================= */
-function getProjectIcon(name){
-  if(!name) return "🏢";
-  const n = name.toLowerCase();
-  if(n.includes("raheem")) return "💊";
-  if(n.includes("barsh")) return "🌾";
-  if(n.includes("azman")) return "🧪";
-  if(n.includes("khairat")) return "♻️";
-  if(n.includes("urban")) return "🚍";
-  if(n.includes("hauwal")) return "🌽";
-  if(n.includes("labbaika")) return "🍞";
-  return "🏢";
-}
+/* ===============================
+   MAIN RENDER
+================================ */
 
-/* ============================= */
-/* RENDER WALLET SUMMARY         */
-/* ============================= */
 function renderWallet(){
 
-  if(typeof getWalletSummary !== "function"){
-    console.warn("wallet-core not loaded");
-    return;
-  }
-
-  const summary = getWalletSummary() || {
-    totalStake:0,
-    grossRewards:0,
-    withdrawn:0,
-    available:0
-  };
-
-  document.getElementById("totalStake").innerText =
-    Number(summary.totalStake||0).toFixed(2)+" Pi";
-
-  document.getElementById("totalReward").innerText =
-    Number(summary.grossRewards||0).toFixed(2)+" Pi";
-
-  document.getElementById("withdrawn").innerText =
-    Number(summary.withdrawn||0).toFixed(2)+" Pi";
+  const summary = getWalletSummary();
 
   document.getElementById("available").innerText =
-    Number(summary.available||0).toFixed(2)+" Pi";
+    summary.available.toFixed(2) + " Pi";
+
+  document.getElementById("totalStake").innerText =
+    summary.totalStake.toFixed(2) + " Pi";
+
+  document.getElementById("withdrawn").innerText =
+    summary.withdrawn.toFixed(2) + " Pi";
 
   renderProjects();
 }
 
-/* ============================= */
-/* RENDER PROJECTS               */
-/* ============================= */
+/* ===============================
+   PROJECT RENDER
+================================ */
+
 function renderProjects(){
 
-  const container =
-    document.getElementById("projectContainer");
-
+  const container = document.getElementById("projects");
   container.innerHTML = "";
 
-  if(typeof getProjectWalletBreakdown !== "function"){
-    container.innerHTML="<small>Wallet engine not ready</small>";
-    return;
-  }
-
-  const projects = getProjectWalletBreakdown() || [];
+  const projects = getProjectWalletBreakdown();
 
   if(!projects.length){
     container.innerHTML =
@@ -335,151 +183,101 @@ function renderProjects(){
   projects.forEach(p=>{
 
     const card = document.createElement("div");
-    card.className="project-card";
+    card.className = "card";
 
     card.innerHTML = `
-      <div class="project-header" onclick="toggleBody(this)">
-        <div class="project-title">
-          <div class="project-icon">
-            ${getProjectIcon(p.project)}
-          </div>
-          ${p.project}
-        </div>
-        <div>${Number(p.netReward||0).toFixed(2)} Pi</div>
+      <h4>${p.project}</h4>
+
+      <div class="row">
+        <div>Staked</div>
+        <div>${p.stake.toFixed(2)} Pi</div>
       </div>
 
-      <div class="project-body">
-
-        <div class="row">
-          <div>Staked</div>
-          <div>${Number(p.stake||0).toFixed(2)} Pi</div>
-        </div>
-
-        <div class="row">
-          <div>Gross Reward</div>
-          <div>${Number(p.grossReward||0).toFixed(2)} Pi</div>
-        </div>
-
-        <div class="row">
-          <div>Withdrawn</div>
-          <div>${Number(p.withdrawn||0).toFixed(2)} Pi</div>
-        </div>
-
-        <button class="btn"
-          style="margin-top:10px"
-          onclick="openWithdraw('${p.project}')">
-          Withdraw Reward
-        </button>
-
-        <button class="btn"
-          style="margin-top:8px;background:#444"
-          onclick="withdrawCapital('${p.project}')">
-          Withdraw Capital
-        </button>
-
-        <div id="history-${p.project}"></div>
+      <div class="row">
+        <div>Available Reward</div>
+        <div>${p.netReward.toFixed(2)} Pi</div>
       </div>
+
+      <div class="row">
+        <div>Total Withdrawn</div>
+        <div>${p.withdrawn.toFixed(2)} Pi</div>
+      </div>
+
+      <button class="btn"
+        onclick="openWithdraw('${p.project}')">
+        Withdraw Reward
+      </button>
+
+      <button class="btn secondary"
+        onclick="withdrawCapital('${p.project}')">
+        Withdraw Capital
+      </button>
+
+      <div id="history-${p.project}"></div>
     `;
 
     container.appendChild(card);
-    renderProjectHistory(p.project);
+    renderHistory(p.project);
   });
 }
 
-/* ============================= */
-/* TOGGLE BODY                   */
-/* ============================= */
-function toggleBody(el){
-  const body = el.nextElementSibling;
-  body.style.display =
-    body.style.display==="block" ? "none":"block";
-}
+/* ===============================
+   HISTORY
+================================ */
 
-/* ============================= */
-/* RENDER HISTORY                */
-/* ============================= */
-function renderProjectHistory(project){
+function renderHistory(project){
 
-  const div =
-    document.getElementById("history-"+project);
-  if(!div) return;
-
+  const div = document.getElementById("history-"+project);
   const history = getWithdrawHistory()
-    .filter(tx=>tx.project===project)
-    .sort((a,b)=>b.timestamp-a.timestamp);
+    .filter(tx=>tx.project===project);
 
   if(!history.length){
-    div.innerHTML="<small>No withdrawals yet</small>";
+    div.innerHTML="<small>No transactions</small>";
     return;
   }
 
-  div.innerHTML="";
+  div.innerHTML = "";
 
   history.forEach(tx=>{
-
-    const label =
-      tx.type==="capital"
-        ? "Capital Withdraw"
-        : "Reward Withdraw";
-
     div.innerHTML += `
       <div class="tx">
-        <div class="tx-left">
-          <div class="tx-icon">
-            ${getProjectIcon(project)}
-          </div>
-          <div>
-            ${label}
-            <small>${new Date(tx.timestamp)
-              .toLocaleString()}</small>
-          </div>
-        </div>
-        <div class="tx-right">
-          -${Number(tx.grossAmount||0).toFixed(2)} Pi
-          <small>
-            ${tx.type==="reward"
-              ? `Fee: ${Number(tx.fee||0).toFixed(2)}
-                 | Received:
-                 ${Number(tx.received||0).toFixed(2)}`
-              : "Capital Returned"}
-          </small>
-        </div>
+        <div>${tx.type}</div>
+        <div>- ${tx.grossAmount.toFixed(2)} Pi</div>
       </div>
     `;
   });
 }
 
-/* ============================= */
-/* WITHDRAW REWARD               */
-/* ============================= */
+/* ===============================
+   WITHDRAW REWARD
+================================ */
+
 function openWithdraw(project){
   activeProject = project;
-  document.getElementById("modalProject")
-    .innerText = "Withdraw Reward from " + project;
-  document.getElementById("withdrawModal")
-    .style.display="flex";
+  document.getElementById("modalTitle").innerText =
+    "Withdraw from " + project;
+  document.getElementById("withdrawModal").style.display="flex";
 }
 
 function closeModal(){
-  document.getElementById("withdrawModal")
-    .style.display="none";
+  document.getElementById("withdrawModal").style.display="none";
 }
 
 function confirmWithdraw(){
 
-  const amt =
+  const amount =
     document.getElementById("withdrawAmount").value;
 
-  const addr =
+  const address =
     document.getElementById("withdrawAddress").value;
 
   const res = requestWithdraw({
     project:activeProject,
-    amount:amt,
-    walletAddress:addr
+    amount,
+    walletAddress:address
   });
 
-  if(res?.error){
+  if(res.error){
     alert(res.error);
     return;
   }
@@ -488,14 +286,15 @@ function confirmWithdraw(){
   renderWallet();
 }
 
-/* ============================= */
-/* WITHDRAW CAPITAL              */
-/* ============================= */
+/* ===============================
+   CAPITAL WITHDRAW
+================================ */
+
 function withdrawCapital(project){
 
   const res = requestCapitalWithdraw(project);
 
-  if(res?.error){
+  if(res.error){
     alert(res.error);
     return;
   }
@@ -503,12 +302,17 @@ function withdrawCapital(project){
   renderWallet();
 }
 
-/* ============================= */
-/* AUTO RENDER                   */
-/* ============================= */
-document.addEventListener("DOMContentLoaded",()=>{
-  renderWallet();
-});
+/* ===============================
+   AUTO REFRESH ON STAKING CHANGE
+================================ */
+
+window.addEventListener("walletUpdated",renderWallet);
+
+/* ===============================
+   INIT
+================================ */
+
+renderWallet();
 
 </script>
 
