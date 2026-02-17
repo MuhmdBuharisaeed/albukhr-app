@@ -326,11 +326,20 @@ function renderProjects(){
           <div>${p.withdrawn.toFixed(2)} Pi</div>
         </div>
 
-        <button class="btn"
-          style="margin-top:10px"
-          onclick="openWithdraw('${p.project}')">
-          Withdraw
-        </button>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+
+  <button class="btn"
+    onclick="openWithdraw('${p.project}')">
+    Reward Withdraw
+  </button>
+
+  <button class="btn"
+    style="background:#333"
+    onclick="withdrawCapitalAction('${p.project}')">
+    Capital Withdraw
+  </button>
+
+</div>
 
         <div id="history-${p.project}"></div>
       </div>
@@ -421,6 +430,20 @@ window.dispatchEvent(new Event("walletUpdated"));
   renderWallet();
 }
 
+function withdrawCapitalAction(project){
+
+  const res = requestCapitalWithdraw(project);
+
+  if(res?.error){
+    alert(res.error);
+    return;
+  }
+
+  alert("Capital withdrawn: " + res.grossAmount.toFixed(2) + " Pi");
+
+  renderWallet();
+  }
+  
 renderWallet();
 
 </script>
