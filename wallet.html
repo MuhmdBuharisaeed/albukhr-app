@@ -261,35 +261,74 @@ Fee: 1% • Daily Limit: 50 Pi
 
 let activeProject = null;
 
+/* ============================= */
+/* SAFE ICON                     */
+/* ============================= */
 function getProjectIcon(name){
-  if(name.toLowerCase().includes("raheem")) return "💊";
-  if(name.toLowerCase().includes("barsh")) return "🌾";
-  if(name.toLowerCase().includes("azman")) return "🧪";
-  if(name.toLowerCase().includes("khairat")) return "♻️";
-  if(name.toLowerCase().includes("urban")) return "🚍";
-  if(name.toLowerCase().includes("hauwal")) return "🌽";
-  if(name.toLowerCase().includes("labbaika")) return "🍞";
+  if(!name) return "🏢";
+  const n = name.toLowerCase();
+  if(n.includes("raheem")) return "💊";
+  if(n.includes("barsh")) return "🌾";
+  if(n.includes("azman")) return "🧪";
+  if(n.includes("khairat")) return "♻️";
+  if(n.includes("urban")) return "🚍";
+  if(n.includes("hauwal")) return "🌽";
+  if(n.includes("labbaika")) return "🍞";
   return "🏢";
 }
 
+/* ============================= */
+/* RENDER WALLET SUMMARY         */
+/* ============================= */
 function renderWallet(){
-  const summary = getWalletSummary();
-  totalStake.innerText = summary.totalStake.toFixed(2) + " Pi";
-  totalReward.innerText = summary.grossRewards.toFixed(2) + " Pi";
-  withdrawn.innerText = summary.withdrawn.toFixed(2) + " Pi";
-  available.innerText = summary.available.toFixed(2) + " Pi";
+
+  if(typeof getWalletSummary !== "function"){
+    console.warn("wallet-core not loaded");
+    return;
+  }
+
+  const summary = getWalletSummary() || {
+    totalStake:0,
+    grossRewards:0,
+    withdrawn:0,
+    available:0
+  };
+
+  document.getElementById("totalStake").innerText =
+    Number(summary.totalStake||0).toFixed(2)+" Pi";
+
+  document.getElementById("totalReward").innerText =
+    Number(summary.grossRewards||0).toFixed(2)+" Pi";
+
+  document.getElementById("withdrawn").innerText =
+    Number(summary.withdrawn||0).toFixed(2)+" Pi";
+
+  document.getElementById("available").innerText =
+    Number(summary.available||0).toFixed(2)+" Pi";
+
   renderProjects();
 }
 
+/* ============================= */
+/* RENDER PROJECTS               */
+/* ============================= */
 function renderProjects(){
 
-  const container = document.getElementById("projectContainer");
-  container.innerHTML="";
+  const container =
+    document.getElementById("projectContainer");
 
-  const projects = getProjectWalletBreakdown();
+  container.innerHTML = "";
+
+  if(typeof getProjectWalletBreakdown !== "function"){
+    container.innerHTML="<small>Wallet engine not ready</small>";
+    return;
+  }
+
+  const projects = getProjectWalletBreakdown() || [];
 
   if(!projects.length){
-    container.innerHTML="<small>No staking activity yet</small>";
+    container.innerHTML =
+      "<small>No staking activity yet</small>";
     return;
   }
 
@@ -306,30 +345,36 @@ function renderProjects(){
           </div>
           ${p.project}
         </div>
-        <div>${p.netReward.toFixed(2)} Pi</div>
+        <div>${Number(p.netReward||0).toFixed(2)} Pi</div>
       </div>
 
       <div class="project-body">
 
         <div class="row">
           <div>Staked</div>
-          <div>${p.stake.toFixed(2)} Pi</div>
+          <div>${Number(p.stake||0).toFixed(2)} Pi</div>
         </div>
 
         <div class="row">
           <div>Gross Reward</div>
-          <div>${p.grossReward.toFixed(2)} Pi</div>
+          <div>${Number(p.grossReward||0).toFixed(2)} Pi</div>
         </div>
 
         <div class="row">
           <div>Withdrawn</div>
-          <div>${p.withdrawn.toFixed(2)} Pi</div>
+          <div>${Number(p.withdrawn||0).toFixed(2)} Pi</div>
         </div>
 
         <button class="btn"
           style="margin-top:10px"
           onclick="openWithdraw('${p.project}')">
-          Withdraw
+          Withdraw Reward
+        </button>
+
+        <button class="btn"
+          style="margin-top:8px;background:#444"
+          onclick="withdrawCapital('${p.project}')">
+          Withdraw Capital
         </button>
 
         <div id="history-${p.project}"></div>
@@ -341,15 +386,22 @@ function renderProjects(){
   });
 }
 
+/* ============================= */
+/* TOGGLE BODY                   */
+/* ============================= */
 function toggleBody(el){
   const body = el.nextElementSibling;
   body.style.display =
     body.style.display==="block" ? "none":"block";
 }
 
+/* ============================= */
+/* RENDER HISTORY                */
+/* ============================= */
 function renderProjectHistory(project){
 
-  const div = document.getElementById("history-"+project);
+  const div =
+    document.getElementById("history-"+project);
   if(!div) return;
 
   const history = getWithdrawHistory()
@@ -364,6 +416,12 @@ function renderProjectHistory(project){
   div.innerHTML="";
 
   history.forEach(tx=>{
+
+    const label =
+      tx.type==="capital"
+        ? "Capital Withdraw"
+        : "Reward Withdraw";
+
     div.innerHTML += `
       <div class="tx">
         <div class="tx-left">
@@ -371,15 +429,19 @@ function renderProjectHistory(project){
             ${getProjectIcon(project)}
           </div>
           <div>
-            Withdraw
-            <small>${new Date(tx.timestamp).toLocaleString()}</small>
+            ${label}
+            <small>${new Date(tx.timestamp)
+              .toLocaleString()}</small>
           </div>
         </div>
         <div class="tx-right">
-          -${tx.grossAmount.toFixed(2)} Pi
+          -${Number(tx.grossAmount||0).toFixed(2)} Pi
           <small>
-            Fee: ${tx.fee.toFixed(2)} |
-            Received: ${tx.received.toFixed(2)}
+            ${tx.type==="reward"
+              ? `Fee: ${Number(tx.fee||0).toFixed(2)}
+                 | Received:
+                 ${Number(tx.received||0).toFixed(2)}`
+              : "Capital Returned"}
           </small>
         </div>
       </div>
@@ -387,22 +449,29 @@ function renderProjectHistory(project){
   });
 }
 
+/* ============================= */
+/* WITHDRAW REWARD               */
+/* ============================= */
 function openWithdraw(project){
   activeProject = project;
-  modalProject.innerText = "Withdraw from " + project;
-  withdrawModal.style.display="flex";
+  document.getElementById("modalProject")
+    .innerText = "Withdraw Reward from " + project;
+  document.getElementById("withdrawModal")
+    .style.display="flex";
 }
 
 function closeModal(){
-  withdrawModal.style.display="none";
+  document.getElementById("withdrawModal")
+    .style.display="none";
 }
 
 function confirmWithdraw(){
 
-window.dispatchEvent(new Event("walletUpdated"));
-  
-  const amt = withdrawAmount.value;
-  const addr = withdrawAddress.value;
+  const amt =
+    document.getElementById("withdrawAmount").value;
+
+  const addr =
+    document.getElementById("withdrawAddress").value;
 
   const res = requestWithdraw({
     project:activeProject,
@@ -410,18 +479,36 @@ window.dispatchEvent(new Event("walletUpdated"));
     walletAddress:addr
   });
 
-  if(res.error){
+  if(res?.error){
     alert(res.error);
     return;
   }
 
-  withdrawAmount.value="";
-  withdrawAddress.value="";
   closeModal();
   renderWallet();
 }
 
-renderWallet();
+/* ============================= */
+/* WITHDRAW CAPITAL              */
+/* ============================= */
+function withdrawCapital(project){
+
+  const res = requestCapitalWithdraw(project);
+
+  if(res?.error){
+    alert(res.error);
+    return;
+  }
+
+  renderWallet();
+}
+
+/* ============================= */
+/* AUTO RENDER                   */
+/* ============================= */
+document.addEventListener("DOMContentLoaded",()=>{
+  renderWallet();
+});
 
 </script>
 
