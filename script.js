@@ -66,6 +66,51 @@ function confirmStake() {
   closeStake();
 }
 
+function renderPopularProjects(){
+
+  if(typeof getAllStakesMerged !== "function") return;
+
+  const stakes = getAllStakesMerged();
+
+  const map = {};
+
+  stakes.forEach(s=>{
+    if(!map[s.project]){
+      map[s.project] = 0;
+    }
+    map[s.project] += Number(s.amount) || 0;
+  });
+
+  const sorted = Object.entries(map)
+    .sort((a,b)=> b[1] - a[1])
+    .slice(0,10);
+
+  const container = document.getElementById("popularProjects");
+  container.innerHTML = "";
+
+  sorted.forEach(([project,amount])=>{
+
+    const div = document.createElement("div");
+    div.className = "popular-card";
+
+    div.innerHTML = `
+      <div class="popular-icon">
+        ${getProjectIcon(project)}
+      </div>
+      <div class="popular-name">
+        ${project}
+      </div>
+      <div class="popular-amount">
+        ${amount.toFixed(2)} Pi
+      </div>
+    `;
+
+    div.onclick = () => scrollToProject(project);
+
+    container.appendChild(div);
+  });
+}
+
 <script>
 (function () {
   const currentPage = document.body.getAttribute("data-page");
