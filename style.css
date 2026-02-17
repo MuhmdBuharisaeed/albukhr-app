@@ -470,3 +470,57 @@ body{
   from{opacity:0;transform:translate(-50%,-10px)}
   to{opacity:1;transform:translate(-50%,0)}
 }
+
+.popular-section{
+  margin:16px;
+}
+
+.popular-title{
+  font-weight:700;
+  margin-bottom:10px;
+  font-size:15px;
+}
+
+.popular-scroll{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  padding-bottom:6px;
+}
+
+.popular-scroll::-webkit-scrollbar{
+  display:none;
+}
+
+.popular-card{
+  flex:0 0 calc(33.33% - 8px);
+  background:#fff;
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 6px 18px rgba(15,122,61,0.08);
+  text-align:center;
+  scroll-snap-align:start;
+  cursor:pointer;
+  transition:.25s ease;
+}
+
+.popular-card:hover{
+  transform:translateY(-3px);
+}
+
+.popular-icon{
+  font-size:22px;
+  margin-bottom:6px;
+}
+
+.popular-name{
+  font-weight:600;
+  font-size:13px;
+}
+
+.popular-amount{
+  font-size:12px;
+  color:#0f7a3d;
+  margin-top:4px;
+}
