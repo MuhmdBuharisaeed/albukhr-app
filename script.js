@@ -111,6 +111,20 @@ function renderPopularProjects(){
   });
 }
 
+function scrollToProject(project){
+
+  const el = document.querySelector(
+    `[data-project="${project}"]`
+  );
+
+  if(el){
+    el.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+  }
+}
+
 <script>
 (function () {
   const currentPage = document.body.getAttribute("data-page");
