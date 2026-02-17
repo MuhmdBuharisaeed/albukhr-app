@@ -1,18 +1,25 @@
 /* =========================================
-   ALBUKHR WALLET CORE v7
-   FULLY SYNCED WITH NEW STAKING ENGINE
+   ALBUKHR WALLET CORE v5 (PROJECT AWARE)
+   Internal + External Unified
 ========================================= */
 
-const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v7";
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v5";
 const SETTINGS_KEY = "albukhr_wallet_settings";
 
 /* =========================================
-   SETTINGS
+   SETTINGS (ADMIN ADJUSTABLE)
 ========================================= */
 
 function getWalletSettings(){
-  const def = { feePercent:1, dailyLimit:50 };
+  const def = {
+    feePercent: 1,        // 1%
+    dailyLimit: 50        // 50 Pi per day
+  };
   return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || def;
+}
+
+function saveWalletSettings(settings){
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
 /* =========================================
@@ -28,12 +35,14 @@ function saveWithdrawals(list){
 }
 
 /* =========================================
-   PROJECT BREAKDOWN (REWARD + CAPITAL)
+   PROJECT BREAKDOWN (CORE)
 ========================================= */
 
 function getProjectWalletBreakdown(){
 
-  if(typeof getAllStakesMerged !== "function") return [];
+  if(typeof getAllStakesMerged !== "function"){
+    return [];
+  }
 
   const stakes = getAllStakesMerged();
   const withdrawals = getWithdrawals();
@@ -41,46 +50,32 @@ function getProjectWalletBreakdown(){
   const map = {};
 
   stakes.forEach(s=>{
-
     if(!map[s.project]){
       map[s.project] = {
         project: s.project,
         stake: 0,
         grossReward: 0,
-        withdrawnReward: 0,
-        withdrawnCapital: 0
+        withdrawn: 0
       };
     }
 
-    if(!s.capitalWithdrawn){
-      map[s.project].stake += Number(s.amount) || 0;
-    }
-
-    map[s.project].grossReward +=
-      Number(s.remainingReward ?? s.reward ?? 0);
+    map[s.project].stake += Number(s.amount) || 0;
+    map[s.project].grossReward += Number(s.reward) || 0;
   });
 
   withdrawals.forEach(w=>{
     if(!map[w.project]) return;
-
-    if(w.type === "reward"){
-      map[w.project].withdrawnReward += Number(w.grossAmount);
-    }
-
-    if(w.type === "capital"){
-      map[w.project].withdrawnCapital += Number(w.grossAmount);
-    }
+    map[w.project].withdrawn += Number(w.grossAmount || w.amount) || 0;
   });
 
   return Object.values(map).map(p=>({
     ...p,
-    withdrawn: p.withdrawnReward + p.withdrawnCapital,
-    netReward: p.grossReward
+    netReward: p.grossReward - p.withdrawn
   }));
 }
 
 /* =========================================
-   SUMMARY
+   GLOBAL SUMMARY
 ========================================= */
 
 function getWalletSummary(){
@@ -88,25 +83,26 @@ function getWalletSummary(){
   const projects = getProjectWalletBreakdown();
 
   let totalStake = 0;
-  let rewards = 0;
+  let grossRewards = 0;
   let withdrawn = 0;
 
   projects.forEach(p=>{
     totalStake += p.stake;
-    rewards += p.netReward;
+    grossRewards += p.grossReward;
     withdrawn += p.withdrawn;
   });
 
   return {
     totalStake,
-    grossRewards: rewards,
+    grossRewards,
     withdrawn,
-    available: rewards
+    rewards: grossRewards - withdrawn,
+    available: grossRewards - withdrawn
   };
 }
 
 /* =========================================
-   DAILY LIMIT
+   DAILY LIMIT CHECK
 ========================================= */
 
 function getTodayWithdrawTotal(){
@@ -114,14 +110,12 @@ function getTodayWithdrawTotal(){
   const today = new Date().toDateString();
 
   return getWithdrawals()
-    .filter(w =>
-      new Date(w.timestamp).toDateString() === today
-    )
-    .reduce((sum,w)=> sum + Number(w.grossAmount),0);
+    .filter(w => new Date(w.timestamp).toDateString() === today)
+    .reduce((sum,w)=> sum + Number(w.grossAmount || 0),0);
 }
 
 /* =========================================
-   REWARD WITHDRAW
+   WITHDRAW (PROJECT SPECIFIC)
 ========================================= */
 
 function requestWithdraw({project, amount, walletAddress}){
@@ -129,68 +123,40 @@ function requestWithdraw({project, amount, walletAddress}){
   const settings = getWalletSettings();
   amount = parseFloat(amount);
 
-  if(!project) return {error:"Project required"};
-  if(amount <= 0) return {error:"Invalid amount"};
-  if(!walletAddress) return {error:"Wallet required"};
+  if(!project)
+    return { error:"Project required" };
+
+  if(amount <= 0)
+    return { error:"Invalid amount" };
+
+  if(!walletAddress)
+    return { error:"Wallet address required" };
 
   const projects = getProjectWalletBreakdown();
   const p = projects.find(x=>x.project===project);
-  if(!p) return {error:"Project not found"};
+
+  if(!p)
+    return { error:"Project not found" };
 
   if(amount > p.netReward)
-    return {error:"Insufficient reward balance"};
+    return { error:"Insufficient project reward balance" };
 
   if(getTodayWithdrawTotal() + amount > settings.dailyLimit)
-    return {error:"Daily limit exceeded"};
+    return { error:"Daily limit exceeded (50 Pi)" };
 
-  const fee = (amount * settings.feePercent)/100;
+  const fee = (amount * settings.feePercent) / 100;
   const received = amount - fee;
 
-  /* ENGINE DEDUCT REWARD */
-  if(typeof withdrawProjectReward === "function"){
-    const res = withdrawProjectReward(project, amount);
-    if(res?.error) return res;
-  }
+  const now = Date.now();
 
   const tx = {
-    id:"WD-"+Date.now(),
+    id: "WD-" + now,
     project,
-    grossAmount:amount,
+    grossAmount: amount,
     fee,
     received,
     walletAddress,
-    timestamp:Date.now(),
-    type:"reward"
-  };
-
-  const list = getWithdrawals();
-  list.push(tx);
-  saveWithdrawals(list);
-
-  return tx;
-}
-
-/* =========================================
-   CAPITAL WITHDRAW (AFTER DURATION)
-========================================= */
-
-function requestCapitalWithdraw(project){
-
-  if(typeof withdrawProjectCapital !== "function")
-    return {error:"Capital engine not ready"};
-
-  const res = withdrawProjectCapital(project);
-  if(res?.error) return res;
-
-  const tx = {
-    id:"CAP-"+Date.now(),
-    project,
-    grossAmount:res.amount,
-    fee:0,
-    received:res.amount,
-    walletAddress:"internal",
-    timestamp:Date.now(),
-    type:"capital"
+    timestamp: now
   };
 
   const list = getWithdrawals();
@@ -207,4 +173,12 @@ function requestCapitalWithdraw(project){
 function getWithdrawHistory(){
   return getWithdrawals()
     .sort((a,b)=> b.timestamp - a.timestamp);
-  }
+}
+
+/* =========================================
+   DEV
+========================================= */
+
+function clearWalletLedger(){
+  localStorage.removeItem(WITHDRAW_KEY);
+                          }
