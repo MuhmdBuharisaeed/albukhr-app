@@ -188,6 +188,40 @@ function requestWithdraw({project, amount, walletAddress}){
 }
 
 /* =========================================
+   CAPITAL WITHDRAW (PROJECT LEVEL)
+========================================= */
+
+function requestCapitalWithdraw(project){
+
+  if(typeof withdrawProjectCapital !== "function"){
+    return { error:"Capital engine not ready" };
+  }
+
+  const res = withdrawProjectCapital(project);
+
+  if(res?.error) return res;
+
+  const now = Date.now();
+
+  const tx = {
+    id:"CAP-"+now,
+    project,
+    grossAmount: res.amount,
+    fee: 0,
+    received: res.amount,
+    walletAddress: "internal",
+    timestamp: now,
+    type:"capital"
+  };
+
+  const list = getWithdrawals();
+  list.push(tx);
+  saveWithdrawals(list);
+
+  return tx;
+}
+
+/* =========================================
    CAPITAL WITHDRAW (MATURED ONLY)
 ========================================= */
 
