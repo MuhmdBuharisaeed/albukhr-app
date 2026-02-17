@@ -443,6 +443,20 @@ function withdrawCapitalAction(project){
 
   renderWallet();
   }
+
+function handleCapitalWithdraw(project){
+
+  const res = requestCapitalWithdraw(project);
+
+  if(res.error){
+    alert(res.error);
+    return;
+  }
+
+  alert("Capital returned: " + res.amount.toFixed(2) + " Pi");
+
+  renderWallet();
+}
   
 renderWallet();
 
