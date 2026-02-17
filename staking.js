@@ -221,3 +221,66 @@ function getStakes(){ return getAllStakesMerged(); }
 function getInternalTotals(){ return getTotals(); }
 function getInternalProjectTotals(p){ return getProjectTotals(p); }
 function addInternalStake(p){ return addStake(p); }
+
+/* ======================================
+   GET MATURED CAPITAL BY PROJECT
+====================================== */
+function getMaturedCapitalByProject(project){
+
+  const stakes = _safeParse(INTERNAL_KEY);
+
+  let total = 0;
+
+  stakes.forEach(s=>{
+    if(
+      s.project === project &&
+      !s.capitalWithdrawn &&
+      isStakeMatured(s)
+    ){
+      total += Number(s.amount) || 0;
+    }
+  });
+
+  return total;
+}
+
+/* ======================================
+   WITHDRAW ALL MATURED CAPITAL (PROJECT)
+====================================== */
+function withdrawProjectCapital(project){
+
+  const stakes = _safeParse(INTERNAL_KEY);
+
+  let total = 0;
+  let updated = false;
+
+  const newStakes = stakes.map(s=>{
+
+    if(
+      s.project === project &&
+      !s.capitalWithdrawn &&
+      isStakeMatured(s)
+    ){
+      total += Number(s.amount) || 0;
+      updated = true;
+
+      return {
+        ...s,
+        capitalWithdrawn:true
+      };
+    }
+
+    return s;
+  });
+
+  if(!updated){
+    return { error:"No matured capital available" };
+  }
+
+  _save(INTERNAL_KEY,newStakes);
+
+  return {
+    success:true,
+    amount: total
+  };
+}
