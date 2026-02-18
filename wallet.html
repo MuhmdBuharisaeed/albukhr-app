@@ -15,7 +15,6 @@ body{
   height:100vh;
 }
 
-/* ===== FIXED HEADER ===== */
 .header{
   background:#0f7a3d;
   color:#fff;
@@ -25,7 +24,6 @@ body{
   flex-shrink:0;
 }
 
-/* ===== FIXED SUMMARY ===== */
 .summary{
   background:#fff;
   padding:16px;
@@ -48,14 +46,12 @@ body{
   font-size:13px;
 }
 
-/* ===== SCROLL AREA ===== */
 .scroll-area{
   flex:1;
   overflow-y:auto;
   padding:16px;
 }
 
-/* ===== PROJECT CARD ===== */
 .project-card{
   background:#fff;
   border-radius:16px;
@@ -85,7 +81,6 @@ body{
   font-size:14px;
 }
 
-/* ===== PREMIUM ICON ===== */
 .project-icon{
   width:36px;
   height:36px;
@@ -95,17 +90,9 @@ body{
   border-radius:50%;
   font-size:16px;
   background:linear-gradient(135deg,#e6f7ee,#f3fff8);
-  box-shadow:
-    0 4px 12px rgba(15,122,61,0.15),
-    inset 0 0 6px rgba(255,255,255,0.7);
-  transition:all .3s ease;
+  box-shadow:0 4px 12px rgba(15,122,61,0.15);
 }
 
-.project-card:hover .project-icon{
-  transform:scale(1.08);
-}
-
-/* ===== BODY ===== */
 .project-body{
   margin-top:12px;
   display:none;
@@ -126,15 +113,8 @@ body{
   font-weight:600;
   cursor:pointer;
   font-size:12px;
-  transition:all .2s ease;
 }
 
-.btn:hover{
-  background:#0c5f2f;
-  transform:scale(1.03);
-}
-
-/* ===== TX STYLE ===== */
 .tx{
   display:flex;
   align-items:center;
@@ -159,7 +139,6 @@ body{
   border-radius:50%;
   font-size:14px;
   background:linear-gradient(135deg,#e6f7ee,#f3fff8);
-  box-shadow:0 3px 10px rgba(15,122,61,0.12);
 }
 
 .tx-right{
@@ -174,7 +153,6 @@ body{
   font-weight:400;
 }
 
-/* ===== MODAL ===== */
 .modal-overlay{
   position:fixed;
   inset:0;
@@ -204,6 +182,17 @@ body{
   display:flex;
   gap:10px;
 }
+
+.hidden-amount{
+  filter:blur(6px);
+  user-select:none;
+}
+
+.visibility-toggle{
+  cursor:pointer;
+  margin-left:8px;
+  font-size:18px;
+}
 </style>
 </head>
 
@@ -212,7 +201,10 @@ body{
 <div class="header">💰 ALBUKHR WALLET</div>
 
 <div class="summary">
-  <div class="balance" id="available">0.00 Pi</div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="balance" id="available">0.00 Pi</div>
+    <span id="toggleWalletVisibility" class="visibility-toggle">👁</span>
+  </div>
   <div class="sub">Available Reward Balance</div>
 
   <div class="row">
@@ -233,34 +225,17 @@ body{
 
 <div class="scroll-area" id="projectContainer"></div>
 
-<!-- WITHDRAW MODAL -->
-<div class="modal-overlay" id="withdrawModal">
-<div class="modal">
-<h3 id="modalProject">Withdraw</h3>
-
-<input type="number" id="withdrawAmount" placeholder="Amount">
-<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
-
-<div class="modal-actions">
-<button class="btn" onclick="confirmWithdraw()">Confirm</button>
-<button class="btn" style="background:#ccc;color:#333"
-onclick="closeModal()">Cancel</button>
-</div>
-
-<p style="font-size:11px;margin-top:10px;color:#777">
-Fee: 1% • Daily Limit: 50 Pi
-</p>
-
-</div>
-</div>
-
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
 
 let activeProject = null;
+const VISIBILITY_KEY = "albukhr_assets_visibility";
 
+/* ======================
+   ICONS
+====================== */
 function getProjectIcon(name){
   if(name.toLowerCase().includes("raheem")) return "💊";
   if(name.toLowerCase().includes("barsh")) return "🌾";
@@ -272,13 +247,52 @@ function getProjectIcon(name){
   return "🏢";
 }
 
+/* ======================
+   VISIBILITY SYSTEM
+====================== */
+function isHidden(){
+  return localStorage.getItem(VISIBILITY_KEY) === "hidden";
+}
+
+function setHidden(state){
+  localStorage.setItem(VISIBILITY_KEY, state ? "hidden":"visible");
+}
+
+function vibrate(){
+  if(navigator.vibrate){
+    navigator.vibrate(30);
+  }
+}
+
+function applyWalletVisibility(){
+
+  const hidden = isHidden();
+
+  document.querySelectorAll(
+    "#available, #totalStake, #totalReward, #withdrawn, .project-header div:last-child, .row div:last-child"
+  ).forEach(el=>{
+    el.classList.toggle("hidden-amount", hidden);
+  });
+
+  const toggle = document.getElementById("toggleWalletVisibility");
+  if(toggle){
+    toggle.textContent = hidden ? "🙈" : "👁";
+  }
+}
+
+/* ======================
+   RENDER
+====================== */
 function renderWallet(){
   const summary = getWalletSummary();
+
   totalStake.innerText = summary.totalStake.toFixed(2) + " Pi";
   totalReward.innerText = summary.grossRewards.toFixed(2) + " Pi";
   withdrawn.innerText = summary.withdrawn.toFixed(2) + " Pi";
   available.innerText = summary.available.toFixed(2) + " Pi";
+
   renderProjects();
+  applyWalletVisibility();
 }
 
 function renderProjects(){
@@ -301,16 +315,13 @@ function renderProjects(){
     card.innerHTML = `
       <div class="project-header" onclick="toggleBody(this)">
         <div class="project-title">
-          <div class="project-icon">
-            ${getProjectIcon(p.project)}
-          </div>
+          <div class="project-icon">${getProjectIcon(p.project)}</div>
           ${p.project}
         </div>
         <div>${p.netReward.toFixed(2)} Pi</div>
       </div>
 
       <div class="project-body">
-
         <div class="row">
           <div>Staked</div>
           <div>${p.stake.toFixed(2)} Pi</div>
@@ -327,140 +338,40 @@ function renderProjects(){
         </div>
 
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn" onclick="openWithdraw('${p.project}')">
+            Reward Withdraw
+          </button>
 
-  <button class="btn"
-    onclick="openWithdraw('${p.project}')">
-    Reward Withdraw
-  </button>
-
-  <button class="btn"
-    style="background:#333"
-    onclick="withdrawCapitalAction('${p.project}')">
-    Capital Withdraw
-  </button>
-
-</div>
-
-        <div id="history-${p.project}"></div>
+          <button class="btn" style="background:#333"
+            onclick="withdrawCapitalAction('${p.project}')">
+            Capital Withdraw
+          </button>
+        </div>
       </div>
     `;
 
     container.appendChild(card);
-    renderProjectHistory(p.project);
   });
 }
 
-function toggleBody(el){
-  const body = el.nextElementSibling;
-  body.style.display =
-    body.style.display==="block" ? "none":"block";
-}
+/* ======================
+   TOGGLE
+====================== */
+document.addEventListener("DOMContentLoaded",()=>{
+  const toggle = document.getElementById("toggleWalletVisibility");
 
-function renderProjectHistory(project){
-
-  const div = document.getElementById("history-"+project);
-  if(!div) return;
-
-  const history = getWithdrawHistory()
-    .filter(tx=>tx.project===project)
-    .sort((a,b)=>b.timestamp-a.timestamp);
-
-  if(!history.length){
-    div.innerHTML="<small>No withdrawals yet</small>";
-    return;
+  if(toggle){
+    toggle.addEventListener("click",()=>{
+      const newState = !isHidden();
+      setHidden(newState);
+      applyWalletVisibility();
+      vibrate();
+    });
   }
-
-  div.innerHTML="";
-
-  history.forEach(tx=>{
-    div.innerHTML += `
-      <div class="tx">
-        <div class="tx-left">
-          <div class="tx-icon">
-            ${getProjectIcon(project)}
-          </div>
-          <div>
-            Withdraw
-            <small>${new Date(tx.timestamp).toLocaleString()}</small>
-          </div>
-        </div>
-        <div class="tx-right">
-          -${tx.grossAmount.toFixed(2)} Pi
-          <small>
-            Fee: ${tx.fee.toFixed(2)} |
-            Received: ${tx.received.toFixed(2)}
-          </small>
-        </div>
-      </div>
-    `;
-  });
-}
-
-function openWithdraw(project){
-  activeProject = project;
-  modalProject.innerText = "Withdraw from " + project;
-  withdrawModal.style.display="flex";
-}
-
-function closeModal(){
-  withdrawModal.style.display="none";
-}
-
-function confirmWithdraw(){
-
-window.dispatchEvent(new Event("walletUpdated"));
-  
-  const amt = withdrawAmount.value;
-  const addr = withdrawAddress.value;
-
-  const res = requestWithdraw({
-    project:activeProject,
-    amount:amt,
-    walletAddress:addr
-  });
-
-  if(res.error){
-    alert(res.error);
-    return;
-  }
-
-  withdrawAmount.value="";
-  withdrawAddress.value="";
-  closeModal();
-  renderWallet();
-}
-
-function withdrawCapitalAction(project){
-
-  const res = requestCapitalWithdraw(project);
-
-  if(res?.error){
-    alert(res.error);
-    return;
-  }
-
-  alert("Capital withdrawn: " + res.grossAmount.toFixed(2) + " Pi");
 
   renderWallet();
-  }
-
-function handleCapitalWithdraw(project){
-
-  const res = requestCapitalWithdraw(project);
-
-  if(res.error){
-    alert(res.error);
-    return;
-  }
-
-  alert("Capital returned: " + res.amount.toFixed(2) + " Pi");
-
-  renderWallet();
-}
-  
-renderWallet();
-
+});
 </script>
 
 </body>
-  </html>
+</html>
