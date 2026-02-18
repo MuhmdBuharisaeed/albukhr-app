@@ -7,53 +7,100 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-/* ===== POPULAR PROJECTS ===== */
-
+/* ===== POPULAR PROJECTS (COMPACT) ===== */
 .popular-section{
-  padding:14px 14px 0 14px;
+  padding:12px 14px 0 14px;
 }
 
 .popular-title{
   font-weight:700;
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
 
 .popular-scroll{
   display:flex;
   overflow-x:auto;
-  gap:12px;
+  gap:10px;
   scroll-snap-type:x mandatory;
-  padding-bottom:6px;
+  padding-bottom:4px;
 }
 
 .popular-card{
   min-width:30%;
   flex:0 0 30%;
   background:#fff;
-  border-radius:12px;
-  padding:8px 6px;      /* ↓ reduced height */
-  box-shadow:0 4px 12px rgba(15,122,61,0.05);
+  border-radius:10px;
+  padding:6px 6px;
+  box-shadow:0 2px 8px rgba(15,122,61,0.05);
   text-align:center;
   scroll-snap-align:start;
   cursor:pointer;
-  transition:.2s ease;
 }
 
 .popular-icon{
-  font-size:20px;        /* ↓ smaller icon */
-  margin-bottom:4px;
+  font-size:18px;
+  margin-bottom:3px;
 }
 
 .popular-name{
   font-weight:600;
-  font-size:12px;        /* ↓ smaller text */
+  font-size:11px;
   line-height:1.2;
 }
 
 .popular-amount{
-  font-size:11px;
+  font-size:10px;
   color:#0f7a3d;
   margin-top:2px;
+}
+
+/* ===== ASSETS SECTION ===== */
+
+.assets-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.assets-search{
+  font-size:18px;
+  cursor:pointer;
+}
+
+.asset-item{
+  background:#fff;
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 3px 10px rgba(15,122,61,0.05);
+  cursor:pointer;
+}
+
+.asset-left{
+  display:flex;
+  flex-direction:column;
+}
+
+.asset-name{
+  font-weight:600;
+  font-size:13px;
+}
+
+.asset-stake{
+  font-size:11px;
+  color:#777;
+}
+
+.asset-right{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:600;
+  color:#0f7a3d;
 }
 </style>
 </head>
@@ -65,13 +112,8 @@
 </header>
 
 <div class="welcome-bar">
-  <div id="welcomeScroll" class="welcome-track" style="display:block">
-    Welcome to Albukhr Investment Limited — Building sustainable industries
-    & empowering communities through investment.
-  </div>
-
-  <div id="welcomeAnnounce" style="display:none;width:100%;text-align:center;font-size:14px;color:#0f7a3d;padding:6px 10px;transition:opacity .5s ease;">
-    📢 Albukhr is opening doors for external projects to join our staking ecosystem.
+  <div id="welcomeScroll" class="welcome-track">
+    Welcome to Albukhr Investment Limited — Building sustainable industries & empowering communities through investment.
   </div>
 </div>
 
@@ -92,53 +134,13 @@
   <div class="popular-scroll" id="popularProjects"></div>
 </div>
 
-<!-- PROJECT LIST -->
-<section class="projects">
-  <h2>Albukhr Projects</h2>
-
-  <a href="azman.html" class="project-item active">
-    <span>🧪 Azman Futures Makers Lab</span>
-  </a>
-
-  <a href="labbaika.html" class="project-item active">
-    <span>🍞 Labbaika Bakery Center</span>
-  </a>
-
-  <a href="barsh.html" class="project-item active">
-    <span>🌾 Barsh Agro</span>
-  </a>
-
-  <a href="urban.html" class="project-item active">
-    <span>🚍 Urban Mobility</span>
-  </a>
-
-  <a href="khairat.html" class="project-item active">
-    <span>♻️ Khairat Organic Fertiliser</span>
-  </a>
-
-  <a href="hauwal.html" class="project-item active">
-    <span>🌽 Hauwal Sumonviter</span>
-  </a>
-
-  <a href="raheem.html" class="project-item active">
-    <span>💊 Raheem Pharmacy</span>
-  </a>
-</section>
-
-<!-- USER ASSETS -->
+<!-- ===== ASSETS ===== -->
 <section class="section">
-
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-    <h3 class="tx-title">Your Assets</h3>
-
-    <a href="projects.html"
-       style="font-size:16px;color:#0f7a3d;text-decoration:none">
-       🔍
-    </a>
+  <div class="assets-header">
+    <h3>Assets</h3>
+    <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
   </div>
-
-  <div id="homeAssets"></div>
-
+  <div id="assetsContainer"></div>
 </section>
 
 <nav class="bottom-nav">
@@ -174,6 +176,8 @@ function loadHome(){
   let totalReward = 0;
 
   stakes.forEach(s=>{
+    if(s.capitalWithdrawn) return;
+
     totalStake += Number(s.amount)||0;
     totalReward += Number(s.remainingReward ?? s.reward)||0;
 
@@ -187,6 +191,7 @@ function loadHome(){
   homeReward.innerText = totalReward.toFixed(2)+" Pi";
 
   renderPopular(map);
+  renderAssets(map);
 }
 
 function renderPopular(map){
@@ -207,21 +212,54 @@ function renderPopular(map){
     div.onclick = ()=> location.href = file;
 
     div.innerHTML = `
-      <div class="popular-icon">
-        ${ICONS[project] || "📦"}
-      </div>
+      <div class="popular-icon">${ICONS[project] || "📦"}</div>
       <div class="popular-name">${project}</div>
-      <div class="popular-amount">
-        ${amount.toFixed(2)} Pi Staked
+      <div class="popular-amount">${amount.toFixed(2)} Pi</div>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+function renderAssets(map){
+
+  const container = document.getElementById("assetsContainer");
+  container.innerHTML = "";
+
+  const sorted = Object.entries(map)
+    .sort((a,b)=>b[1]-a[1]);
+
+  if(sorted.length === 0){
+    container.innerHTML =
+      "<p style='font-size:12px;color:#777'>No assets yet</p>";
+    return;
+  }
+
+  sorted.forEach(([project,amount])=>{
+
+    const file = project.toLowerCase()+".html";
+
+    const div = document.createElement("div");
+    div.className = "asset-item";
+    div.onclick = ()=> location.href = file;
+
+    div.innerHTML = `
+      <div class="asset-left">
+        <div class="asset-name">${project}</div>
+        <div class="asset-stake">${amount.toFixed(2)} Pi Staked</div>
+      </div>
+      <div class="asset-right">
+        ${ICONS[project] || "📦"}
+        ${amount.toFixed(2)}
       </div>
     `;
 
     container.appendChild(div);
   });
 }
-  
+
 window.addEventListener("DOMContentLoaded", loadHome);
 </script>
 
 </body>
-</html>
+  </html>
