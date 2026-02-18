@@ -261,5 +261,48 @@ function renderAssets(map){
 window.addEventListener("DOMContentLoaded", loadHome);
 </script>
 
+<script>
+/* ======================================
+   ALBUKHR – SMART LIVE REFRESH
+====================================== */
+
+(function(){
+
+  const REFRESH_INTERVAL = 30000; // 30s
+  let refreshTimer = null;
+
+  function softRefresh(){
+    if(typeof loadHome === "function"){
+      loadHome();
+    }
+  }
+
+  function startRefresh(){
+    if(refreshTimer) return;
+    refreshTimer = setInterval(softRefresh, REFRESH_INTERVAL);
+  }
+
+  function stopRefresh(){
+    if(refreshTimer){
+      clearInterval(refreshTimer);
+      refreshTimer = null;
+    }
+  }
+
+  /* Start after page loads */
+  window.addEventListener("DOMContentLoaded", startRefresh);
+
+  /* Stop when tab inactive */
+  document.addEventListener("visibilitychange", ()=>{
+    if(document.hidden){
+      stopRefresh();
+    } else {
+      startRefresh();
+    }
+  });
+
+})();
+</script>
+  
 </body>
   </html>
