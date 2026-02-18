@@ -86,8 +86,12 @@ body{
 <body>
 
 <header class="header">
-  <div class="header-left">
+  <div style="display:flex;justify-content:space-between;align-items:center">
     <span>All Transactions</span>
+    <button onclick="goBack()"
+      style="background:#fff;color:#0f7a3d;border:none;padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer">
+      Wallet
+    </button>
   </div>
 </header>
 
@@ -112,6 +116,10 @@ const ICONS = {
   Labbaika: "🍞"
 };
 
+function goBack(){
+  window.location.href = "wallet.html";
+}
+  
 function loadTransactions(){
 
   txList.innerHTML = "";
