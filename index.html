@@ -194,16 +194,16 @@ function loadHome(){
   renderAssets(map);
 }
 
-function renderPopular(map){
+function renderPopular(globalMap){
 
   const container = document.getElementById("popularProjects");
   container.innerHTML = "";
 
-  const sorted = Object.entries(map)
-    .sort((a,b)=>b[1]-a[1])
+  const sorted = Object.entries(globalMap)
+    .sort((a,b)=> b[1].total - a[1].total)
     .slice(0,10);
 
-  sorted.forEach(([project,amount])=>{
+  sorted.forEach(([project,data],index)=>{
 
     const file = project.toLowerCase()+".html";
 
@@ -212,14 +212,20 @@ function renderPopular(map){
     div.onclick = ()=> location.href = file;
 
     div.innerHTML = `
-      <div class="popular-icon">${ICONS[project] || "📦"}</div>
-      <div class="popular-name">${project}</div>
-      <div class="popular-amount">${amount.toFixed(2)} Pi</div>
+      <div class="popular-icon">
+        ${ICONS[project] || "📦"}
+      </div>
+      <div class="popular-name">
+        ${project}
+      </div>
+      <div class="popular-amount">
+        ${data.total.toFixed(2)} Pi
+      </div>
     `;
 
     container.appendChild(div);
   });
-}
+  }
 
 function renderAssets(map){
 
