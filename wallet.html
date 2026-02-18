@@ -209,10 +209,7 @@ body{
 
 <body>
 
-<div class="header">
-  💰 ALBUKHR WALLET
-  <button onclick="goToTransactions()" 
-    style="float:right;background:#fff;color:#0f7a3d;border:none;padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer">
+<div class="header">💰 ALBUKHR WALLET</div>
 
 <div class="summary">
   <div class="balance" id="available">0.00 Pi</div>
@@ -234,10 +231,6 @@ body{
   </div>
 </div>
 
-Transactions
-  </button>
-</div>
-    
 <div class="scroll-area" id="projectContainer"></div>
 
 <!-- WITHDRAW MODAL -->
@@ -278,7 +271,7 @@ function getProjectIcon(name){
   if(name.toLowerCase().includes("labbaika")) return "🍞";
   return "🏢";
 }
-  
+
 function renderWallet(){
   const summary = getWalletSummary();
   totalStake.innerText = summary.totalStake.toFixed(2) + " Pi";
@@ -466,12 +459,8 @@ function handleCapitalWithdraw(project){
 }
   
 renderWallet();
-  
-function goToTransactions(){
-  window.location.href = "transactions.html";
-}
-  
+
 </script>
-  
+
 </body>
-</html>
+  </html>
