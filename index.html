@@ -30,34 +30,30 @@
   min-width:30%;
   flex:0 0 30%;
   background:#fff;
-  border-radius:14px;
-  padding:14px;
-  box-shadow:0 6px 18px rgba(15,122,61,0.06);
+  border-radius:12px;
+  padding:10px 8px;      /* ↓ reduced height */
+  box-shadow:0 4px 12px rgba(15,122,61,0.05);
   text-align:center;
   scroll-snap-align:start;
   cursor:pointer;
-  transition:.25s ease;
-}
-
-.popular-card:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 24px rgba(15,122,61,0.12);
+  transition:.2s ease;
 }
 
 .popular-icon{
-  font-size:24px;
-  margin-bottom:6px;
+  font-size:20px;        /* ↓ smaller icon */
+  margin-bottom:4px;
 }
 
 .popular-name{
   font-weight:600;
-  font-size:13px;
+  font-size:12px;        /* ↓ smaller text */
+  line-height:1.2;
 }
 
 .popular-amount{
-  font-size:12px;
+  font-size:11px;
   color:#0f7a3d;
-  margin-top:4px;
+  margin-top:2px;
 }
 </style>
 </head>
