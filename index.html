@@ -186,6 +186,11 @@ body::before{
   to{opacity:1;transform:translateY(0);}
 }
 
+.hidden-amount{
+  filter: blur(6px);
+  user-select:none;
+}
+   
 </style>
   
 </head>
@@ -222,11 +227,12 @@ body::before{
 <!-- ===== ASSETS ===== -->
 <section class="section">
   <div class="assets-header">
-    <h3>Assets</h3>
-    <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <h3 style="margin:0;">Assets</h3>
+    <span id="toggleAssets" style="cursor:pointer;font-size:16px;">👁</span>
   </div>
-  <div id="assetsContainer"></div>
-</section>
+  <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
+  </div>
 
 <nav class="bottom-nav">
   <a href="index.html" class="active"><span>🏠</span>Home</a>
@@ -381,6 +387,59 @@ function renderAssets(userMap){
   });
 }
 
+/* =========================
+   ASSET VISIBILITY TOGGLE
+========================= */
+
+const VISIBILITY_KEY = "albukhr_assets_visibility";
+
+function isAssetsHidden(){
+  return localStorage.getItem(VISIBILITY_KEY) === "hidden";
+}
+
+function setAssetsHidden(hidden){
+  localStorage.setItem(VISIBILITY_KEY, hidden ? "hidden" : "visible");
+}
+
+function applyVisibility(){
+
+  const hidden = isAssetsHidden();
+
+  // totals
+  document.getElementById("homeStake")
+    ?.classList.toggle("hidden-amount", hidden);
+
+  document.getElementById("homeReward")
+    ?.classList.toggle("hidden-amount", hidden);
+
+  // asset rows
+  document.querySelectorAll(".asset-right, .asset-stake")
+    .forEach(el=>{
+      el.classList.toggle("hidden-amount", hidden);
+    });
+
+  // icon change
+  const toggle = document.getElementById("toggleAssets");
+  if(toggle){
+    toggle.textContent = hidden ? "🙈" : "👁";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+
+  const toggle = document.getElementById("toggleAssets");
+
+  if(toggle){
+    toggle.addEventListener("click", ()=>{
+      const newState = !isAssetsHidden();
+      setAssetsHidden(newState);
+      applyVisibility();
+    });
+  }
+
+  applyVisibility();
+});
+   
 window.addEventListener("DOMContentLoaded", loadHome);
 </script>
 
@@ -399,7 +458,8 @@ window.addEventListener("DOMContentLoaded", loadHome);
       loadHome();
     }
   }
-
+applyVisibility();
+   
   function startRefresh(){
     if(refreshTimer) return;
     refreshTimer = setInterval(softRefresh, REFRESH_INTERVAL);
