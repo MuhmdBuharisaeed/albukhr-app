@@ -70,16 +70,31 @@ function renderPopularProjects(){
 
   if(typeof getAllStakesMerged !== "function") return;
 
-  const stakes = getAllStakesMerged();
+const stakes = getAllStakesMerged();
 
-  const map = {};
+let globalMap = {};
+let totalStake = 0;
+let totalReward = 0;
 
-  stakes.forEach(s=>{
-    if(!map[s.project]){
-      map[s.project] = 0;
-    }
-    map[s.project] += Number(s.amount) || 0;
-  });
+stakes.forEach(s=>{
+
+  const amount = Number(s.amount)||0;
+  const reward = Number(s.remainingReward ?? s.reward)||0;
+
+  totalStake += amount;
+  totalReward += reward;
+
+  if(!globalMap[s.project]){
+    globalMap[s.project] = {
+      total:0,
+      investors:0
+    };
+  }
+
+  globalMap[s.project].total += amount;
+  globalMap[s.project].investors += 1;
+
+});
 
   const sorted = Object.entries(map)
     .sort((a,b)=> b[1] - a[1])
