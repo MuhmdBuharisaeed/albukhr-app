@@ -15,14 +15,50 @@ body{
   height:100vh;
 }
 
-/* ===== FIXED HEADER ===== */
+/* ===== HEADER WITH NAV ===== */
 .header{
   background:#0f7a3d;
   color:#fff;
-  padding:16px;
-  font-weight:700;
-  text-align:center;
+  padding:14px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   flex-shrink:0;
+}
+
+.header-title{
+  font-weight:800;
+  font-size:16px;
+  letter-spacing:.3px;
+}
+
+.header-nav{
+  display:flex;
+  gap:8px;
+}
+
+.nav-btn{
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+  transition:.2s ease;
+}
+
+.nav-wallet{
+  background:#fff;
+  color:#0f7a3d;
+}
+
+.nav-trans{
+  background:rgba(255,255,255,.15);
+  color:#fff;
+}
+
+.nav-trans:hover{
+  background:rgba(255,255,255,.25);
 }
 
 /* ===== FIXED SUMMARY ===== */
@@ -209,7 +245,24 @@ body{
 
 <body>
 
-<div class="header">💰 ALBUKHR WALLET</div>
+<div class="header">
+  
+  <div class="header-title">
+    💰 ALBUKHR WALLET
+  </div>
+
+  <div class="header-nav">
+    <button class="nav-btn nav-wallet">
+      Wallet
+    </button>
+
+    <button class="nav-btn nav-trans"
+      onclick="goToTransactions()">
+      Transactions
+    </button>
+  </div>
+
+</div>
 
 <div class="summary">
   <div class="balance" id="available">0.00 Pi</div>
