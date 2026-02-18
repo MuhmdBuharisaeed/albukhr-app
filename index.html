@@ -171,29 +171,58 @@ function loadHome(){
 
   const stakes = getAllStakesMerged();
 
-  let map = {};
+  let userMap = {};
+  let globalMap = {};
+
   let totalStake = 0;
   let totalReward = 0;
 
   stakes.forEach(s=>{
+
     if(s.capitalWithdrawn) return;
 
-    totalStake += Number(s.amount)||0;
-    totalReward += Number(s.remainingReward ?? s.reward)||0;
+    const amount = Number(s.amount)||0;
+    const reward = Number(s.remainingReward ?? s.reward)||0;
 
-    if(!map[s.project]){
-      map[s.project] = 0;
+    totalStake += amount;
+    totalReward += reward;
+
+    /* USER ASSETS */
+    if(!userMap[s.project]){
+      userMap[s.project] = 0;
     }
-    map[s.project] += Number(s.amount)||0;
+    userMap[s.project] += amount;
+
+    /* GLOBAL POPULAR */
+    if(!globalMap[s.project]){
+      globalMap[s.project] = {
+        total:0,
+        investors:0
+      };
+    }
+
+    globalMap[s.project].total += amount;
+  });
+
+  /* count investors */
+  Object.keys(globalMap).forEach(project=>{
+    const investors = stakes.filter(s=> 
+      s.project===project && !s.capitalWithdrawn
+    ).length;
+
+    globalMap[project].investors = investors;
   });
 
   homeStake.innerText = totalStake.toFixed(2)+" Pi";
   homeReward.innerText = totalReward.toFixed(2)+" Pi";
 
-  renderPopular(map);
-  renderAssets(map);
+  renderPopular(globalMap);
+  renderAssets(userMap);
 }
 
+/* =========================
+   POPULAR (GLOBAL RANK)
+========================= */
 function renderPopular(globalMap){
 
   const container = document.getElementById("popularProjects");
@@ -216,7 +245,7 @@ function renderPopular(globalMap){
         ${ICONS[project] || "📦"}
       </div>
       <div class="popular-name">
-        ${project}
+        #${index+1} ${project}
       </div>
       <div class="popular-amount">
         ${data.total.toFixed(2)} Pi
@@ -225,14 +254,17 @@ function renderPopular(globalMap){
 
     container.appendChild(div);
   });
-  }
+}
 
-function renderAssets(map){
+/* =========================
+   USER ASSETS
+========================= */
+function renderAssets(userMap){
 
   const container = document.getElementById("assetsContainer");
   container.innerHTML = "";
 
-  const sorted = Object.entries(map)
+  const sorted = Object.entries(userMap)
     .sort((a,b)=>b[1]-a[1]);
 
   if(sorted.length === 0){
