@@ -227,12 +227,15 @@ body::before{
 <!-- ===== ASSETS ===== -->
 <section class="section">
   <div class="assets-header">
-  <div style="display:flex;align-items:center;gap:8px;">
-    <h3 style="margin:0;">Assets</h3>
-    <span id="toggleAssets" style="cursor:pointer;font-size:16px;">👁</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <h3 style="margin:0;">Assets</h3>
+      <span id="toggleAssets" style="cursor:pointer;font-size:16px;">👁</span>
+    </div>
+    <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
   </div>
-  <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
-  </div>
+
+  <div id="assetsContainer"></div>
+</section>
 
 <nav class="bottom-nav">
   <a href="index.html" class="active"><span>🏠</span>Home</a>
@@ -329,14 +332,15 @@ function renderPopular(globalMap){
 
     const div = document.createElement("div");
     div.className = "popular-card";
-div.setAttribute("data-rank","#"+(index+1));
+    div.setAttribute("data-rank","#"+(index+1));
+    div.onclick = ()=> location.href = file;
+
     div.innerHTML = `
-    
       <div class="popular-icon">
         ${ICONS[project] || "📦"}
       </div>
       <div class="popular-name">
-        #${index+1} ${project}
+        ${project}
       </div>
       <div class="popular-amount">
         ${data.total.toFixed(2)} Pi
@@ -345,8 +349,7 @@ div.setAttribute("data-rank","#"+(index+1));
 
     container.appendChild(div);
   });
-}
-
+   }
 /* =========================
    USER ASSETS
 ========================= */
@@ -458,7 +461,6 @@ window.addEventListener("DOMContentLoaded", loadHome);
       loadHome();
     }
   }
-applyVisibility();
    
   function startRefresh(){
     if(refreshTimer) return;
