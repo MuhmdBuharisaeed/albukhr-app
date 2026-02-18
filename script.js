@@ -125,6 +125,72 @@ function scrollToProject(project){
   }
 }
 
+function loadAssets(){
+
+  if(typeof getAllStakesMerged !== "function"){
+    return;
+  }
+
+  const stakes = getAllStakesMerged() || [];
+
+  const map = {};
+
+  stakes.forEach(s=>{
+    const amount = Number(s.amount) || 0;
+
+    if(amount <= 0) return;
+
+    if(!map[s.project]){
+      map[s.project] = {
+        project: s.project,
+        total: 0
+      };
+    }
+
+    map[s.project].total += amount;
+  });
+
+  const list = Object.values(map)
+    .sort((a,b)=> b.total - a.total);
+
+  const box = document.getElementById("homeAssets");
+  box.innerHTML = "";
+
+  if(list.length === 0){
+    box.innerHTML =
+      "<p style='font-size:12px;color:#777'>No active staking yet</p>";
+    return;
+  }
+
+  list.forEach(p=>{
+
+    const div = document.createElement("div");
+    div.className = "home-tx";
+
+    div.innerHTML = `
+      <div class="home-icon">
+        ${ICONS[p.project] || "📦"}
+      </div>
+
+      <div class="home-body">
+        <div class="home-title">${p.project}</div>
+        <div class="home-date">
+          Total Staked
+        </div>
+      </div>
+
+      <div class="home-right">
+        <div class="home-amount">
+          ${p.total.toFixed(2)} Pi
+        </div>
+      </div>
+    `;
+
+    box.appendChild(div);
+  });
+
+}
+
 <script>
 (function () {
   const currentPage = document.body.getAttribute("data-page");
