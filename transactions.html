@@ -188,49 +188,74 @@ const ICONS = {
   Labbaika:"🍞"
 };
 
-function generateReference(tx){
-  return "ALB-" + (tx.timestamp || Date.now());
+/* ===== SAFE HELPERS ===== */
+
+function safeNumber(val){
+  const n = Number(val);
+  return isNaN(n) ? 0 : n;
 }
 
-function openModal(tx){
-  activeTx = tx;
-  const ref = generateReference(tx);
-  const date = new Date(tx.timestamp);
+function safeDate(ts){
+  const d = new Date(Number(ts) || Date.now());
+  return d;
+}
 
-  const gross = tx.grossAmount || tx.amount;
+function generateReference(tx){
+  return "ALB-" + (Number(tx.timestamp) || Date.now());
+}
+
+/* ===== MODAL OPEN ===== */
+
+function openModal(tx){
+
+  if(!tx) return;
+
+  activeTx = tx;
+
+  const ref = generateReference(tx);
+  const date = safeDate(tx.timestamp);
+
+  const gross = safeNumber(tx.grossAmount || tx.amount);
+  const received = safeNumber(tx.received || gross);
   const fee = tx.type==="reward-withdraw"
-      ? (gross - tx.received).toFixed(2)
+      ? (gross - received).toFixed(2)
       : "0.00";
 
   txDetails.innerHTML = `
-    <div class="detail-row"><span>Project</span><span>${tx.project}</span></div>
-    <div class="detail-row"><span>Type</span><span>${tx.type}</span></div>
+    <div class="detail-row"><span>Project</span><span>${tx.project || "-"}</span></div>
+    <div class="detail-row"><span>Type</span><span>${tx.type || "-"}</span></div>
     <div class="detail-row"><span>Gross</span><span>${gross.toFixed(2)} Pi</span></div>
     <div class="detail-row"><span>Fee</span><span>${fee} Pi</span></div>
-    <div class="detail-row"><span>Net Received</span><span>${(tx.received||gross).toFixed(2)} Pi</span></div>
+    <div class="detail-row"><span>Net Received</span><span>${received.toFixed(2)} Pi</span></div>
     <div class="detail-row"><span>Date</span><span>${date.toLocaleString()}</span></div>
     <div class="detail-row"><span>Reference</span><span>${ref}</span></div>
-    <div class="detail-row"><span>Wallet</span><span>${tx.walletAddress||"Internal"}</span></div>
+    <div class="detail-row"><span>Wallet</span><span>${tx.walletAddress || "Internal Wallet"}</span></div>
   `;
 
   txModal.style.display="flex";
 }
 
+/* ===== CLOSE MODAL ===== */
+
 function closeModal(){
   txModal.style.display="none";
 }
+
+/* ===== DOWNLOAD ===== */
 
 function downloadReceipt(){
   if(!activeTx) return;
 
   const ref = generateReference(activeTx);
+
   const text = `
 Albukhr Transaction Receipt
 Reference: ${ref}
 Project: ${activeTx.project}
 Type: ${activeTx.type}
-Amount: ${(activeTx.grossAmount||activeTx.amount)} Pi
-Date: ${new Date(activeTx.timestamp).toLocaleString()}
+Amount: ${safeNumber(activeTx.grossAmount||activeTx.amount).toFixed(2)} Pi
+Date: ${safeDate(activeTx.timestamp).toLocaleString()}
+Wallet: ${activeTx.walletAddress || "Internal Wallet"}
   `;
 
   const blob = new Blob([text],{type:"text/plain"});
@@ -240,23 +265,31 @@ Date: ${new Date(activeTx.timestamp).toLocaleString()}
   a.click();
 }
 
+/* ===== SHARE ===== */
+
 function shareReceipt(){
   if(!activeTx) return;
 
   const ref = generateReference(activeTx);
+
   const text = `
 Albukhr Transaction
 Ref: ${ref}
 Project: ${activeTx.project}
-Amount: ${(activeTx.grossAmount||activeTx.amount)} Pi
+Amount: ${safeNumber(activeTx.grossAmount||activeTx.amount).toFixed(2)} Pi
   `;
 
   if(navigator.share){
-    navigator.share({title:"Albukhr Receipt",text});
+    navigator.share({
+      title:"Albukhr Receipt",
+      text
+    });
   }else{
     alert("Sharing not supported on this device.");
   }
 }
+
+/* ===== LOAD TRANSACTIONS ===== */
 
 function loadTransactions(){
 
@@ -268,8 +301,8 @@ function loadTransactions(){
       .map(s=>({
         type:"stake",
         project:s.project,
-        amount:Number(s.amount),
-        timestamp:s.timestamp
+        amount:safeNumber(s.amount),
+        timestamp:Number(s.timestamp)
       }))
     : [];
 
@@ -277,10 +310,10 @@ function loadTransactions(){
     ? getWithdrawHistory().map(w=>({
         type:w.type==="capital"?"capital-withdraw":"reward-withdraw",
         project:w.project,
-        grossAmount:Number(w.grossAmount||w.amount),
-        received:Number(w.received||w.amount),
+        grossAmount:safeNumber(w.grossAmount||w.amount),
+        received:safeNumber(w.received||w.amount),
         walletAddress:w.walletAddress||"Internal Wallet",
-        timestamp:w.timestamp
+        timestamp:Number(w.timestamp)
       }))
     : [];
 
@@ -298,7 +331,8 @@ function loadTransactions(){
     div.className="project-tx";
     div.onclick=()=>openModal(tx);
 
-    const d = new Date(tx.timestamp);
+    const d = safeDate(tx.timestamp);
+    const amount = safeNumber(tx.grossAmount||tx.amount);
 
     div.innerHTML = `
       <div class="project-icon">
@@ -313,8 +347,8 @@ function loadTransactions(){
         </div>
       </div>
       <div class="project-right">
-        <div class="project-amount ${tx.type.includes('withdraw')?'withdraw-status':''}">
-          ${(tx.type==="stake"?"+":"-")}${(tx.grossAmount||tx.amount).toFixed(2)} Pi
+        <div class="project-amount ${(tx.type||'').includes('withdraw')?'withdraw-status':''}">
+          ${(tx.type==="stake"?"+":"-")}${amount.toFixed(2)} Pi
         </div>
         <div class="project-status">
           Completed
@@ -327,6 +361,7 @@ function loadTransactions(){
 }
 
 window.addEventListener("walletUpdated", loadTransactions);
+
 loadTransactions();
 </script>
 
