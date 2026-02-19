@@ -190,6 +190,43 @@ body::before{
   filter: blur(6px);
   user-select:none;
 }
+
+/* ===== HEADER STRUCTURE ===== */
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:14px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header-title{
+  font-weight:800;
+  font-size:16px;
+  letter-spacing:.3px;
+}
+
+/* ===== HAMBURGER ===== */
+.menu-icon{
+  width:28px;
+  height:22px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.menu-icon div{
+  height:3px;
+  background:#fff;
+  border-radius:2px;
+  transition:.25s ease;
+}
+
+.menu-icon:hover div{
+  opacity:.8;
+   }
    
 </style>
   
@@ -197,9 +234,15 @@ body::before{
 
 <body data-page="home">
 
-<header class="header">
-  <h1 class="brand">ALBUKHR</h1>
-</header>
+<div class="header">
+  <div class="header-title">ALBUKHR</div>
+
+  <div class="menu-icon" onclick="goToSettings()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+</div>
 
 <div class="welcome-bar">
   <div id="welcomeScroll" class="welcome-track">
@@ -442,6 +485,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   applyVisibility();
 });
+
+function goToSettings(){
+  window.location.href = "settings.html";
+   }
    
 window.addEventListener("DOMContentLoaded", loadHome);
 </script>
