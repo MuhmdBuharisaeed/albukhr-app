@@ -243,10 +243,21 @@ body{
 
 <div class="header">
   
-  <div class="header-title">
-     ALBUKHR WALLET
-  </div>
+<div class="header">
+  <div class="header-title">ALBUKHR WALLET</div>
+</div>
 
+<div class="header-nav">
+  <button class="nav-btn nav-wallet">
+    💼 Wallet
+  </button>
+
+  <button class="nav-btn nav-trans"
+    onclick="window.location.href='transactions.html'">
+    📜 Transactions
+  </button>
+</div>
+  
 </div>
 
 <div class="summary">
@@ -267,17 +278,6 @@ body{
     <div>Total Withdrawn</div>
     <div id="withdrawn">0.00 Pi</div>
   </div>
-</div>
-
-<div class="header-nav">
-  <button class="nav-btn nav-wallet">
-    💼 Wallet
-  </button>
-
-  <button class="nav-btn nav-trans"
-    onclick="window.location.href='transactions.html'">
-    📜 Transactions
-  </button>
 </div>
   
 <div class="scroll-area" id="projectContainer"></div>
