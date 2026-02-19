@@ -548,5 +548,47 @@ renderWallet();
 
 </script>
 
+<script>
+
+const withdrawSuccessBox = document.getElementById("withdrawSuccessBox");
+
+/* Track last withdraw timestamp */
+let lastWithdrawTime = 0;
+
+/* Listen for wallet updates */
+window.addEventListener("walletUpdated", function(e){
+
+  if(!e.detail) return;
+
+  const data = e.detail;
+
+  /* Idan withdraw ne */
+  if(data.type === "reward-withdraw" || data.type === "capital-withdraw"){
+
+    const now = Date.now();
+
+    /* Kauce wa duplicate show */
+    if(now - lastWithdrawTime < 1000) return;
+
+    lastWithdrawTime = now;
+
+    showWithdrawSuccess();
+  }
+
+});
+
+function showWithdrawSuccess(){
+
+  withdrawSuccessBox.style.display = "block";
+  withdrawSuccessBox.textContent = "Withdraw Successful ✓";
+
+  /* Auto hide after 4 seconds */
+  setTimeout(()=>{
+    withdrawSuccessBox.style.display = "none";
+  },4000);
+}
+
+</script>
+  
 </body>
 </html>
