@@ -25,7 +25,6 @@ body{
   align-items:center;
 }
 
-/* VERIFIED BADGE */
 .badge{
   font-size:10px;
   background:#fff;
@@ -44,10 +43,11 @@ body{
 .news-card{
   background:#fff;
   border-radius:14px;
-  padding:14px;
-  margin-bottom:14px;
+  margin-bottom:16px;
   box-shadow:0 6px 18px rgba(15,122,61,0.06);
+  overflow:hidden;
   transition:.25s ease;
+  cursor:pointer;
 }
 
 .news-card:hover{
@@ -55,9 +55,20 @@ body{
   box-shadow:0 10px 24px rgba(15,122,61,0.12);
 }
 
+.news-image{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+  display:block;
+}
+
+.news-body{
+  padding:14px;
+}
+
 .news-title{
   font-weight:700;
-  font-size:14px;
+  font-size:15px;
   margin-bottom:6px;
 }
 
@@ -72,7 +83,6 @@ body{
   color:#777;
   display:flex;
   justify-content:space-between;
-  align-items:center;
 }
 
 .news-source{
@@ -80,25 +90,7 @@ body{
   color:#0f7a3d;
 }
 
-/* OPEN BUTTON */
-.open-btn{
-  margin-top:10px;
-  padding:8px 10px;
-  font-size:12px;
-  border:none;
-  border-radius:8px;
-  background:#0f7a3d;
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-  width:100%;
-  transition:.2s ease;
-}
-
-.open-btn:hover{
-  background:#0c5f2f;
-}
-
+/* BOTTOM NAV */
 .bottom-nav{
   position:fixed;
   bottom:0;
@@ -129,7 +121,7 @@ body{
 
 .bottom-nav a.active{
   color:#0f7a3d;
-}  
+}
 </style>
 </head>
 
@@ -144,147 +136,94 @@ body{
   <div id="newsContainer"></div>
 </section>
 
-<section class="section">
-  <div id="newsContainer"></div>
-</section>
-  
 <!-- ===== ALBUKHR BOTTOM NAV ===== -->
 <nav class="bottom-nav">
-  <a href="index.html" class="active"><span>🏠</span>Home</a>
+  <a href="index.html"><span>🏠</span>Home</a>
   <a href="wallet.html"><span>💼</span>Wallet</a>
   <a href="services.html"><span>🛠️</span>Services</a>
-  <a href="news.html"><span>📰</span>News</a>
+  <a href="news.html" class="active"><span>📰</span>News</a>
 </nav>
-  
-<script src="news-data.js"></script>
 
 <script>
 const container = document.getElementById("newsContainer");
 
-function renderNews(){
+/* BLOCK CLICKBAIT */
+const BLOCKED = ["rumor","leaked","unconfirmed","fake"];
 
-  if(!ALBUKHR_NEWS || !ALBUKHR_NEWS.length){
+/* FALLBACK VERIFIED NEWS */
+const FALLBACK_NEWS = [
+  {
+    title:"Pi Core Team Publishes Official Ecosystem Update",
+    summary:"Latest roadmap update from Pi Core Team regarding ecosystem growth.",
+    image:"https://via.placeholder.com/800x400",
+    source:"Pi Core Team",
+    date:new Date().toISOString(),
+    link:"https://minepi.com/blog"
+  }
+];
+
+function renderNews(newsArray){
+
+  container.innerHTML="";
+
+  const cleanNews = newsArray.filter(item=>{
+    return !BLOCKED.some(word =>
+      item.title.toLowerCase().includes(word)
+    );
+  });
+
+  if(!cleanNews.length){
     container.innerHTML =
       "<p style='font-size:12px;color:#777'>No verified news available.</p>";
     return;
   }
 
-// Remove clickbait words
-const BLOCKED = ["rumor","leaked","unconfirmed"];
-
-if(BLOCKED.some(word => item.title.toLowerCase().includes(word))){
-  return;
-}
-  
-  ALBUKHR_NEWS
+  cleanNews
     .sort((a,b)=> new Date(b.date)-new Date(a.date))
     .forEach(news=>{
 
       const card = document.createElement("div");
       card.className = "news-card";
+      card.onclick = ()=> window.open(news.link,"_blank");
 
       card.innerHTML = `
-        <div class="news-title">${news.title}</div>
-        <div class="news-summary">${news.summary}</div>
+        <img src="${news.image || 'https://via.placeholder.com/800x400'}"
+             class="news-image">
 
-        <div class="news-meta">
-          <span class="news-source">
-            ${news.source}
-          </span>
-          <span>
-            ${new Date(news.date).toLocaleDateString()}
-          </span>
+        <div class="news-body">
+          <div class="news-title">${news.title}</div>
+          <div class="news-summary">
+            ${news.summary || ""}
+          </div>
+          <div class="news-meta">
+            <span class="news-source">${news.source}</span>
+            <span>${new Date(news.date).toLocaleDateString()}</span>
+          </div>
         </div>
-
-        <button class="open-btn"
-          onclick="window.open('${news.link}','_blank')">
-          Read Official Source
-        </button>
       `;
 
       container.appendChild(card);
     });
 }
 
-renderNews();
-</script>
-
-<script>
-const newsContainer = document.getElementById("newsContainer");
-
-const NEWS = [
-  {
-    title:"Pi Network Expands Ecosystem Utility",
-    image:"https://via.placeholder.com/600x400",
-    date:"Feb 2026",
-    source:"Pi Network",
-    link:"#"
-  },
-  {
-    title:"Pi Core Team Announces Developer Update",
-    image:"https://via.placeholder.com/600x400",
-    date:"Feb 2026",
-    source:"Official Blog",
-    link:"#"
-  }
-];
-
-function loadNews(){
-
-  newsContainer.innerHTML="";
-
-  NEWS.forEach(item=>{
-
-    const div=document.createElement("div");
-    div.className="news-card";
-    div.onclick=()=>window.location.href=item.link;
-
-    div.innerHTML=`
-      <img src="${item.image}" class="news-image">
-      <div class="news-body">
-        <div class="news-title">${item.title}</div>
-        <div class="news-meta">${item.date} • ${item.source}</div>
-      </div>
-    `;
-
-    newsContainer.appendChild(div);
-  });
-}
-
-loadNews();
-</script>
-
-<script>
+/* AUTO FETCH SYSTEM */
 async function loadNews(){
 
-  const res = await fetch("/api/news");
-  const news = await res.json();
+  try{
+    const res = await fetch("/api/news");
+    if(!res.ok) throw new Error("API not available");
 
-  const container = document.getElementById("newsContainer");
-  container.innerHTML="";
+    const data = await res.json();
+    renderNews(data);
 
-  news.forEach(item=>{
-
-    const div=document.createElement("div");
-    div.className="news-card";
-    div.onclick=()=>window.open(item.link,"_blank");
-
-    div.innerHTML=`
-      <img src="${item.image || 'default.jpg'}" class="news-image">
-      <div class="news-body">
-        <div class="news-title">${item.title}</div>
-        <div class="news-meta">
-          ${new Date(item.date).toLocaleDateString()} • ${item.source}
-        </div>
-      </div>
-    `;
-
-    container.appendChild(div);
-  });
+  }catch(e){
+    /* fallback if api fails */
+    renderNews(FALLBACK_NEWS);
+  }
 }
 
 loadNews();
 </script>
-  
+
 </body>
 </html>
