@@ -144,6 +144,10 @@ body{
   <div id="newsContainer"></div>
 </section>
 
+<section class="section">
+  <div id="newsContainer"></div>
+</section>
+  
 <!-- ===== ALBUKHR BOTTOM NAV ===== -->
 <nav class="bottom-nav">
   <a href="index.html" class="active"><span>🏠</span>Home</a>
@@ -198,5 +202,50 @@ function renderNews(){
 renderNews();
 </script>
 
+<script>
+const newsContainer = document.getElementById("newsContainer");
+
+const NEWS = [
+  {
+    title:"Pi Network Expands Ecosystem Utility",
+    image:"https://via.placeholder.com/600x400",
+    date:"Feb 2026",
+    source:"Pi Network",
+    link:"#"
+  },
+  {
+    title:"Pi Core Team Announces Developer Update",
+    image:"https://via.placeholder.com/600x400",
+    date:"Feb 2026",
+    source:"Official Blog",
+    link:"#"
+  }
+];
+
+function loadNews(){
+
+  newsContainer.innerHTML="";
+
+  NEWS.forEach(item=>{
+
+    const div=document.createElement("div");
+    div.className="news-card";
+    div.onclick=()=>window.location.href=item.link;
+
+    div.innerHTML=`
+      <img src="${item.image}" class="news-image">
+      <div class="news-body">
+        <div class="news-title">${item.title}</div>
+        <div class="news-meta">${item.date} • ${item.source}</div>
+      </div>
+    `;
+
+    newsContainer.appendChild(div);
+  });
+}
+
+loadNews();
+</script>
+  
 </body>
 </html>
