@@ -280,11 +280,29 @@ body::before{
   <div id="assetsContainer"></div>
 </section>
 
+<!-- ===== ALBUKHR BOTTOM NAV ===== -->
 <nav class="bottom-nav">
-  <a href="index.html" class="active"><span>🏠</span>Home</a>
-  <a href="projects.html"><span>🔎</span>Projects</a>
-  <a href="wallet.html"><span>💼</span>Wallet</a>
-  <a href="services.html"><span>🛠️</span>Services</a>
+
+  <a href="index.html" class="nav-item">
+    <div>🏠</div>
+    <span>Home</span>
+  </a>
+
+  <a href="wallet.html" class="nav-item">
+    <div>💼</div>
+    <span>Wallet</span>
+  </a>
+
+  <a href="news.html" class="nav-item">
+    <div>📰</div>
+    <span>News</span>
+  </a>
+
+  <a href="staking.html" class="nav-item">
+    <div>📊</div>
+    <span>Stake</span>
+  </a>
+
 </nav>
 
 <script src="staking.js"></script>
@@ -534,6 +552,15 @@ window.addEventListener("DOMContentLoaded", loadHome);
 
 })();
 </script>
-  
+
+<script>
+const currentPage = location.pathname.split("/").pop();
+document.querySelectorAll(".nav-item").forEach(link=>{
+  if(link.getAttribute("href") === currentPage){
+    link.classList.add("active");
+  }
+});
+</script>
+   
 </body>
   </html>
