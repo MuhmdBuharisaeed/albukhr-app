@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr Verified Pi News</title>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f4f7f6;
+  padding-bottom:90px;
+}
+
+/* HEADER */
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:16px;
+  font-weight:700;
+  font-size:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* VERIFIED BADGE */
+.badge{
+  font-size:10px;
+  background:#fff;
+  color:#0f7a3d;
+  padding:4px 8px;
+  border-radius:20px;
+  font-weight:700;
+}
+
+/* SECTION */
+.section{
+  padding:16px;
+}
+
+/* NEWS CARD */
+.news-card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+  box-shadow:0 6px 18px rgba(15,122,61,0.06);
+  transition:.25s ease;
+}
+
+.news-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 24px rgba(15,122,61,0.12);
+}
+
+.news-title{
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.news-summary{
+  font-size:12px;
+  color:#555;
+  margin-bottom:8px;
+}
+
+.news-meta{
+  font-size:11px;
+  color:#777;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.news-source{
+  font-weight:600;
+  color:#0f7a3d;
+}
+
+/* OPEN BUTTON */
+.open-btn{
+  margin-top:10px;
+  padding:8px 10px;
+  font-size:12px;
+  border:none;
+  border-radius:8px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  width:100%;
+  transition:.2s ease;
+}
+
+.open-btn:hover{
+  background:#0c5f2f;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <span>Verified Pi News</span>
+  <span class="badge">Albukhr Verified</span>
+</div>
+
+<section class="section">
+  <div id="newsContainer"></div>
+</section>
+
+<script src="news-data.js"></script>
+
+<script>
+const container = document.getElementById("newsContainer");
+
+function renderNews(){
+
+  if(!ALBUKHR_NEWS || !ALBUKHR_NEWS.length){
+    container.innerHTML =
+      "<p style='font-size:12px;color:#777'>No verified news available.</p>";
+    return;
+  }
+
+  ALBUKHR_NEWS
+    .sort((a,b)=> new Date(b.date)-new Date(a.date))
+    .forEach(news=>{
+
+      const card = document.createElement("div");
+      card.className = "news-card";
+
+      card.innerHTML = `
+        <div class="news-title">${news.title}</div>
+        <div class="news-summary">${news.summary}</div>
+
+        <div class="news-meta">
+          <span class="news-source">
+            ${news.source}
+          </span>
+          <span>
+            ${new Date(news.date).toLocaleDateString()}
+          </span>
+        </div>
+
+        <button class="open-btn"
+          onclick="window.open('${news.link}','_blank')">
+          Read Official Source
+        </button>
+      `;
+
+      container.appendChild(card);
+    });
+}
+
+renderNews();
+</script>
+
+</body>
+</html>
