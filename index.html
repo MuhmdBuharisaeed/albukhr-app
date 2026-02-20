@@ -293,14 +293,12 @@ body::before{
     <span>Wallet</span>
   </a>
 
-  <a href="news.html" class="nav-item">
-    <div>📰</div>
-    <span>News</span>
-  </a>
-
-  <a href="staking.html" class="nav-item">
-    <div>📊</div>
-    <span>Stake</span>
+  <a href="news.html" class="nav-item" id="newsNavItem">
+  <div class="nav-icon">
+    📰
+    <span class="news-badge" id="newsBadge">NEW</span>
+  </div>
+  <span>News</span>
   </a>
 
 </nav>
@@ -558,6 +556,38 @@ const currentPage = location.pathname.split("/").pop();
 document.querySelectorAll(".nav-item").forEach(link=>{
   if(link.getAttribute("href") === currentPage){
     link.classList.add("active");
+  }
+});
+</script>
+
+<script>
+/* ===== ALBUKHR NEWS BADGE SYSTEM ===== */
+
+const NEWS_VERSION = "1.0"; // change this when new news is added
+
+function checkNewsBadge(){
+
+  const seenVersion = localStorage.getItem("albukhr_news_seen");
+
+  if(seenVersion !== NEWS_VERSION){
+    const badge = document.getElementById("newsBadge");
+    if(badge){
+      badge.style.display = "inline-block";
+    }
+  }
+}
+
+/* When user opens news page */
+function markNewsAsSeen(){
+  localStorage.setItem("albukhr_news_seen", NEWS_VERSION);
+}
+
+/* Run on load */
+document.addEventListener("DOMContentLoaded", ()=>{
+  checkNewsBadge();
+
+  if(location.pathname.includes("news.html")){
+    markNewsAsSeen();
   }
 });
 </script>
