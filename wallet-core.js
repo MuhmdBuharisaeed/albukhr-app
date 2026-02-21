@@ -1,9 +1,9 @@
 /* =========================================
-   ALBUKHR WALLET CORE v5 (EXTENDED SAFE)
-   Backward Compatible + Capital Support
+   ALBUKHR WALLET CORE v6 (ACCOUNTING SAFE)
+   Single Source of Truth Architecture
 ========================================= */
 
-const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v5";
+const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v6";
 const SETTINGS_KEY = "albukhr_wallet_settings";
 
 /* =========================================
@@ -11,15 +11,10 @@ const SETTINGS_KEY = "albukhr_wallet_settings";
 ========================================= */
 
 function getWalletSettings(){
-  const def = {
+  return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
     feePercent: 1,
     dailyLimit: 50
   };
-  return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || def;
-}
-
-function saveWalletSettings(settings){
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
 /* =========================================
@@ -35,7 +30,7 @@ function saveWithdrawals(list){
 }
 
 /* =========================================
-   PROJECT BREAKDOWN (SYNC WITH ENGINE 3.2)
+   PROJECT BREAKDOWN (REAL ACCOUNTING)
 ========================================= */
 
 function getProjectWalletBreakdown(){
@@ -46,6 +41,7 @@ function getProjectWalletBreakdown(){
 
   const stakes = getAllStakesMerged();
   const withdrawals = getWithdrawals();
+
   const map = {};
 
   stakes.forEach(s=>{
@@ -64,7 +60,7 @@ function getProjectWalletBreakdown(){
       map[s.project].stake += Number(s.amount) || 0;
     }
 
-    map[s.project].grossReward += 
+    map[s.project].grossReward +=
       Number(s.remainingReward ?? s.reward) || 0;
   });
 
@@ -81,15 +77,26 @@ function getProjectWalletBreakdown(){
   return Object.values(map).map(p=>({
 
     project: p.project,
+
     stake: p.stake,
+
     grossReward: p.grossReward,
+
     withdrawn: p.withdrawnReward + p.withdrawnCapital,
-    netReward: p.grossReward
+
+    withdrawnReward: p.withdrawnReward,
+
+    withdrawnCapital: p.withdrawnCapital,
+
+    netReward: Math.max(
+      p.grossReward - p.withdrawnReward,
+      0
+    )
   }));
 }
 
 /* =========================================
-   GLOBAL SUMMARY
+   GLOBAL SUMMARY (CORRECTED)
 ========================================= */
 
 function getWalletSummary(){
@@ -98,20 +105,21 @@ function getWalletSummary(){
 
   let totalStake = 0;
   let grossRewards = 0;
-  let withdrawn = 0;
+  let totalWithdrawn = 0;
+  let availableRewards = 0;
 
   projects.forEach(p=>{
     totalStake += p.stake;
     grossRewards += p.grossReward;
-    withdrawn += p.withdrawn;
+    totalWithdrawn += p.withdrawn;
+    availableRewards += p.netReward;
   });
 
   return {
     totalStake,
     grossRewards,
-    withdrawn,
-    rewards: grossRewards,
-    available: grossRewards
+    withdrawn: totalWithdrawn,
+    available: availableRewards
   };
 }
 
@@ -124,12 +132,16 @@ function getTodayWithdrawTotal(){
   const today = new Date().toDateString();
 
   return getWithdrawals()
-    .filter(w => new Date(w.timestamp).toDateString() === today)
-    .reduce((sum,w)=> sum + Number(w.grossAmount || 0),0);
+    .filter(w =>
+      new Date(w.timestamp).toDateString() === today &&
+      w.type !== "capital"
+    )
+    .reduce((sum,w)=>
+      sum + Number(w.grossAmount || 0),0);
 }
 
 /* =========================================
-   REWARD WITHDRAW
+   REWARD WITHDRAW (SAFE VERSION)
 ========================================= */
 
 function requestWithdraw({project, amount, walletAddress}){
@@ -140,6 +152,7 @@ function requestWithdraw({project, amount, walletAddress}){
     return {error:"Invalid amount"};
   }
 
+  const settings = getWalletSettings();
   const projects = getProjectWalletBreakdown();
   const target = projects.find(p => p.project === project);
 
@@ -151,21 +164,17 @@ function requestWithdraw({project, amount, walletAddress}){
     return {error:"Insufficient reward balance"};
   }
 
-  const fee = amount * 0.01;
+  if(getTodayWithdrawTotal() + amount > settings.dailyLimit){
+    return {error:"Daily withdraw limit exceeded"};
+  }
+
+  const fee = amount * (settings.feePercent / 100);
   const received = amount - fee;
 
-  /* ===== UPDATE PROJECT VALUES ===== */
-  target.grossReward -= amount;
-  target.netReward -= amount;
-  target.withdrawn += amount;
-
-  /* ===== SAVE PROJECT STATE ===== */
-  saveProjectWalletBreakdown(projects);
-
-  /* ===== SAVE HISTORY ===== */
-  const history = getWithdrawHistory();
+  const history = getWithdrawals();
 
   history.push({
+    id:"RW-"+Date.now(),
     type:"reward",
     project,
     grossAmount:amount,
@@ -175,9 +184,8 @@ function requestWithdraw({project, amount, walletAddress}){
     timestamp:Date.now()
   });
 
-  saveWithdrawHistory(history);
+  saveWithdrawals(history);
 
-  /* ===== DISPATCH EVENT ===== */
   window.dispatchEvent(new Event("walletUpdated"));
 
   return {
@@ -189,41 +197,7 @@ function requestWithdraw({project, amount, walletAddress}){
 }
 
 /* =========================================
-   CAPITAL WITHDRAW (PROJECT LEVEL)
-========================================= */
-
-function requestCapitalWithdraw(project){
-
-  if(typeof withdrawProjectCapital !== "function"){
-    return { error:"Capital engine not ready" };
-  }
-
-  const res = withdrawProjectCapital(project);
-
-  if(res?.error) return res;
-
-  const now = Date.now();
-
-  const tx = {
-    id:"CAP-"+now,
-    project,
-    grossAmount: res.amount,
-    fee: 0,
-    received: res.amount,
-    walletAddress: "internal",
-    timestamp: now,
-    type:"capital"
-  };
-
-  const list = getWithdrawals();
-  list.push(tx);
-  saveWithdrawals(list);
-
-  return tx;
-}
-
-/* =========================================
-   CAPITAL WITHDRAW (MATURED ONLY)
+   CAPITAL WITHDRAW (MATURED SAFE)
 ========================================= */
 
 function requestCapitalWithdraw(project){
@@ -269,6 +243,8 @@ function requestCapitalWithdraw(project){
   list.push(tx);
   saveWithdrawals(list);
 
+  window.dispatchEvent(new Event("walletUpdated"));
+
   return tx;
 }
 
@@ -287,4 +263,4 @@ function getWithdrawHistory(){
 
 function clearWalletLedger(){
   localStorage.removeItem(WITHDRAW_KEY);
-                                   }
+     }
