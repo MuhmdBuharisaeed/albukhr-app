@@ -58,10 +58,15 @@
 }
 
 .receipt img{
-  max-width:100%;
-  margin-top:6px;
+  display:block;
+  width:100%;
+  max-width:320px;      /* kar ya cika screen */
+  max-height:220px;     /* iyakar tsawo */
+  object-fit:cover;     /* ya daidaita crop */
+  margin:8px auto 0;    /* center */
   border-radius:10px;
-  border:1px solid #ddd
+  border:1px solid #e5e5e5;
+  box-shadow:0 6px 18px rgba(0,0,0,0.06);
 }
 
 .empty{
