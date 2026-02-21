@@ -171,90 +171,66 @@ function shouldBlock(title){
   );
 }
 
-async function loadNews(auto=false){
+async function loadNews(){
+
+  let news = [];
 
   try{
-
     const res = await fetch("/api/news");
-    const news = await res.json();
-
-    if(!Array.isArray(news) || !news.length){
-      container.innerHTML =
-        "<p style='font-size:12px;color:#777'>No verified news available.</p>";
-      return;
-    }
-
-    const sorted = news
-      .filter(n => !shouldBlock(n.title))
-      .sort((a,b)=> new Date(b.date) - new Date(a.date));
-
-    const latestTime =
-      new Date(sorted[0]?.date || 0).getTime();
-
-    if(auto && latestTime <= LAST_TIMESTAMP){
-      return;
-    }
-
-    if(auto && latestTime > LAST_TIMESTAMP){
-      if(navigator.vibrate){
-        navigator.vibrate(100);
+    news = await res.json();
+  }catch(e){
+    // Fallback local data
+    news = [
+      {
+        title:"Pi Core Team Developer Update",
+        summary:"Official ecosystem development progress.",
+        image:"https://via.placeholder.com/600x400",
+        source:"Pi Network",
+        date:"2026-02-20",
+        link:"#"
+      },
+      {
+        title:"Pi Ecosystem Utility Expansion",
+        summary:"New apps integrated into Pi ecosystem.",
+        image:"https://via.placeholder.com/600x400",
+        source:"Pi Blog",
+        date:"2026-02-18",
+        link:"#"
       }
-    }
-
-    LAST_TIMESTAMP = latestTime;
-
-    container.innerHTML = "";
-
-    sorted.forEach(item=>{
-
-      const div = document.createElement("div");
-      div.className = "news-card";
-
-      const isNew =
-        new Date(item.date).getTime() >= LAST_TIMESTAMP;
-
-      div.onclick = ()=>{
-        window.open(item.link,"_blank");
-      };
-
-      div.innerHTML = `
-        ${item.image ?
-          `<img src="${item.image}" class="news-image">`
-          : ""
-        }
-
-        <div class="news-body">
-
-          <div class="news-title">
-            ${item.title}
-            ${auto && isNew ?
-              `<span class="new-badge">NEW</span>`
-              : ""}
-          </div>
-
-          <div class="news-summary">
-            ${item.summary || ""}
-          </div>
-
-          <div class="news-meta">
-            <span class="news-source">
-              ${item.source}
-            </span>
-            <span>
-              ${new Date(item.date).toLocaleDateString()}
-            </span>
-          </div>
-
-        </div>
-      `;
-
-      container.appendChild(div);
-    });
-
-  }catch(err){
-    console.log("News error:", err);
+    ];
   }
+
+  renderNews(news);
 }
+
+function renderNews(news){
+  const container = document.getElementById("newsContainer");
+  container.innerHTML="";
+
+  if(!news.length){
+    container.innerHTML="<p>No verified news available.</p>";
+    return;
+  }
+
+  news.forEach(item=>{
+    const div=document.createElement("div");
+    div.className="news-card";
+    div.onclick=()=>window.open(item.link,"_blank");
+
+    div.innerHTML=`
+      ${item.image ? `<img src="${item.image}" class="news-image">`:""}
+      <div class="news-body">
+        <div class="news-title">${item.title}</div>
+        <div class="news-summary">${item.summary}</div>
+        <div class="news-meta">
+          ${new Date(item.date).toLocaleDateString()} • ${item.source}
+        </div>
+      </div>
+    `;
+
+    container.appendChild(div);
+  });
+  }  
 
 function startAutoRefresh(){
 
