@@ -134,57 +134,58 @@ function getTodayWithdrawTotal(){
 
 function requestWithdraw({project, amount, walletAddress}){
 
-  const settings = getWalletSettings();
-  amount = parseFloat(amount);
+  amount = Number(amount);
 
-  if(!project)
-    return { error:"Project required" };
-
-  if(amount <= 0)
-    return { error:"Invalid amount" };
-
-  if(!walletAddress)
-    return { error:"Wallet address required" };
-
-  const projects = getProjectWalletBreakdown();
-  const p = projects.find(x=>x.project===project);
-
-  if(!p)
-    return { error:"Project not found" };
-
-  if(amount > p.netReward)
-    return { error:"Insufficient project reward balance" };
-
-  if(getTodayWithdrawTotal() + amount > settings.dailyLimit)
-    return { error:"Daily limit exceeded (50 Pi)" };
-
-  const fee = (amount * settings.feePercent) / 100;
-  const received = amount - fee;
-
-  /* ENGINE SYNC */
-  if(typeof withdrawProjectReward === "function"){
-    const res = withdrawProjectReward(project, amount);
-    if(res?.error) return res;
+  if(!amount || amount <= 0){
+    return {error:"Invalid amount"};
   }
 
-  const now = Date.now();
+  const projects = getProjectWalletBreakdown();
+  const target = projects.find(p => p.project === project);
 
-  const tx = {
-    id: "WD-" + now,
+  if(!target){
+    return {error:"Project not found"};
+  }
+
+  if(amount > target.netReward){
+    return {error:"Insufficient reward balance"};
+  }
+
+  const fee = amount * 0.01;
+  const received = amount - fee;
+
+  /* ===== UPDATE PROJECT VALUES ===== */
+  target.grossReward -= amount;
+  target.netReward -= amount;
+  target.withdrawn += amount;
+
+  /* ===== SAVE PROJECT STATE ===== */
+  saveProjectWalletBreakdown(projects);
+
+  /* ===== SAVE HISTORY ===== */
+  const history = getWithdrawHistory();
+
+  history.push({
+    type:"reward",
     project,
-    grossAmount: amount,
+    grossAmount:amount,
     fee,
     received,
     walletAddress,
-    timestamp: now,
-    type: "reward"
+    timestamp:Date.now()
+  });
+
+  saveWithdrawHistory(history);
+
+  /* ===== DISPATCH EVENT ===== */
+  window.dispatchEvent(new Event("walletUpdated"));
+
+  return {
+    success:true,
+    grossAmount:amount,
+    fee,
+    received
   };
-
-  const list = getWithdrawals();
-  list.push(tx);
-  saveWithdrawals(list);
-
-  return tx;
 }
 
 /* =========================================
