@@ -129,6 +129,23 @@ input,select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1p
       <option value="90">90 Days</option>
     </select>
 
+<div id="projectionBox" style="
+  margin-top:14px;
+  background:#f6fbf8;
+  padding:10px;
+  border-radius:10px;
+  font-size:13px;
+  color:#0f7a3d;
+  display:none;
+">
+  <div><strong>Estimated Reward:</strong> 
+    <span id="estReward">0.00</span> Pi
+  </div>
+  <div><strong>Total Return:</strong> 
+    <span id="estTotal">0.00</span> Pi
+  </div>
+</div>
+    
     <div class="btns" style="margin-top:16px">
       <button class="btn primary" onclick="confirmStake()">Confirm</button>
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
@@ -202,6 +219,41 @@ function confirmStake(){
   successModal.style.display = "flex";
 }
 
+function getRaheemDailyRate(duration){
+
+  duration = Number(duration);
+
+  if(duration === 30) return 0.005;   // 0.5%
+  if(duration === 60) return 0.007;   // 0.7%
+  if(duration === 90) return 0.009;   // 0.9%
+
+  return 0.005;
+}
+
+function updateProjection(){
+
+  const amount   = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+
+  if(!amount || amount <= 0){
+    projectionBox.style.display = "none";
+    return;
+  }
+
+  const rate   = getRaheemDailyRate(duration);
+  const reward = amount * rate * duration;
+  const total  = amount + reward;
+
+  estReward.innerText = reward.toFixed(2);
+  estTotal.innerText  = total.toFixed(2);
+
+  projectionBox.style.display = "block";
+}
+
+/* LIVE EVENTS */
+amountInput.addEventListener("input", updateProjection);
+durationSelect.addEventListener("change", updateProjection);
+  
 /* =====================================
    CAPITAL WITHDRAW (IF MATURED)
 ===================================== */
