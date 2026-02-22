@@ -82,23 +82,19 @@
 
 <section class="section">
 
-  <!-- SEARCH -->
   <div class="search-box">
     🔍
     <input id="searchInput" placeholder="Search projects...">
   </div>
 
-  <!-- INTERNAL -->
   <div class="section-title">Albukhr Internal Projects</div>
   <div id="internalList"></div>
 
-  <!-- EXTERNAL -->
   <div class="section-title">Verified External Projects</div>
   <div id="externalList"></div>
 
 </section>
 
-<!-- ENGINES -->
 <script src="staking.js"></script>
 <script src="staking-external.js"></script>
 <script src="js/settings/settings-core.js"></script>
@@ -115,7 +111,10 @@ const INTERNAL_PROJECTS = [
   {name:"Barsh",title:"Barsh Agro",icon:"🌾",desc:"Mechanized farming & livestock.",page:"barsh.html"},
   {name:"Khairat",title:"Khairat Organic Fertiliser",icon:"♻️",desc:"Organic fertiliser from waste.",page:"khairat.html"},
   {name:"Urban",title:"Urban Mobility",icon:"🚍",desc:"Urban transportation systems.",page:"urban.html"},
-  {name:"Labbaika",title:"Labbaika Bakery Center",icon:"🍞",desc:"Bakery & flour-based production.",page:"labbaika.html"}
+  {name:"Labbaika",title:"Labbaika Bakery Center",icon:"🍞",desc:"Bakery & flour-based production.",page:"labbaika.html"},
+
+  /* ===== ADDED PROJECT ===== */
+  {name:"Azman",title:"Azman Futures Markers Lab",icon:"📊",desc:"Market intelligence, financial modeling & predictive analytics lab.",page:"azman.html"}
 ];
 
 /* ===============================
@@ -159,7 +158,7 @@ function renderInternal(q){
 }
 
 /* ===============================
-   RENDER EXTERNAL (APPROVED ONLY)
+   RENDER EXTERNAL
 ================================ */
 function renderExternal(q){
   externalList.innerHTML = "";
@@ -205,9 +204,6 @@ function renderExternal(q){
   });
 }
 
-/* ===============================
-   MASTER
-================================ */
 function renderAll(){
   const q = searchInput.value.toLowerCase();
   renderInternal(q);
