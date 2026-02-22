@@ -168,7 +168,20 @@ input,select{
       <option value="120">120 Days</option>
       <option value="180">180 Days</option>
     </select>
-
+    
+<div id="projectionBox" style="
+  margin-top:14px;
+  background:#f6fbf8;
+  padding:10px;
+  border-radius:10px;
+  font-size:13px;
+  color:#0f7a3d;
+  display:none;
+">
+  <div><strong>Estimated Reward:</strong> <span id="estReward">0.00</span> Pi</div>
+  <div><strong>Total Return:</strong> <span id="estTotal">0.00</span> Pi</div>
+</div>
+    
     <div class="btns" style="margin-top:16px">
       <button class="btn primary" onclick="confirmStake()">Confirm</button>
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
@@ -214,6 +227,42 @@ function closeSuccess(){ successModal.style.display="none"; }
 function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
+function getKhairatDailyRate(duration){
+
+  duration = Number(duration);
+
+  if(duration === 60)  return 0.006;  // 0.6%
+  if(duration === 120) return 0.008;  // 0.8%
+  if(duration === 180) return 0.01;   // 1%
+
+  return 0.006;
+}
+
+function updateProjection(){
+
+  const amount   = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+
+  if(!amount || amount <= 0){
+    projectionBox.style.display="none";
+    return;
+  }
+
+  const rate = getKhairatDailyRate(duration);
+
+  const reward = amount * rate * duration;
+  const total  = amount + reward;
+
+  estReward.innerText = reward.toFixed(2);
+  estTotal.innerText  = total.toFixed(2);
+
+  projectionBox.style.display="block";
+}
+
+/* LIVE EVENTS */
+amountInput.addEventListener("input", updateProjection);
+durationSelect.addEventListener("change", updateProjection);
+  
 function confirmStake(){
 
   const amount=Number(amountInput.value);
