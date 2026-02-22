@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr • Unified Admin</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f7f6;
+}
+
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:16px;
+  font-size:18px;
+  font-weight:700;
+}
+
+.section{
+  padding:18px;
+}
+
+.admin-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+.admin-btn{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#fff;
+  padding:16px;
+  border-radius:14px;
+  text-decoration:none;
+  color:#111;
+  box-shadow:0 6px 18px rgba(0,0,0,0.05);
+  transition:0.2s ease;
+  font-weight:600;
+}
+
+.admin-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+.admin-label{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.admin-arrow{
+  color:#0f7a3d;
+  font-weight:bold;
+}
+
+.admin-desc{
+  font-size:12px;
+  color:#777;
+  margin-top:4px;
+}
+
+.group-title{
+  margin:20px 0 10px;
+  font-size:14px;
+  font-weight:700;
+  color:#0f7a3d;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  ALBUKHR • Unified Admin Control
+</div>
+
+<div class="section">
+
+  <div class="group-title">Core Administration</div>
+  <div class="admin-grid">
+
+    <a href="admin-dapp-requests.html" class="admin-btn">
+      <div>
+        <div class="admin-label">📥 DApp Requests</div>
+        <div class="admin-desc">Review and approve new dApps</div>
+      </div>
+      <div class="admin-arrow">→</div>
+    </a>
+
+    <a href="admin-review.html" class="admin-btn">
+      <div>
+        <div class="admin-label">🛡 Admin Review</div>
+        <div class="admin-desc">Project & compliance verification</div>
+      </div>
+      <div class="admin-arrow">→</div>
+    </a>
+
+    <a href="admin-contributors.html" class="admin-btn">
+      <div>
+        <div class="admin-label">👥 Contributors</div>
+        <div class="admin-desc">Manage ecosystem contributors</div>
+      </div>
+      <div class="admin-arrow">→</div>
+    </a>
+
+  </div>
+
+  <div class="group-title">Financial & Transaction Control</div>
+  <div class="admin-grid">
+
+    <a href="admin-transactions.html" class="admin-btn">
+      <div>
+        <div class="admin-label">💰 Transactions</div>
+        <div class="admin-desc">View staking & withdrawals</div>
+      </div>
+      <div class="admin-arrow">→</div>
+    </a>
+
+    <a href="escrow-admin.html" class="admin-btn">
+      <div>
+        <div class="admin-label">🔐 Escrow Control</div>
+        <div class="admin-desc">External project escrow system</div>
+      </div>
+      <div class="admin-arrow">→</div>
+    </a>
+
+  </div>
+
+  <div class="group-title">Internal Projects</div>
+  <div class="admin-grid">
+
+    <a href="internal-admin-panel.html" class="admin-btn">
+      <div>
+        <div class="admin-label">🏢 Internal Panel</div>
+        <div class="admin-desc">Manage internal staking projects</div>
+      </div>
+      <div class="admin-arrow">→</div>
+    </a>
+
+  </div>
+
+  <div class="group-title">External Projects</div>
+  <div class="admin-grid">
+
+    <a href="external-admin-panel.html" class="admin-btn">
+      <div>
+        <div class="admin-label">🌍 External Panel</div>
+        <div class="admin-desc">Approve & manage external projects</div>
+      </div>
+      <div class="admin-arrow">→</div>
+    </a>
+
+    <a href="external-admin-dashboard.html" class="admin-btn">
+      <div>
+        <div class="admin-label">📊 External Dashboard</div>
+        <div class="admin-desc">Analytics & performance overview</div>
+      </div>
+      <div class="admin-arrow">→</div>
+    </a>
+
+  </div>
+
+</div>
+
+</body>
+</html>
