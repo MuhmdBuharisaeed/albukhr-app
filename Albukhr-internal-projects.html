@@ -4,126 +4,247 @@
 <meta charset="UTF-8">
 <title>Albukhr Internal Projects</title>
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  background:#f5f7f6;
+  font-family:Arial;
+  margin:0;
+}
+
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:14px 16px;
+}
+
+.section{
+  padding:16px;
+}
+
+.project-card{
+  background:#fff;
+  padding:16px;
+  border-radius:14px;
+  margin-bottom:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.project-title{
+  font-size:16px;
+  font-weight:700;
+}
+
+.project-meta{
+  font-size:13px;
+  color:#666;
+  margin-top:6px;
+}
+
+.project-live{
+  margin-top:8px;
+  font-size:13px;
+  color:#0f7a3d;
+  font-weight:600;
+}
+
+canvas{
+  margin-top:10px;
+  height:100px !important;
+}
+
+.btn{
+  margin-top:12px;
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+</style>
 </head>
 <body>
 
 <header class="header">
-  <h1>ALBUKHR • Internal Projects</h1>
+  <h2>ALBUKHR • Internal Projects</h2>
 </header>
 
-<section style="padding:16px">
+<section class="section">
   <div id="projectList"></div>
 </section>
 
-<script src="internal-project-engine.js"></script>
-
-<script>
-const container = document.getElementById("projectList");
-
-function renderInternalProjects(){
-
-  const list = getInternalLiveProjects();
-
-  if(!list.length){
-    container.innerHTML = "<p>No active internal projects yet.</p>";
-    return;
-  }
-
-  container.innerHTML = "";
-
-  list.forEach(p=>{
-
-    const div = document.createElement("div");
-    div.style.background="#fff";
-    div.style.padding="14px";
-    div.style.marginBottom="12px";
-    div.style.borderRadius="12px";
-
-    div.innerHTML = `
-      <h3>${p.name}</h3>
-      <small>${p.category}</small><br><br>
-
-      Duration: ${p.durationDays} days<br>
-      Reward Rate: ${p.rewardRate * 100}%<br>
-      Total Staked: ${p.totalStaked} Pi<br>
-      Status: ${p.status}
-    `;
-
-    container.appendChild(div);
-  });
-}
-
-renderInternalProjects();
-</script>
-
+<!-- ENGINES -->
 <script src="internal-core-seed.js"></script>
 <script src="staking-engine.js"></script>
 <script src="reward-engine.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
-
 seedInternalCoreProjects();
+initInternalProjects();
 
-function renderInternalProjects(){
+const container = document.getElementById("projectList");
 
-  const list = getAllInternalProjects();
-  const container = document.getElementById("projectList");
-  container.innerHTML = "";
+/* =========================
+   GET LIVE TOTAL STAKED
+========================= */
+function getLiveTotalStaked(projectName){
 
-  list.forEach(p=>{
+  if(typeof getAllStakesMerged !== "function") return 0;
 
-    const div = document.createElement("div");
-    div.className="card";
-    div.innerHTML = `
-      <h3>${p.name}</h3>
-      <small>${p.category}</small>
-      <div>Reward Rate: ${p.rewardRate * 100}%</div>
-      <div>Duration: ${p.durationDays} days</div>
-      <button onclick="stakeNow('${p.id}')">Stake</button>
-    `;
+  const stakes = getAllStakesMerged();
 
-    container.appendChild(div);
+  let total = 0;
+
+  stakes.forEach(s=>{
+    if(s.project === projectName && !s.capitalWithdrawn){
+      total += Number(s.amount) || 0;
+    }
+  });
+
+  return total;
+}
+
+/* =========================
+   MINI 7 DAY DATA
+========================= */
+function getMini7Day(projectName){
+
+  if(typeof getAllStakesMerged !== "function") return [];
+
+  const stakes = getAllStakesMerged();
+  const days = Array(7).fill(0);
+  const now = new Date();
+
+  stakes.forEach(s=>{
+    if(s.project !== projectName) return;
+    if(s.capitalWithdrawn) return;
+
+    const d = new Date(s.timestamp || Date.now());
+    const diff = Math.floor((now - d)/(1000*60*60*24));
+
+    if(diff >=0 && diff <7){
+      days[6-diff] += Number(s.amount)||0;
+    }
+  });
+
+  return days;
+}
+
+/* =========================
+   RENDER MINI CHART
+========================= */
+function renderMiniChart(projectName){
+
+  const canvas = document
+    .getElementById("chart_"+projectName);
+
+  if(!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const data = getMini7Day(projectName);
+
+  new Chart(ctx,{
+    type:"line",
+    data:{
+      labels:["","","","","","",""],
+      datasets:[{
+        data:data,
+        borderColor:"#0f7a3d",
+        backgroundColor:"rgba(15,122,61,0.12)",
+        fill:true,
+        tension:0.4,
+        pointRadius:0
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{display:false},
+        y:{display:false}
+      }
+    }
   });
 }
 
+/* =========================
+   STAKE NOW
+========================= */
 function stakeNow(projectId){
 
   const amount = prompt("Enter amount to stake:");
   if(!amount || amount<=0) return;
 
-  addStake(projectId, parseFloat(amount));
+  addStake({
+    project: projectId,
+    amount: parseFloat(amount),
+    duration: 90
+  });
 
   alert("Stake successful");
+  renderProjects();
 }
 
-renderInternalProjects();
+/* =========================
+   MAIN RENDER
+========================= */
+function renderProjects(){
 
-initInternalProjects();
-
-function renderInternalProjects(){
   const list = getAllInternalProjects();
-  const container = document.getElementById("internalProjectsList");
-
-  container.innerHTML="";
+  container.innerHTML = "";
 
   list.forEach(p=>{
-    const div=document.createElement("div");
-    div.innerHTML=`
-      <h4>${p.name}</h4>
-      <small>${p.category}</small><br>
-      Duration: ${p.durationDays} days<br>
-      Reward Rate: ${(p.rewardRate*100)}%<br>
-      Status: ${p.status}
-      <hr>
+
+    const total = getLiveTotalStaked(p.name);
+
+    const div = document.createElement("div");
+    div.className="project-card";
+
+    div.innerHTML = `
+      <div class="project-title">${p.name}</div>
+
+      <div class="project-meta">
+        Category: ${p.category}<br>
+        Duration: ${p.durationDays} days<br>
+        Reward Rate: ${p.rewardRate*100}%
+      </div>
+
+      <div class="project-live">
+        Live Total Staked: ${total.toFixed(2)} Pi
+      </div>
+
+      <canvas id="chart_${p.name}"></canvas>
+
+      <button class="btn"
+        onclick="stakeNow('${p.name}')">
+        Stake
+      </button>
     `;
+
     container.appendChild(div);
+  });
+
+  /* render charts */
+  list.forEach(p=>{
+    renderMiniChart(p.name);
   });
 }
 
-renderInternalProjects();  
-  
+renderProjects();
+
+/* =========================
+   AUTO REFRESH
+========================= */
+setInterval(()=>{
+  renderProjects();
+},30000);
+
 </script>
-  
+
 </body>
 </html>
