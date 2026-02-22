@@ -394,8 +394,9 @@ function renderPopular(globalMap){
     container.appendChild(div);
   });
    }
+   
 /* =========================
-   USER ASSETS
+   USER ASSETS (ICON ONLY STYLE)
 ========================= */
 function renderAssets(userMap){
 
@@ -411,29 +412,34 @@ function renderAssets(userMap){
     return;
   }
 
-  sorted.forEach(([project,amount])=>{
+  sorted.forEach(([project])=>{
 
     const file = project.toLowerCase()+".html";
 
     const div = document.createElement("div");
-    div.className = "asset-item";
+    div.className = "project-card";   // ← kamar projects.html
     div.onclick = ()=> location.href = file;
 
     div.innerHTML = `
-      <div class="asset-left">
-        <div class="asset-name">${project}</div>
-        <div class="asset-stake">${amount.toFixed(2)} Pi Staked</div>
-      </div>
-      <div class="asset-right">
+      <div class="project-icon">
         ${ICONS[project] || "📦"}
-        ${amount.toFixed(2)}
+      </div>
+      <div class="project-body">
+        <div class="project-title">${project}</div>
+        <div class="project-desc">
+          View project details & manage staking
+        </div>
+        <span class="project-tag">Asset</span>
+      </div>
+      <div class="project-action">
+        <span style="color:#0f7a3d;font-weight:600">Open →</span>
       </div>
     `;
 
     container.appendChild(div);
   });
-}
-
+   }
+   
 /* =========================
    ASSET VISIBILITY TOGGLE
 ========================= */
