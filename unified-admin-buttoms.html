@@ -9,7 +9,7 @@
 <style>
 body{
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
   background:#f4f7f6;
 }
 
@@ -21,28 +21,25 @@ body{
   font-weight:700;
 }
 
-.section{
-  padding:18px;
-}
+.section{ padding:18px; }
 
 .admin-grid{
   display:grid;
-  grid-template-columns:1fr;
   gap:14px;
 }
 
 .admin-btn{
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   background:#fff;
   padding:16px;
   border-radius:14px;
   text-decoration:none;
   color:#111;
   box-shadow:0 6px 18px rgba(0,0,0,0.05);
-  transition:0.2s ease;
   font-weight:600;
+  transition:.2s ease;
 }
 
 .admin-btn:hover{
@@ -50,28 +47,58 @@ body{
   box-shadow:0 10px 25px rgba(0,0,0,0.08);
 }
 
-.admin-label{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.admin-arrow{
-  color:#0f7a3d;
-  font-weight:bold;
-}
-
-.admin-desc{
-  font-size:12px;
-  color:#777;
-  margin-top:4px;
-}
-
 .group-title{
   margin:20px 0 10px;
   font-size:14px;
   font-weight:700;
   color:#0f7a3d;
+}
+
+/* PIN MODAL */
+.pin-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.pin-box{
+  background:#fff;
+  width:90%;
+  max-width:350px;
+  padding:20px;
+  border-radius:16px;
+  text-align:center;
+}
+
+.pin-box input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+
+.pin-btn{
+  margin-top:14px;
+  padding:12px;
+  width:100%;
+  background:#0f7a3d;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.logout-btn{
+  margin-top:20px;
+  font-size:12px;
+  color:#c0392b;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -81,93 +108,134 @@ body{
   ALBUKHR • Unified Admin Control
 </div>
 
-<div class="section">
+<div class="section" id="adminContent" style="display:none">
 
-  <div class="group-title">Core Administration</div>
+  <div class="group-title">Admin Pages</div>
+
   <div class="admin-grid">
-
-    <a href="admin-dapp-requests.html" class="admin-btn">
-      <div>
-        <div class="admin-label">📥 DApp Requests</div>
-        <div class="admin-desc">Review and approve new dApps</div>
-      </div>
-      <div class="admin-arrow">→</div>
-    </a>
-
-    <a href="admin-review.html" class="admin-btn">
-      <div>
-        <div class="admin-label">🛡 Admin Review</div>
-        <div class="admin-desc">Project & compliance verification</div>
-      </div>
-      <div class="admin-arrow">→</div>
-    </a>
-
-    <a href="admin-contributors.html" class="admin-btn">
-      <div>
-        <div class="admin-label">👥 Contributors</div>
-        <div class="admin-desc">Manage ecosystem contributors</div>
-      </div>
-      <div class="admin-arrow">→</div>
-    </a>
-
+    <a href="admin-dapp-requests.html" class="admin-btn">📥 DApp Requests →</a>
+    <a href="admin-contributors.html" class="admin-btn">👥 Contributors →</a>
+    <a href="admin-transactions.html" class="admin-btn">💰 Transactions →</a>
+    <a href="internal-admin-panel.html" class="admin-btn">🏢 Internal Panel →</a>
+    <a href="external-admin-panel.html" class="admin-btn">🌍 External Panel →</a>
+    <a href="external-admin-dashboard.html" class="admin-btn">📊 External Dashboard →</a>
+    <a href="admin-review.html" class="admin-btn">🛡 Admin Review →</a>
+    <a href="escrow-admin.html" class="admin-btn">🔐 Escrow Control →</a>
   </div>
 
-  <div class="group-title">Financial & Transaction Control</div>
-  <div class="admin-grid">
-
-    <a href="admin-transactions.html" class="admin-btn">
-      <div>
-        <div class="admin-label">💰 Transactions</div>
-        <div class="admin-desc">View staking & withdrawals</div>
-      </div>
-      <div class="admin-arrow">→</div>
-    </a>
-
-    <a href="escrow-admin.html" class="admin-btn">
-      <div>
-        <div class="admin-label">🔐 Escrow Control</div>
-        <div class="admin-desc">External project escrow system</div>
-      </div>
-      <div class="admin-arrow">→</div>
-    </a>
-
-  </div>
-
-  <div class="group-title">Internal Projects</div>
-  <div class="admin-grid">
-
-    <a href="internal-admin-panel.html" class="admin-btn">
-      <div>
-        <div class="admin-label">🏢 Internal Panel</div>
-        <div class="admin-desc">Manage internal staking projects</div>
-      </div>
-      <div class="admin-arrow">→</div>
-    </a>
-
-  </div>
-
-  <div class="group-title">External Projects</div>
-  <div class="admin-grid">
-
-    <a href="external-admin-panel.html" class="admin-btn">
-      <div>
-        <div class="admin-label">🌍 External Panel</div>
-        <div class="admin-desc">Approve & manage external projects</div>
-      </div>
-      <div class="admin-arrow">→</div>
-    </a>
-
-    <a href="external-admin-dashboard.html" class="admin-btn">
-      <div>
-        <div class="admin-label">📊 External Dashboard</div>
-        <div class="admin-desc">Analytics & performance overview</div>
-      </div>
-      <div class="admin-arrow">→</div>
-    </a>
-
+  <div class="logout-btn" onclick="logoutAdmin()">
+    Logout Admin
   </div>
 
 </div>
 
+<!-- PIN MODAL -->
+<div class="pin-modal" id="pinModal">
+  <div class="pin-box">
+    <h3>Admin Access Required</h3>
+    <p style="font-size:13px;color:#666">
+      Enter Admin PIN to continue
+    </p>
+    <input type="password" id="adminPinInput" placeholder="Enter PIN">
+    <button class="pin-btn" onclick="verifyPin()">Unlock</button>
+  </div>
+</div>
+
+<script>
+/* ===================================
+   CONFIG
+=================================== */
+
+const ADMIN_PIN = "@5194Bhr"; // ⚠ Change this
+const SESSION_KEY = "albukhr_admin_session";
+const ATTEMPT_KEY = "albukhr_admin_attempts";
+const LOCK_KEY = "albukhr_admin_lock";
+
+/* ===================================
+   VERIFY PIN
+=================================== */
+
+function verifyPin(){
+
+  if(isLocked()){
+    showLockMessage();
+    return;
+  }
+
+  const input = document.getElementById("adminPinInput").value;
+  let attempts = parseInt(localStorage.getItem(ATTEMPT_KEY)) || 0;
+
+  if(input === ADMIN_PIN){
+
+    sessionStorage.setItem(SESSION_KEY,"active");
+    localStorage.removeItem(ATTEMPT_KEY);
+    localStorage.removeItem(LOCK_KEY);
+
+    document.getElementById("pinModal").style.display="none";
+    document.getElementById("adminContent").style.display="block";
+
+  } else {
+
+    attempts++;
+    localStorage.setItem(ATTEMPT_KEY, attempts);
+
+    if(attempts >= 3){
+      const lockUntil = Date.now() + (5 * 60 * 1000); // 5 minutes
+      localStorage.setItem(LOCK_KEY, lockUntil);
+      alert("Too many failed attempts. Locked for 5 minutes.");
+    } else {
+      alert("Incorrect PIN. Attempts left: " + (3 - attempts));
+    }
+  }
+}
+
+/* ===================================
+   LOCK CHECK
+=================================== */
+
+function isLocked(){
+  const lockUntil = localStorage.getItem(LOCK_KEY);
+  if(!lockUntil) return false;
+
+  if(Date.now() > parseInt(lockUntil)){
+    localStorage.removeItem(LOCK_KEY);
+    localStorage.removeItem(ATTEMPT_KEY);
+    return false;
+  }
+
+  return true;
+}
+
+function showLockMessage(){
+  const lockUntil = parseInt(localStorage.getItem(LOCK_KEY));
+  const remaining = Math.ceil((lockUntil - Date.now()) / 60000);
+  alert("System locked. Try again in " + remaining + " minute(s).");
+}
+
+/* ===================================
+   SESSION CHECK
+=================================== */
+
+function checkSession(){
+
+  if(sessionStorage.getItem(SESSION_KEY)==="active"){
+    document.getElementById("pinModal").style.display="none";
+    document.getElementById("adminContent").style.display="block";
+    return;
+  }
+
+  if(isLocked()){
+    showLockMessage();
+  }
+}
+
+function logoutAdmin(){
+  sessionStorage.removeItem(SESSION_KEY);
+  location.reload();
+}
+
+checkSession();
+</script>
+  
 </body>
 </html>
