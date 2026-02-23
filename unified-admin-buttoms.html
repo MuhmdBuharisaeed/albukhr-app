@@ -236,6 +236,72 @@ function logoutAdmin(){
 
 checkSession();
 </script>
+
+<script src="admin-auth.js"></script>
+<script>
+requireRole([
+  "super_admin",
+  "internal_admin",
+  "review_admin",
+  "escrow_admin",
+  "external_admin"
+]);
+</script>
+
+<script>
+const role = getCurrentAdmin()?.role;
+const container = document.getElementById("adminButtons");
+
+const ALL_PAGES = [
+
+  { title:"Internal Admin Panel", page:"internal-admin-panel.html", roles:["super_admin","internal_admin"] },
+
+  { title:"External Admin Panel", page:"external-admin-panel.html", roles:["super_admin","external_admin"] },
+
+  { title:"External Admin Dashboard", page:"external-admin-dashboard.html", roles:["super_admin","external_admin"] },
+
+  { title:"External Project Reviews", page:"admin-review.html", roles:["super_admin","review_admin"] },
+
+  { title:"Escrow Admin", page:"escrow-admin.html", roles:["super_admin","escrow_admin"] },
+
+  { title:"dApp Requests", page:"admin-dapp-requests.html", roles:["super_admin"] },
+
+  { title:"Contributors", page:"admin-contributors.html", roles:["super_admin"] },
+
+  { title:"Transactions", page:"admin-transactions.html", roles:["super_admin"] }
+
+];
+
+function renderAdminButtons(){
+
+  if(!role){
+    container.innerHTML = "<p>Unauthorized</p>";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  ALL_PAGES.forEach(item=>{
+
+    if(item.roles.includes(role)){
+
+      const btn = document.createElement("button");
+      btn.className = "admin-btn";
+      btn.innerText = item.title;
+      btn.onclick = ()=> location.href = item.page;
+
+      container.appendChild(btn);
+    }
+
+  });
+
+  if(container.innerHTML===""){
+    container.innerHTML="<p>No accessible admin panels.</p>";
+  }
+}
+
+renderAdminButtons();
+</script>
   
 </body>
 </html>
