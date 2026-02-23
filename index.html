@@ -227,6 +227,32 @@ body::before{
 .menu-icon:hover div{
   opacity:.8;
    }
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  background:#0f7a3d;
+  color:#fff;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.main-logo{
+  height:36px;
+  width:auto;
+}
+
+.brand{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+   }
    
 </style>
   
@@ -234,8 +260,12 @@ body::before{
 
 <body data-page="home">
 
-<div class="header">
-  <div class="header-title">ALBUKHR</div>
+<header class="header">
+  <div class="header-left">
+    <img src="logo.png" alt="Albukhr Logo" class="main-logo">
+    <h1 class="brand">ALBUKHR</h1>
+  </div>
+</header>
 
   <div class="menu-icon" onclick="goToSettings()">
     <div></div>
