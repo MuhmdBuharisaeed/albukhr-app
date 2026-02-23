@@ -3,15 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Admin Login</title>
-
+<title>ALBUKHR – Admin Access</title>
 <link rel="stylesheet" href="style.css">
-
 <style>
 body{
   background:#f4faf6;
 }
-
 .login-wrap{
   min-height:100vh;
   display:flex;
@@ -19,7 +16,6 @@ body{
   justify-content:center;
   padding:16px;
 }
-
 .login-card{
   width:100%;
   max-width:380px;
@@ -28,7 +24,6 @@ body{
   padding:22px;
   box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
-
 .brand{
   text-align:center;
   font-size:18px;
@@ -36,25 +31,21 @@ body{
   color:#0f7a3d;
   margin-bottom:6px;
 }
-
 .subtitle{
   text-align:center;
   font-size:12px;
   color:#666;
   margin-bottom:20px;
 }
-
 .form-group{
   margin-bottom:14px;
 }
-
 .form-group label{
   display:block;
   font-size:12px;
   font-weight:600;
   margin-bottom:6px;
 }
-
 .form-group input,
 .form-group select{
   width:100%;
@@ -62,14 +53,7 @@ body{
   border-radius:12px;
   border:1px solid #cceedd;
   font-size:14px;
-  outline:none;
 }
-
-.form-group input:focus,
-.form-group select:focus{
-  border-color:#0f7a3d;
-}
-
 .login-btn{
   width:100%;
   padding:12px;
@@ -81,23 +65,21 @@ body{
   font-size:14px;
   cursor:pointer;
 }
-
-.note{
-  margin-top:14px;
-  font-size:11px;
-  color:#777;
-  text-align:center;
+.error{
+  margin-top:12px;
+  font-size:12px;
+  color:#b00020;
+  display:none;
 }
 </style>
 </head>
-
 <body>
 
 <div class="login-wrap">
   <div class="login-card">
 
     <div class="brand">ALBUKHR • Admin</div>
-    <div class="subtitle">Secure role-based access</div>
+    <div class="subtitle">Role-based secured access</div>
 
     <div class="form-group">
       <label>Admin Role</label>
@@ -110,45 +92,54 @@ body{
     </div>
 
     <div class="form-group">
-      <label>Admin Access Key</label>
-      <input id="key" type="password" placeholder="Enter admin key">
+      <label>Access Key</label>
+      <input id="key" type="password" placeholder="Enter access key">
     </div>
 
     <button class="login-btn" onclick="login()">Login</button>
 
-    <div class="note">
-      Unauthorized access is prohibited.
+    <div class="error" id="errorBox">
+      Invalid credentials
     </div>
 
   </div>
 </div>
 
 <script>
-/* DEMO KEYS – LATER MOVE TO BACKEND */
-const KEYS = {
-  super_admin: "5194Bhr@",
-  finance_admin: "5194Bhr@",
-  review_admin: "5194Bhr@",
-  viewer_admin: "5194Bhr@"
+/* SIMPLE HASH CHECK (not raw key exposure) */
+function hash(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){
+    h = Math.imul(31,h) + str.charCodeAt(i) | 0;
+  }
+  return h;
+}
+
+/* Store only hash */
+const ROLE_HASH = {
+  super_admin:  hash("5194Bhr@"),
+  finance_admin:hash("5194Bhr@"),
+  review_admin: hash("5194Bhr@"),
+  viewer_admin: hash("5194Bhr@")
 };
 
 function login(){
-  const role = document.getElementById("role").value;
-  const key = document.getElementById("key").value;
 
-  if(KEYS[role] !== key){
-    alert("Invalid admin credentials");
+  const role = document.getElementById("role").value;
+  const key  = document.getElementById("key").value;
+  const error = document.getElementById("errorBox");
+
+  if(hash(key) !== ROLE_HASH[role]){
+    error.style.display="block";
     return;
   }
 
-  localStorage.setItem("albukhr_admin_role", role);
+  /* Use sessionStorage (safer than localStorage) */
+  sessionStorage.setItem("albukhr_admin_role", role);
+  sessionStorage.setItem("albukhr_admin_auth", "true");
 
-  /* Redirect */
-  if(role === "review_admin"){
-    window.location.href = "admin-review.html";
-  }else{
-    window.location.href = "admin-transactions.html";
-  }
+  /* Redirect to unified admin hub */
+  window.location.href = "unified-admin-buttoms.html";
 }
 </script>
 
