@@ -116,15 +116,16 @@ body{
     🔐 Escrow Admin
   </button>
 
-<!-- 9. Super Admin Dashboard -->
-<div class="admin-card super">
-  <h3>Super Admin Dashboard</h3>
-  <p>Live ecosystem control center (Internal + External + Escrow + Wallet)</p>
-  <button onclick="goAdmin('super-admin-dashboard.html')">
-    Open Dashboard
+  <!-- 9. Super Admin Dashboard (Super Admin Only) -->
+  <button 
+    class="admin-btn" 
+    id="superAdminBtn"
+    onclick="go('super-admin-dashboard.html')"
+    style="display:none; background:#0f7a3d; color:#fff; font-weight:700;"
+  >
+    👑 Super Admin Dashboard
   </button>
-</div>
-  
+
   <button class="logout-btn" onclick="adminLogout()">
     🚪 Logout
   </button>
@@ -135,19 +136,28 @@ body{
 <script src="admin-auth.js"></script>
 
 <script>
+
 /* Allow all main admin roles */
 requireRole(["super_admin","finance_admin","review_admin","viewer_admin"]);
 
-/* Show current role */
+/* Get current admin */
 const admin = getAdmin();
+
+/* Show role badge */
 if(admin){
   document.getElementById("adminRoleBadge").innerText =
     admin.role.replace("_"," ").toUpperCase();
+
+  /* Show Super Admin button only if role is super_admin */
+  if(admin.role === "super_admin"){
+    document.getElementById("superAdminBtn").style.display = "block";
+  }
 }
 
 function go(page){
   window.location.href = page;
 }
+
 </script>
   
 </body>
