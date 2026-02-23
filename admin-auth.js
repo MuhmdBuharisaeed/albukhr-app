@@ -1,72 +1,92 @@
-/* ===============================
-   ALBUKHR – ADMIN AUTH ENGINE
-================================ */
+/* ==========================================
+   ALBUKHR – SECURE ADMIN AUTH ENGINE
+========================================== */
 
-const ADMIN_KEY = "albukhr_admin_session";
+const ADMIN_SESSION_KEY = "albukhr_admin_session";
+const SESSION_DURATION = 2 * 60 * 60 * 1000; // 2 hours
 
-/* LOGIN */
+/* ==========================================
+   LOGIN
+========================================== */
 function adminLogin(username, role, secret){
+
   const VALID_SECRET = "ALBUKHR_CORE_2026";
 
   if(secret !== VALID_SECRET){
     return false;
   }
 
-  const admin = {
-    username,
-    role,
-    loggedInAt: Date.now()
+  const session = {
+    username: username,
+    role: role,
+    loginTime: Date.now(),
+    expiresAt: Date.now() + SESSION_DURATION
   };
 
-  localStorage.setItem(ADMIN_KEY, JSON.stringify(admin));
+  localStorage.setItem(
+    ADMIN_SESSION_KEY,
+    JSON.stringify(session)
+  );
+
   return true;
 }
 
-/* LOGOUT */
-function adminLogout(){
-  localStorage.removeItem(ADMIN_KEY);
-  window.location.href = "admin-login.html";
+/* ==========================================
+   GET SESSION
+========================================== */
+function getAdminSession(){
+  const raw = localStorage.getItem(ADMIN_SESSION_KEY);
+  if(!raw) return null;
+
+  try{
+    const session = JSON.parse(raw);
+
+    // Check expiry
+    if(Date.now() > session.expiresAt){
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+      return null;
+    }
+
+    return session;
+
+  }catch(e){
+    localStorage.removeItem(ADMIN_SESSION_KEY);
+    return null;
+  }
 }
 
-/* GET ADMIN */
-function getAdmin(){
-  return JSON.parse(localStorage.getItem(ADMIN_KEY));
-}
+/* ==========================================
+   REQUIRE ROLE (GUARD)
+========================================== */
+function requireRole(allowedRoles){
 
-/* ROLE GUARD */
-function requireRole(allowed){
-  const admin = getAdmin();
+  const session = getAdminSession();
 
-  if(!admin){
+  if(!session){
     alert("Admin login required");
     window.location.href = "admin-login.html";
     return;
   }
 
-  if(!allowed.includes(admin.role)){
+  if(!allowedRoles.includes(session.role)){
     alert("Access denied");
-    window.location.href = "admin-dashboard.html";
+    window.location.href = "unified-admin-buttons.html";
+    return;
   }
 }
 
-function getAdminRole(){
-  return localStorage.getItem("albukhr_admin_role");
-}
-
-function requireRole(allowed){
-  const role = getAdminRole();
-
-  if(!role || !allowed.includes(role)){
-    alert("Access denied");
-    window.location.href = "index.html";
-  }
-}
-
+/* ==========================================
+   LOGOUT
+========================================== */
 function adminLogout(){
-  localStorage.removeItem("albukhr_admin_role");
-  window.location.href = "index.html";
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  window.location.href = "admin-login.html";
 }
 
-localStorage.setItem("albukhr_admin_role", "super_admin");
-
-localStorage.setItem("albukhr_admin_role", "finance_admin");
+/* ==========================================
+   GET ROLE HELPER
+========================================== */
+function getAdminRole(){
+  const session = getAdminSession();
+  return session ? session.role : null;
+}
