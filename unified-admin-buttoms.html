@@ -116,6 +116,15 @@ body{
     🔐 Escrow Admin
   </button>
 
+<!-- 9. Super Admin Dashboard -->
+<div class="admin-card super">
+  <h3>Super Admin Dashboard</h3>
+  <p>Live ecosystem control center (Internal + External + Escrow + Wallet)</p>
+  <button onclick="goAdmin('super-admin-dashboard.html')">
+    Open Dashboard
+  </button>
+</div>
+  
   <button class="logout-btn" onclick="adminLogout()">
     🚪 Logout
   </button>
@@ -141,5 +150,14 @@ function go(page){
 }
 </script>
 
+<script>
+requireRole([
+  "super_admin",
+  "finance_admin",
+  "review_admin",
+  "viewer_admin"
+]);
+</script>
+  
 </body>
 </html>
