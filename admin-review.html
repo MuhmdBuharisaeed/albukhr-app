@@ -4,21 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr Admin – External Reviews</title>
-
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header class="header">
-  <h1 class="brand">ALBUKHR • Admin</h1>
+  <h1 class="brand">ALBUKHR • Admin Review</h1>
 </header>
 
 <div class="admin-wrap">
 
   <div class="admin-header">
     <h2>External Project Reviews</h2>
-    <button onclick="adminLogout()">Logout</button>
+    <div style="display:flex; gap:10px;">
+      <button onclick="location.href='unified-admin-buttons.html'">
+        Admin Hub
+      </button>
+      <button onclick="adminLogout()">Logout</button>
+    </div>
   </div>
 
   <table class="review-table">
@@ -36,20 +40,16 @@
 
 </div>
 
-<!-- AUTH -->
+<!-- AUTH (LOAD ONCE) -->
 <script src="admin-auth.js"></script>
+
 <script>
 requireRole(["super_admin", "review_admin"]);
 </script>
 
-<!-- ENGINES -->
-<script src="admin-auth.js"></script>
+<!-- BUSINESS LOGIC -->
 <script src="staking-external.js"></script>
 <script src="admin-review.js"></script>
 
-<script>
-requireRole(["super_admin", "review_admin"]);
-</script>
-  
 </body>
 </html>
