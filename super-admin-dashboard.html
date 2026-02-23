@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR – Super Admin Dashboard</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f4f7f5;
+}
+
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header h2{
+  margin:0;
+  font-size:16px;
+}
+
+.section{
+  padding:16px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;
+}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 6px 16px rgba(0,0,0,.05);
+}
+
+.card span{
+  font-size:11px;
+  color:#666;
+}
+
+.card strong{
+  display:block;
+  margin-top:6px;
+  font-size:16px;
+  color:#0f7a3d;
+}
+
+.refresh{
+  background:#fff;
+  border:none;
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:12px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <h2>ALBUKHR • Super Admin</h2>
+  <button class="refresh" onclick="loadDashboard()">🔄 Refresh</button>
+</header>
+
+<section class="section">
+
+  <h3>🏢 Internal System</h3>
+  <div class="grid" id="internalStats"></div>
+
+  <h3 style="margin-top:24px">🌍 External System</h3>
+  <div class="grid" id="externalStats"></div>
+
+  <h3 style="margin-top:24px">💳 Wallet System</h3>
+  <div class="grid" id="walletStats"></div>
+
+  <h3 style="margin-top:24px">🔐 Escrow System</h3>
+  <div class="grid" id="escrowStats"></div>
+
+</section>
+
+<script src="admin-auth.js"></script>
+<script src="staking.js"></script>
+<script src="staking-external.js"></script>
+<script src="wallet-core.js"></script>
+<script src="internal-project-engine.js"></script>
+<script src="external-engine.js"></script>
+<script src="escrow-engine.js"></script>
+
+<script>
+requireRole(["super_admin"]);
+
+function card(title,value){
+  return `
+    <div class="card">
+      <span>${title}</span>
+      <strong>${value}</strong>
+    </div>
+  `;
+}
+
+function loadDashboard(){
+
+  /* ================= INTERNAL ================= */
+
+  let internalStake = 0;
+  let activeStakes = 0;
+  let pendingRewards = 0;
+
+  if(typeof getAllStakesMerged === "function"){
+    const stakes = getAllStakesMerged();
+
+    stakes.forEach(s=>{
+      if(!s.capitalWithdrawn){
+        internalStake += Number(s.amount)||0;
+        pendingRewards += Number(s.remainingReward ?? s.reward)||0;
+        activeStakes++;
+      }
+    });
+  }
+
+  const totalProjects =
+    typeof getAllInternalProjects === "function"
+    ? getAllInternalProjects().length
+    : 0;
+
+  internalStats.innerHTML =
+    card("Total Staked", internalStake.toFixed(2)+" Pi") +
+    card("Active Stakes", activeStakes) +
+    card("Pending Rewards", pendingRewards.toFixed(2)+" Pi") +
+    card("Internal Projects", totalProjects);
+
+
+  /* ================= EXTERNAL ================= */
+
+  let approved = 0;
+  let pending = 0;
+  let escrowLocked = 0;
+
+  if(typeof getApprovedExternalProjects === "function"){
+    approved = getApprovedExternalProjects().length;
+  }
+
+  if(typeof getPendingReviews === "function"){
+    pending = getPendingReviews().length;
+  }
+
+  if(typeof getEscrowStats === "function"){
+    const e = getEscrowStats();
+    escrowLocked = e.locked || 0;
+  }
+
+  externalStats.innerHTML =
+    card("Approved Projects", approved) +
+    card("Pending Reviews", pending) +
+    card("Escrow Locked", escrowLocked.toFixed(2)+" Pi");
+
+
+  /* ================= WALLET ================= */
+
+  let totalWithdraw = 0;
+  let rewardPaid = 0;
+
+  if(typeof getWithdrawHistory === "function"){
+    const tx = getWithdrawHistory();
+    totalWithdraw = tx.length;
+    rewardPaid = tx.reduce((sum,t)=> sum + (t.grossAmount||0),0);
+  }
+
+  walletStats.innerHTML =
+    card("Total Withdrawals", totalWithdraw) +
+    card("Rewards Paid", rewardPaid.toFixed(2)+" Pi");
+
+
+  /* ================= ESCROW ================= */
+
+  if(typeof getEscrowStats === "function"){
+    const e = getEscrowStats();
+
+    escrowStats.innerHTML =
+      card("Locked", (e.locked||0).toFixed(2)+" Pi") +
+      card("Released", (e.released||0).toFixed(2)+" Pi") +
+      card("Disputed", (e.disputed||0).toFixed(2)+" Pi");
+  }
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>
