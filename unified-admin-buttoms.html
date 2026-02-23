@@ -1,307 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr • Unified Admin</title>
+<title>ALBUKHR – Admin Control Center</title>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
 body{
   margin:0;
-  font-family:Arial,sans-serif;
-  background:#f4f7f6;
+  font-family:system-ui;
+  background:#f4f7f5;
 }
 
 .header{
   background:#0f7a3d;
   color:#fff;
   padding:16px;
-  font-size:18px;
-  font-weight:700;
-}
-
-.section{ padding:18px; }
-
-.admin-grid{
-  display:grid;
-  gap:14px;
-}
-
-.admin-btn{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:#fff;
+}
+
+.header h2{
+  margin:0;
+  font-size:16px;
+}
+
+.role-badge{
+  background:#ffffff22;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:11px;
+}
+
+.container{
   padding:16px;
+  max-width:500px;
+  margin:auto;
+}
+
+.admin-btn{
+  width:100%;
+  padding:14px;
+  margin-bottom:12px;
+  border:none;
   border-radius:14px;
-  text-decoration:none;
-  color:#111;
-  box-shadow:0 6px 18px rgba(0,0,0,0.05);
   font-weight:600;
+  font-size:14px;
+  cursor:pointer;
+  background:#fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.06);
   transition:.2s ease;
 }
 
 .admin-btn:hover{
   transform:translateY(-2px);
-  box-shadow:0 10px 25px rgba(0,0,0,0.08);
-}
-
-.group-title{
-  margin:20px 0 10px;
-  font-size:14px;
-  font-weight:700;
-  color:#0f7a3d;
-}
-
-/* PIN MODAL */
-.pin-modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.pin-box{
-  background:#fff;
-  width:90%;
-  max-width:350px;
-  padding:20px;
-  border-radius:16px;
-  text-align:center;
-}
-
-.pin-box input{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px;
-}
-
-.pin-btn{
-  margin-top:14px;
-  padding:12px;
-  width:100%;
-  background:#0f7a3d;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  font-weight:600;
-  cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 
 .logout-btn{
+  width:100%;
+  padding:14px;
   margin-top:20px;
-  font-size:12px;
-  color:#c0392b;
+  border:none;
+  border-radius:14px;
+  font-weight:700;
+  font-size:14px;
   cursor:pointer;
+  background:#c0392b;
+  color:#fff;
 }
 </style>
 </head>
+
 <body>
 
-<div class="header">
-  ALBUKHR • Unified Admin Control
+<header class="header">
+  <h2>ALBUKHR • Admin Center</h2>
+  <div class="role-badge" id="adminRoleBadge"></div>
+</header>
+
+<div class="container">
+
+  <button class="admin-btn" onclick="go('admin-dapp-requests.html')">
+    📥 DApp Requests
+  </button>
+
+  <button class="admin-btn" onclick="go('admin-contributors.html')">
+    👥 Contributors Management
+  </button>
+
+  <button class="admin-btn" onclick="go('admin-transactions.html')">
+    💳 Transactions Monitor
+  </button>
+
+  <button class="admin-btn" onclick="go('internal-admin-panel.html')">
+    🏢 Internal Admin Panel
+  </button>
+
+  <button class="admin-btn" onclick="go('external-admin-panel.html')">
+    🌍 External Admin Panel
+  </button>
+
+  <button class="admin-btn" onclick="go('external-admin-dashboard.html')">
+    📊 External Dashboard
+  </button>
+
+  <button class="admin-btn" onclick="go('admin-review.html')">
+    🔍 External Project Reviews
+  </button>
+
+  <button class="admin-btn" onclick="go('escrow-admin.html')">
+    🔐 Escrow Admin
+  </button>
+
+  <button class="logout-btn" onclick="adminLogout()">
+    🚪 Logout
+  </button>
+
 </div>
 
-<div class="section" id="adminContent" style="display:none">
-
-  <div class="group-title">Admin Pages</div>
-
-  <div class="admin-grid">
-    <a href="admin-dapp-requests.html" class="admin-btn">📥 DApp Requests →</a>
-    <a href="admin-contributors.html" class="admin-btn">👥 Contributors →</a>
-    <a href="admin-transactions.html" class="admin-btn">💰 Transactions →</a>
-    <a href="internal-admin-panel.html" class="admin-btn">🏢 Internal Panel →</a>
-    <a href="external-admin-panel.html" class="admin-btn">🌍 External Panel →</a>
-    <a href="external-admin-dashboard.html" class="admin-btn">📊 External Dashboard →</a>
-    <a href="admin-review.html" class="admin-btn">🛡 Admin Review →</a>
-    <a href="escrow-admin.html" class="admin-btn">🔐 Escrow Control →</a>
-  </div>
-
-  <div class="logout-btn" onclick="logoutAdmin()">
-    Logout Admin
-  </div>
-
-</div>
-
-<!-- PIN MODAL -->
-<div class="pin-modal" id="pinModal">
-  <div class="pin-box">
-    <h3>Admin Access Required</h3>
-    <p style="font-size:13px;color:#666">
-      Enter Admin PIN to continue
-    </p>
-    <input type="password" id="adminPinInput" placeholder="Enter PIN">
-    <button class="pin-btn" onclick="verifyPin()">Unlock</button>
-  </div>
-</div>
-
-<script>
-/* ===================================
-   CONFIG
-=================================== */
-
-const ADMIN_PIN = "@5194Bhr"; // ⚠ Change this
-const SESSION_KEY = "albukhr_admin_session";
-const ATTEMPT_KEY = "albukhr_admin_attempts";
-const LOCK_KEY = "albukhr_admin_lock";
-
-/* ===================================
-   VERIFY PIN
-=================================== */
-
-function verifyPin(){
-
-  if(isLocked()){
-    showLockMessage();
-    return;
-  }
-
-  const input = document.getElementById("adminPinInput").value;
-  let attempts = parseInt(localStorage.getItem(ATTEMPT_KEY)) || 0;
-
-  if(input === ADMIN_PIN){
-
-    sessionStorage.setItem(SESSION_KEY,"active");
-    localStorage.removeItem(ATTEMPT_KEY);
-    localStorage.removeItem(LOCK_KEY);
-
-    document.getElementById("pinModal").style.display="none";
-    document.getElementById("adminContent").style.display="block";
-
-  } else {
-
-    attempts++;
-    localStorage.setItem(ATTEMPT_KEY, attempts);
-
-    if(attempts >= 3){
-      const lockUntil = Date.now() + (5 * 60 * 1000); // 5 minutes
-      localStorage.setItem(LOCK_KEY, lockUntil);
-      alert("Too many failed attempts. Locked for 5 minutes.");
-    } else {
-      alert("Incorrect PIN. Attempts left: " + (3 - attempts));
-    }
-  }
-}
-
-/* ===================================
-   LOCK CHECK
-=================================== */
-
-function isLocked(){
-  const lockUntil = localStorage.getItem(LOCK_KEY);
-  if(!lockUntil) return false;
-
-  if(Date.now() > parseInt(lockUntil)){
-    localStorage.removeItem(LOCK_KEY);
-    localStorage.removeItem(ATTEMPT_KEY);
-    return false;
-  }
-
-  return true;
-}
-
-function showLockMessage(){
-  const lockUntil = parseInt(localStorage.getItem(LOCK_KEY));
-  const remaining = Math.ceil((lockUntil - Date.now()) / 60000);
-  alert("System locked. Try again in " + remaining + " minute(s).");
-}
-
-/* ===================================
-   SESSION CHECK
-=================================== */
-
-function checkSession(){
-
-  if(sessionStorage.getItem(SESSION_KEY)==="active"){
-    document.getElementById("pinModal").style.display="none";
-    document.getElementById("adminContent").style.display="block";
-    return;
-  }
-
-  if(isLocked()){
-    showLockMessage();
-  }
-}
-
-function logoutAdmin(){
-  sessionStorage.removeItem(SESSION_KEY);
-  location.reload();
-}
-
-checkSession();
-</script>
-
+<!-- AUTH -->
 <script src="admin-auth.js"></script>
-<script>
-requireRole([
-  "super_admin",
-  "internal_admin",
-  "review_admin",
-  "escrow_admin",
-  "external_admin"
-]);
-</script>
 
 <script>
-const role = getCurrentAdmin()?.role;
-const container = document.getElementById("adminButtons");
+/* Allow all main admin roles */
+requireRole(["super_admin","finance_admin","review_admin","viewer_admin"]);
 
-const ALL_PAGES = [
-
-  { title:"Internal Admin Panel", page:"internal-admin-panel.html", roles:["super_admin","internal_admin"] },
-
-  { title:"External Admin Panel", page:"external-admin-panel.html", roles:["super_admin","external_admin"] },
-
-  { title:"External Admin Dashboard", page:"external-admin-dashboard.html", roles:["super_admin","external_admin"] },
-
-  { title:"External Project Reviews", page:"admin-review.html", roles:["super_admin","review_admin"] },
-
-  { title:"Escrow Admin", page:"escrow-admin.html", roles:["super_admin","escrow_admin"] },
-
-  { title:"dApp Requests", page:"admin-dapp-requests.html", roles:["super_admin"] },
-
-  { title:"Contributors", page:"admin-contributors.html", roles:["super_admin"] },
-
-  { title:"Transactions", page:"admin-transactions.html", roles:["super_admin"] }
-
-];
-
-function renderAdminButtons(){
-
-  if(!role){
-    container.innerHTML = "<p>Unauthorized</p>";
-    return;
-  }
-
-  container.innerHTML = "";
-
-  ALL_PAGES.forEach(item=>{
-
-    if(item.roles.includes(role)){
-
-      const btn = document.createElement("button");
-      btn.className = "admin-btn";
-      btn.innerText = item.title;
-      btn.onclick = ()=> location.href = item.page;
-
-      container.appendChild(btn);
-    }
-
-  });
-
-  if(container.innerHTML===""){
-    container.innerHTML="<p>No accessible admin panels.</p>";
-  }
+/* Show current role */
+const admin = getAdmin();
+if(admin){
+  document.getElementById("adminRoleBadge").innerText =
+    admin.role.replace("_"," ").toUpperCase();
 }
 
-renderAdminButtons();
+function go(page){
+  window.location.href = page;
+}
 </script>
-  
+
 </body>
 </html>
