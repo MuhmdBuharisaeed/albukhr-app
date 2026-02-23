@@ -583,3 +583,29 @@ body{
   font-size:11px;
   color:#777;
 }
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  background:#0f7a3d;
+  color:#fff;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.main-logo{
+  height:36px;
+  width:auto;
+}
+
+.brand{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+}
