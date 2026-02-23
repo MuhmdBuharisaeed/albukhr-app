@@ -3,11 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALBUKHR – Admin Access</title>
+<title>ALBUKHR Admin Login</title>
+
 <link rel="stylesheet" href="style.css">
+
 <style>
 body{
   background:#f4faf6;
+  font-family:system-ui;
 }
 .login-wrap{
   min-height:100vh;
@@ -53,6 +56,11 @@ body{
   border-radius:12px;
   border:1px solid #cceedd;
   font-size:14px;
+  outline:none;
+}
+.form-group input:focus,
+.form-group select:focus{
+  border-color:#0f7a3d;
 }
 .login-btn{
   width:100%;
@@ -65,21 +73,22 @@ body{
   font-size:14px;
   cursor:pointer;
 }
-.error{
-  margin-top:12px;
-  font-size:12px;
-  color:#b00020;
-  display:none;
+.note{
+  margin-top:14px;
+  font-size:11px;
+  color:#777;
+  text-align:center;
 }
 </style>
 </head>
+
 <body>
 
 <div class="login-wrap">
   <div class="login-card">
 
     <div class="brand">ALBUKHR • Admin</div>
-    <div class="subtitle">Role-based secured access</div>
+    <div class="subtitle">Secure role-based access</div>
 
     <div class="form-group">
       <label>Admin Role</label>
@@ -98,48 +107,57 @@ body{
 
     <button class="login-btn" onclick="login()">Login</button>
 
-    <div class="error" id="errorBox">
-      Invalid credentials
+    <div class="note">
+      Unauthorized access is prohibited.
     </div>
 
   </div>
 </div>
 
+<script src="admin-auth.js"></script>
 <script>
-/* SIMPLE HASH CHECK (not raw key exposure) */
-function hash(str){
-  let h=0;
-  for(let i=0;i<str.length;i++){
-    h = Math.imul(31,h) + str.charCodeAt(i) | 0;
-  }
-  return h;
-}
-
-/* Store only hash */
-const ROLE_HASH = {
-  super_admin:  hash("5194Bhr@"),
-  finance_admin:hash("5194Bhr@"),
-  review_admin: hash("5194Bhr@"),
-  viewer_admin: hash("5194Bhr@")
+/* KEYS – demo only, replace with backend validation later */
+const KEYS = {
+  super_admin: "5194Bhr@",
+  finance_admin: "5194Bhr@",
+  review_admin: "5194Bhr@",
+  viewer_admin: "5194Bhr@"
 };
 
 function login(){
-
   const role = document.getElementById("role").value;
-  const key  = document.getElementById("key").value;
-  const error = document.getElementById("errorBox");
+  const key = document.getElementById("key").value.trim();
 
-  if(hash(key) !== ROLE_HASH[role]){
-    error.style.display="block";
+  if(KEYS[role] !== key){
+    alert("❌ Invalid admin credentials");
     return;
   }
 
-  /* Use sessionStorage (safer than localStorage) */
-  sessionStorage.setItem("albukhr_admin_role", role);
-  sessionStorage.setItem("albukhr_admin_auth", "true");
+  // Login using new session engine
+  const success = adminLogin("admin", role, "ALBUKHR_CORE_2026");
 
-  /* Redirect to unified admin hub */
-  window.location.href = "unified-admin-buttoms.html";
+  if(!success){
+    alert("❌ Unable to login. Invalid core key.");
+    return;
+  }
+
+  // Redirect based on role
+  switch(role){
+    case "super_admin":
+      window.location.href = "unified-admin-buttons.html";
+      break;
+    case "finance_admin":
+      window.location.href = "admin-transactions.html";
+      break;
+    case "review_admin":
+      window.location.href = "admin-review.html";
+      break;
+    case "viewer_admin":
+      window.location.href = "unified-admin-buttons.html";
+      break;
+    default:
+      window.location.href = "unified-admin-buttons.html";
+  }
 }
 </script>
 
