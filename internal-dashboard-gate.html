@@ -88,6 +88,11 @@ h3{margin-top:0}
 
 <script src="internal-registry.js"></script>
 
+<script src="admin-auth.js"></script>
+<script>
+requireRole(["super_admin","internal_admin"]);
+</script>
+  
 <script>
 function verifyAccess(){
   const id = document.getElementById("accessId").value.trim();
