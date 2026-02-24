@@ -191,16 +191,49 @@ body::before{
   user-select:none;
 }
 
-/* ===== HEADER STRUCTURE ===== */
+/* ===== PREMIUM FLAT HEADER ===== */
 .header{
   background:#0f7a3d;
-  color:#fff;
-  height:60px;              /* Fixed clean height */
-  padding:0 16px;           /* Cire vertical padding */
+  height:60px;
+  padding:0 16px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  overflow:hidden;          /* Hana logo ya tura height */
+  justify-content:space-between;
+}
+
+/* left side (logo + brand) */
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.main-logo{
+  height:54px;
+  width:auto;
+  object-fit:contain;
+}
+
+.brand{
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+/* hamburger */
+.menu-icon{
+  width:20px;
+  height:14px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.menu-icon div{
+  height:2px;
+  background:#fff;
+  border-radius:2px;
 }
 
 /* ===== HAMBURGER ===== */
@@ -261,7 +294,7 @@ body::before{
 <header class="header">
   <div class="header-left">
     <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
-    <span class="header-title">ALBUKHR</span>
+    <span class="brand">ALBUKHR</span>
   </div>
 
   <div class="menu-icon" onclick="goToSettings()">
