@@ -261,34 +261,94 @@ body::before{
   font-size:16px;
   flex-shrink:0;
 }
-
 /* ===============================
-   BOTTOM NAV
+   ALBUKHR PREMIUM BLUE + GOLD NAV
 ================================ */
+
 .bottom-nav{
   position:fixed;
   bottom:0;
   left:0;
   width:100%;
   display:flex;
-  background:#fff;
-  border-top:1px solid #eee;
+  justify-content:space-around;
+  align-items:center;
+  padding:10px 0 12px;
+  background:linear-gradient(180deg,#0b3d91,#062a63);
+  backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,215,0,0.15);
+  box-shadow:0 -4px 18px rgba(0,0,0,0.25);
+  z-index:999;
 }
 
+/* nav item */
 .bottom-nav a{
   flex:1;
-  padding:8px 0;
   text-align:center;
   text-decoration:none;
-  font-size:12px;
-  color:#777;
+  color:#cfd8ff;
+  font-size:11px;
+  font-weight:500;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  position:relative;
+  transition:.25s ease;
 }
 
+/* icon */
+.bottom-nav a span{
+  font-size:19px;
+  transition:.25s ease;
+}
+
+/* hover effect */
+.bottom-nav a:hover span{
+  transform:translateY(-2px) scale(1.1);
+}
+
+/* ACTIVE STATE */
 .bottom-nav a.active{
-  color:#0f7a3d;
+  color:#ffd700;
   font-weight:700;
 }
 
+/* gold glow */
+.bottom-nav a.active span{
+  color:#ffd700;
+  text-shadow:0 0 10px rgba(255,215,0,0.7);
+}
+
+/* top gold indicator */
+.bottom-nav a.active::before{
+  content:"";
+  position:absolute;
+  top:-6px;
+  width:28px;
+  height:3px;
+  border-radius:10px;
+  background:linear-gradient(90deg,#ffd700,#ffb700);
+  box-shadow:0 0 10px rgba(255,215,0,0.8);
+}
+
+/* subtle shimmer */
+.bottom-nav::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,215,0,0.6),transparent);
+  animation:navShimmer 6s linear infinite;
+}
+
+@keyframes navShimmer{
+  0%{left:-100%;}
+  100%{left:100%;}
+}
 /* ===============================
    SIDE DRAWER
 ================================ */
