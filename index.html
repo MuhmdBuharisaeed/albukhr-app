@@ -532,26 +532,33 @@ function renderAssets(userMap, globalMap){
     div.onclick = ()=> location.href = file;
 
     div.innerHTML = `
-      <div class="asset-left">
-        <div class="asset-name">${item.name}</div>
-        <div class="asset-stake">
-          ${
-            item.userAmount > 0
-              ? item.userAmount.toFixed(2)+" Pi Staked"
-              : "Not Staked"
-          }
-        </div>
-      </div>
+  <div class="asset-row">
 
-      <div class="asset-right">
-        ${ICONS[item.name] || "📦"}
+    <div class="project-icon">
+      ${item.name.slice(0,2).toUpperCase()}
+    </div>
+
+    <div class="asset-info">
+      <div class="asset-name">${item.name}</div>
+      <div class="asset-stake">
         ${
           item.userAmount > 0
-            ? item.userAmount.toFixed(2)
-            : ""
+            ? item.userAmount.toFixed(2)+" Pi Staked"
+            : "Not Staked"
         }
       </div>
-    `;
+    </div>
+
+    ${
+      item.userAmount > 0
+        ? `<div class="asset-right">
+            ${item.userAmount.toFixed(2)} Pi
+           </div>`
+        : ""
+    }
+
+  </div>
+`;
 
     container.appendChild(div);
   });
