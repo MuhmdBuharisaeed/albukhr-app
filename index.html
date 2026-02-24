@@ -350,6 +350,39 @@ body::before{
   100%{left:100%;}
 }
 /* ===============================
+   ACTIVE PULSE EFFECT
+================================ */
+
+.bottom-nav a.active span{
+  position:relative;
+}
+
+/* soft breathing glow */
+.bottom-nav a.active span::after{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,255,136,0.35),transparent 70%);
+  animation:activePulse 2.2s ease-in-out infinite;
+  z-index:-1;
+}
+
+@keyframes activePulse{
+  0%{
+    transform:scale(0.9);
+    opacity:.6;
+  }
+  50%{
+    transform:scale(1.15);
+    opacity:.3;
+  }
+  100%{
+    transform:scale(0.9);
+    opacity:.6;
+  }
+                             } 
+/* ===============================
    SIDE DRAWER
 ================================ */
 .side-drawer{
