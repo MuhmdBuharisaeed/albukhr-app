@@ -609,3 +609,51 @@ body{
   font-size:18px;
   font-weight:700;
 }
+
+/* =================================
+   ALBUKHR GLOBAL HEADER SYSTEM
+================================= */
+
+.header{
+  background:#0f7a3d;
+  height:60px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.main-logo{
+  height:54px;
+  width:auto;
+  object-fit:contain;
+}
+
+.brand{
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.5px;
+  color:#fff;
+}
+
+/* Hamburger – only used on index */
+.menu-icon{
+  width:20px;
+  height:14px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.menu-icon div{
+  height:2px;
+  background:#fff;
+  border-radius:2px;
+}
