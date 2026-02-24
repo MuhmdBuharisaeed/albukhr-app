@@ -13,6 +13,9 @@
 body{
   background: linear-gradient(135deg,#f4fff8,#ffffff);
   font-family: system-ui,-apple-system,sans-serif;
+  margin:0;
+  padding:0;
+  overflow-x:hidden;
 }
 
 body::before{
@@ -26,33 +29,105 @@ body::before{
   z-index:-1;
 }
 
+/* ===== PREMIUM FLAT HEADER ===== */
+.header{
+  background:#0f7a3d;
+  height:60px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+/* left side (logo + brand) */
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.main-logo{
+  height:54px;
+  width:auto;
+}
+
+.brand{
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+/* hamburger */
+.menu-icon{
+  width:18px;
+  height:13px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.menu-icon div{
+  height:2px;
+  background:#fff;
+  border-radius:2px;
+}
+
 /* ===============================
-   WELCOME BAR SLOW SCROLL
+   WELCOME BAR
 ================================ */
 .welcome-bar{
-  overflow:hidden;
-  background:#f0fff7;
+  background:#f4fff8;
   padding:8px 16px;
-  margin-bottom:12px;
-  border-radius:10px;
-  font-size:13px;
-  font-weight:500;
-  color:#0f7a3d;
+  overflow:hidden;
+  white-space:nowrap;
 }
 
 .welcome-track{
   display:inline-block;
-  white-space:nowrap;
-  animation:scrollText 40s linear infinite; /* slower scroll */
+  padding-left:100%;
+  animation:scrollWelcome 20s linear infinite;
+  font-size:13px;
+  color:#0f7a3d;
 }
 
-@keyframes scrollText{
-  0% { transform:translateX(100%);}
-  100% { transform:translateX(-100%);}
+@keyframes scrollWelcome{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-100%);}
 }
 
 /* ===============================
-   POPULAR PROJECTS – PREMIUM
+   STATS
+================================ */
+.stats{
+  display:flex;
+  gap:12px;
+  padding:16px;
+}
+
+.stat-card{
+  flex:1;
+  background:#ffffff;
+  border-radius:12px;
+  padding:10px 12px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.05);
+  text-align:center;
+}
+
+.stat-card span{
+  font-size:12px;
+  color:#777;
+}
+
+.stat-card strong{
+  display:block;
+  font-size:14px;
+  font-weight:700;
+  color:#0f7a3d;
+}
+
+/* ===============================
+   POPULAR PROJECTS
 ================================ */
 .popular-section{
   padding:14px;
@@ -109,7 +184,6 @@ body::before{
   font-weight:600;
 }
 
-/* Rank badge */
 .popular-card::after{
   content:attr(data-rank);
   position:absolute;
@@ -129,7 +203,7 @@ body::before{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:12px;
+  margin:16px;
 }
 
 .assets-search{
@@ -143,25 +217,37 @@ body::before{
 }
 
 .asset-item{
-  background:#ffffff;
+  background:#fff;
   border-radius:12px;
-  padding:12px;
+  padding:12px 12px;
   margin-bottom:10px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  gap:10px;
+  gap:12px;
+  position:relative;
   box-shadow:0 6px 16px rgba(0,0,0,0.05);
   cursor:pointer;
   transition:all .25s ease;
-  position:relative;
+}
+
+.asset-item:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 22px rgba(0,0,0,0.08);
 }
 
 .asset-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
   flex:1;
+}
+
+.asset-name{
+  font-weight:600;
+  font-size:14px;
+}
+
+.asset-stake{
+  font-size:12px;
+  color:#0f7a3d;
+  margin-top:2px;
 }
 
 .asset-icon{
@@ -176,86 +262,104 @@ body::before{
   flex-shrink:0;
 }
 
-.asset-name{
-  font-weight:600;
-  font-size:14px;
+/* ===============================
+   BOTTOM NAV
+================================ */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  display:flex;
+  background:#fff;
+  border-top:1px solid #eee;
 }
 
-.asset-stake{
+.bottom-nav a{
+  flex:1;
+  padding:8px 0;
+  text-align:center;
+  text-decoration:none;
   font-size:12px;
-  color:#666;
-  margin-top:2px;
+  color:#777;
 }
 
-.asset-right{
-  font-weight:700;
+.bottom-nav a.active{
   color:#0f7a3d;
-  font-size:14px;
-}
-
-/* hover effect similar to popular cards */
-.asset-item:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 22px rgba(15,122,61,0.12);
-  background: linear-gradient(145deg,#f0fff7,#ffffff);
-}
-
-/* subtle fade in */
-.asset-item,
-.popular-card{
-  animation:fadeIn .4s ease forwards;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(5px);}
-  to{opacity:1;transform:translateY(0);}
-}
-
-/* ===== PREMIUM FLAT HEADER ===== */
-.header{
-  background:#0f7a3d;
-  height:60px;
-  padding:0 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.main-logo{
-  height:54px;
-  width:auto;
-  object-fit:contain;
-}
-
-.brand{
-  font-size:15px;
   font-weight:700;
-  letter-spacing:.5px;
 }
 
-.menu-icon{
-  width:18px;
-  height:13px;
+/* ===============================
+   SIDE DRAWER
+================================ */
+.side-drawer{
+  position: fixed;
+  top:0;
+  right:-280px;
+  width:280px;
+  height:100%;
+  background:#fff;
+  box-shadow:-4px 0 18px rgba(0,0,0,0.12);
+  transition: right 0.3s ease;
+  z-index:1001;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
-  cursor:pointer;
 }
 
-.menu-icon div{
-  height:2px;
-  background:#fff;
-  border-radius:2px;
+.side-drawer.open{
+  right:0;
+}
+
+.drawer-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px;
+  border-bottom:1px solid #eee;
+  font-weight:700;
+  background:#f4fff8;
+}
+
+.drawer-body{
+  display:flex;
+  flex-direction:column;
+  padding:12px 16px;
+  gap:10px;
+}
+
+.drawer-body a{
+  text-decoration:none;
+  color:#0f7a3d;
+  font-weight:600;
+  padding:8px 0;
+  border-bottom:1px solid #eee;
+}
+
+.drawer-overlay{
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.2);
+  opacity:0;
+  visibility:hidden;
+  transition: opacity 0.3s ease;
+  z-index:1000;
+}
+
+.drawer-overlay.show{
+  opacity:1;
+  visibility:visible;
+}
+
+.hidden-amount{
+  filter: blur(6px);
+  user-select:none;
 }
 </style>
-</head>
 
+</head>
 <body data-page="home">
 
 <header class="header">
@@ -263,11 +367,8 @@ body::before{
     <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
     <span class="brand"></span>
   </div>
-
-  <div class="menu-icon" onclick="goToSettings()">
-    <div></div>
-    <div></div>
-    <div></div>
+  <div class="menu-icon">
+    <div></div><div></div><div></div>
   </div>
 </header>
 
@@ -288,32 +389,39 @@ body::before{
   </div>
 </section>
 
-<!-- ===== POPULAR PROJECTS ===== -->
 <div class="popular-section">
   <div class="popular-title">🔥 Popular Projects</div>
   <div class="popular-scroll" id="popularProjects"></div>
 </div>
 
-<!-- ===== ASSETS ===== -->
 <section class="section">
   <div class="assets-header">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <h3 style="margin:0;">Assets</h3>
-      <span id="toggleAssets" style="cursor:pointer;font-size:16px;">👁</span>
-    </div>
-    <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
+    <h3>Assets</h3>
   </div>
-
   <div id="assetsContainer"></div>
 </section>
 
-<!-- ===== ALBUKHR BOTTOM NAV ===== -->
 <nav class="bottom-nav">
   <a href="index.html" class="active"><span>🏠</span>Home</a>
   <a href="wallet.html"><span>💼</span>Wallet</a>
   <a href="services.html"><span>🛠️</span>Services</a>
   <a href="news.html"><span>📰</span>News</a>
 </nav>
+
+<!-- SIDE DRAWER -->
+<div id="sideDrawer" class="side-drawer">
+  <div class="drawer-header">
+    <h3>Settings</h3>
+    <span class="close-drawer" onclick="closeDrawer()">✖️</span>
+  </div>
+  <div class="drawer-body">
+    <a href="profile.html">Profile</a>
+    <a href="preferences.html">Preferences</a>
+    <a href="security.html">Security</a>
+    <a href="help.html">Help</a>
+  </div>
+</div>
+<div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
 
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
@@ -330,17 +438,11 @@ const ICONS = {
 };
 
 function loadHome(){
-
   if(typeof getAllStakesMerged !== "function") return;
-
   const stakes = getAllStakesMerged();
-
-  let userMap = {};
-  let globalMap = {};
-
-  let totalStake = 0;
-  let totalReward = 0;
-
+  let userMap = {}, globalMap = {};
+  let totalStake=0, totalReward=0;
+  
   stakes.forEach(s=>{
     if(s.capitalWithdrawn) return;
     const amount = Number(s.amount)||0;
@@ -348,16 +450,13 @@ function loadHome(){
     totalStake += amount;
     totalReward += reward;
 
-    if(!userMap[s.project]) userMap[s.project] = 0;
-    userMap[s.project] += amount;
-
+    userMap[s.project] = (userMap[s.project]||0) + amount;
     if(!globalMap[s.project]) globalMap[s.project]={total:0, investors:0};
     globalMap[s.project].total += amount;
   });
 
   Object.keys(globalMap).forEach(project=>{
-    const investors = stakes.filter(s=> s.project===project && !s.capitalWithdrawn).length;
-    globalMap[project].investors = investors;
+    globalMap[project].investors = stakes.filter(s=> s.project===project && !s.capitalWithdrawn).length;
   });
 
   homeStake.innerText = totalStake.toFixed(2)+" Pi";
@@ -367,42 +466,28 @@ function loadHome(){
   renderAssets(userMap, globalMap);
 }
 
-/* ========================= POPULAR ========================= */
 function renderPopular(globalMap){
-  const container = document.getElementById("popularProjects");
-  container.innerHTML = "";
-  Object.entries(globalMap)
-    .sort((a,b)=>b[1].total - a[1].total)
-    .slice(0,10)
-    .forEach(([project,data],index)=>{
-      const div=document.createElement("div");
-      div.className="popular-card";
-      div.setAttribute("data-rank","#"+(index+1));
-      div.onclick=()=>location.href=project.toLowerCase()+".html";
-      div.innerHTML=`<div class="popular-icon">${ICONS[project]||"📦"}</div>
-        <div class="popular-name">${project}</div>
-        <div class="popular-amount">${data.total.toFixed(2)} Pi</div>`;
-      container.appendChild(div);
-    });
+  const container=document.getElementById("popularProjects");
+  container.innerHTML="";
+  const sorted = Object.entries(globalMap).sort((a,b)=>b[1].total-a[1].total).slice(0,10);
+  sorted.forEach(([project,data],index)=>{
+    const div=document.createElement("div");
+    div.className="popular-card";
+    div.setAttribute("data-rank","#"+(index+1));
+    div.onclick=()=> location.href=project.toLowerCase()+".html";
+    div.innerHTML=`<div class="popular-icon">${ICONS[project]||"📦"}</div>
+    <div class="popular-name">${project}</div>
+    <div class="popular-amount">${data.total.toFixed(2)} Pi</div>`;
+    container.appendChild(div);
+  });
 }
 
-/* ========================= ASSETS ========================= */
 function renderAssets(userMap, globalMap){
-  const container = document.getElementById("assetsContainer");
-  container.innerHTML = "";
-
-  const projects = Object.keys(globalMap);
-  if(projects.length===0){
-    container.innerHTML="<p style='font-size:12px;color:#777'>No projects available</p>";
-    return;
-  }
-
-  const merged = projects.map(project=>({
-    name: project,
-    globalTotal: globalMap[project].total,
-    userAmount: userMap[project]||0
-  }));
-
+  const container=document.getElementById("assetsContainer");
+  container.innerHTML="";
+  const projects=Object.keys(globalMap);
+  if(projects.length===0){ container.innerHTML="<p style='font-size:12px;color:#777'>No projects</p>"; return;}
+  const merged=projects.map(p=>({name:p,globalTotal:globalMap[p].total,userAmount:userMap[p]||0}));
   merged.sort((a,b)=>{
     if(a.userAmount>0 && b.userAmount===0) return -1;
     if(a.userAmount===0 && b.userAmount>0) return 1;
@@ -411,68 +496,43 @@ function renderAssets(userMap, globalMap){
   }).slice(0,10).forEach(item=>{
     const div=document.createElement("div");
     div.className="asset-item";
-    div.onclick=()=>location.href=item.name.toLowerCase()+".html";
-    div.innerHTML=`<div class="asset-left">
-      <div class="asset-icon">${ICONS[item.name]||"📦"}</div>
-      <div>
-        <div class="asset-name">${item.name}</div>
-        <div class="asset-stake">
-          ${item.userAmount>0?item.userAmount.toFixed(2)+" Staked":"Not Staked"}
-        </div>
-      </div>
-    </div>
-    <div class="asset-right">
-      ${item.userAmount>0?item.userAmount.toFixed(2):""}
+    div.onclick=()=> location.href=item.name.toLowerCase()+".html";
+    div.innerHTML=`<div class="asset-icon">${ICONS[item.name]||"📦"}</div>
+    <div class="asset-left">
+      <div class="asset-name">${item.name}</div>
+      <div class="asset-stake">${item.userAmount>0?item.userAmount.toFixed(2)+" Pi Staked":"Not Staked"}</div>
     </div>`;
     container.appendChild(div);
   });
 }
 
-/* ========================= ASSET VISIBILITY ========================= */
+/* ASSETS VISIBILITY */
 const VISIBILITY_KEY="albukhr_assets_visibility";
-function isAssetsHidden(){ return localStorage.getItem(VISIBILITY_KEY)==="hidden";}
-function setAssetsHidden(hidden){ localStorage.setItem(VISIBILITY_KEY, hidden?"hidden":"visible");}
+function isAssetsHidden(){return localStorage.getItem(VISIBILITY_KEY)==="hidden";}
+function setAssetsHidden(hidden){localStorage.setItem(VISIBILITY_KEY,hidden?"hidden":"visible");}
 function applyVisibility(){
   const hidden=isAssetsHidden();
-  document.getElementById("homeStake")?.classList.toggle("hidden-amount", hidden);
-  document.getElementById("homeReward")?.classList.toggle("hidden-amount", hidden);
-  document.querySelectorAll(".asset-right, .asset-stake").forEach(el=>{
-    el.classList.toggle("hidden-amount", hidden);
-  });
-  const toggle=document.getElementById("toggleAssets");
-  if(toggle){toggle.textContent=hidden?"🙈":"👁";}
+  document.getElementById("homeStake")?.classList.toggle("hidden-amount",hidden);
+  document.getElementById("homeReward")?.classList.toggle("hidden-amount",hidden);
+  document.querySelectorAll(".asset-stake").forEach(el=>el.classList.toggle("hidden-amount",hidden));
 }
-
-document.addEventListener("DOMContentLoaded", ()=>{
-  const toggle=document.getElementById("toggleAssets");
-  if(toggle){
-    toggle.addEventListener("click", ()=>{
-      const newState=!isAssetsHidden();
-      setAssetsHidden(newState);
-      applyVisibility();
-    });
-  }
+document.addEventListener("DOMContentLoaded",()=>{
   applyVisibility();
 });
 
-function goToSettings(){ window.location.href="settings.html";}
 window.addEventListener("DOMContentLoaded", loadHome);
 
-/* ========================= SMART LIVE REFRESH ========================= */
-(function(){
-  const REFRESH_INTERVAL=30000;
-  let refreshTimer=null;
-  function softRefresh(){ if(typeof loadHome==="function") loadHome();}
-  function startRefresh(){ if(refreshTimer)return; refreshTimer=setInterval(softRefresh, REFRESH_INTERVAL);}
-  function stopRefresh(){ if(refreshTimer){ clearInterval(refreshTimer); refreshTimer=null;}}
-  window.addEventListener("DOMContentLoaded", startRefresh);
-  document.addEventListener("visibilitychange", ()=>{ document.hidden?stopRefresh():startRefresh(); });
-})();
+/* SIDE DRAWER */
+function openDrawer(){
+  document.getElementById("sideDrawer").classList.add("open");
+  document.getElementById("drawerOverlay").classList.add("show");
+}
+function closeDrawer(){
+  document.getElementById("sideDrawer").classList.remove("open");
+  document.getElementById("drawerOverlay").classList.remove("show");
+}
+document.querySelector(".menu-icon").addEventListener("click", openDrawer);
 </script>
 
-<script src="js/core/header.js"></script>
-<script>
-  renderAlbukhrHeader({ hamburger:true });
-</script>
 </body>
-</html>
+   </html>
