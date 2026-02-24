@@ -537,19 +537,30 @@ function renderAssets(userMap, globalMap){
   });
 }
 
-/* ASSETS VISIBILITY */
+/* ========================= ASSET VISIBILITY ========================= */
 const VISIBILITY_KEY="albukhr_assets_visibility";
-function isAssetsHidden(){return localStorage.getItem(VISIBILITY_KEY)==="hidden";}
-function setAssetsHidden(hidden){localStorage.setItem(VISIBILITY_KEY,hidden?"hidden":"visible");}
+function isAssetsHidden(){ return localStorage.getItem(VISIBILITY_KEY)==="hidden";}
+function setAssetsHidden(hidden){ localStorage.setItem(VISIBILITY_KEY, hidden?"hidden":"visible");}
 function applyVisibility(){
   const hidden=isAssetsHidden();
-  document.getElementById("homeStake")?.classList.toggle("hidden-amount",hidden);
-  document.getElementById("homeReward")?.classList.toggle("hidden-amount",hidden);
-  document.querySelectorAll(".asset-stake").forEach(el=>el.classList.toggle("hidden-amount",hidden));
+  document.getElementById("homeStake")?.classList.toggle("hidden-amount", hidden);
+  document.getElementById("homeReward")?.classList.toggle("hidden-amount", hidden);
+  document.querySelectorAll(".asset-right, .asset-stake").forEach(el=>{
+    el.classList.toggle("hidden-amount", hidden);
+  });
+  const toggle=document.getElementById("toggleAssets");
+  if(toggle){toggle.textContent=hidden?"🙈":"👁";}
 }
-document.addEventListener("DOMContentLoaded",()=>{
-  applyVisibility();
-});
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  const toggle=document.getElementById("toggleAssets");
+  if(toggle){
+    toggle.addEventListener("click", ()=>{
+      const newState=!isAssetsHidden();
+      setAssetsHidden(newState);
+      applyVisibility();
+    });
+  }
 
 window.addEventListener("DOMContentLoaded", loadHome);
 
