@@ -415,7 +415,7 @@ function loadHome(){
   homeReward.innerText = totalReward.toFixed(2)+" Pi";
 
   renderPopular(globalMap);
-  renderAssets(userMap);
+renderAssets(userMap, globalMap);
 }
 
 /* =========================
@@ -455,25 +455,52 @@ function renderPopular(globalMap){
   });
    }
 /* =========================
-   USER ASSETS
+   HYBRID SMART ASSETS
 ========================= */
-function renderAssets(userMap){
+function renderAssets(userMap, globalMap){
 
   const container = document.getElementById("assetsContainer");
   container.innerHTML = "";
 
-  const sorted = Object.entries(userMap)
-    .sort((a,b)=>b[1]-a[1]);
+  /* Merge global list */
+  const projects = Object.keys(globalMap);
 
-  if(sorted.length === 0){
+  if(projects.length === 0){
     container.innerHTML =
-      "<p style='font-size:12px;color:#777'>No assets yet</p>";
+      "<p style='font-size:12px;color:#777'>No projects available</p>";
     return;
   }
 
-  sorted.forEach(([project,amount])=>{
+  /* Build unified array */
+  const merged = projects.map(project => {
+    return {
+      name: project,
+      globalTotal: globalMap[project].total,
+      userAmount: userMap[project] || 0
+    };
+  });
 
-    const file = project.toLowerCase()+".html";
+  /* Sort Logic:
+     1. User stake first
+     2. Then by user amount desc
+     3. Then by global popularity
+  */
+  merged.sort((a,b)=>{
+
+    if(a.userAmount > 0 && b.userAmount === 0) return -1;
+    if(a.userAmount === 0 && b.userAmount > 0) return 1;
+
+    if(a.userAmount !== b.userAmount){
+      return b.userAmount - a.userAmount;
+    }
+
+    return b.globalTotal - a.globalTotal;
+  });
+
+  /* Limit to 10 */
+  merged.slice(0,10).forEach(item=>{
+
+    const file = item.name.toLowerCase()+".html";
 
     const div = document.createElement("div");
     div.className = "asset-item";
@@ -481,19 +508,29 @@ function renderAssets(userMap){
 
     div.innerHTML = `
       <div class="asset-left">
-        <div class="asset-name">${project}</div>
-        <div class="asset-stake">${amount.toFixed(2)} Pi Staked</div>
+        <div class="asset-name">${item.name}</div>
+        <div class="asset-stake">
+          ${
+            item.userAmount > 0
+              ? item.userAmount.toFixed(2)+" Pi Staked"
+              : "Not Staked"
+          }
+        </div>
       </div>
+
       <div class="asset-right">
-        ${ICONS[project] || "📦"}
-        ${amount.toFixed(2)}
+        ${ICONS[item.name] || "📦"}
+        ${
+          item.userAmount > 0
+            ? item.userAmount.toFixed(2)
+            : ""
+        }
       </div>
     `;
 
     container.appendChild(div);
   });
 }
-
 /* =========================
    ASSET VISIBILITY TOGGLE
 ========================= */
