@@ -419,13 +419,19 @@ body::before{
   <div class="popular-scroll" id="popularProjects"></div>
 </div>
 
+<!-- ===== ASSETS ===== -->
 <section class="section">
   <div class="assets-header">
-    <h3>Assets</h3>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <h3 style="margin:0;">Assets</h3>
+      <span id="toggleAssets" style="cursor:pointer;font-size:16px;">👁</span>
+    </div>
+    <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
   </div>
+
   <div id="assetsContainer"></div>
 </section>
-
+   
 <nav class="bottom-nav">
   <a href="index.html" class="active"><span>🏠</span>Home</a>
   <a href="wallet.html"><span>💼</span>Wallet</a>
