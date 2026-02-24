@@ -357,7 +357,82 @@ body::before{
   filter: blur(6px);
   user-select:none;
 }
+
+/* ===============================
+   DRAWER SOCIAL (HORIZONTAL)
+================================ */
+.drawer-section{
+  margin-top:14px;
+}
+
+.drawer-section h4{
+  font-size:13px;
+  margin:10px 0 8px 0;
+  color:#0f7a3d;
+}
+
+.drawer-social{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding-bottom:6px;
+}
+
+.social-item{
+  min-width:70px;
+  text-align:center;
+  text-decoration:none;
+  color:#0f7a3d;
+  font-size:11px;
+  font-weight:600;
+}
+
+.social-icon{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#e6f6ec;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  margin:auto;
+  margin-bottom:4px;
+  transition:.2s ease;
+}
+
+.social-item:hover .social-icon{
+  transform:scale(1.08);
+  background:#d9f4e7;
+}
+
+/* ===============================
+   DRAWER POLICIES (VERTICAL)
+================================ */
+.drawer-policy a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#0f7a3d;
+  padding:8px 0;
+  font-weight:600;
+  border-bottom:1px solid #eee;
+  font-size:13px;
+}
+
+.policy-icon{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  background:#e6f6ec;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+}   
 </style>
+   
 <style>
 /* BLUE LEFT ACCENT ANIMATION */
 .asset-item{
@@ -450,6 +525,89 @@ body::before{
     <a href="security.html">Security</a>
     <a href="help.html">Help</a>
   </div>
+
+<div class="drawer-body">
+
+  <!-- BASIC SETTINGS -->
+  <a href="profile.html">Profile</a>
+  <a href="preferences.html">Preferences</a>
+  <a href="security.html">Security</a>
+  <a href="help.html">Help</a>
+
+  <!-- SOCIAL / MEDIA -->
+  <div class="drawer-section">
+    <h4>🌐 Media & Channels</h4>
+
+    <div class="drawer-social">
+
+      <a class="social-item"
+         href="https://t.me/albukhrinvestmentlimited"
+         target="_blank">
+        <div class="social-icon">📢</div>
+        Telegram
+      </a>
+
+      <a class="social-item"
+         href="https://whatsapp.com/channel/0029VbAyyWgI7BeNfCDjyZ1C"
+         target="_blank">
+        <div class="social-icon">🟢</div>
+        WhatsApp
+      </a>
+
+      <a class="social-item"
+         href="#"
+         target="_blank">
+        <div class="social-icon">❌</div>
+        X
+      </a>
+
+      <a class="social-item"
+         href="https://www.facebook.com/groups/1491982365549301/permalink/1646336656780537/?mibextid=Nif5oz"
+         target="_blank">
+        <div class="social-icon">📘</div>
+        Facebook
+      </a>
+
+      <a class="social-item"
+         href="https://www.youtube.com/@Albukhrinvestmentlimited"
+         target="_blank">
+        <div class="social-icon">▶️</div>
+        YouTube
+      </a>
+
+    </div>
+
+    <small style="font-size:11px;color:#777;">
+      Official public channels of ALBUKHR ecosystem
+    </small>
+  </div>
+
+  <!-- POLICIES -->
+  <div class="drawer-section drawer-policy">
+    <h4>📜 Legal & Policies</h4>
+
+    <a href="privacy-policy.html">
+      <div class="policy-icon">🔐</div>
+      Privacy Policy
+    </a>
+
+    <a href="terms-of-service.html">
+      <div class="policy-icon">📄</div>
+      Terms of Service
+    </a>
+
+    <a href="whitepaper.html">
+      <div class="policy-icon">📘</div>
+      Whitepaper
+    </a>
+
+    <small style="font-size:11px;color:#777;margin-top:6px;">
+      All users must comply with ALBUKHR governance rules.
+    </small>
+  </div>
+
+</div>
+   
 </div>
 <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
 
