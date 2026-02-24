@@ -102,6 +102,7 @@ body::before{
 /* ===============================
    ASSETS – RECENT TRANSACTIONS STYLE
 ================================ */
+
 .assets-header{
   display:flex;
   justify-content:space-between;
@@ -119,17 +120,17 @@ body::before{
   transform:scale(1.1);
 }
 
-/* Asset item */
+/* assets card updated like recent transactions */
 .asset-item{
   background:#fff;
   border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:10px;
+  padding:8px 12px;
+  margin-bottom:8px;
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
   width:100%;
-  min-height:60px; /* tsawo */
+  min-height:60px;
   cursor:pointer;
   transition:all 0.25s ease;
   overflow:hidden;
@@ -139,7 +140,7 @@ body::before{
   width:36px;
   height:36px;
   border-radius:50%;
-  background:#0f7a3d22; /* blue-ish background */
+  background:#0f7a3d22;
   color:#0f7a3d;
   display:flex;
   align-items:center;
@@ -172,11 +173,6 @@ body::before{
   font-size:14px;
 }
 
-.asset-item:hover{
-  transform:translateY(-2px);
-  box-shadow:0 6px 18px rgba(15,122,61,0.12);
-}
-
 /* subtle fade in */
 .asset-item,
 .popular-card{
@@ -203,7 +199,6 @@ body::before{
   justify-content:space-between;
 }
 
-/* left side (logo + brand) */
 .header-left{
   display:flex;
   align-items:center;
@@ -236,62 +231,68 @@ body::before{
   height:2px;
   background:#fff;
   border-radius:2px;
-  transition:.25s ease;
 }
 
 /* ===== WELCOME BAR ===== */
 .welcome-bar{
-  padding:8px 16px;
-  font-size:12px;
-  color:#0f7a3d;
   overflow:hidden;
   white-space:nowrap;
+  background:#f0fff7;
+  padding:8px 16px;
+  font-size:12px;
+  font-weight:500;
+  color:#0f7a3d;
 }
 
 .welcome-track{
   display:inline-block;
-  padding-left:100%;
   animation:scrollWelcome 15s linear infinite;
 }
 
 @keyframes scrollWelcome{
-  0%{transform:translateX(0);}
-  100%{transform:translateX(-100%);}
+  0%{transform:translateX(100%)}
+  100%{transform:translateX(-100%)}
 }
 
 /* ===== STATS ===== */
 .stats{
   display:flex;
-  gap:10px;
-  padding:0 16px 10px 16px;
+  gap:12px;
+  padding:14px;
 }
 
 .stat-card{
-  flex:1;
   background:#fff;
+  flex:1;
   border-radius:12px;
   padding:10px;
   text-align:center;
-  box-shadow:0 4px 14px rgba(0,0,0,0.06);
-  font-size:12px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.05);
 }
 
-/* ===== BOTTOM NAV ===== */
+.stat-card strong{
+  display:block;
+  margin-top:4px;
+  font-size:14px;
+}
+
+/* ===== ALBUKHR BOTTOM NAV ===== */
 .bottom-nav{
-  display:flex;
-  justify-content:space-around;
   position:fixed;
   bottom:0;
-  left:0;
   width:100%;
+  display:flex;
+  justify-content:space-around;
   background:#fff;
-  border-top:1px solid #eee;
-  padding:6px 0;
+  padding:8px 0;
+  box-shadow:0 -2px 12px rgba(0,0,0,0.08);
+  border-top-left-radius:12px;
+  border-top-right-radius:12px;
 }
 
 .bottom-nav a{
+  color:#0f7a3d;
   text-decoration:none;
-  color:#555;
   font-size:12px;
   display:flex;
   flex-direction:column;
@@ -299,9 +300,8 @@ body::before{
 }
 
 .bottom-nav a.active{
-  color:#0f7a3d;
+  font-weight:700;
 }
-
 </style>
 </head>
 
@@ -312,7 +312,6 @@ body::before{
     <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
     <span class="brand"></span>
   </div>
-
   <div class="menu-icon" onclick="goToSettings()">
     <div></div>
     <div></div>
@@ -352,10 +351,10 @@ body::before{
     </div>
     <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
   </div>
+
   <div id="assetsContainer"></div>
 </section>
 
-<!-- ===== BOTTOM NAV ===== -->
 <nav class="bottom-nav">
   <a href="index.html" class="active"><span>🏠</span>Home</a>
   <a href="wallet.html"><span>💼</span>Wallet</a>
@@ -391,21 +390,18 @@ function loadHome(){
     if(s.capitalWithdrawn) return;
     const amount = Number(s.amount)||0;
     const reward = Number(s.remainingReward ?? s.reward)||0;
-
     totalStake += amount;
     totalReward += reward;
 
     if(!userMap[s.project]) userMap[s.project]=0;
-    userMap[s.project] += amount;
+    userMap[s.project]+=amount;
 
-    if(!globalMap[s.project]){
-      globalMap[s.project]={ total:0, investors:0 };
-    }
+    if(!globalMap[s.project]) globalMap[s.project]={total:0, investors:0};
     globalMap[s.project].total += amount;
   });
 
   Object.keys(globalMap).forEach(project=>{
-    const investors = stakes.filter(s=>s.project===project && !s.capitalWithdrawn).length;
+    const investors = stakes.filter(s=> s.project===project && !s.capitalWithdrawn).length;
     globalMap[project].investors = investors;
   });
 
@@ -416,23 +412,22 @@ function loadHome(){
   renderAssets(userMap, globalMap);
 }
 
-/* POPULAR */
 function renderPopular(globalMap){
   const container = document.getElementById("popularProjects");
   container.innerHTML = "";
 
   const sorted = Object.entries(globalMap)
-    .sort((a,b)=>b[1].total - a[1].total)
+    .sort((a,b)=> b[1].total - a[1].total)
     .slice(0,10);
 
   sorted.forEach(([project,data],index)=>{
     const file = project.toLowerCase()+".html";
     const div = document.createElement("div");
-    div.className="popular-card";
+    div.className = "popular-card";
     div.setAttribute("data-rank","#"+(index+1));
-    div.onclick = ()=> location.href=file;
+    div.onclick = ()=> location.href = file;
     div.innerHTML = `
-      <div class="popular-icon">${ICONS[project]||"📦"}</div>
+      <div class="popular-icon">${ICONS[project] || "📦"}</div>
       <div class="popular-name">${project}</div>
       <div class="popular-amount">${data.total.toFixed(2)} Pi</div>
     `;
@@ -440,10 +435,9 @@ function renderPopular(globalMap){
   });
 }
 
-/* ASSETS */
 function renderAssets(userMap, globalMap){
   const container = document.getElementById("assetsContainer");
-  container.innerHTML="";
+  container.innerHTML = "";
 
   const projects = Object.keys(globalMap);
   if(projects.length===0){
@@ -451,9 +445,11 @@ function renderAssets(userMap, globalMap){
     return;
   }
 
-  const merged = projects.map(project=>{
-    return { name: project, userAmount: userMap[project]||0, globalTotal: globalMap[project].total };
-  });
+  const merged = projects.map(p=>({
+    name:p,
+    globalTotal:globalMap[p].total,
+    userAmount:userMap[p]||0
+  }));
 
   merged.sort((a,b)=>{
     if(a.userAmount>0 && b.userAmount===0) return -1;
@@ -465,71 +461,66 @@ function renderAssets(userMap, globalMap){
   merged.slice(0,10).forEach(item=>{
     const file = item.name.toLowerCase()+".html";
     const div = document.createElement("div");
-    div.className="asset-item";
-    div.onclick = ()=> location.href=file;
-    div.innerHTML=`
-      <div class="asset-icon">${ICONS[item.name]||"📦"}</div>
+    div.className = "asset-item";
+    div.onclick = ()=> location.href = file;
+    div.innerHTML = `
+      <div class="asset-icon">${ICONS[item.name] || "📦"}</div>
       <div class="asset-left">
         <div class="asset-name">${item.name}</div>
-        <div class="asset-stake">${
-          item.userAmount>0 ? item.userAmount.toFixed(2)+" Pi Staked":"Not Staked"
-        }</div>
+        <div class="asset-stake">${item.userAmount>0?item.userAmount.toFixed(2)+" Pi Staked":"Not Staked"}</div>
       </div>
-      <div class="asset-right">${
-        item.userAmount>0 ? item.userAmount.toFixed(2) : ""
-      }</div>
+      <div class="asset-right">${item.userAmount>0?item.userAmount.toFixed(2):""}</div>
     `;
     container.appendChild(div);
   });
 }
 
-/* ASSET VISIBILITY */
-const VISIBILITY_KEY="albukhr_assets_visibility";
-function isAssetsHidden(){ return localStorage.getItem(VISIBILITY_KEY)==="hidden"; }
-function setAssetsHidden(hidden){ localStorage.setItem(VISIBILITY_KEY, hidden?"hidden":"visible"); }
+/* ===== ASSET VISIBILITY TOGGLE ===== */
+const VISIBILITY_KEY = "albukhr_assets_visibility";
+
+function isAssetsHidden(){return localStorage.getItem(VISIBILITY_KEY)==="hidden";}
+function setAssetsHidden(hidden){localStorage.setItem(VISIBILITY_KEY,hidden?"hidden":"visible");}
+
 function applyVisibility(){
-  const hidden=isAssetsHidden();
-  document.getElementById("homeStake")?.classList.toggle("hidden-amount",hidden);
-  document.getElementById("homeReward")?.classList.toggle("hidden-amount",hidden);
-  document.querySelectorAll(".asset-right,.asset-stake").forEach(el=>{
-    el.classList.toggle("hidden-amount",hidden);
+  const hidden = isAssetsHidden();
+  document.getElementById("homeStake")?.classList.toggle("hidden-amount", hidden);
+  document.getElementById("homeReward")?.classList.toggle("hidden-amount", hidden);
+  document.querySelectorAll(".asset-right, .asset-stake").forEach(el=>{
+    el.classList.toggle("hidden-amount", hidden);
   });
-  const toggle=document.getElementById("toggleAssets");
-  if(toggle){ toggle.textContent=hidden?"🙈":"👁"; }
+  const toggle = document.getElementById("toggleAssets");
+  if(toggle) toggle.textContent = hidden?"🙈":"👁";
 }
+
 document.addEventListener("DOMContentLoaded",()=>{
-  const toggle=document.getElementById("toggleAssets");
-  if(toggle){
-    toggle.addEventListener("click",()=>{
-      const newState=!isAssetsHidden();
-      setAssetsHidden(newState);
-      applyVisibility();
-    });
-  }
+  const toggle = document.getElementById("toggleAssets");
+  if(toggle) toggle.addEventListener("click", ()=>{
+    const newState = !isAssetsHidden();
+    setAssetsHidden(newState);
+    applyVisibility();
+  });
   applyVisibility();
 });
 
-function goToSettings(){ window.location.href="settings.html"; }
-
+function goToSettings(){window.location.href="settings.html";}
 window.addEventListener("DOMContentLoaded", loadHome);
 
-/* SMART REFRESH */
+/* ===== SMART LIVE REFRESH ===== */
 (function(){
   const REFRESH_INTERVAL=30000;
   let refreshTimer=null;
-  function softRefresh(){ if(typeof loadHome==="function") loadHome(); }
-  function startRefresh(){ if(refreshTimer) return; refreshTimer=setInterval(softRefresh,REFRESH_INTERVAL); }
-  function stopRefresh(){ if(refreshTimer){ clearInterval(refreshTimer); refreshTimer=null; } }
-  window.addEventListener("DOMContentLoaded",startRefresh);
-  document.addEventListener("visibilitychange",()=>{
-    if(document.hidden){ stopRefresh(); } else { startRefresh(); }
-  });
+  function softRefresh(){if(typeof loadHome==="function") loadHome();}
+  function startRefresh(){if(refreshTimer) return; refreshTimer=setInterval(softRefresh,REFRESH_INTERVAL);}
+  function stopRefresh(){if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}}
+  window.addEventListener("DOMContentLoaded", startRefresh);
+  document.addEventListener("visibilitychange",()=>{document.hidden?stopRefresh():startRefresh();});
 })();
 </script>
 
 <script src="js/core/header.js"></script>
 <script>
-renderAlbukhrHeader({ hamburger:true });
+  renderAlbukhrHeader({ hamburger:true });
 </script>
+
 </body>
-   </html>
+</html>
