@@ -99,63 +99,34 @@ body::before{
   border-radius:20px;
 }
 
-/* ===============================
-   ASSETS – WALLET STYLE
-================================ */
-
-.assets-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
-}
-
-.assets-search{
-  font-size:18px;
-  cursor:pointer;
-  transition:.2s ease;
-}
-
-.assets-search:hover{
-  transform:scale(1.1);
-}
-
+/* ================= HOME – ASSETS ================= */
 .asset-item{
-  background:#ffffff;
-  border-radius:14px;
-  padding:8px 12px;        /* ↓ reduced vertical padding */
-  margin-bottom:8px;       /* ↓ tighter spacing */
-  min-height:52px;         /* consistent height */
-}
-
-.asset-item::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
-  width:4px;
-  background:#0f7a3d;
-}
-
-.asset-item:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 22px rgba(0,0,0,0.08);
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;        /* same as home-tx */
+  margin-bottom:8px;        /* same as home-tx */
+  display:flex;
+  align-items:center;
+  gap:10px;                 /* same as home-tx */
+  width:100%;
+  cursor:pointer;
+  transition:all .25s ease;
 }
 
 .asset-left{
+  flex:1;
   display:flex;
   flex-direction:column;
 }
 
 .asset-name{
+  font-size:13px;
   font-weight:600;
-  font-size:14px;
 }
 
 .asset-stake{
-  font-size:12px;
-  color:#666;
+  font-size:11px;
+  color:#777;
   margin-top:2px;
 }
 
@@ -163,25 +134,21 @@ body::before{
   display:flex;
   align-items:center;
   gap:8px;
-  font-weight:700;
+  font-weight:600;
   color:#0f7a3d;
-  font-size:14px;
+  font-size:13px;
 }
 
-/* subtle fade in */
-.asset-item,
-.popular-card{
-  animation:fadeIn .4s ease forwards;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(5px);}
-  to{opacity:1;transform:translateY(0);}
-}
-
-.hidden-amount{
-  filter: blur(6px);
-  user-select:none;
+.asset-icon{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#e6f6ec;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  flex-shrink:0;
 }
 
 /* ===== PREMIUM FLAT HEADER ===== */
@@ -525,17 +492,19 @@ function renderAssets(userMap, globalMap){
     div.innerHTML = `
   <div class="asset-left" style="display:flex;align-items:center;gap:10px;">
 
-    <div style="
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#e9f5ef;
-  font-size:16px;
-">
+    <div class="asset-icon">
   ${ICONS[item.name] || "📦"}
+</div>
+
+<div class="asset-left">
+  <div class="asset-name">${item.name}</div>
+  <div class="asset-stake">
+    ${item.userAmount > 0 ? item.userAmount.toFixed(2)+" Staked" : "Not Staked"}
+  </div>
+</div>
+
+<div class="asset-right">
+  ${item.userAmount > 0 ? item.userAmount.toFixed(2) : ""}
 </div>
 
     <div style="display:flex;flex-direction:column;">
