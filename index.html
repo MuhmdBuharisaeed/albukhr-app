@@ -99,34 +99,70 @@ body::before{
   border-radius:20px;
 }
 
-/* ================= HOME – ASSETS ================= */
-.asset-item{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;        /* same as home-tx */
-  margin-bottom:8px;        /* same as home-tx */
+/* ===============================
+   ASSETS – WALLET STYLE
+================================ */
+
+.assets-header{
   display:flex;
+  justify-content:space-between;
   align-items:center;
-  gap:10px;                 /* same as home-tx */
-  width:100%;
+  margin-bottom:12px;
+}
+
+.assets-search{
+  font-size:18px;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.assets-search:hover{
+  transform:scale(1.1);
+}
+
+.asset-item{
+  background:#ffffff;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 6px 16px rgba(0,0,0,0.05);
   cursor:pointer;
   transition:all .25s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+.asset-item::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:4px;
+  background:#0f7a3d;
+}
+
+.asset-item:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 22px rgba(0,0,0,0.08);
 }
 
 .asset-left{
-  flex:1;
   display:flex;
   flex-direction:column;
 }
 
 .asset-name{
-  font-size:13px;
   font-weight:600;
+  font-size:14px;
 }
 
 .asset-stake{
-  font-size:11px;
-  color:#777;
+  font-size:12px;
+  color:#666;
   margin-top:2px;
 }
 
@@ -134,21 +170,25 @@ body::before{
   display:flex;
   align-items:center;
   gap:8px;
-  font-weight:600;
+  font-weight:700;
   color:#0f7a3d;
-  font-size:13px;
+  font-size:14px;
 }
 
-.asset-icon{
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  background:#e6f6ec;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:16px;
-  flex-shrink:0;
+/* subtle fade in */
+.asset-item,
+.popular-card{
+  animation:fadeIn .4s ease forwards;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(5px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.hidden-amount{
+  filter: blur(6px);
+  user-select:none;
 }
 
 /* ===== PREMIUM FLAT HEADER ===== */
@@ -244,29 +284,6 @@ body::before{
   background:#fff;
   border-radius:2px;
    }
-
-/* Project Icon Style (Like Recent Transactions) */
-.project-icon{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  font-weight:600;
-  background:#e9f5ef;
-  color:#0f7a3d;
-  flex-shrink:0;
-}
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.asset-info{
-  flex:1;
-}
    
 </style>
   
@@ -490,36 +507,27 @@ function renderAssets(userMap, globalMap){
     div.onclick = ()=> location.href = file;
 
     div.innerHTML = `
-  <div class="asset-left" style="display:flex;align-items:center;gap:10px;">
+      <div class="asset-left">
+        <div class="asset-name">${item.name}</div>
+        <div class="asset-stake">
+          ${
+            item.userAmount > 0
+              ? item.userAmount.toFixed(2)+" Pi Staked"
+              : "Not Staked"
+          }
+        </div>
+      </div>
 
-    <div class="asset-icon">
-  ${ICONS[item.name] || "📦"}
-</div>
-
-<div class="asset-left">
-  <div class="asset-name">${item.name}</div>
-  <div class="asset-stake">
-    ${item.userAmount > 0 ? item.userAmount.toFixed(2)+" Staked" : "Not Staked"}
-  </div>
-</div>
-
-<div class="asset-right">
-  ${item.userAmount > 0 ? item.userAmount.toFixed(2) : ""}
-</div>
-
-    <div style="display:flex;flex-direction:column;">
-      <div class="asset-name">${item.name}</div>
-      <div class="asset-stake">
+      <div class="asset-right">
+        ${ICONS[item.name] || "📦"}
         ${
           item.userAmount > 0
-            ? item.userAmount.toFixed(2)+" Pi Staked"
-            : "Not Staked"
+            ? item.userAmount.toFixed(2)
+            : ""
         }
       </div>
-    </div>
+    `;
 
-  </div>
-`;
     container.appendChild(div);
   });
 }
@@ -673,4 +681,4 @@ document.addEventListener("DOMContentLoaded", ()=>{
 </script>
    
 </body>
-   </html>
+</html>
