@@ -227,6 +227,34 @@ body::before{
 .menu-icon:hover div{
   opacity:.8;
    }
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* LOGO */
+.main-logo{
+  height:34px;
+  width:auto;
+}
+
+/* Smaller refined hamburger */
+.menu-icon{
+  width:18px;
+  height:13px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.menu-icon div{
+  height:2px;
+  background:#fff;
+  border-radius:2px;
+   }
    
 </style>
   
@@ -237,16 +265,15 @@ body::before{
 <header class="header">
   <div class="header-left">
     <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
-    <h1 class="brand">ALBUKHR</h1>
+    <span class="header-title">ALBUKHR</span>
   </div>
-</header>
 
   <div class="menu-icon" onclick="goToSettings()">
     <div></div>
     <div></div>
     <div></div>
   </div>
-</div>
+</header>
 
 <div class="welcome-bar">
   <div id="welcomeScroll" class="welcome-track">
