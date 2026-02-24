@@ -657,3 +657,26 @@ body{
   background:#fff;
   border-radius:2px;
 }
+
+/* ===============================
+   ASSET PROGRESS BAR
+================================ */
+
+.asset-progress{
+  margin-top:6px;
+  height:5px;
+  background:#e9f5ef;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.asset-progress-fill{
+  height:100%;
+  background:#0f7a3d;
+  width:0%;
+  transition:width .4s ease;
+}
+
+.asset-progress-faint{
+  background:#cfe9db;
+}
