@@ -123,16 +123,9 @@ body::before{
 .asset-item{
   background:#ffffff;
   border-radius:14px;
-  padding:12px;
-  margin-bottom:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 6px 16px rgba(0,0,0,0.05);
-  cursor:pointer;
-  transition:all .25s ease;
-  position:relative;
-  overflow:hidden;
+  padding:8px 12px;        /* ↓ reduced vertical padding */
+  margin-bottom:8px;       /* ↓ tighter spacing */
+  min-height:52px;         /* consistent height */
 }
 
 .asset-item::before{
@@ -533,17 +526,17 @@ function renderAssets(userMap, globalMap){
   <div class="asset-left" style="display:flex;align-items:center;gap:10px;">
 
     <div style="
-      width:38px;
-      height:38px;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#e9f5ef;
-      font-size:18px;
-    ">
-      ${ICONS[item.name] || "📦"}
-    </div>
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#e9f5ef;
+  font-size:16px;
+">
+  ${ICONS[item.name] || "📦"}
+</div>
 
     <div style="display:flex;flex-direction:column;">
       <div class="asset-name">${item.name}</div>
