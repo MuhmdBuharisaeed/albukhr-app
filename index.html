@@ -3,195 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALBUKHR Projects</title>
+<title>ALBUKHR – Home</title>
 <link rel="stylesheet" href="style.css">
 
 <style>
 
 /* ===============================
-   GLOBAL BACKGROUND POLISH
+   GLOBAL
 ================================ */
 body{
-  background: linear-gradient(135deg,#f4fff8,#ffffff);
-  font-family: system-ui,-apple-system,sans-serif;
-}
-
-body::before{
-  content:"";
-  position:fixed;
-  width:350px;
-  height:350px;
-  background: radial-gradient(circle,#0f7a3d22,transparent 70%);
-  top:-120px;
-  right:-120px;
-  z-index:-1;
+  margin:0;
+  font-family:system-ui,-apple-system,sans-serif;
+  background:linear-gradient(135deg,#f4fff8,#ffffff);
 }
 
 /* ===============================
-   POPULAR PROJECTS – PREMIUM
+   HEADER (Albukhr Architecture)
 ================================ */
-
-.popular-section{
-  padding:14px;
-}
-
-.popular-title{
-  font-weight:700;
-  margin-bottom:10px;
-  font-size:15px;
-}
-
-.popular-scroll{
-  display:flex;
-  overflow-x:auto;
-  gap:12px;
-  scroll-snap-type:x mandatory;
-  padding-bottom:6px;
-}
-
-.popular-card{
-  min-width:30%;
-  flex:0 0 30%;
-  background: linear-gradient(145deg,#ffffff,#f2fff7);
-  border-radius:14px;
-  padding:10px 8px;
-  box-shadow:0 6px 18px rgba(15,122,61,0.08);
-  text-align:center;
-  scroll-snap-align:start;
-  cursor:pointer;
-  transition:all .25s ease;
-  position:relative;
-}
-
-.popular-card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 10px 24px rgba(15,122,61,0.15);
-}
-
-.popular-icon{
-  font-size:22px;
-  margin-bottom:6px;
-}
-
-.popular-name{
-  font-weight:600;
-  font-size:12px;
-  line-height:1.2;
-}
-
-.popular-amount{
-  font-size:11px;
-  color:#0f7a3d;
-  margin-top:4px;
-  font-weight:600;
-}
-
-/* Rank badge */
-.popular-card::after{
-  content:attr(data-rank);
-  position:absolute;
-  top:6px;
-  right:8px;
-  font-size:9px;
-  background:#0f7a3d;
-  color:#fff;
-  padding:2px 6px;
-  border-radius:20px;
-}
-
-/* ===============================
-   ASSETS – WALLET STYLE
-================================ */
-
-.assets-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
-}
-
-.assets-search{
-  font-size:18px;
-  cursor:pointer;
-  transition:.2s ease;
-}
-
-.assets-search:hover{
-  transform:scale(1.1);
-}
-
-.asset-item{
-  background:#ffffff;
-  border-radius:14px;
-  padding:12px;
-  margin-bottom:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 6px 16px rgba(0,0,0,0.05);
-  cursor:pointer;
-  transition:all .25s ease;
-  position:relative;
-  overflow:hidden;
-}
-
-.asset-item::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
-  width:4px;
-  background:#0f7a3d;
-}
-
-.asset-item:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 22px rgba(0,0,0,0.08);
-}
-
-.asset-left{
-  display:flex;
-  flex-direction:column;
-}
-
-.asset-name{
-  font-weight:600;
-  font-size:14px;
-}
-
-.asset-stake{
-  font-size:12px;
-  color:#666;
-  margin-top:2px;
-}
-
-.asset-right{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-weight:700;
-  color:#0f7a3d;
-  font-size:14px;
-}
-
-/* subtle fade in */
-.asset-item,
-.popular-card{
-  animation:fadeIn .4s ease forwards;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(5px);}
-  to{opacity:1;transform:translateY(0);}
-}
-
-.hidden-amount{
-  filter: blur(6px);
-  user-select:none;
-}
-
-/* ===== PREMIUM FLAT HEADER ===== */
 .header{
   background:#0f7a3d;
   height:60px;
@@ -201,7 +29,6 @@ body::before{
   justify-content:space-between;
 }
 
-/* left side (logo + brand) */
 .header-left{
   display:flex;
   align-items:center;
@@ -211,65 +38,8 @@ body::before{
 .main-logo{
   height:54px;
   width:auto;
-  object-fit:contain;
 }
 
-.brand{
-  font-size:15px;
-  font-weight:700;
-  letter-spacing:.5px;
-}
-
-/* hamburger */
-.menu-icon{
-  width:20px;
-  height:14px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  cursor:pointer;
-}
-
-.menu-icon div{
-  height:2px;
-  background:#fff;
-  border-radius:2px;
-}
-
-/* ===== HAMBURGER ===== */
-.menu-icon{
-  width:20px;
-  height:14px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  cursor:pointer;
-}
-
-.menu-icon div{
-  height:2px;
-  background:#fff;
-  border-radius:2px;
-  transition:.25s ease;
-   }
-
-.menu-icon:hover div{
-  opacity:.8;
-   }
-
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-/* LOGO */
-.main-logo{
-  height:54px;
-  width:auto;
-}
-
-/* Smaller refined hamburger */
 .menu-icon{
   width:18px;
   height:13px;
@@ -283,32 +53,177 @@ body::before{
   height:2px;
   background:#fff;
   border-radius:2px;
-   }
-   
+}
+
+/* ===============================
+   STATS
+================================ */
+.stats{
+  padding:14px;
+  display:flex;
+  gap:10px;
+}
+
+.stat-card{
+  flex:1;
+  background:#fff;
+  border-radius:14px;
+  padding:12px;
+  box-shadow:0 6px 16px rgba(0,0,0,.05);
+}
+
+.stat-card span{
+  font-size:12px;
+  color:#777;
+}
+
+.stat-card strong{
+  display:block;
+  margin-top:4px;
+  font-size:16px;
+  color:#0f7a3d;
+}
+
+/* ===============================
+   POPULAR
+================================ */
+.popular-section{
+  padding:14px;
+}
+
+.popular-title{
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.popular-scroll{
+  display:flex;
+  overflow-x:auto;
+  gap:12px;
+}
+
+.popular-card{
+  min-width:120px;
+  background:#fff;
+  border-radius:14px;
+  padding:10px;
+  text-align:center;
+  box-shadow:0 6px 18px rgba(15,122,61,.08);
+  cursor:pointer;
+  position:relative;
+}
+
+.popular-card::after{
+  content:attr(data-rank);
+  position:absolute;
+  top:6px;
+  right:8px;
+  font-size:9px;
+  background:#0f7a3d;
+  color:#fff;
+  padding:2px 6px;
+  border-radius:20px;
+}
+
+/* ===============================
+   ASSETS
+================================ */
+.section{
+  padding:14px;
+}
+
+.assets-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.asset-item{
+  background:#fff;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
+  box-shadow:0 6px 16px rgba(0,0,0,.05);
+  cursor:pointer;
+}
+
+.asset-name{
+  font-weight:600;
+  font-size:14px;
+}
+
+.asset-stake{
+  font-size:12px;
+  color:#666;
+  margin-top:2px;
+}
+
+.asset-progress{
+  margin-top:6px;
+  height:5px;
+  background:#e9f5ef;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.asset-progress-fill{
+  height:100%;
+  background:#0f7a3d;
+  width:0%;
+  transition:width .4s ease;
+}
+
+.asset-progress-faint{
+  background:#cfe9db;
+}
+
+.hidden-amount{
+  filter:blur(6px);
+}
+
+/* ===============================
+   BOTTOM NAV
+================================ */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#fff;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  box-shadow:0 -4px 16px rgba(0,0,0,.05);
+}
+
+.bottom-nav a{
+  text-decoration:none;
+  font-size:12px;
+  color:#666;
+}
+
+.bottom-nav a.active{
+  color:#0f7a3d;
+  font-weight:700;
+}
+
 </style>
-  
 </head>
 
-<body data-page="home">
+<body>
 
 <header class="header">
   <div class="header-left">
     <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
-    <span class="brand"></span>
   </div>
 
-  <div class="menu-icon" onclick="goToSettings()">
+  <div class="menu-icon" onclick="location.href='settings.html'">
     <div></div>
     <div></div>
     <div></div>
   </div>
 </header>
-
-<div class="welcome-bar">
-  <div id="welcomeScroll" class="welcome-track">
-    Welcome to Albukhr Investment Limited — Building sustainable industries & empowering communities through investment.
-  </div>
-</div>
 
 <section class="stats">
   <div class="stat-card">
@@ -321,47 +236,50 @@ body::before{
   </div>
 </section>
 
-<!-- ===== POPULAR PROJECTS ===== -->
 <div class="popular-section">
   <div class="popular-title">🔥 Popular Projects</div>
   <div class="popular-scroll" id="popularProjects"></div>
 </div>
 
-<!-- ===== ASSETS ===== -->
 <section class="section">
   <div class="assets-header">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <h3 style="margin:0;">Assets</h3>
-      <span id="toggleAssets" style="cursor:pointer;font-size:16px;">👁</span>
-    </div>
-    <span class="assets-search" onclick="location.href='projects.html'">🔍</span>
+    <h3>Assets</h3>
+    <span id="toggleAssets" style="cursor:pointer;">👁</span>
   </div>
-
   <div id="assetsContainer"></div>
 </section>
 
-<!-- ===== ALBUKHR BOTTOM NAV ===== -->
 <nav class="bottom-nav">
-  <a href="index.html" class="active"><span>🏠</span>Home</a>
-  <a href="wallet.html"><span>💼</span>Wallet</a>
-  <a href="services.html"><span>🛠️</span>Services</a>
-  <a href="news.html"><span>📰</span>News</a>
+  <a href="index.html" class="active">🏠 Home</a>
+  <a href="wallet.html">💼 Wallet</a>
+  <a href="services.html">🛠 Services</a>
+  <a href="news.html">📰 News</a>
 </nav>
 
-   
 <script src="staking.js"></script>
-<script src="wallet-core.js"></script>
 
 <script>
+
+/* ===============================
+   CONFIG
+================================ */
+
+const ALL_PROJECTS = [
+  "Raheem","Hauwal","Barsh","Khairat",
+  "Azman","Urban","Labbaika",
+  "Sadiq","Ameen","Zarah"
+];
+
 const ICONS = {
-  Raheem:"💊",
-  Hauwal:"🌽",
-  Barsh:"🌾",
-  Khairat:"♻️",
-  Azman:"🧪",
-  Urban:"🚍",
-  Labbaika:"🍞"
+  Raheem:"💊", Hauwal:"🌽", Barsh:"🌾",
+  Khairat:"♻️", Azman:"🧪", Urban:"🚍",
+  Labbaika:"🍞", Sadiq:"🏗",
+  Ameen:"🧵", Zarah:"🏭"
 };
+
+/* ===============================
+   MAIN LOAD
+================================ */
 
 function loadHome(){
 
@@ -371,12 +289,10 @@ function loadHome(){
 
   let userMap = {};
   let globalMap = {};
-
   let totalStake = 0;
   let totalReward = 0;
 
   stakes.forEach(s=>{
-
     if(s.capitalWithdrawn) return;
 
     const amount = Number(s.amount)||0;
@@ -385,42 +301,34 @@ function loadHome(){
     totalStake += amount;
     totalReward += reward;
 
-    /* USER ASSETS */
-    if(!userMap[s.project]){
-      userMap[s.project] = 0;
-    }
-    userMap[s.project] += amount;
+    userMap[s.project] = (userMap[s.project]||0)+amount;
 
-    /* GLOBAL POPULAR */
     if(!globalMap[s.project]){
-      globalMap[s.project] = {
-        total:0,
-        investors:0
-      };
+      globalMap[s.project] = { total:0 };
     }
-
     globalMap[s.project].total += amount;
   });
 
-  /* count investors */
-  Object.keys(globalMap).forEach(project=>{
-    const investors = stakes.filter(s=> 
-      s.project===project && !s.capitalWithdrawn
-    ).length;
-
-    globalMap[project].investors = investors;
+  ALL_PROJECTS.forEach(p=>{
+    if(!globalMap[p]){
+      globalMap[p] = { total:0 };
+    }
   });
 
-  homeStake.innerText = totalStake.toFixed(2)+" Pi";
-  homeReward.innerText = totalReward.toFixed(2)+" Pi";
+  document.getElementById("homeStake").innerText =
+    totalStake.toFixed(2)+" Pi";
+
+  document.getElementById("homeReward").innerText =
+    totalReward.toFixed(2)+" Pi";
 
   renderPopular(globalMap);
-renderAssets(userMap, globalMap);
+  renderAssets(userMap, globalMap);
 }
 
-/* =========================
-   POPULAR (GLOBAL RANK)
-========================= */
+/* ===============================
+   POPULAR
+================================ */
+
 function renderPopular(globalMap){
 
   const container = document.getElementById("popularProjects");
@@ -430,255 +338,116 @@ function renderPopular(globalMap){
     .sort((a,b)=> b[1].total - a[1].total)
     .slice(0,10);
 
-  sorted.forEach(([project,data],index)=>{
-
-    const file = project.toLowerCase()+".html";
-
+  sorted.forEach(([project,data],i)=>{
     const div = document.createElement("div");
-    div.className = "popular-card";
-    div.setAttribute("data-rank","#"+(index+1));
-    div.onclick = ()=> location.href = file;
-
-    div.innerHTML = `
-      <div class="popular-icon">
-        ${ICONS[project] || "📦"}
-      </div>
-      <div class="popular-name">
-        ${project}
-      </div>
-      <div class="popular-amount">
+    div.className="popular-card";
+    div.setAttribute("data-rank","#"+(i+1));
+    div.innerHTML=`
+      <div style="font-size:20px">${ICONS[project]||"📦"}</div>
+      <div style="font-size:12px;font-weight:600">${project}</div>
+      <div style="font-size:11px;color:#0f7a3d">
         ${data.total.toFixed(2)} Pi
       </div>
     `;
-
+    div.onclick=()=>location.href=project.toLowerCase()+".html";
     container.appendChild(div);
   });
-   }
-/* =========================
-   HYBRID SMART ASSETS
-========================= */
+}
+
+/* ===============================
+   ASSETS
+================================ */
+
 function renderAssets(userMap, globalMap){
 
   const container = document.getElementById("assetsContainer");
-  container.innerHTML = "";
+  container.innerHTML="";
 
-  /* Merge global list */
-  const projects = Object.keys(globalMap);
+  const maxGlobal = Math.max(
+    ...Object.values(globalMap).map(p=>p.total)
+  );
 
-  if(projects.length === 0){
-    container.innerHTML =
-      "<p style='font-size:12px;color:#777'>No projects available</p>";
-    return;
-  }
-
-  /* Build unified array */
-  const merged = projects.map(project => {
+  const combined = ALL_PROJECTS.map(name=>{
     return {
-      name: project,
-      globalTotal: globalMap[project].total,
-      userAmount: userMap[project] || 0
+      name,
+      user:userMap[name]||0,
+      global:globalMap[name]?.total||0
     };
   });
 
-  /* Sort Logic:
-     1. User stake first
-     2. Then by user amount desc
-     3. Then by global popularity
-  */
-  merged.sort((a,b)=>{
-
-    if(a.userAmount > 0 && b.userAmount === 0) return -1;
-    if(a.userAmount === 0 && b.userAmount > 0) return 1;
-
-    if(a.userAmount !== b.userAmount){
-      return b.userAmount - a.userAmount;
-    }
-
-    return b.globalTotal - a.globalTotal;
+  combined.sort((a,b)=>{
+    if(b.user !== a.user) return b.user - a.user;
+    return b.global - a.global;
   });
 
-  /* Limit to 10 */
-  merged.slice(0,10).forEach(item=>{
-
-    const file = item.name.toLowerCase()+".html";
+  combined.forEach(item=>{
 
     const div = document.createElement("div");
-    div.className = "asset-item";
-    div.onclick = ()=> location.href = file;
+    div.className="asset-item";
 
-    div.innerHTML = `
-      <div class="asset-left">
-        <div class="asset-name">${item.name}</div>
-        <div class="asset-stake">
-          ${
-            item.userAmount > 0
-              ? item.userAmount.toFixed(2)+" Pi Staked"
-              : "Not Staked"
-          }
-        </div>
+    const percent = item.user>0
+      ? (item.user/item.global)*100
+      : (item.global/maxGlobal)*100;
+
+    div.innerHTML=`
+      <div class="asset-name">${item.name}</div>
+      <div class="asset-stake">
+        ${item.user>0
+          ? item.user.toFixed(2)+" Pi Staked"
+          : "Not Staked"}
       </div>
-
-      <div class="asset-right">
-        ${ICONS[item.name] || "📦"}
-        ${
-          item.userAmount > 0
-            ? item.userAmount.toFixed(2)
-            : ""
-        }
+      <div class="asset-progress">
+        <div class="asset-progress-fill 
+          ${item.user===0?"asset-progress-faint":""}"
+          style="width:${percent||0}%">
+        </div>
       </div>
     `;
 
+    div.onclick=()=>location.href=item.name.toLowerCase()+".html";
     container.appendChild(div);
   });
 }
-/* =========================
-   ASSET VISIBILITY TOGGLE
-========================= */
 
-const VISIBILITY_KEY = "albukhr_assets_visibility";
+/* ===============================
+   VISIBILITY
+================================ */
 
-function isAssetsHidden(){
-  return localStorage.getItem(VISIBILITY_KEY) === "hidden";
-}
+const VISIBILITY_KEY="albukhr_assets_visibility";
 
-function setAssetsHidden(hidden){
-  localStorage.setItem(VISIBILITY_KEY, hidden ? "hidden" : "visible");
+function toggleVisibility(){
+  const hidden =
+    localStorage.getItem(VISIBILITY_KEY)==="hidden";
+  localStorage.setItem(
+    VISIBILITY_KEY,
+    hidden?"visible":"hidden"
+  );
+  applyVisibility();
 }
 
 function applyVisibility(){
+  const hidden =
+    localStorage.getItem(VISIBILITY_KEY)==="hidden";
 
-  const hidden = isAssetsHidden();
-
-  // totals
-  document.getElementById("homeStake")
-    ?.classList.toggle("hidden-amount", hidden);
-
-  document.getElementById("homeReward")
-    ?.classList.toggle("hidden-amount", hidden);
-
-  // asset rows
-  document.querySelectorAll(".asset-right, .asset-stake")
-    .forEach(el=>{
-      el.classList.toggle("hidden-amount", hidden);
-    });
-
-  // icon change
-  const toggle = document.getElementById("toggleAssets");
-  if(toggle){
-    toggle.textContent = hidden ? "🙈" : "👁";
-  }
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
-
-  const toggle = document.getElementById("toggleAssets");
-
-  if(toggle){
-    toggle.addEventListener("click", ()=>{
-      const newState = !isAssetsHidden();
-      setAssetsHidden(newState);
-      applyVisibility();
-    });
-  }
-
-  applyVisibility();
-});
-
-function goToSettings(){
-  window.location.href = "settings.html";
-   }
-   
-window.addEventListener("DOMContentLoaded", loadHome);
-</script>
-
-<script>
-/* ======================================
-   ALBUKHR – SMART LIVE REFRESH
-====================================== */
-
-(function(){
-
-  const REFRESH_INTERVAL = 30000; // 30s
-  let refreshTimer = null;
-
-  function softRefresh(){
-    if(typeof loadHome === "function"){
-      loadHome();
-    }
-  }
-   
-  function startRefresh(){
-    if(refreshTimer) return;
-    refreshTimer = setInterval(softRefresh, REFRESH_INTERVAL);
-  }
-
-  function stopRefresh(){
-    if(refreshTimer){
-      clearInterval(refreshTimer);
-      refreshTimer = null;
-    }
-  }
-
-  /* Start after page loads */
-  window.addEventListener("DOMContentLoaded", startRefresh);
-
-  /* Stop when tab inactive */
-  document.addEventListener("visibilitychange", ()=>{
-    if(document.hidden){
-      stopRefresh();
-    } else {
-      startRefresh();
-    }
+  document.querySelectorAll(
+    "#homeStake,#homeReward,.asset-stake"
+  ).forEach(el=>{
+    el.classList.toggle("hidden-amount",hidden);
   });
 
-})();
-</script>
-
-<script>
-const currentPage = location.pathname.split("/").pop();
-document.querySelectorAll(".nav-item").forEach(link=>{
-  if(link.getAttribute("href") === currentPage){
-    link.classList.add("active");
-  }
-});
-</script>
-
-<script>
-/* ===== ALBUKHR NEWS BADGE SYSTEM ===== */
-
-const NEWS_VERSION = "1.0"; // change this when new news is added
-
-function checkNewsBadge(){
-
-  const seenVersion = localStorage.getItem("albukhr_news_seen");
-
-  if(seenVersion !== NEWS_VERSION){
-    const badge = document.getElementById("newsBadge");
-    if(badge){
-      badge.style.display = "inline-block";
-    }
-  }
+  document.getElementById("toggleAssets")
+    .textContent=hidden?"🙈":"👁";
 }
 
-/* When user opens news page */
-function markNewsAsSeen(){
-  localStorage.setItem("albukhr_news_seen", NEWS_VERSION);
-}
+document.getElementById("toggleAssets")
+  .addEventListener("click",toggleVisibility);
 
-/* Run on load */
-document.addEventListener("DOMContentLoaded", ()=>{
-  checkNewsBadge();
-
-  if(location.pathname.includes("news.html")){
-    markNewsAsSeen();
-  }
+window.addEventListener("DOMContentLoaded",()=>{
+  applyVisibility();
+  loadHome();
 });
+
 </script>
 
-<script src="js/core/header.js"></script>
-<script>
-  renderAlbukhrHeader({ hamburger:true });
-</script>
-   
 </body>
-   </html>
+</html>
