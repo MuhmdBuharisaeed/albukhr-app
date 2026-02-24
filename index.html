@@ -532,13 +532,22 @@ function renderAssets(userMap, globalMap){
     div.onclick = ()=> location.href = file;
 
     div.innerHTML = `
-  <div class="asset-row">
+  <div class="asset-left" style="display:flex;align-items:center;gap:10px;">
 
-    <div class="project-icon">
-      ${item.name.slice(0,2).toUpperCase()}
+    <div style="
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#e9f5ef;
+      font-size:18px;
+    ">
+      ${ICONS[item.name] || "📦"}
     </div>
 
-    <div class="asset-info">
+    <div style="display:flex;flex-direction:column;">
       <div class="asset-name">${item.name}</div>
       <div class="asset-stake">
         ${
@@ -549,17 +558,8 @@ function renderAssets(userMap, globalMap){
       </div>
     </div>
 
-    ${
-      item.userAmount > 0
-        ? `<div class="asset-right">
-            ${item.userAmount.toFixed(2)} Pi
-           </div>`
-        : ""
-    }
-
   </div>
 `;
-
     container.appendChild(div);
   });
 }
