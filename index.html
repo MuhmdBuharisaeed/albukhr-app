@@ -262,7 +262,7 @@ body::before{
   flex-shrink:0;
 }
 /* ===============================
-   ALBUKHR PREMIUM GREEN NAV
+   ALBUKHR GLASS GREEN NAV
 ================================ */
 
 .bottom-nav{
@@ -273,82 +273,64 @@ body::before{
   display:flex;
   justify-content:space-around;
   align-items:center;
-  padding:10px 0 12px;
-  background:linear-gradient(180deg,#0f7a3d,#0b5c2e);
-  backdrop-filter:blur(12px);
-  border-top:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 -4px 18px rgba(0,0,0,0.25);
+
+  padding:10px 0;
+
+  background:rgba(15,122,61,0.75); /* translucent emerald */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border-top:1px solid rgba(255,255,255,0.15);
+  box-shadow:0 -8px 30px rgba(0,0,0,0.15);
+
   z-index:999;
 }
 
-/* nav item */
+/* NAV LINKS */
 .bottom-nav a{
   flex:1;
   text-align:center;
   text-decoration:none;
-  color:#c8f5dd;
   font-size:11px;
   font-weight:500;
+  color:rgba(255,255,255,0.7);
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
-  gap:4px;
-  position:relative;
+  gap:3px;
   transition:.25s ease;
 }
 
-/* icon */
+/* ICON */
 .bottom-nav a span{
-  font-size:19px;
+  font-size:18px;
   transition:.25s ease;
-}
-
-/* hover */
-.bottom-nav a:hover span{
-  transform:translateY(-2px) scale(1.1);
 }
 
 /* ACTIVE STATE */
 .bottom-nav a.active{
   color:#ffffff;
-  font-weight:700;
 }
 
-/* active glow */
 .bottom-nav a.active span{
   color:#ffffff;
-  text-shadow:0 0 8px rgba(255,255,255,0.7);
 }
 
-/* active indicator line */
-.bottom-nav a.active::before{
+/* SOFT GLOW UNDER ACTIVE */
+.bottom-nav a.active span::after{
   content:"";
   position:absolute;
-  top:-6px;
-  width:26px;
-  height:3px;
-  border-radius:10px;
-  background:linear-gradient(90deg,#7bffb2,#00ff88);
-  box-shadow:0 0 10px rgba(0,255,136,0.8);
+  inset:-8px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,255,136,0.4),transparent 70%);
+  animation:activePulse 2.2s ease-in-out infinite;
+  z-index:-1;
 }
 
-/* subtle shimmer */
-.bottom-nav::after{
-  content:"";
-  position:absolute;
-  top:0;
-  left:-100%;
-  width:100%;
-  height:2px;
-  background:linear-gradient(90deg,transparent,rgba(0,255,136,0.4),transparent);
-  animation:navShimmer 6s linear infinite;
-}
-
-@keyframes navShimmer{
-  0%{left:-100%;}
-  100%{left:100%;}
-}
+/* Hover lift */
+.bottom-nav a:hover span{
+  transform:translateY(-3px);
+   }
 /* ===============================
    ACTIVE PULSE EFFECT
 ================================ */
