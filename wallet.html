@@ -438,9 +438,8 @@ function getProjectIcon(name){
   return "🏢";
 }
 
-document.addEventListener("DOMContentLoaded", function(){
-  renderWallet();
-});
+function renderWallet(){
+  const summary = getWalletSummary();
   totalStake.innerText = summary.totalStake.toFixed(2) + " Pi";
   totalReward.innerText = summary.grossRewards.toFixed(2) + " Pi";
   withdrawn.innerText = summary.withdrawn.toFixed(2) + " Pi";
@@ -575,6 +574,8 @@ function closeModal(){
 
 function confirmWithdraw(){
 
+window.dispatchEvent(new Event("walletUpdated"));
+  
   const amt = withdrawAmount.value;
   const addr = withdrawAddress.value;
 
@@ -589,17 +590,12 @@ function confirmWithdraw(){
     return;
   }
 
-  // trigger success event properly
-  window.dispatchEvent(new CustomEvent("walletUpdated",{
-    detail:{ type:"reward-withdraw" }
-  }));
-
   withdrawAmount.value="";
   withdrawAddress.value="";
   closeModal();
   renderWallet();
-  }
-  
+}
+
 function withdrawCapitalAction(project){
 
   const res = requestCapitalWithdraw(project);
@@ -609,12 +605,8 @@ function withdrawCapitalAction(project){
     return;
   }
 
-window.dispatchEvent(new CustomEvent("walletUpdated",{
-  detail:{ type:"capital-withdraw" }
-}));
+  alert("Capital withdrawn: " + res.grossAmount.toFixed(2) + " Pi");
 
-alert("Capital withdrawn: " + res.grossAmount.toFixed(2) + " Pi");
-  
   renderWallet();
   }
 
@@ -679,4 +671,4 @@ function showWithdrawSuccess(){
 </script>
   
 </body>
-</html>
+    </html>
