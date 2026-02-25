@@ -1,20 +1,46 @@
 /* =========================================
-   ALBUKHR WALLET CORE v6 (ACCOUNTING SAFE)
-   Single Source of Truth Architecture
+   ALBUKHR WALLET CORE v7 (SAFE + RECOVERY)
+   Backward Compatible • Corruption Safe
 ========================================= */
 
 const WITHDRAW_KEY = "albukhr_wallet_withdrawals_v6";
 const SETTINGS_KEY = "albukhr_wallet_settings";
 
 /* =========================================
+   SAFE JSON PARSE
+========================================= */
+
+function safeParse(value, fallback){
+  try{
+    if(!value) return fallback;
+    return JSON.parse(value);
+  }catch(e){
+    console.warn("Wallet parse error recovered");
+    return fallback;
+  }
+}
+
+function safeStringify(value){
+  try{
+    return JSON.stringify(value);
+  }catch(e){
+    console.error("Wallet stringify error");
+    return "[]";
+  }
+}
+
+/* =========================================
    SETTINGS
 ========================================= */
 
 function getWalletSettings(){
-  return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
-    feePercent: 1,
-    dailyLimit: 50
-  };
+  return safeParse(
+    localStorage.getItem(SETTINGS_KEY),
+    {
+      feePercent: 1,
+      dailyLimit: 50
+    }
+  );
 }
 
 /* =========================================
@@ -22,15 +48,26 @@ function getWalletSettings(){
 ========================================= */
 
 function getWithdrawals(){
-  return JSON.parse(localStorage.getItem(WITHDRAW_KEY)) || [];
+  const data = safeParse(
+    localStorage.getItem(WITHDRAW_KEY),
+    []
+  );
+
+  if(!Array.isArray(data)) return [];
+
+  return data;
 }
 
 function saveWithdrawals(list){
-  localStorage.setItem(WITHDRAW_KEY, JSON.stringify(list));
+  if(!Array.isArray(list)) return;
+  localStorage.setItem(
+    WITHDRAW_KEY,
+    safeStringify(list)
+  );
 }
 
 /* =========================================
-   PROJECT BREAKDOWN (REAL ACCOUNTING)
+   PROJECT BREAKDOWN
 ========================================= */
 
 function getProjectWalletBreakdown(){
@@ -39,12 +76,14 @@ function getProjectWalletBreakdown(){
     return [];
   }
 
-  const stakes = getAllStakesMerged();
+  const stakes = getAllStakesMerged() || [];
   const withdrawals = getWithdrawals();
 
   const map = {};
 
   stakes.forEach(s=>{
+
+    if(!s?.project) return;
 
     if(!map[s.project]){
       map[s.project] = {
@@ -65,6 +104,8 @@ function getProjectWalletBreakdown(){
   });
 
   withdrawals.forEach(w=>{
+
+    if(!w?.project) return;
     if(!map[w.project]) return;
 
     if(w.type === "capital"){
@@ -96,7 +137,7 @@ function getProjectWalletBreakdown(){
 }
 
 /* =========================================
-   GLOBAL SUMMARY (CORRECTED)
+   GLOBAL SUMMARY
 ========================================= */
 
 function getWalletSummary(){
@@ -109,10 +150,10 @@ function getWalletSummary(){
   let availableRewards = 0;
 
   projects.forEach(p=>{
-    totalStake += p.stake;
-    grossRewards += p.grossReward;
-    totalWithdrawn += p.withdrawn;
-    availableRewards += p.netReward;
+    totalStake += Number(p.stake) || 0;
+    grossRewards += Number(p.grossReward) || 0;
+    totalWithdrawn += Number(p.withdrawn) || 0;
+    availableRewards += Number(p.netReward) || 0;
   });
 
   return {
@@ -141,7 +182,7 @@ function getTodayWithdrawTotal(){
 }
 
 /* =========================================
-   REWARD WITHDRAW (SAFE VERSION)
+   REWARD WITHDRAW
 ========================================= */
 
 function requestWithdraw({project, amount, walletAddress}){
@@ -180,7 +221,7 @@ function requestWithdraw({project, amount, walletAddress}){
     grossAmount:amount,
     fee,
     received,
-    walletAddress,
+    walletAddress:walletAddress || "internal",
     timestamp:Date.now()
   });
 
@@ -197,7 +238,7 @@ function requestWithdraw({project, amount, walletAddress}){
 }
 
 /* =========================================
-   CAPITAL WITHDRAW (MATURED SAFE)
+   CAPITAL WITHDRAW
 ========================================= */
 
 function requestCapitalWithdraw(project){
@@ -213,6 +254,7 @@ function requestCapitalWithdraw(project){
   let totalCapital = 0;
 
   totals.stakes.forEach(s=>{
+
     if(typeof isStakeMatured === "function" &&
        isStakeMatured(s) &&
        !s.capitalWithdrawn){
@@ -258,7 +300,7 @@ function getWithdrawHistory(){
 }
 
 /* =========================================
-   DEV
+   DEV RESET
 ========================================= */
 
 function clearWalletLedger(){
