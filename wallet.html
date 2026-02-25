@@ -574,20 +574,18 @@ function closeModal(){
 
 function confirmWithdraw(){
 
-window.dispatchEvent(new Event("walletUpdated"));
-  
-  const amt = withdrawAmount.value;
-  const addr = withdrawAddress.value;
+  if(isLocked()){
+    if(!unlockWallet()) return;
+  }
 
-  const res = requestWithdraw({
-    project:activeProject,
-    amount:amt,
-    walletAddress:addr
-  });
+  if(getSecurity().twofa){
+    if(!verifyPin()){
+      alert("Transaction blocked by Security Guard");
+      return;
+    }
+  }
 
-  if(res.error){
-    alert(res.error);
-    return;
+  // existing withdraw logic continues...
   }
 
   withdrawAmount.value="";
