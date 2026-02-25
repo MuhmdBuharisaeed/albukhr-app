@@ -76,7 +76,8 @@
 
 <header class="header">
   <div class="header-left">
-    <span>📁 Projects</span>
+    <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
+    <span style="color:#fff;font-weight:700;font-size:15px;">Projects</span>
   </div>
 </header>
 
@@ -135,7 +136,9 @@ function renderInternal(q){
 
   list.forEach(p=>{
     internalList.innerHTML += `
-      <div class="project-card">
+      <div class="project-card"
+           onclick="window.location.href='${p.page}'"
+           style="cursor:pointer;">
         <div class="project-icon">${p.icon}</div>
         <div class="project-body">
           <div class="project-title">${p.title}</div>
@@ -149,14 +152,10 @@ function renderInternal(q){
           </div>
           <span class="project-tag">Internal</span>
         </div>
-        <div class="project-action">
-          <a href="${p.page}">Open →</a>
-        </div>
       </div>
     `;
   });
-}
-
+  }
 /* ===============================
    RENDER EXTERNAL
 ================================ */
@@ -182,7 +181,9 @@ function renderExternal(q){
 
   projects.forEach(p=>{
     externalList.innerHTML += `
-      <div class="project-card">
+      <div class="project-card"
+           onclick="window.location.href='external-project.html?id=${p.projectId}'"
+           style="cursor:pointer;">
         <div class="project-icon">🌍</div>
         <div class="project-body">
           <div class="project-title">${p.title}</div>
@@ -194,15 +195,10 @@ function renderExternal(q){
           </div>
           <span class="project-tag external">External</span>
         </div>
-        <div class="project-action">
-          <a href="external-project.html?id=${p.projectId}">
-            View →
-          </a>
-        </div>
       </div>
     `;
   });
-}
+              }
 
 function renderAll(){
   const q = searchInput.value.toLowerCase();
