@@ -12,7 +12,8 @@ body{
   background:#f4f7f6;
   display:flex;
   flex-direction:column;
-  height:100vh;
+  min-height:100vh;
+  padding-bottom:90px; /* space for floating nav */
 }
 
 /* ===== TOP NAV BUTTONS (UPGRADED) ===== */
@@ -25,18 +26,17 @@ body{
 
 .nav-btn{
   flex:1;
-  padding:12px 14px;
-  border-radius:14px;
-  font-size:14px;
-  font-weight:700;
+  padding:8px 10px;     /* ⬅️ reduced */
+  border-radius:10px;   /* ⬅️ smaller */
+  font-size:12px;       /* ⬅️ smaller */
+  font-weight:600;
   cursor:pointer;
   border:none;
   transition:all .25s ease;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
-  letter-spacing:.3px;
+  gap:4px;
 }
 
 .nav-wallet{
@@ -274,19 +274,21 @@ body{
 
 <body>
 
-<div class="header">
+<header class="header">
+  <div class="header-left">
+    <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
+  </div>
+</header>
 
 <div class="header-nav">
   <button class="nav-btn nav-wallet">
-     Wallet
+     💼 Wallet
   </button>
 
   <button class="nav-btn nav-trans"
     onclick="window.location.href='transactions.html'">
-     Transactions
+     📜 Transactions
   </button>
-</div>
-  
 </div>
 
 <div class="summary">
