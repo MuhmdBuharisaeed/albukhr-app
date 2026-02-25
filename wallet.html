@@ -16,44 +16,42 @@ body{
   padding-bottom:90px; /* space for floating nav */
 }
 
-/* ===== TOP NAV BUTTONS (UPGRADED) ===== */
-.header-nav{
+/* ===== WALLET TOP TABS (OUTSIDE HEADER) ===== */
+.wallet-tabs{
   display:flex;
-  gap:8px;
-  padding:10px 16px;
-  background:#0f7a3d;
+  gap:10px;
+  padding:14px 16px;
+  background:#f4f7f6; /* same as body */
 }
 
+/* Smaller refined buttons */
 .nav-btn{
   flex:1;
-  padding:7px 8px;      /* smaller */
-  border-radius:10px;
+  padding:8px 10px;
+  border-radius:12px;
   font-size:12px;
   font-weight:600;
   cursor:pointer;
   border:none;
+  transition:.2s ease;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:4px;
+  gap:6px;
 }
 
+/* Active Wallet */
 .nav-wallet{
-  background:#ffffff;
-  color:#0f7a3d;
-  box-shadow:0 4px 14px rgba(0,0,0,0.15);
-}
-
-.nav-trans{
-  background:rgba(255,255,255,0.15);
+  background:#0f7a3d;
   color:#fff;
-  border:1px solid rgba(255,255,255,0.25);
+  box-shadow:0 4px 12px rgba(15,122,61,0.25);
 }
 
-.nav-trans:hover{
-  background:#ffffff;
+/* Secondary */
+.nav-trans{
+  background:#fff;
   color:#0f7a3d;
-  transform:translateY(-2px);
+  border:1px solid #dfeee7;
 }
 
 /* ===== FIXED SUMMARY ===== */
@@ -297,17 +295,6 @@ body{
   </div>
 </header>
 
-<div class="header-nav">
-  <button class="nav-btn nav-wallet">
-     💼 Wallet
-  </button>
-
-  <button class="nav-btn nav-trans"
-    onclick="window.location.href='transactions.html'">
-     📜 Transactions
-  </button>
-</div>
-
 <div class="summary">
   <div class="balance" id="available">0.00 Pi</div>
   <div class="sub">Available Reward Balance</div>
@@ -317,6 +304,17 @@ body{
     <div id="totalStake">0.00 Pi</div>
   </div>
 
+<div class="wallet-tabs">
+  <button class="nav-btn nav-wallet">
+    💼 Wallet
+  </button>
+
+  <button class="nav-btn nav-trans"
+    onclick="window.location.href='transactions.html'">
+    📜 Transactions
+  </button>
+</div>
+  
   <div class="row">
     <div>Total Rewards (Gross)</div>
     <div id="totalReward">0.00 Pi</div>
