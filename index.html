@@ -385,28 +385,13 @@ body::before{
    SIDE DRAWER
 ================================ */
 .side-drawer{
-  position:fixed;
-  top:10px;
-  right:-75%;
-  width:75%;
-  max-width:360px;
-  height:calc(100% - 20px);
-  background:rgba(255,255,255,0.85);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  position: fixed;
+  top:0;
+  right:-55%;
+  width:50%;
+  max-width:340px;
+  height:100%;
 
-  border-radius:28px 0 0 28px;
-
-  box-shadow:
-    -10px 0 40px rgba(0,0,0,0.18);
-
-  transition:right .35s cubic-bezier(.25,.8,.25,1);
-  z-index:2000;
-
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
   /* Premium glass */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -434,6 +419,10 @@ body::before{
 .side-drawer.open{
   right:0;
 }
+   
+.side-drawer.open{
+  right:0;
+}
 
 .drawer-header{
   padding:18px;
@@ -458,23 +447,14 @@ body::before{
 }
 
 .drawer-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.25);
-  backdrop-filter:blur(2px);
-  -webkit-backdrop-filter:blur(2px);
-
-  opacity:0;
-  visibility:hidden;
-  transition:opacity .3s ease;
-  z-index:1500;
-}
+  background: rgba(0,0,0,0.15);
+  }
 
 .drawer-overlay.show{
   opacity:1;
   visibility:visible;
-   }
-   
+}
+
 .hidden-amount{
   filter: blur(6px);
   user-select:none;
@@ -857,4 +837,4 @@ document.querySelector(".menu-icon").addEventListener("click", openDrawer);
 </script>
 
 </body>
-  </html>
+   </html>
