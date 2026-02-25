@@ -438,8 +438,9 @@ function getProjectIcon(name){
   return "🏢";
 }
 
-function renderWallet(){
-  const summary = getWalletSummary();
+document.addEventListener("DOMContentLoaded", function(){
+  renderWallet();
+});
   totalStake.innerText = summary.totalStake.toFixed(2) + " Pi";
   totalReward.innerText = summary.grossRewards.toFixed(2) + " Pi";
   withdrawn.innerText = summary.withdrawn.toFixed(2) + " Pi";
@@ -574,26 +575,31 @@ function closeModal(){
 
 function confirmWithdraw(){
 
-  if(isLocked()){
-    if(!unlockWallet()) return;
+  const amt = withdrawAmount.value;
+  const addr = withdrawAddress.value;
+
+  const res = requestWithdraw({
+    project:activeProject,
+    amount:amt,
+    walletAddress:addr
+  });
+
+  if(res.error){
+    alert(res.error);
+    return;
   }
 
-  if(getSecurity().twofa){
-    if(!verifyPin()){
-      alert("Transaction blocked by Security Guard");
-      return;
-    }
-  }
-
-  // existing withdraw logic continues...
-  }
+  // trigger success event properly
+  window.dispatchEvent(new CustomEvent("walletUpdated",{
+    detail:{ type:"reward-withdraw" }
+  }));
 
   withdrawAmount.value="";
   withdrawAddress.value="";
   closeModal();
   renderWallet();
-}
-
+  }
+  
 function withdrawCapitalAction(project){
 
   const res = requestCapitalWithdraw(project);
@@ -603,8 +609,12 @@ function withdrawCapitalAction(project){
     return;
   }
 
-  alert("Capital withdrawn: " + res.grossAmount.toFixed(2) + " Pi");
+window.dispatchEvent(new CustomEvent("walletUpdated",{
+  detail:{ type:"capital-withdraw" }
+}));
 
+alert("Capital withdrawn: " + res.grossAmount.toFixed(2) + " Pi");
+  
   renderWallet();
   }
 
