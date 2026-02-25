@@ -3,140 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Verified Pi News</title>
+<title>Albukhr News</title>
+
+<link rel="stylesheet" href="style.css">
 
 <style>
 body{
   margin:0;
   font-family:system-ui;
   background:#f4f7f6;
-  padding-bottom:90px;
+  padding-bottom:110px;
 }
 
-/* HEADER */
+/* ===== HEADER MATCH INDEX ===== */
 .header{
   background:#0f7a3d;
-  color:#fff;
-  padding:16px;
-  font-weight:700;
-  font-size:16px;
+  height:60px;
+  padding:0 16px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
 }
 
-.badge{
-  font-size:10px;
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.main-logo{
+  height:54px;
+  width:auto;
+}
+
+.menu-icon{
+  width:18px;
+  height:13px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+.menu-icon div{
+  height:2px;
   background:#fff;
-  color:#0f7a3d;
-  padding:4px 8px;
-  border-radius:20px;
-  font-weight:700;
+  border-radius:2px;
 }
 
-/* SECTION */
+/* ===== NEWS SECTION ===== */
 .section{
   padding:16px;
 }
 
-/* NEWS CARD */
+/* Skeleton */
+.skeleton{
+  height:180px;
+  border-radius:16px;
+  margin-bottom:14px;
+  background:linear-gradient(90deg,#eee,#f5f5f5,#eee);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+}
+@keyframes shimmer{
+  0%{background-position:200% 0;}
+  100%{background-position:-200% 0;}
+}
+
+/* ===== NEWS CARD ===== */
 .news-card{
   background:#fff;
-  border-radius:14px;
+  border-radius:18px;
+  padding:14px;
   margin-bottom:16px;
-  box-shadow:0 6px 18px rgba(15,122,61,0.06);
-  overflow:hidden;
+  box-shadow:0 8px 20px rgba(0,0,0,0.06);
   transition:.25s ease;
-  cursor:pointer;
 }
-
 .news-card:hover{
   transform:translateY(-3px);
-  box-shadow:0 10px 24px rgba(15,122,61,0.12);
 }
 
-.news-image{
+.news-media{
   width:100%;
-  height:180px;
-  object-fit:cover;
-  display:block;
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:10px;
 }
-
-.news-body{
-  padding:14px;
+.news-media img,
+.news-media video{
+  width:100%;
+  display:block;
+  border-radius:14px;
 }
 
 .news-title{
-  font-weight:700;
   font-size:15px;
+  font-weight:700;
   margin-bottom:6px;
 }
 
 .news-summary{
-  font-size:12px;
-  color:#555;
+  font-size:13px;
+  color:#444;
   margin-bottom:8px;
 }
 
 .news-meta{
-  font-size:11px;
-  color:#777;
   display:flex;
   justify-content:space-between;
+  align-items:center;
+  font-size:11px;
+  color:#777;
 }
 
-.news-source{
+.source-badge{
+  background:#e6f6ec;
+  padding:4px 8px;
+  border-radius:20px;
   font-weight:600;
   color:#0f7a3d;
 }
 
-/* BOTTOM NAV */
-.bottom-nav{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  height:60px;
-  background:#fff;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  border-top:1px solid #cceedd;
-  z-index:100;
+.verified-badge{
+  background:#0f7a3d;
+  color:#fff;
+  padding:3px 8px;
+  border-radius:20px;
+  font-size:10px;
+  margin-left:6px;
 }
 
-.bottom-nav a{
-  text-decoration:none;
-  color:#0f7a3d;
-  font-weight:bold;
-  font-size:14px;
+/* ===== SIDE DRAWER ===== */
+.side-drawer{
+  position: fixed;
+  top:0;
+  right:-280px;
+  width:280px;
+  height:100%;
+  background:#fff;
+  box-shadow:-4px 0 18px rgba(0,0,0,0.12);
+  transition:right .3s ease;
+  z-index:1001;
   display:flex;
   flex-direction:column;
-  align-items:center;
 }
+.side-drawer.open{ right:0; }
 
-.bottom-nav a span{
-  font-size:18px;
+.drawer-overlay{
+  position: fixed;
+  inset:0;
+  background: rgba(0,0,0,0.2);
+  opacity:0;
+  visibility:hidden;
+  transition:.3s ease;
+  z-index:1000;
 }
-
-.bottom-nav a.active{
-  color:#0f7a3d;
+.drawer-overlay.show{
+  opacity:1;
+  visibility:visible;
 }
 </style>
 </head>
 
-<body>
+<body data-page="news">
 
-<div class="header">
-  <span>Verified Pi News</span>
-  <span class="badge">Albukhr Verified</span>
-</div>
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-left">
+    <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
+  </div>
+  <div class="menu-icon" onclick="openDrawer()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+</header>
 
+<!-- ===== NEWS CONTENT ===== -->
 <section class="section">
-  <div id="newsContainer"></div>
+  <div id="newsContainer">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
 </section>
 
-<!-- ===== ALBUKHR BOTTOM NAV ===== -->
+<!-- ===== TELEGRAM STYLE BOTTOM NAV ===== -->
 <nav class="bottom-nav">
   <a href="index.html"><span>🏠</span>Home</a>
   <a href="wallet.html"><span>💼</span>Wallet</a>
@@ -144,86 +194,94 @@ body{
   <a href="news.html" class="active"><span>📰</span>News</a>
 </nav>
 
+<!-- ===== SIDE DRAWER ===== -->
+<div id="sideDrawer" class="side-drawer">
+  <div style="padding:16px;border-bottom:1px solid #eee;font-weight:700;">
+    Menu
+    <span onclick="closeDrawer()" style="float:right;cursor:pointer">✖️</span>
+  </div>
+
+  <div style="padding:12px 16px;">
+    <a href="profile.html">Profile</a><br><br>
+    <a href="preferences.html">Preferences</a><br><br>
+    <a href="security.html">Security</a><br><br>
+    <a href="help.html">Help</a>
+  </div>
+</div>
+
+<div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+
+<script src="news-data.js"></script>
+
 <script>
-const container = document.getElementById("newsContainer");
+async function renderNews(){
 
-/* BLOCK CLICKBAIT */
-const BLOCKED = ["rumor","leaked","unconfirmed","fake"];
+  const container = document.getElementById("newsContainer");
+  container.innerHTML = "";
 
-/* FALLBACK VERIFIED NEWS */
-const FALLBACK_NEWS = [
-  {
-    title:"Pi Core Team Publishes Official Ecosystem Update",
-    summary:"Latest roadmap update from Pi Core Team regarding ecosystem growth.",
-    image:"https://via.placeholder.com/800x400",
-    source:"Pi Core Team",
-    date:new Date().toISOString(),
-    link:"https://minepi.com/blog"
-  }
-];
+  const news = await getAllNews();
 
-function renderNews(newsArray){
-
-  container.innerHTML="";
-
-  const cleanNews = newsArray.filter(item=>{
-    return !BLOCKED.some(word =>
-      item.title.toLowerCase().includes(word)
-    );
-  });
-
-  if(!cleanNews.length){
-    container.innerHTML =
-      "<p style='font-size:12px;color:#777'>No verified news available.</p>";
+  if(!news.length){
+    container.innerHTML = "<p>No news available</p>";
     return;
   }
 
-  cleanNews
-    .sort((a,b)=> new Date(b.date)-new Date(a.date))
-    .forEach(news=>{
+  news.forEach(item=>{
 
-      const card = document.createElement("div");
-      card.className = "news-card";
-      card.onclick = ()=> window.open(news.link,"_blank");
+    const div = document.createElement("div");
+    div.className = "news-card";
 
-      card.innerHTML = `
-        <img src="${news.image || 'https://via.placeholder.com/800x400'}"
-             class="news-image">
+    div.innerHTML = `
+      ${
+        item.image || item.video
+        ? `
+        <div class="news-media">
+          ${
+            item.video
+            ? `<video controls src="${item.video}"></video>`
+            : `<img src="${item.image}" alt="news image">`
+          }
+        </div>`
+        : ""
+      }
 
-        <div class="news-body">
-          <div class="news-title">${news.title}</div>
-          <div class="news-summary">
-            ${news.summary || ""}
-          </div>
-          <div class="news-meta">
-            <span class="news-source">${news.source}</span>
-            <span>${new Date(news.date).toLocaleDateString()}</span>
-          </div>
-        </div>
-      `;
+      <div class="news-title">
+        ${item.title}
+        ${
+          item.verified
+          ? `<span class="verified-badge">Verified</span>`
+          : ""
+        }
+      </div>
 
-      container.appendChild(card);
-    });
+      <div class="news-summary">
+        ${item.summary || ""}
+      </div>
+
+      <div class="news-meta">
+        <div class="source-badge">${item.source}</div>
+        <div>${new Date(item.date).toLocaleDateString()}</div>
+      </div>
+    `;
+
+    div.onclick = ()=> window.open(item.link,"_blank");
+
+    container.appendChild(div);
+  });
 }
 
-/* AUTO FETCH SYSTEM */
-async function loadNews(){
+renderNews();
 
-  try{
-    const res = await fetch("/api/news");
-    if(!res.ok) throw new Error("API not available");
-
-    const data = await res.json();
-    renderNews(data);
-
-  }catch(e){
-    /* fallback if api fails */
-    renderNews(FALLBACK_NEWS);
-  }
+/* Drawer */
+function openDrawer(){
+  document.getElementById("sideDrawer").classList.add("open");
+  document.getElementById("drawerOverlay").classList.add("show");
 }
-
-loadNews();
+function closeDrawer(){
+  document.getElementById("sideDrawer").classList.remove("open");
+  document.getElementById("drawerOverlay").classList.remove("show");
+}
 </script>
 
 </body>
-</html>
+  </html>
