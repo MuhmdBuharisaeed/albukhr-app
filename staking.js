@@ -1,13 +1,13 @@
 // =======================================
-// ALBUKHR STAKING ENGINE v3.1 (HARDENED)
-// Internal + External + Wallet Compatible
+// ALBUKHR STAKING ENGINE v3.2 (WALLET SAFE)
+// Fully Compatible with Wallet Core v7
 // =======================================
 
 const INTERNAL_KEY = "albukhr_stakes";
 const EXTERNAL_KEY = "albukhr_external_projects";
 
 /* ======================================
-   STORAGE CORE
+   SAFE STORAGE
 ====================================== */
 function _safeParse(key){
   try{
@@ -31,7 +31,8 @@ const PROJECT_RULES = {
   Barsh:{minStake:100},
   Khairat:{minStake:50},
   Urban:{minStake:150},
-  Labbaika:{minStake:30}
+  Labbaika:{minStake:30},
+  Azman:{minStake:50}
 };
 
 function getMinStake(project){
@@ -51,14 +52,15 @@ function getRate(project,duration){
     Khairat:{30:0.025,60:0.05,90:0.09},
     Barsh:{30:0.03,60:0.06,90:0.10},
     Labbaika:{30:0.02,60:0.045,90:0.075},
-    Urban:{30:0.12,60:0.12,90:0.12}
+    Urban:{30:0.12,60:0.12,90:0.12},
+    Azman:{30:0.04,60:0.07,90:0.12}
   };
 
   return table?.[project]?.[d] || 0;
 }
 
 /* ======================================
-   ADD INTERNAL STAKE
+   ADD INTERNAL STAKE (UPDATED)
 ====================================== */
 function addStake({project,amount,duration}){
 
@@ -84,6 +86,11 @@ function addStake({project,amount,duration}){
     amount:safeAmount,
     duration:safeDuration,
     reward:Number(reward)||0,
+
+    // 🔥 IMPORTANT FOR WALLET
+    remainingReward:Number(reward)||0,
+    capitalWithdrawn:false,
+
     status:"Successful",
     timestamp:Date.now(),
     type:"internal"
@@ -94,84 +101,32 @@ function addStake({project,amount,duration}){
 }
 
 /* ======================================
-   EXTERNAL PROJECTS
-====================================== */
-function getExternalProjects(){
-  return _safeParse(EXTERNAL_KEY);
-}
-
-function addExternalStake(data){
-
-  const projects = _safeParse(EXTERNAL_KEY);
-
-  projects.push({
-    id:"EX-"+Date.now(),
-    project:data.project || "External",
-    amount:Number(data.amount)||0,
-    duration:Number(data.duration)||0,
-    reward:Number(data.reward)||0,
-    status:"pending",
-    timestamp:Date.now(),
-    type:"external"
-  });
-
-  _save(EXTERNAL_KEY,projects);
-}
-
-/* OPTIONAL ADMIN APPROVAL */
-function approveExternalStake(id){
-
-  const projects = _safeParse(EXTERNAL_KEY);
-
-  const updated = projects.map(p=>{
-    if(p.id === id){
-      return {...p,status:"approved"};
-    }
-    return p;
-  });
-
-  _save(EXTERNAL_KEY,updated);
-}
-
-/* ======================================
-   MERGED STAKES
+   MERGED STAKES (WALLET SAFE)
 ====================================== */
 function getAllStakesMerged(){
 
   const internal = _safeParse(INTERNAL_KEY)
-    .filter(s=>s.status==="Successful");
+    .filter(s=>s.status==="Successful")
+    .map(s=>({
+      ...s,
+      remainingReward:
+        s.remainingReward ?? s.reward ?? 0,
+      capitalWithdrawn:
+        s.capitalWithdrawn ?? false
+    }));
 
   const external = _safeParse(EXTERNAL_KEY)
     .filter(p=>p.status==="approved")
     .map(p=>({
       ...p,
-      status:"Successful"
+      status:"Successful",
+      remainingReward:
+        p.remainingReward ?? p.reward ?? 0,
+      capitalWithdrawn:false
     }));
 
   return [...internal,...external]
-    .map(s=>({
-      ...s,
-      timestamp:s.timestamp || Date.now()
-    }))
     .sort((a,b)=>b.timestamp - a.timestamp);
-}
-
-/* ======================================
-   TOTALS
-====================================== */
-function getTotals(){
-
-  const all = getAllStakesMerged();
-
-  let totalStake  = 0;
-  let totalReward = 0;
-
-  all.forEach(s=>{
-    totalStake  += Number(s.amount)||0;
-    totalReward += Number(s.reward)||0;
-  });
-
-  return {totalStake,totalReward};
 }
 
 /* ======================================
@@ -194,93 +149,9 @@ function getProjectTotals(project){
 }
 
 /* ======================================
-   DATE FORMAT
-====================================== */
-function formatDateTime(obj){
-
-  const d = new Date(obj?.timestamp || Date.now());
-
-  if(isNaN(d)){
-    return {date:"--",time:"--"};
-  }
-
-  return{
-    date:d.toLocaleDateString("en-GB"),
-    time:d.toLocaleTimeString("en-GB",{
-      hour:"2-digit",
-      minute:"2-digit",
-      second:"2-digit"
-    })
-  };
-}
-
-/* ======================================
    LEGACY WRAPPERS
 ====================================== */
 function getStakes(){ return getAllStakesMerged(); }
-function getInternalTotals(){ return getTotals(); }
+function getInternalTotals(){ return getProjectTotals(); }
 function getInternalProjectTotals(p){ return getProjectTotals(p); }
 function addInternalStake(p){ return addStake(p); }
-
-/* ======================================
-   GET MATURED CAPITAL BY PROJECT
-====================================== */
-function getMaturedCapitalByProject(project){
-
-  const stakes = _safeParse(INTERNAL_KEY);
-
-  let total = 0;
-
-  stakes.forEach(s=>{
-    if(
-      s.project === project &&
-      !s.capitalWithdrawn &&
-      isStakeMatured(s)
-    ){
-      total += Number(s.amount) || 0;
-    }
-  });
-
-  return total;
-}
-
-/* ======================================
-   WITHDRAW ALL MATURED CAPITAL (PROJECT)
-====================================== */
-function withdrawProjectCapital(project){
-
-  const stakes = _safeParse(INTERNAL_KEY);
-
-  let total = 0;
-  let updated = false;
-
-  const newStakes = stakes.map(s=>{
-
-    if(
-      s.project === project &&
-      !s.capitalWithdrawn &&
-      isStakeMatured(s)
-    ){
-      total += Number(s.amount) || 0;
-      updated = true;
-
-      return {
-        ...s,
-        capitalWithdrawn:true
-      };
-    }
-
-    return s;
-  });
-
-  if(!updated){
-    return { error:"No matured capital available" };
-  }
-
-  _save(INTERNAL_KEY,newStakes);
-
-  return {
-    success:true,
-    amount: total
-  };
-}
