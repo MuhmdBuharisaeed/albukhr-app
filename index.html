@@ -572,6 +572,16 @@ body::before{
   color:#777;
   margin-top:6px;
    }
+
+.security-item{
+  margin:8px 0;
+  font-size:13px;
+  font-weight:600;
+}
+
+.security-item input{
+  margin-right:6px;
+}   
 </style>
    
 </head>
@@ -645,6 +655,35 @@ body::before{
     <a href="help.html">Help</a>
   </div>
 
+<hr style="margin:12px 0">
+
+<div class="drawer-title">🔐 Security</div>
+
+<div class="security-item">
+  <label>
+    <input type="checkbox" id="enable2fa">
+    Enable 2FA (PIN)
+  </label>
+</div>
+
+<div class="security-item">
+  <label>
+    <input type="checkbox" id="enableBio">
+    Biometric Login
+  </label>
+</div>
+
+<div class="security-item">
+  <label>
+    <input type="checkbox" id="encryptData">
+    Encrypt Sensitive Data
+  </label>
+</div>
+
+<p style="font-size:11px;color:#777;margin-top:8px">
+Security is enforced to protect your assets and projects.
+</p>   
+   
   <!-- ===============================
        EXTENDED DRAWER CONTENT
   ================================ -->
@@ -839,5 +878,26 @@ function closeDrawer(){
 document.querySelector(".menu-icon").addEventListener("click", openDrawer);
 </script>
 
+<script src="js/security/security-core.js"></script>
+
+<script>
+const sec = getSecurity();
+
+enable2fa.checked = sec.twofa || false;
+encryptData.checked = sec.encrypt || false;
+
+enable2fa.addEventListener("change", e=>{
+  if(e.target.checked){
+    enable2FA();
+  }else{
+    setSecurity({...getSecurity(), twofa:false});
+  }
+});
+
+encryptData.addEventListener("change", e=>{
+  setSecurity({...getSecurity(), encrypt:e.target.checked});
+});
+</script>
+   
 </body>
          </html>
