@@ -227,7 +227,11 @@ function requestWithdraw({project, amount, walletAddress}){
 
   saveWithdrawals(history);
 
-  window.dispatchEvent(new Event("walletUpdated"));
+  window.dispatchEvent(new CustomEvent("walletUpdated", {
+  detail: {
+    type: "reward-withdraw"
+  }
+}));
 
   return {
     success:true,
@@ -285,7 +289,11 @@ function requestCapitalWithdraw(project){
   list.push(tx);
   saveWithdrawals(list);
 
-  window.dispatchEvent(new Event("walletUpdated"));
+  window.dispatchEvent(new CustomEvent("walletUpdated", {
+  detail: {
+    type: "capital-withdraw"
+  }
+}));
 
   return tx;
 }
