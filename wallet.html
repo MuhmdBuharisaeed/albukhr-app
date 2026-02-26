@@ -572,15 +572,63 @@ function closeModal(){
   withdrawModal.style.display="none";
 }
 
+function isSecurityEnabled(){
+  try{
+    const s = JSON.parse(localStorage.getItem("albukhr_security_settings"));
+    return s?.enabled === true;
+  }catch{
+    return false;
+  }
+}
+
+function isValidPiAddress(addr){
+  if(!addr) return false;
+
+  addr = addr.trim();
+
+  if(addr.length < 20) return false;
+  if(!addr.startsWith("G")) return false;
+
+  return true;
+}
+
 function confirmWithdraw(){
 
-  const amt = withdrawAmount.value;
-  const addr = withdrawAddress.value;
+  const amt  = withdrawAmount.value.trim();
+  let addr   = withdrawAddress.value.trim();
+
+  /* ===== AMOUNT VALIDATION ===== */
+
+  if(!amt || Number(amt) <= 0){
+    alert("Enter valid withdraw amount");
+    return;
+  }
+
+  /* ===== SECURITY MODE CHECK ===== */
+
+  if(isSecurityEnabled()){
+
+    /* Security ON → address mandatory */
+    if(!isValidPiAddress(addr)){
+      alert("Valid Pi wallet address required");
+      return;
+    }
+
+  }else{
+
+    /* Security OFF → default to internal wallet */
+    if(!addr){
+      addr = "Internal Wallet";
+    }
+
+  }
+
+  /* ===== PROCESS WITHDRAW ===== */
 
   const res = requestWithdraw({
-    project:activeProject,
-    amount:amt,
-    walletAddress:addr
+    project: activeProject,
+    amount: amt,
+    walletAddress: addr
   });
 
   if(res.error){
@@ -592,7 +640,7 @@ function confirmWithdraw(){
   withdrawAddress.value="";
   closeModal();
   renderWallet();
-}
+  }
   
 function withdrawCapitalAction(project){
 
