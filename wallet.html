@@ -333,53 +333,6 @@ body{
 .bottom-nav a:hover span{
   transform:translateY(-2px);
 }
-
-/* ===============================
-   ALBUKHR SUCCESS GLOW
-================================ */
-
-#withdrawSuccessBox{
-  display:none;
-  margin:12px 16px;
-  padding:14px;
-  border-radius:14px;
-
-  background:linear-gradient(135deg,#e9f9ef,#ffffff);
-  color:#0f7a3d;
-
-  font-size:13px;
-  font-weight:700;
-
-  box-shadow:
-    0 0 0 rgba(15,122,61,0),
-    0 6px 20px rgba(15,122,61,0.15);
-
-  transition:all .4s ease;
-}
-
-/* Active animation */
-#withdrawSuccessBox.show{
-  display:block;
-  animation:successGlow .8s ease forwards;
-}
-
-@keyframes successGlow{
-  0%{
-    opacity:0;
-    transform:scale(.95);
-    box-shadow:0 0 0 rgba(15,122,61,0);
-  }
-  50%{
-    opacity:1;
-    transform:scale(1.03);
-    box-shadow:0 0 25px rgba(15,122,61,0.45);
-  }
-  100%{
-    opacity:1;
-    transform:scale(1);
-    box-shadow:0 0 15px rgba(15,122,61,0.25);
-  }
-  }
   
 </style>
 </head>
@@ -816,16 +769,16 @@ window.addEventListener("walletUpdated", function(e){
 
 function showWithdrawSuccess(){
 
-  withdrawSuccessBox.classList.add("show");
+  withdrawSuccessBox.style.display = "block";
   withdrawSuccessBox.textContent = "Withdraw Successful ✓";
 
+  /* Auto hide after 4 seconds */
   setTimeout(()=>{
-    withdrawSuccessBox.classList.remove("show");
     withdrawSuccessBox.style.display = "none";
   },4000);
-  }
+}
 
 </script>
   
 </body>
-    </html>
+  </html>
