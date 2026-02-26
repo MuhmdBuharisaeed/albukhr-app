@@ -574,8 +574,6 @@ function closeModal(){
 
 function confirmWithdraw(){
 
-window.dispatchEvent(new Event("walletUpdated"));
-  
   const amt = withdrawAmount.value;
   const addr = withdrawAddress.value;
 
@@ -594,8 +592,8 @@ window.dispatchEvent(new Event("walletUpdated"));
   withdrawAddress.value="";
   closeModal();
   renderWallet();
-}
-
+  }
+  
 function withdrawCapitalAction(project){
 
   const res = requestCapitalWithdraw(project);
