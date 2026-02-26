@@ -3,65 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALBUKHR Admin Login</title>
+<title>ALBUKHR Admin Access</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
 body{
-  background:#f4faf6;
+  margin:0;
   font-family:system-ui;
+  background:linear-gradient(135deg,#f4fff8,#ffffff);
 }
+
+/* ===== ECOSYSTEM HEADER ===== */
+.header{
+  background:#0f7a3d;
+  height:60px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+}
+.main-logo{
+  height:50px;
+}
+
+/* ===== LOGIN SECTION ===== */
 .login-wrap{
-  min-height:100vh;
+  min-height:calc(100vh - 60px);
   display:flex;
   align-items:center;
   justify-content:center;
   padding:16px;
 }
+
 .login-card{
   width:100%;
   max-width:380px;
   background:#fff;
   border-radius:18px;
-  padding:22px;
+  padding:24px;
   box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
+
 .brand{
   text-align:center;
-  font-size:18px;
+  font-size:16px;
   font-weight:700;
   color:#0f7a3d;
   margin-bottom:6px;
 }
+
 .subtitle{
   text-align:center;
   font-size:12px;
   color:#666;
-  margin-bottom:20px;
+  margin-bottom:22px;
 }
+
 .form-group{
-  margin-bottom:14px;
+  margin-bottom:16px;
 }
+
 .form-group label{
   display:block;
   font-size:12px;
   font-weight:600;
   margin-bottom:6px;
 }
+
 .form-group input,
 .form-group select{
   width:100%;
   padding:12px;
   border-radius:12px;
-  border:1px solid #cceedd;
+  border:1px solid #dfeee7;
   font-size:14px;
   outline:none;
 }
+
 .form-group input:focus,
 .form-group select:focus{
   border-color:#0f7a3d;
 }
+
 .login-btn{
   width:100%;
   padding:12px;
@@ -72,7 +95,13 @@ body{
   font-weight:700;
   font-size:14px;
   cursor:pointer;
+  transition:.2s ease;
 }
+
+.login-btn:hover{
+  background:#0c5f2f;
+}
+
 .note{
   margin-top:14px;
   font-size:11px;
@@ -84,11 +113,16 @@ body{
 
 <body>
 
+<!-- ===== HEADER (Like Unified Admin) ===== -->
+<header class="header">
+  <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
+</header>
+
 <div class="login-wrap">
   <div class="login-card">
 
-    <div class="brand">ALBUKHR • Admin</div>
-    <div class="subtitle">Secure role-based access</div>
+    <div class="brand">ALBUKHR • Admin Portal</div>
+    <div class="subtitle">Role-based ecosystem access</div>
 
     <div class="form-group">
       <label>Admin Role</label>
@@ -102,21 +136,22 @@ body{
 
     <div class="form-group">
       <label>Access Key</label>
-      <input id="key" type="password" placeholder="Enter access key">
+      <input id="key" type="password" placeholder="Enter secure access key">
     </div>
 
-    <button class="login-btn" onclick="login()">Login</button>
+    <button class="login-btn" onclick="login()">Access Control Center</button>
 
     <div class="note">
-      Unauthorized access is prohibited.
+      Unauthorized access is strictly prohibited.
     </div>
 
   </div>
 </div>
 
 <script src="admin-auth.js"></script>
+
 <script>
-/* KEYS – demo only, replace with backend validation later */
+/* Demo Keys – move to backend in production */
 const KEYS = {
   super_admin: "5194Bhr@",
   finance_admin: "5194Bhr@",
@@ -125,39 +160,25 @@ const KEYS = {
 };
 
 function login(){
+
   const role = document.getElementById("role").value;
-  const key = document.getElementById("key").value.trim();
+  const key  = document.getElementById("key").value.trim();
 
   if(KEYS[role] !== key){
     alert("❌ Invalid admin credentials");
     return;
   }
 
-  // Login using new session engine
+  /* Start Session */
   const success = adminLogin("admin", role, "ALBUKHR_CORE_2026");
 
   if(!success){
-    alert("❌ Unable to login. Invalid core key.");
+    alert("❌ Core authentication failed");
     return;
   }
 
-  // Redirect based on role
-  switch(role){
-    case "super_admin":
-      window.location.href = "unified-admin-buttons.html";
-      break;
-    case "finance_admin":
-      window.location.href = "admin-transactions.html";
-      break;
-    case "review_admin":
-      window.location.href = "admin-review.html";
-      break;
-    case "viewer_admin":
-      window.location.href = "unified-admin-buttons.html";
-      break;
-    default:
-      window.location.href = "unified-admin-buttons.html";
-  }
+  /* ALL roles enter unified control center */
+  window.location.href = "unified-admin-buttons.html";
 }
 </script>
 
