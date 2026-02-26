@@ -664,6 +664,22 @@ function confirmWithdraw(){
     return;
   }
 
+  const amt  = withdrawAmount.value.trim();
+  const addr = withdrawAddress.value.trim();
+
+  /* ===== AMOUNT VALIDATION ===== */
+  if(!amt || Number(amt) <= 0){
+    alert("Enter valid withdraw amount");
+    return;
+  }
+
+  /* ===== ADDRESS IS NOW ALWAYS REQUIRED ===== */
+  if(!isValidPiAddress(addr)){
+    alert("Valid Pi wallet address required");
+    return;
+  }
+
+  /* ===== SECURITY PIN CHECK ===== */
   const security = getSecurity();
 
   if(security.enabled && security.twofa){
@@ -671,40 +687,8 @@ function confirmWithdraw(){
       return;
     }
   }
-  
-function confirmWithdraw(){
-
-  const amt  = withdrawAmount.value.trim();
-  let addr   = withdrawAddress.value.trim();
-
-  /* ===== AMOUNT VALIDATION ===== */
-
-  if(!amt || Number(amt) <= 0){
-    alert("Enter valid withdraw amount");
-    return;
-  }
-
-  /* ===== SECURITY MODE CHECK ===== */
-
-  if(isSecurityEnabled()){
-
-    /* Security ON → address mandatory */
-    if(!isValidPiAddress(addr)){
-      alert("Valid Pi wallet address required");
-      return;
-    }
-
-  }else{
-
-    /* Security OFF → default to internal wallet */
-    if(!addr){
-      addr = "Internal Wallet";
-    }
-
-  }
 
   /* ===== PROCESS WITHDRAW ===== */
-
   const res = requestWithdraw({
     project: activeProject,
     amount: amt,
@@ -720,7 +704,7 @@ function confirmWithdraw(){
   withdrawAddress.value="";
   closeModal();
   renderWallet();
-  }
+}
   
 function withdrawCapitalAction(project){
 
