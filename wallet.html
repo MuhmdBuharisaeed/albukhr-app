@@ -572,6 +572,71 @@ function closeModal(){
   withdrawModal.style.display="none";
 }
 
+/* ===============================
+   SECURITY PIN ENGINE
+================================ */
+
+const PIN_KEY = "albukhr_wallet_pin";
+const LOCK_KEY = "albukhr_wallet_lock";
+
+function getSecurity(){
+  try{
+    return JSON.parse(localStorage.getItem("albukhr_security_settings")) || {};
+  }catch{
+    return {};
+  }
+}
+
+function isLocked(){
+  const lockUntil = Number(localStorage.getItem(LOCK_KEY));
+  if(!lockUntil) return false;
+
+  if(Date.now() > lockUntil){
+    localStorage.removeItem(LOCK_KEY);
+    return false;
+  }
+
+  return true;
+}
+
+function lockWallet(seconds=30){
+  localStorage.setItem(LOCK_KEY, Date.now() + (seconds*1000));
+}
+
+function setPin(pin){
+  localStorage.setItem(PIN_KEY, pin);
+}
+
+function verifyPin(){
+  const saved = localStorage.getItem(PIN_KEY);
+  if(!saved){
+    alert("No PIN set. Set PIN in Security Settings.");
+    return false;
+  }
+
+  const input = prompt("Enter Wallet PIN:");
+  if(!input) return false;
+
+  if(input === saved){
+    return true;
+  }
+
+  // failed attempt logic
+  let attempts = Number(localStorage.getItem("albukhr_pin_attempts") || 0);
+  attempts++;
+  localStorage.setItem("albukhr_pin_attempts", attempts);
+
+  if(attempts >= 3){
+    lockWallet(30);
+    localStorage.removeItem("albukhr_pin_attempts");
+    alert("Too many failed attempts. Wallet locked for 30 seconds.");
+  }else{
+    alert("Incorrect PIN");
+  }
+
+  return false;
+    }
+  
 function isSecurityEnabled(){
   try{
     const s = JSON.parse(localStorage.getItem("albukhr_security_settings"));
@@ -592,6 +657,21 @@ function isValidPiAddress(addr){
   return true;
 }
 
+function confirmWithdraw(){
+
+  if(isLocked()){
+    alert("Wallet temporarily locked. Try again later.");
+    return;
+  }
+
+  const security = getSecurity();
+
+  if(security.enabled && security.twofa){
+    if(!verifyPin()){
+      return;
+    }
+  }
+  
 function confirmWithdraw(){
 
   const amt  = withdrawAmount.value.trim();
