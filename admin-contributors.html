@@ -67,6 +67,7 @@ const box = document.getElementById("list");
 function getList(){
   return JSON.parse(localStorage.getItem(KEY)) || [];
 }
+
 function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
@@ -157,7 +158,6 @@ function setStatus(index,status){
 
   list[index].status = status;
 
-  // DO NOT auto unlock anything
   if(status === "approved"){
     list[index].telegramUnlocked = false;
     list[index].internalUnlocked = false;
@@ -167,22 +167,46 @@ function setStatus(index,status){
   render();
 }
 
+/* ==============================
+   TELEGRAM UNLOCK
+================================ */
 function unlockTelegram(index){
   const list = getList();
+
+  if(list[index].status !== "approved"){
+    alert("Contributor must be approved first");
+    return;
+  }
+
   list[index].telegramUnlocked = true;
   saveList(list);
   render();
 }
 
+/* ==============================
+   INTERNAL UNLOCK (REAL ACCESS)
+================================ */
 function unlockInternal(index){
   const list = getList();
+
+  if(list[index].status !== "approved"){
+    alert("Contributor must be approved first");
+    return;
+  }
+
   list[index].internalUnlocked = true;
+
+  /* 🔐 Grant real internal access */
+  localStorage.setItem("albukhr_internal_access", "granted");
+
   saveList(list);
   render();
+
+  alert("Internal project creation access granted.");
 }
 
 render();
-</script>
+      </script>
   
 </body>
 </html>
