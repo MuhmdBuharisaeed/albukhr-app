@@ -341,61 +341,127 @@ checkInternalAccess();
     </script>
 
 <script>
-/* ===============================
-   INTERNAL ACCESS GATE
-================================ */
+/* =========================================
+   ALBUKHR INTERNAL REGISTRY – ACCESS GATE
+========================================= */
 
 const CONTRIB_KEY = "albukhr_contributors";
+const STORAGE_KEY = "albukhr_internal_projects";
 
+/* ===============================
+   GET CURRENT SESSION EMAIL
+=============================== */
+function getCurrentEmail(){
+  return localStorage.getItem("albukhr_current_email");
+}
+
+/* ===============================
+   GET CONTRIBUTORS
+=============================== */
 function getContributors(){
   return JSON.parse(localStorage.getItem(CONTRIB_KEY)) || [];
 }
 
-/* Get current user email from session */
-function getCurrentContributorEmail(){
-  return localStorage.getItem("albukhr_current_contributor_email");
-}
-
+/* ===============================
+   ACCESS CONTROL
+=============================== */
 function checkInternalAccess(){
 
-  const email = localStorage.getItem("albukhr_current_email");
+  const email = getCurrentEmail();
+
   if(!email){
-    alert("Login required");
-    window.location.href = "submit-albukhrecosystem-form.html";
+    redirectOut("Login required.");
     return false;
   }
 
-  const list = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
+  const list = getContributors();
 
   const record = list.find(r => r.email === email);
 
-  if(!record || record.status !== "approved" || !record.internalUnlocked){
-    alert("Access Restricted\nYou are not authorized for Internal Registry.");
-    window.location.href = "submit-albukhrecosystem-form.html";
+  if(!record){
+    redirectOut("Contributor record not found.");
     return false;
+  }
+
+  if(record.status !== "approved"){
+    redirectOut("Your contributor account is not approved.");
+    return false;
+  }
+
+  if(record.internalUnlocked !== true){
+    redirectOut("Internal registry access not unlocked by admin.");
+    return false;
+  }
+
+  /* Auto-fill email field */
+  const emailField = document.getElementById("email");
+  if(emailField){
+    emailField.value = email;
+    emailField.readOnly = true;
   }
 
   return true;
 }
 
-checkInternalAccess();
-  
-  /* Must be approved AND internalUnlocked */
-  if(record.status !== "approved" || record.internalUnlocked !== true){
-    redirectOut();
-    return;
-  }
-
-  /* Access granted */
-  console.log("Internal Access Granted");
-}
-
-function redirectOut(){
-  alert("⛔ Access Restricted\nYou are not authorized for Internal Registry.");
+/* ===============================
+   REDIRECT HANDLER
+=============================== */
+function redirectOut(message){
+  alert("⛔ Access Restricted\n" + message);
   window.location.href = "submit-albukhrecosystem-form.html";
 }
 
-checkInternalAccess();
+/* ===============================
+   INTERNAL SUBMISSION LOCK
+=============================== */
+function getInternalList(){
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+}
+
+function getLastEntry(){
+  const list = getInternalList();
+  return list[list.length - 1];
+}
+
+function checkSubmissionLock(){
+
+  const last = getLastEntry();
+  if(!last) return;
+
+  const btn = document.getElementById("submitBtn");
+  const notice = document.getElementById("doneNotice");
+
+  if(last.status === "internal_pending"){
+    btn.classList.add("disabled");
+    notice.style.display = "block";
+    notice.innerHTML =
+      "⏳ Your previous internal project is under review.";
+    return;
+  }
+
+  if(last.status === "internal_approved"){
+    const unlockAt = last.approvedAt + (7 * 24 * 60 * 60 * 1000);
+
+    if(Date.now() < unlockAt){
+      btn.classList.add("disabled");
+      notice.style.display = "block";
+      notice.innerHTML =
+        "🔒 Approved project locked. You can submit a new one after 7 days.";
+      return;
+    }
+  }
+
+  if(last.status === "internal_rejected"){
+    btn.classList.remove("disabled");
+  }
+}
+
+/* ===============================
+   INIT
+=============================== */
+if(checkInternalAccess()){
+  checkSubmissionLock();
+}
 </script>
   
 </body>
