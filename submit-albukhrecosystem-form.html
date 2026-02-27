@@ -140,6 +140,13 @@ Join Albukhr Ecosystem Telegram Group
 </a>
 </div>
 
+<div class="telegram" id="internalBox" style="display:none">
+  🏗️ Internal Project Access Granted<br>
+  <a href="internal-registry-form.html">
+    Create Internal Albukhr Project →
+  </a>
+</div>
+  
 </section>
 
 <script>
@@ -171,9 +178,18 @@ function checkStatus(){
     document.getElementById("pendingNotice").style.display = "block";
   }
 
-  if(record.status === "approved" && record.telegramUnlocked){
+  if(record.status === "approved"){
+
     btn.classList.add("disabled");
-    document.getElementById("telegramBox").style.display = "block";
+
+    if(record.telegramUnlocked){
+      document.getElementById("telegramBox").style.display = "block";
+    }
+
+    /* 🔐 NEW: Internal registry unlock */
+    if(record.internalUnlocked === true){
+      document.getElementById("internalBox").style.display = "block";
+    }
   }
 
   if(record.status === "rejected"){
