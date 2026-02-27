@@ -183,6 +183,9 @@ Join Albukhr Ecosystem Telegram Group
 <script>
 const KEY = "albukhr_contributors";
 
+/* ==========================
+   STORAGE
+========================== */
 function getList(){
   return JSON.parse(localStorage.getItem(KEY)) || [];
 }
@@ -191,9 +194,17 @@ function saveList(l){
 }
 
 /* ==========================
+   SESSION HANDLER
+========================== */
+function setSession(email){
+  localStorage.setItem("albukhr_current_email", email);
+}
+
+/* ==========================
    CHECK CURRENT USER STATUS
 ========================== */
 function checkStatus(){
+
   const email = document.getElementById("email")?.value.trim();
   if(!email) return;
 
@@ -204,23 +215,33 @@ function checkStatus(){
 
   const btn = document.getElementById("submitBtn");
 
+  /* RESET VISIBILITY */
+  document.getElementById("pendingNotice").style.display = "none";
+  document.getElementById("telegramBox").style.display = "none";
+  document.getElementById("internalBox").style.display = "none";
+
   if(record.status === "pending"){
     btn.classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
+    return;
   }
 
   if(record.status === "approved"){
 
     btn.classList.add("disabled");
 
-    if(record.telegramUnlocked){
+    /* STORE SESSION */
+    setSession(record.email);
+
+    if(record.telegramUnlocked === true){
       document.getElementById("telegramBox").style.display = "block";
     }
 
-    /* 🔐 NEW: Internal registry unlock */
     if(record.internalUnlocked === true){
       document.getElementById("internalBox").style.display = "block";
     }
+
+    return;
   }
 
   if(record.status === "rejected"){
@@ -232,6 +253,7 @@ function checkStatus(){
    SUBMIT FUNCTION
 ========================== */
 function submitContributor(){
+
   const f = id => document.getElementById(id);
 
   if(
@@ -253,24 +275,22 @@ function submitContributor(){
   }
 
   const list = getList();
+  const email = f("email").value.trim();
 
-  if(list.some(r => r.email === f("email").value && r.status === "pending")){
+  if(list.some(r => r.email === email && r.status === "pending")){
     alert("⏳ You already have a pending submission.");
     checkStatus();
     return;
   }
 
-if(record.status === "approved" && record.internalUnlocked){
-   // show internal registry link
-}
-  
   const reader = new FileReader();
+
   reader.onload = ()=>{
     const data = {
       id:"CONTRIB-"+Date.now(),
       fullName:f("fullName").value.trim(),
       phone:f("phone").value.trim(),
-      email:f("email").value.trim(),
+      email:email,
       address:f("address").value.trim(),
       country:f("country").value.trim(),
       skills:f("skills").value.trim(),
@@ -279,6 +299,7 @@ if(record.status === "approved" && record.internalUnlocked){
       photo:reader.result,
       status:"pending",
       telegramUnlocked:false,
+      internalUnlocked:false,
       createdAt:Date.now()
     };
 
@@ -294,8 +315,9 @@ if(record.status === "approved" && record.internalUnlocked){
   reader.readAsDataURL(f("photo").files[0]);
 }
 
-/* auto check when email entered */
-document.getElementById("email").addEventListener("blur", checkStatus);
+/* AUTO CHECK WHEN EMAIL ENTERED */
+document.getElementById("email")
+  .addEventListener("blur", checkStatus);
 </script>
 
 </body>
