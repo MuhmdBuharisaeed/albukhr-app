@@ -81,6 +81,15 @@ function render(){
   }
 
   list.forEach((c,i)=>{
+
+    const telegramStatus = c.telegramUnlocked
+      ? "<span style='color:#0f7a3d;font-weight:700'>Telegram: Unlocked</span>"
+      : "<span style='color:#b02a37;font-weight:700'>Telegram: Locked</span>";
+
+    const internalStatus = c.internalUnlocked
+      ? "<span style='color:#0f7a3d;font-weight:700'>Internal: Unlocked</span>"
+      : "<span style='color:#b02a37;font-weight:700'>Internal: Locked</span>";
+
     box.innerHTML += `
       <div class="card">
         <strong>${c.fullName}</strong>
@@ -99,7 +108,13 @@ function render(){
           <b>Contribution:</b><br>${c.contribution}
         </div>
 
+        <div style="margin-top:10px;font-size:12px">
+          ${telegramStatus}<br>
+          ${internalStatus}
+        </div>
+
         <div style="margin-top:12px">
+
           ${
             c.status === "pending"
             ? `
@@ -114,6 +129,21 @@ function render(){
             ? `<span class="approved">✓ Approved</span>`
             : `<span class="rejected">✗ Rejected</span>`
           }
+
+          ${
+            c.status === "approved"
+            ? `
+              <button onclick="unlockTelegram(${i})">
+                🔓 Unlock Telegram
+              </button>
+
+              <button onclick="unlockInternal(${i})">
+                🏗 Unlock Internal
+              </button>
+            `
+            : ""
+          }
+
         </div>
       </div>
     `;
@@ -122,20 +152,37 @@ function render(){
 
 function setStatus(index,status){
   const list = getList();
+
   if(list[index].status !== "pending") return;
 
   list[index].status = status;
 
+  // DO NOT auto unlock anything
   if(status === "approved"){
-    list[index].telegramUnlocked = true;
+    list[index].telegramUnlocked = false;
+    list[index].internalUnlocked = false;
   }
 
   saveList(list);
   render();
 }
 
+function unlockTelegram(index){
+  const list = getList();
+  list[index].telegramUnlocked = true;
+  saveList(list);
+  render();
+}
+
+function unlockInternal(index){
+  const list = getList();
+  list[index].internalUnlocked = true;
+  saveList(list);
+  render();
+}
+
 render();
 </script>
-
+  
 </body>
 </html>
