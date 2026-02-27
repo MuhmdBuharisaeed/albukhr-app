@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ALBUKHR Admin – Contributors</title>
+
+<style>
+body{font-family:system-ui;background:#f4f7f6;margin:0}
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px
+}
+.header{
+  padding:14px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:800
+}
+.meta{font-size:12px;color:#555;margin-top:6px}
+.desc{
+  font-size:13px;
+  margin-top:8px;
+  background:#f6fbf8;
+  padding:10px;
+  border-radius:10px;
+  line-height:1.6
+}
+img.photo{
+  width:90px;
+  height:90px;
+  border-radius:12px;
+  object-fit:cover;
+  border:1px solid #ddd;
+  margin-top:8px
+}
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  font-size:12px;
+  cursor:pointer;
+  margin-right:6px
+}
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#eee;color:#333}
+.disabled{opacity:.6;pointer-events:none}
+.approved{color:#0f7a3d;font-weight:800}
+.rejected{color:#b02a37;font-weight:800}
+.empty{text-align:center;color:#777;padding:20px}
+</style>
+</head>
+
+<body>
+
+<div class="header">ALBUKHR • Admin Contributor Panel</div>
+
+<section class="section" id="list"></section>
+
+<script>
+const KEY = "albukhr_contributors";
+const box = document.getElementById("list");
+
+function getList(){
+  return JSON.parse(localStorage.getItem(KEY)) || [];
+}
+function saveList(l){
+  localStorage.setItem(KEY, JSON.stringify(l));
+}
+
+function render(){
+  const list = getList();
+  box.innerHTML = "";
+
+  if(list.length === 0){
+    box.innerHTML = "<div class='empty'>No contributors yet</div>";
+    return;
+  }
+
+  list.forEach((c,i)=>{
+    box.innerHTML += `
+      <div class="card">
+        <strong>${c.fullName}</strong>
+
+        <div class="meta">
+          📧 ${c.email}<br>
+          📞 ${c.phone}<br>
+          🌍 ${c.country || "—"}
+        </div>
+
+        <img src="${c.photo}" class="photo">
+
+        <div class="desc">
+          <b>Skills:</b> ${c.skills}<br><br>
+          <b>Experience:</b><br>${c.experience || "—"}<br><br>
+          <b>Contribution:</b><br>${c.contribution}
+        </div>
+
+        <div style="margin-top:12px">
+          ${
+            c.status === "pending"
+            ? `
+              <button class="approve" onclick="setStatus(${i},'approved')">
+                Approve
+              </button>
+              <button class="reject" onclick="setStatus(${i},'rejected')">
+                Reject
+              </button>
+            `
+            : c.status === "approved"
+            ? `<span class="approved">✓ Approved</span>`
+            : `<span class="rejected">✗ Rejected</span>`
+          }
+        </div>
+      </div>
+    `;
+  });
+}
+
+function setStatus(index,status){
+  const list = getList();
+  if(list[index].status !== "pending") return;
+
+  list[index].status = status;
+
+  if(status === "approved"){
+    list[index].telegramUnlocked = true;
+  }
+
+  saveList(list);
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
