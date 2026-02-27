@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR – Internal Access</title>
+
+<style>
+body{
+  background:#f4f7f5;
+  font-family:system-ui;
+  margin:0
+}
+.container{
+  max-width:420px;
+  margin:60px auto;
+  padding:16px
+}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:20px
+}
+h3{margin-top:0}
+
+.input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:14px
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#0f7a3d;
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  margin-top:16px
+}
+
+.notice{
+  font-size:13px;
+  margin-top:12px;
+  padding:12px;
+  background:#fdecea;
+  border-left:4px solid #b00020;
+  display:none
+}
+
+.tip{
+  font-size:12px;
+  color:#555;
+  margin-top:10px
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="card">
+    <h3>🔐 Internal Project Access</h3>
+    <p style="font-size:13px">
+      This area is restricted to ALBUKHR internal stakeholders.
+    </p>
+
+    <input class="input" id="accessId"
+      placeholder="Enter Internal Access ID">
+
+    <button class="btn" onclick="verifyAccess()">
+      Verify & Continue
+    </button>
+
+    <div class="notice" id="errorBox">
+      ❌ Invalid or unauthorized access ID
+    </div>
+
+    <div class="tip">
+      Access ID is issued by ALBUKHR admin only.
+    </div>
+  </div>
+</div>
+
+<script src="internal-registry.js"></script>
+
+<script src="admin-auth.js"></script>
+<script>
+requireRole(["super_admin","internal_admin"]);
+</script>
+  
+<script>
+function verifyAccess(){
+  const id = document.getElementById("accessId").value.trim();
+  const error = document.getElementById("errorBox");
+
+  if(!id){
+    error.style.display="block";
+    error.innerText="❌ Please enter your access ID";
+    return;
+  }
+
+  const list = getInternalProjects();
+
+  const valid = list.some(p =>
+    p.internalAccessIds &&
+    p.internalAccessIds.includes(id)
+  );
+
+  if(valid){
+    sessionStorage.setItem("albukhr_internal_access","true");
+    location.href = "internal-project-dashboard.html";
+  }else{
+    error.style.display="block";
+  }
+}
+</script>
+
+</body>
+</html>
