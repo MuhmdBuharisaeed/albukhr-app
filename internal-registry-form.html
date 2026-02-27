@@ -186,6 +186,20 @@ Register Internal Project
 <script src="internal-registry.js"></script>
 
 <script>
+const email = prompt("Enter your approved email:");
+const list = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
+
+const record = list.find(r =>
+  r.email === email &&
+  r.status === "approved" &&
+  r.internalUnlocked === true
+);
+
+if(!record){
+  alert("Access Restricted");
+  window.location.href = "index.html";
+}  
+  
 const STORAGE_KEY = "albukhr_internal_projects";
 
 function getInternalList(){
