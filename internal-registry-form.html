@@ -358,21 +358,28 @@ function getCurrentContributorEmail(){
 
 function checkInternalAccess(){
 
-  const email = getCurrentContributorEmail();
-
+  const email = localStorage.getItem("albukhr_current_email");
   if(!email){
-    redirectOut();
-    return;
+    alert("Login required");
+    window.location.href = "submit-albukhrecosystem-form.html";
+    return false;
   }
 
-  const list = getContributors();
-  const record = list.find(c => c.email === email);
+  const list = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
 
-  if(!record){
-    redirectOut();
-    return;
+  const record = list.find(r => r.email === email);
+
+  if(!record || record.status !== "approved" || !record.internalUnlocked){
+    alert("Access Restricted\nYou are not authorized for Internal Registry.");
+    window.location.href = "submit-albukhrecosystem-form.html";
+    return false;
   }
 
+  return true;
+}
+
+checkInternalAccess();
+  
   /* Must be approved AND internalUnlocked */
   if(record.status !== "approved" || record.internalUnlocked !== true){
     redirectOut();
