@@ -229,6 +229,10 @@ function submitContributor(){
     return;
   }
 
+if(record.status === "approved" && record.internalUnlocked){
+   // show internal registry link
+}
+  
   const reader = new FileReader();
   reader.onload = ()=>{
     const data = {
