@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR – Internal Project Dashboard</title>
+
+<style>
+body{
+  background:#f4f7f5;
+  font-family:system-ui;
+  margin:0;
+}
+.section{padding:16px}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px
+}
+h3,h4{margin:4px 0}
+small{color:#555;font-size:12px}
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  font-size:11px;
+  border-radius:20px;
+  font-weight:700
+}
+.pending{background:#fff4cc;color:#8a6d00}
+.approved{background:#e6f7ee;color:#0f7a3d}
+.rejected{background:#fdecea;color:#b00020}
+
+.stage{
+  font-size:11px;
+  background:#444;
+  color:#fff;
+  padding:4px 8px;
+  border-radius:6px;
+  display:inline-block;
+  margin-left:6px
+}
+.lock{
+  font-size:12px;
+  color:#b00020;
+  margin-top:6px
+}
+</style>
+</head>
+
+<body>
+
+<section class="section">
+  <h3>📊 Internal Project Dashboard</h3>
+  <p style="font-size:13px">
+    Read-only overview of all ALBUKHR internal projects
+  </p>
+
+  <div id="dashboard"></div>
+</section>
+
+<script src="internal-registry.js"></script>
+
+<script>
+const container = document.getElementById("dashboard");
+
+function daysLeft(approvedAt){
+  const limit = 7 * 24 * 60 * 60 * 1000;
+  const diff = limit - (Date.now() - approvedAt);
+  return Math.ceil(diff / (24 * 60 * 60 * 1000));
+}
+
+function renderDashboard(){
+  const list = getInternalProjects();
+  container.innerHTML = "";
+
+  if(!list.length){
+    container.innerHTML = "<p>No internal projects available.</p>";
+    return;
+  }
+
+  list.slice().reverse().forEach(p=>{
+    let badge = "pending";
+    let badgeText = "Pending Review";
+    let lockInfo = "";
+
+    if(p.status === "internal_approved"){
+      badge = "approved";
+      badgeText = "Approved";
+
+      if(p.approvedAt){
+        const left = daysLeft(p.approvedAt);
+        if(left > 0){
+          lockInfo = `
+            <div class="lock">
+              🔒 Locked for ${left} day(s)
+            </div>`;
+        }
+      }
+    }
+
+    if(p.status === "internal_rejected"){
+      badge = "rejected";
+      badgeText = "Rejected";
+    }
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <h4>${p.projectName}</h4>
+      <small>
+        ${p.category}
+        <span class="stage">${p.stage || "Concept"}</span>
+      </small>
+      <br><br>
+
+      <span class="badge ${badge}">
+        ${badgeText}
+      </span>
+
+      ${lockInfo}
+
+      <p style="font-size:13px;margin-top:10px">
+        <b>Owner:</b> ${p.creatorName} (${p.role})<br>
+        <b>Internal ID:</b> ${p.internalId}<br>
+        <b>Risk:</b> ${p.risk || "N/A"}<br>
+        <b>Confidentiality:</b> ${p.confidentiality || "N/A"}
+      </p>
+
+      <details>
+        <summary style="cursor:pointer;font-size:12px">
+          View project details
+        </summary>
+        <p><b>Summary:</b><br>${p.summary}</p>
+        <p><b>Problem:</b><br>${p.problem}</p>
+        <p><b>Solution:</b><br>${p.solution}</p>
+        <p><b>Impact:</b><br>${p.impact || "-"}</p>
+      </details>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+renderDashboard();
+</script>
+
+</body>
+</html>
