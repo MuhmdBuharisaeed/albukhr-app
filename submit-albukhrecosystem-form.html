@@ -206,19 +206,20 @@ function setSession(email){
 function checkStatus(){
 
   const email = document.getElementById("email")?.value.trim();
+  const btn = document.getElementById("submitBtn");
+
+  /* Always reset first */
+  btn.classList.remove("disabled");
+  document.getElementById("pendingNotice").style.display = "none";
+  document.getElementById("telegramBox").style.display = "none";
+  document.getElementById("internalBox").style.display = "none";
+
   if(!email) return;
 
   const list = getList();
   const record = list.find(r => r.email === email);
 
   if(!record) return;
-
-  const btn = document.getElementById("submitBtn");
-
-  /* RESET VISIBILITY */
-  document.getElementById("pendingNotice").style.display = "none";
-  document.getElementById("telegramBox").style.display = "none";
-  document.getElementById("internalBox").style.display = "none";
 
   if(record.status === "pending"){
     btn.classList.add("disabled");
@@ -227,17 +228,15 @@ function checkStatus(){
   }
 
   if(record.status === "approved"){
-
     btn.classList.add("disabled");
 
-    /* STORE SESSION */
-    setSession(record.email);
+    localStorage.setItem("albukhr_current_email", record.email);
 
-    if(record.telegramUnlocked === true){
+    if(record.telegramUnlocked){
       document.getElementById("telegramBox").style.display = "block";
     }
 
-    if(record.internalUnlocked === true){
+    if(record.internalUnlocked){
       document.getElementById("internalBox").style.display = "block";
     }
 
@@ -247,7 +246,7 @@ function checkStatus(){
   if(record.status === "rejected"){
     btn.classList.remove("disabled");
   }
-}
+  }
 
 /* ==========================
    SUBMIT FUNCTION
