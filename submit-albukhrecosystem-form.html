@@ -173,7 +173,7 @@ Join Albukhr Ecosystem Telegram Group
 
 <div class="telegram" id="internalBox" style="display:none">
   🏗️ Internal Project Access Granted<br>
-  <a href="#" onclick="openInternalSecure()">
+  <a href="#" onclick="openInternal()">
   Create Internal Albukhr Project →
   </a>
 </div>
@@ -282,66 +282,6 @@ function openInternal(){
 
   if(!record) return;
 
-function generateDeviceHash(){
-  const raw =
-    navigator.userAgent +
-    screen.width +
-    screen.height +
-    Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  return btoa(raw).slice(0,25);
-}
-
-function generateSecureToken(){
-  return "ALB-CORE-" + Date.now() + "-" +
-         Math.random().toString(36).substring(2,10);
-}
-
-function openInternalSecure(){
-
-  const email = localStorage.getItem("albukhr_current_email");
-  if(!email){
-    alert("Session invalid");
-    return;
-  }
-
-  const list = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
-
-  const record = list.find(r =>
-    r.email?.toLowerCase() === email.toLowerCase()
-  );
-
-  if(!record ||
-     record.status !== "approved" ||
-     record.internalUnlocked !== true){
-    alert("Access denied");
-    return;
-  }
-
-  const token = generateSecureToken();
-  const deviceHash = generateDeviceHash();
-
-  const accessPayload = {
-    token: token,
-    email: email,
-    device: deviceHash,
-    createdAt: Date.now(),
-    used: false
-  };
-
-  sessionStorage.setItem(
-    "albukhr_core_internal_access",
-    JSON.stringify(accessPayload)
-  );
-
-  /* expire after 30 seconds */
-  setTimeout(()=>{
-    sessionStorage.removeItem("albukhr_core_internal_access");
-  }, 30000);
-
-  window.location.href = "internal-registry-form.html";
-}  
-  
   /* 🔐 CREATE TEMP ACCESS TOKEN */
   const accessToken = "INT-ACCESS-" + Date.now();
 
@@ -457,4 +397,4 @@ window.addEventListener("DOMContentLoaded", checkStatus);
 </script>
 
 </body>
-  </html>
+</html>
