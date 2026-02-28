@@ -248,6 +248,27 @@ function checkStatus(){
   }
   }
 
+if(record.status === "approved" && record.albukhrId){
+
+  const idBox = document.createElement("div");
+  idBox.className = "telegram";
+  idBox.innerHTML = `
+    🆔 Your Albukhr Internal ID<br>
+    <b>${record.albukhrId}</b>
+    <button onclick="copyUserId('${record.albukhrId}')"
+      style="margin-left:8px;font-size:11px">
+      Copy
+    </button>
+  `;
+
+  document.querySelector(".section").appendChild(idBox);
+  }
+
+function copyUserId(id){
+  navigator.clipboard.writeText(id);
+  alert("Albukhr ID copied");
+      }  
+  
 /* ==========================
    SUBMIT FUNCTION
 ========================== */
