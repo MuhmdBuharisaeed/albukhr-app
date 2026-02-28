@@ -181,9 +181,7 @@ Join Albukhr Ecosystem Telegram Group
 <script>
 const KEY = "albukhr_contributors";
 
-/* ==========================
-   STORAGE
-========================== */
+/* STORAGE */
 function getList(){
   return JSON.parse(localStorage.getItem(KEY)) || [];
 }
@@ -192,69 +190,51 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
-/* ==========================
-   SESSION
-========================== */
+/* SESSION */
 function setSession(email){
-  localStorage.setItem("albukhr_current_email", email);
+  localStorage.setItem("albukhr_current_email", email.trim().toLowerCase());
 }
 
 function getSession(){
   return localStorage.getItem("albukhr_current_email");
 }
 
-/* ==========================
-   COPY ID
-========================== */
+/* COPY ID */
 function copyUserId(id){
   navigator.clipboard.writeText(id);
   alert("Albukhr ID copied: " + id);
 }
 
-/* ==========================
-   RENDER STATUS
-========================== */
+/* CORE RENDER */
 function renderStatus(record){
 
-  const formSection = document.querySelector(".section");
   const submitBtn  = document.getElementById("submitBtn");
-
   const pendingBox  = document.getElementById("pendingNotice");
   const telegramBox = document.getElementById("telegramBox");
   const internalBox = document.getElementById("internalBox");
 
-  /* Reset */
   pendingBox.style.display = "none";
   telegramBox.style.display = "none";
   internalBox.style.display = "none";
 
-  /* =========================
-     PENDING
-  ========================= */
   if(record.status === "pending"){
     submitBtn.classList.add("disabled");
     pendingBox.style.display = "block";
     return;
   }
 
-  /* =========================
-     APPROVED (FULL LOCK)
-  ========================= */
   if(record.status === "approved"){
 
-    /* Hide entire form */
+    /* Hide form */
     document.querySelectorAll(".card").forEach(card=>{
       card.style.display = "none";
     });
-
     submitBtn.style.display = "none";
 
     /* Show ID */
     if(record.albukhrId){
 
-      const existing = document.getElementById("idBox");
-      if(!existing){
-
+      if(!document.getElementById("idBox")){
         const idBox = document.createElement("div");
         idBox.id = "idBox";
         idBox.className = "telegram";
@@ -266,66 +246,57 @@ function renderStatus(record){
             Copy
           </button>
         `;
-
-        formSection.appendChild(idBox);
+        document.querySelector(".section").appendChild(idBox);
       }
     }
 
-    if(record.telegramUnlocked){
+    if(record.telegramUnlocked === true){
       telegramBox.style.display = "block";
     }
 
-    if(record.internalUnlocked){
+    if(record.internalUnlocked === true){
       internalBox.style.display = "block";
     }
 
     return;
   }
 
-  /* =========================
-     REJECTED
-  ========================= */
   if(record.status === "rejected"){
-
     submitBtn.classList.remove("disabled");
     submitBtn.style.display = "block";
-
     document.querySelectorAll(".card").forEach(card=>{
       card.style.display = "block";
     });
-
   }
 }
 
-/* ==========================
-   CHECK STATUS
-========================== */
+/* STATUS CHECK */
 function checkStatus(){
 
-  let email = document.getElementById("email")?.value.trim();
+  let emailInput = document.getElementById("email").value.trim().toLowerCase();
 
-  /* If no email typed, check session */
-  if(!email){
-    email = getSession();
-    if(email){
-      document.getElementById("email").value = email;
+  if(!emailInput){
+    emailInput = getSession();
+    if(emailInput){
+      document.getElementById("email").value = emailInput;
     }
   }
 
-  if(!email) return;
+  if(!emailInput) return;
 
   const list = getList();
-  const record = list.find(r => r.email === email);
+
+  const record = list.find(r =>
+    r.email?.trim().toLowerCase() === emailInput
+  );
 
   if(!record) return;
 
-  setSession(email);
+  setSession(record.email);
   renderStatus(record);
 }
 
-/* ==========================
-   SUBMIT
-========================== */
+/* SUBMIT */
 function submitContributor(){
 
   const f = id => document.getElementById(id);
@@ -349,9 +320,9 @@ function submitContributor(){
   }
 
   const list = getList();
-  const email = f("email").value.trim();
+  const email = f("email").value.trim().toLowerCase();
 
-  if(list.some(r => r.email === email && r.status === "pending")){
+  if(list.some(r => r.email?.toLowerCase() === email && r.status === "pending")){
     alert("⏳ You already have a pending submission.");
     return;
   }
@@ -381,24 +352,21 @@ function submitContributor(){
     list.push(data);
     saveList(list);
 
+    setSession(email);
+
     document.getElementById("submitBtn").classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
 
-    setSession(email);
-
-    alert("✅ Submitted successfully. Await admin review.");
+    alert("Submitted successfully. Await admin review.");
   };
 
   reader.readAsDataURL(f("photo").files[0]);
 }
 
-/* ==========================
-   AUTO INIT
-========================== */
+/* EVENTS */
 document.getElementById("email")
   .addEventListener("blur", checkStatus);
 
-/* Run on page load */
 window.addEventListener("DOMContentLoaded", checkStatus);
 </script>
 
