@@ -396,5 +396,96 @@ document.getElementById("email")
 window.addEventListener("DOMContentLoaded", checkStatus);
 </script>
 
+<script>
+/* ======================================
+   ALBUKHR INVITE SECURITY GATE
+====================================== */
+
+(function(){
+
+  const params = new URLSearchParams(window.location.search);
+  const inviteToken = params.get("invite");
+
+  if(!inviteToken){
+    redirect();
+    return;
+  }
+
+  const invites =
+    JSON.parse(localStorage.getItem("albukhr_invites")) || [];
+
+  const record =
+    invites.find(i => i.token === inviteToken);
+
+  if(!record){
+    redirect();
+    return;
+  }
+
+  /* EXPIRED */
+  if(Date.now() > record.expiresAt){
+    redirect();
+    return;
+  }
+
+  /* ALREADY USED */
+  if(record.used === true){
+    redirect();
+    return;
+  }
+
+  /* MARK USED (ONE TIME ENTRY) */
+  record.used = true;
+  localStorage.setItem(
+    "albukhr_invites",
+    JSON.stringify(invites)
+  );
+
+  showWelcomeBanner();
+
+  function redirect(){
+    document.body.innerHTML = `
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100vh;
+        text-align:center;
+        font-family:system-ui;
+        background:#f4f7f6;
+      ">
+        <div>
+          <h2 style="color:#b02a37">⛔ Access Restricted</h2>
+          <p>This contributor link is invalid or expired.</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function showWelcomeBanner(){
+    const banner = document.createElement("div");
+    banner.style.cssText = `
+      background:#e9f9ef;
+      padding:16px;
+      text-align:center;
+      border-bottom:1px solid #d6efe1;
+      font-family:system-ui;
+    `;
+    banner.innerHTML = `
+      <h3 style="margin:0;color:#0f7a3d;">
+        🎉 Congratulations!
+      </h3>
+      <p style="margin:6px 0 0;font-size:13px;">
+        You have been officially invited by 
+        <b>ALBUKHR Ecosystem</b> 
+        to join as a Contributor.
+      </p>
+    `;
+    document.body.prepend(banner);
+  }
+
+})();
+    </script>
+  
 </body>
 </html>
