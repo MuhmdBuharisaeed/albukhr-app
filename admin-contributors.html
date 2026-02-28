@@ -162,6 +162,36 @@ function setStatus(index,status){
   render();
 }
 
+function generateInviteToken(){
+
+  const token =
+    "ALB-INV-" +
+    Date.now() +
+    "-" +
+    Math.random().toString(36).substring(2,10);
+
+  const invite = {
+    token: token,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + (48 * 60 * 60 * 1000), // 48 hours
+    used: false
+  };
+
+  const invites =
+    JSON.parse(localStorage.getItem("albukhr_invites")) || [];
+
+  invites.push(invite);
+
+  localStorage.setItem("albukhr_invites", JSON.stringify(invites));
+
+  const link =
+    window.location.origin +
+    "/submit-albukhrecosystem-form.html?invite=" +
+    token;
+
+  alert("Secure Invite Link Generated:\n\n" + link);
+  }
+  
 /* =========================================
    UNLOCK CONTROLS
 ========================================= */
@@ -292,6 +322,10 @@ function render(){
               <button onclick="unlockTelegram(${i})">
                 🔓 Unlock Telegram
               </button>
+              
+              <button onclick="generateInviteToken()">
+  🎟 Generate Contributor Invite Link
+</button>
 
               <button onclick="unlockInternal(${i})">
                 🏗 Unlock Internal
