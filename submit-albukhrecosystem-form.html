@@ -189,30 +189,43 @@ const KEY = "albukhr_contributors";
 function getList(){
   return JSON.parse(localStorage.getItem(KEY)) || [];
 }
+
 function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
 /* ==========================
-   SESSION HANDLER
+   SESSION
 ========================== */
 function setSession(email){
   localStorage.setItem("albukhr_current_email", email);
 }
 
 /* ==========================
-   CHECK CURRENT USER STATUS
+   COPY ID
+========================== */
+function copyUserId(id){
+  navigator.clipboard.writeText(id);
+  alert("Albukhr ID copied: " + id);
+}
+
+/* ==========================
+   CHECK STATUS
 ========================== */
 function checkStatus(){
 
-  const email = document.getElementById("email")?.value.trim();
+  const emailInput = document.getElementById("email");
+  const email = emailInput.value.trim();
   const btn = document.getElementById("submitBtn");
 
-  /* Always reset first */
+  /* RESET UI */
   btn.classList.remove("disabled");
   document.getElementById("pendingNotice").style.display = "none";
   document.getElementById("telegramBox").style.display = "none";
   document.getElementById("internalBox").style.display = "none";
+
+  const oldIdBox = document.getElementById("userAlbukhrIdBox");
+  if(oldIdBox) oldIdBox.remove();
 
   if(!email) return;
 
@@ -221,54 +234,56 @@ function checkStatus(){
 
   if(!record) return;
 
+  /* ===== PENDING ===== */
   if(record.status === "pending"){
     btn.classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
     return;
   }
 
+  /* ===== APPROVED ===== */
   if(record.status === "approved"){
+
     btn.classList.add("disabled");
+    setSession(record.email);
 
-    localStorage.setItem("albukhr_current_email", record.email);
-
+    /* Show Telegram */
     if(record.telegramUnlocked){
       document.getElementById("telegramBox").style.display = "block";
     }
 
+    /* Show Internal Access */
     if(record.internalUnlocked){
       document.getElementById("internalBox").style.display = "block";
+    }
+
+    /* Show Albukhr ID */
+    if(record.albukhrId){
+
+      const idBox = document.createElement("div");
+      idBox.className = "telegram";
+      idBox.id = "userAlbukhrIdBox";
+      idBox.innerHTML = `
+        🆔 Your Albukhr Internal ID<br>
+        <b>${record.albukhrId}</b>
+        <button onclick="copyUserId('${record.albukhrId}')"
+          style="margin-left:8px;font-size:11px">
+          Copy
+        </button>
+      `;
+
+      document.querySelector(".section").appendChild(idBox);
     }
 
     return;
   }
 
+  /* ===== REJECTED ===== */
   if(record.status === "rejected"){
     btn.classList.remove("disabled");
   }
-  }
+}
 
-if(record.status === "approved" && record.albukhrId){
-
-  const idBox = document.createElement("div");
-  idBox.className = "telegram";
-  idBox.innerHTML = `
-    🆔 Your Albukhr Internal ID<br>
-    <b>${record.albukhrId}</b>
-    <button onclick="copyUserId('${record.albukhrId}')"
-      style="margin-left:8px;font-size:11px">
-      Copy
-    </button>
-  `;
-
-  document.querySelector(".section").appendChild(idBox);
-  }
-
-function copyUserId(id){
-  navigator.clipboard.writeText(id);
-  alert("Albukhr ID copied");
-      }  
-  
 /* ==========================
    SUBMIT FUNCTION
 ========================== */
@@ -306,6 +321,7 @@ function submitContributor(){
   const reader = new FileReader();
 
   reader.onload = ()=>{
+
     const data = {
       id:"CONTRIB-"+Date.now(),
       fullName:f("fullName").value.trim(),
@@ -320,6 +336,7 @@ function submitContributor(){
       status:"pending",
       telegramUnlocked:false,
       internalUnlocked:false,
+      albukhrId:null,
       createdAt:Date.now()
     };
 
@@ -335,7 +352,7 @@ function submitContributor(){
   reader.readAsDataURL(f("photo").files[0]);
 }
 
-/* AUTO CHECK WHEN EMAIL ENTERED */
+/* AUTO CHECK */
 document.getElementById("email")
   .addEventListener("blur", checkStatus);
 </script>
