@@ -295,6 +295,17 @@ function checkInternalAccess(){
   }
 }
 
+const contributors = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
+
+const record = contributors.find(r =>
+  r.email === localStorage.getItem("albukhr_current_email")
+);
+
+if(!record || record.albukhrId !== f("internalId").value.trim()){
+  alert("Invalid Albukhr Internal ID");
+  return;
+   }  
+  
 function submitInternalProject(){
 
   const f = id => document.getElementById(id);
