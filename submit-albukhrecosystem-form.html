@@ -178,8 +178,6 @@ Join Albukhr Ecosystem Telegram Group
   </a>
 </div>
   
-</section>
-
 <script>
 const KEY = "albukhr_contributors";
 
@@ -201,6 +199,10 @@ function setSession(email){
   localStorage.setItem("albukhr_current_email", email);
 }
 
+function getSession(){
+  return localStorage.getItem("albukhr_current_email");
+}
+
 /* ==========================
    COPY ID
 ========================== */
@@ -210,83 +212,78 @@ function copyUserId(id){
 }
 
 /* ==========================
-   CHECK STATUS
+   RENDER STATUS
 ========================== */
-function checkStatus(){
-
-  const email = document.getElementById("email")?.value.trim();
-  if(!email) return;
-
-  const list = getList();
-  const record = list.find(r => r.email === email);
-
-  if(!record) return;
+function renderStatus(record){
 
   const formSection = document.querySelector(".section");
   const submitBtn  = document.getElementById("submitBtn");
 
-  /* RESET VISUALS */
-  document.getElementById("pendingNotice").style.display = "none";
-  document.getElementById("telegramBox").style.display = "none";
-  document.getElementById("internalBox").style.display = "none";
+  const pendingBox  = document.getElementById("pendingNotice");
+  const telegramBox = document.getElementById("telegramBox");
+  const internalBox = document.getElementById("internalBox");
+
+  /* Reset */
+  pendingBox.style.display = "none";
+  telegramBox.style.display = "none";
+  internalBox.style.display = "none";
 
   /* =========================
-     PENDING STATE
+     PENDING
   ========================= */
   if(record.status === "pending"){
-
     submitBtn.classList.add("disabled");
-    document.getElementById("pendingNotice").style.display = "block";
+    pendingBox.style.display = "block";
     return;
   }
 
   /* =========================
-     APPROVED STATE (FULL LOCK)
+     APPROVED (FULL LOCK)
   ========================= */
   if(record.status === "approved"){
 
-    /* 🔒 Hide entire form */
+    /* Hide entire form */
     document.querySelectorAll(".card").forEach(card=>{
       card.style.display = "none";
     });
 
     submitBtn.style.display = "none";
 
-    /* Save session */
-    localStorage.setItem("albukhr_current_email", record.email);
-
-    /* Show Albukhr ID */
+    /* Show ID */
     if(record.albukhrId){
 
-      const idBox = document.createElement("div");
-      idBox.className = "telegram";
-      idBox.innerHTML = `
-        🆔 Your Albukhr Internal ID<br>
-        <b>${record.albukhrId}</b>
-        <button onclick="copyUserId('${record.albukhrId}')"
-          style="margin-left:8px;font-size:11px">
-          Copy
-        </button>
-      `;
+      const existing = document.getElementById("idBox");
+      if(!existing){
 
-      formSection.appendChild(idBox);
+        const idBox = document.createElement("div");
+        idBox.id = "idBox";
+        idBox.className = "telegram";
+        idBox.innerHTML = `
+          🆔 Your Albukhr Internal ID<br>
+          <b>${record.albukhrId}</b>
+          <button onclick="copyUserId('${record.albukhrId}')"
+            style="margin-left:8px;font-size:11px">
+            Copy
+          </button>
+        `;
+
+        formSection.appendChild(idBox);
+      }
     }
 
-    /* Telegram */
     if(record.telegramUnlocked){
-      document.getElementById("telegramBox").style.display = "block";
+      telegramBox.style.display = "block";
     }
 
-    /* Internal */
     if(record.internalUnlocked){
-      document.getElementById("internalBox").style.display = "block";
+      internalBox.style.display = "block";
     }
 
     return;
   }
 
   /* =========================
-     REJECTED STATE
+     REJECTED
   ========================= */
   if(record.status === "rejected"){
 
@@ -301,7 +298,33 @@ function checkStatus(){
 }
 
 /* ==========================
-   SUBMIT FUNCTION
+   CHECK STATUS
+========================== */
+function checkStatus(){
+
+  let email = document.getElementById("email")?.value.trim();
+
+  /* If no email typed, check session */
+  if(!email){
+    email = getSession();
+    if(email){
+      document.getElementById("email").value = email;
+    }
+  }
+
+  if(!email) return;
+
+  const list = getList();
+  const record = list.find(r => r.email === email);
+
+  if(!record) return;
+
+  setSession(email);
+  renderStatus(record);
+}
+
+/* ==========================
+   SUBMIT
 ========================== */
 function submitContributor(){
 
@@ -330,7 +353,6 @@ function submitContributor(){
 
   if(list.some(r => r.email === email && r.status === "pending")){
     alert("⏳ You already have a pending submission.");
-    checkStatus();
     return;
   }
 
@@ -362,15 +384,22 @@ function submitContributor(){
     document.getElementById("submitBtn").classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
 
+    setSession(email);
+
     alert("✅ Submitted successfully. Await admin review.");
   };
 
   reader.readAsDataURL(f("photo").files[0]);
 }
 
-/* AUTO CHECK */
+/* ==========================
+   AUTO INIT
+========================== */
 document.getElementById("email")
   .addEventListener("blur", checkStatus);
+
+/* Run on page load */
+window.addEventListener("DOMContentLoaded", checkStatus);
 </script>
 
 </body>
