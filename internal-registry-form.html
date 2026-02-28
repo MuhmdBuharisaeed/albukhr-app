@@ -237,76 +237,84 @@ Register Internal Project
 <script src="internal-registry.js"></script>
 
 <script>
-const email = prompt("Enter your approved email:");
-const list = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
-
-const record = list.find(r =>
-  r.email === email &&
-  r.status === "approved" &&
-  r.internalUnlocked === true
-);
-
-if(!record){
-  alert("Access Restricted");
-  window.location.href = "index.html";
-}  
-  
 const STORAGE_KEY = "albukhr_internal_projects";
+const CONTRIB_KEY = "albukhr_contributors";
 
+/* ===============================
+   ACCESS CHECK
+================================ */
+function checkInternalAccess(){
+
+  const email = localStorage.getItem("albukhr_current_email");
+  if(!email){
+    alert("Login required");
+    window.location.href = "submit-albukhrecosystem-form.html";
+    return false;
+  }
+
+  const list = JSON.parse(localStorage.getItem(CONTRIB_KEY)) || [];
+  const record = list.find(r =>
+    r.email?.toLowerCase() === email.toLowerCase()
+  );
+
+  if(!record || record.status !== "approved" || record.internalUnlocked !== true){
+    alert("Access Restricted");
+    window.location.href = "submit-albukhrecosystem-form.html";
+    return false;
+  }
+
+  return true;
+}
+
+/* ===============================
+   GET INTERNAL PROJECTS
+================================ */
 function getInternalList(){
   return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
 
-function getLastEntry(){
-  const list = getInternalList();
-  return list[list.length - 1];
+function saveInternalList(list){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 }
 
-function checkInternalAccess(){
-  const last = getLastEntry();
-  if(!last) return;
+/* ===============================
+   LOCK LOGIC
+================================ */
+function checkInternalLock(){
 
   const btn = document.getElementById("submitBtn");
   const notice = document.getElementById("doneNotice");
 
-  // PENDING → LOCK
+  const list = getInternalList();
+  if(!list.length) return;
+
+  const last = list[list.length - 1];
+
   if(last.status === "internal_pending"){
     btn.classList.add("disabled");
     notice.style.display = "block";
-    notice.innerHTML = "⏳ Your previous internal project is under review.";
+    notice.innerHTML = "⏳ Previous project under review.";
     return;
   }
 
-  // APPROVED → 7 DAYS LOCK
   if(last.status === "internal_approved"){
-    const unlockAt = last.approvedAt + (7 * 24 * 60 * 60 * 1000);
+    const unlockAt = last.approvedAt + (7*24*60*60*1000);
+
     if(Date.now() < unlockAt){
       btn.classList.add("disabled");
       notice.style.display = "block";
-      notice.innerHTML =
-        "🔒 Approved project locked. You can submit a new one after 7 days.";
+      notice.innerHTML = "🔒 You can submit again after 7 days.";
       return;
     }
   }
-
-  // REJECTED → ALLOW
-  if(last.status === "internal_rejected"){
-    btn.classList.remove("disabled");
-  }
 }
 
-const contributors = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
-
-const record = contributors.find(r =>
-  r.email === localStorage.getItem("albukhr_current_email")
-);
-
-if(!record || record.albukhrId !== f("internalId").value.trim()){
-  alert("Invalid Albukhr Internal ID");
-  return;
-   }  
-  
+/* ===============================
+   SUBMIT
+================================ */
 function submitInternalProject(){
+
+  if(!checkInternalAccess()) return;
 
   const f = id => document.getElementById(id);
 
@@ -322,9 +330,11 @@ function submitInternalProject(){
     !f("solution").value ||
     !f("agree").checked
   ){
-    alert("Please complete all required internal fields");
+    alert("Please complete all required fields");
     return;
   }
+
+  const list = getInternalList();
 
   const data = {
     id: "INT-" + Date.now(),
@@ -334,155 +344,33 @@ function submitInternalProject(){
     creatorName: f("creatorName").value.trim(),
     role: f("role").value,
     internalId: f("internalId").value.trim(),
-    email: f("email").value.trim(),
-    phone: f("phone").value.trim(),
+    email: localStorage.getItem("albukhr_current_email"),
     summary: f("summary").value.trim(),
     problem: f("problem").value.trim(),
     solution: f("solution").value.trim(),
-    impact: f("impact").value.trim(),
-    funding: f("funding").value,
-    risk: f("risk").value,
-    confidentiality: f("confidentiality").value,
     status: "internal_pending",
     createdAt: Date.now(),
-    approvedAt: null,
-    rejectedAt: null
+    approvedAt: null
   };
 
-  registerInternalProject(data); // internal-registry.js
+  list.push(data);
+  saveInternalList(list);
+
+  alert("Internal project submitted successfully");
 
   document.getElementById("submitBtn").classList.add("disabled");
   document.getElementById("doneNotice").style.display = "block";
-
-  alert("Internal project registered successfully");
-}
-
-checkInternalAccess();
-    </script>
-
-<script>
-/* =========================================
-   ALBUKHR INTERNAL REGISTRY – ACCESS GATE
-========================================= */
-
-const CONTRIB_KEY = "albukhr_contributors";
-const STORAGE_KEY = "albukhr_internal_projects";
-
-/* ===============================
-   GET CURRENT SESSION EMAIL
-=============================== */
-function getCurrentEmail(){
-  return localStorage.getItem("albukhr_current_email");
-}
-
-/* ===============================
-   GET CONTRIBUTORS
-=============================== */
-function getContributors(){
-  return JSON.parse(localStorage.getItem(CONTRIB_KEY)) || [];
-}
-
-/* ===============================
-   ACCESS CONTROL
-=============================== */
-function checkInternalAccess(){
-
-  const email = getCurrentEmail();
-
-  if(!email){
-    redirectOut("Login required.");
-    return false;
-  }
-
-  const list = getContributors();
-
-  const record = list.find(r => r.email === email);
-
-  if(!record){
-    redirectOut("Contributor record not found.");
-    return false;
-  }
-
-  if(record.status !== "approved"){
-    redirectOut("Your contributor account is not approved.");
-    return false;
-  }
-
-  if(record.internalUnlocked !== true){
-    redirectOut("Internal registry access not unlocked by admin.");
-    return false;
-  }
-
-  /* Auto-fill email field */
-  const emailField = document.getElementById("email");
-  if(emailField){
-    emailField.value = email;
-    emailField.readOnly = true;
-  }
-
-  return true;
-}
-
-/* ===============================
-   REDIRECT HANDLER
-=============================== */
-function redirectOut(message){
-  alert("⛔ Access Restricted\n" + message);
-  window.location.href = "submit-albukhrecosystem-form.html";
-}
-
-/* ===============================
-   INTERNAL SUBMISSION LOCK
-=============================== */
-function getInternalList(){
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-}
-
-function getLastEntry(){
-  const list = getInternalList();
-  return list[list.length - 1];
-}
-
-function checkSubmissionLock(){
-
-  const last = getLastEntry();
-  if(!last) return;
-
-  const btn = document.getElementById("submitBtn");
-  const notice = document.getElementById("doneNotice");
-
-  if(last.status === "internal_pending"){
-    btn.classList.add("disabled");
-    notice.style.display = "block";
-    notice.innerHTML =
-      "⏳ Your previous internal project is under review.";
-    return;
-  }
-
-  if(last.status === "internal_approved"){
-    const unlockAt = last.approvedAt + (7 * 24 * 60 * 60 * 1000);
-
-    if(Date.now() < unlockAt){
-      btn.classList.add("disabled");
-      notice.style.display = "block";
-      notice.innerHTML =
-        "🔒 Approved project locked. You can submit a new one after 7 days.";
-      return;
-    }
-  }
-
-  if(last.status === "internal_rejected"){
-    btn.classList.remove("disabled");
-  }
 }
 
 /* ===============================
    INIT
-=============================== */
-if(checkInternalAccess()){
-  checkSubmissionLock();
-}
-</script>
+================================ */
+window.addEventListener("DOMContentLoaded", ()=>{
+  if(checkInternalAccess()){
+    checkInternalLock();
+  }
+});
+                      </script>
   
 </body>
   </html>
