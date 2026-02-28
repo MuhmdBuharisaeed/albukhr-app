@@ -51,9 +51,37 @@ button{
 .approved{color:#0f7a3d;font-weight:800}
 .rejected{color:#b02a37;font-weight:800}
 .empty{text-align:center;color:#777;padding:20px}
+
+  .invite-btn{
+  background:#0f7a3d;
+  color:#fff;
+}
+
+.copy-btn{
+  background:#333;
+  color:#fff;
+  font-size:11px;
+}
+
+.link-box{
+  margin-top:8px;
+  padding:8px;
+  background:#f6fbf8;
+  border-radius:8px;
+  font-size:11px;
+  word-break:break-all;
+}
 </style>
 </head>
 
+<div style="padding:16px">
+  <button class="invite-btn" onclick="generateInviteToken()">
+    🎟 Generate Contributor Invite
+  </button>
+
+  <div id="inviteOutput" class="link-box" style="display:none"></div>
+</div>  
+  
 <body>
 
 <div class="header">ALBUKHR • Admin Contributor Panel</div>
@@ -168,12 +196,12 @@ function generateInviteToken(){
     "ALB-INV-" +
     Date.now() +
     "-" +
-    Math.random().toString(36).substring(2,10);
+    crypto.randomUUID().slice(0,8);
 
   const invite = {
     token: token,
     createdAt: Date.now(),
-    expiresAt: Date.now() + (48 * 60 * 60 * 1000), // 48 hours
+    expiresAt: Date.now() + (48 * 60 * 60 * 1000),
     used: false
   };
 
@@ -182,15 +210,33 @@ function generateInviteToken(){
 
   invites.push(invite);
 
-  localStorage.setItem("albukhr_invites", JSON.stringify(invites));
+  localStorage.setItem(
+    "albukhr_invites",
+    JSON.stringify(invites)
+  );
 
   const link =
     window.location.origin +
     "/submit-albukhrecosystem-form.html?invite=" +
     token;
 
-  alert("Secure Invite Link Generated:\n\n" + link);
-  }
+  const output = document.getElementById("inviteOutput");
+
+  output.style.display = "block";
+  output.innerHTML = `
+    <b>Secure Invite Link:</b><br>
+    ${link}
+    <br><br>
+    <button class="copy-btn" onclick="copyInviteLink('${link}')">
+      📋 Copy Link
+    </button>
+  `;
+}
+
+function copyInviteLink(link){
+  navigator.clipboard.writeText(link);
+  alert("Invite link copied successfully");
+}
   
 /* =========================================
    UNLOCK CONTROLS
@@ -322,10 +368,6 @@ function render(){
               <button onclick="unlockTelegram(${i})">
                 🔓 Unlock Telegram
               </button>
-              
-              <button onclick="generateInviteToken()">
-  🎟 Generate Contributor Invite Link
-</button>
 
               <button onclick="unlockInternal(${i})">
                 🏗 Unlock Internal
