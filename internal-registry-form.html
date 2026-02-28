@@ -371,6 +371,40 @@ window.addEventListener("DOMContentLoaded", ()=>{
   }
 });
                       </script>
+
+<script>
+/* ===================================
+   HARD ENTRY GATE
+=================================== */
+
+(function(){
+
+  const token = sessionStorage.getItem("albukhr_internal_token");
+  const email = sessionStorage.getItem("albukhr_internal_email");
+
+  if(!token || !email){
+    alert("⛔ Direct access not allowed");
+    window.location.href = "submit-albukhrecosystem-form.html";
+    return;
+  }
+
+  const list = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
+
+  const record = list.find(r =>
+    r.email?.toLowerCase() === email.toLowerCase()
+  );
+
+  if(!record || record.status !== "approved" || record.internalUnlocked !== true){
+    alert("⛔ Access denied");
+    window.location.href = "submit-albukhrecosystem-form.html";
+    return;
+  }
+
+  /* Clear token immediately after validation */
+  sessionStorage.removeItem("albukhr_internal_token");
+
+})();
+</script>
   
 </body>
   </html>
