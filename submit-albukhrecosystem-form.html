@@ -214,19 +214,7 @@ function copyUserId(id){
 ========================== */
 function checkStatus(){
 
-  const emailInput = document.getElementById("email");
-  const email = emailInput.value.trim();
-  const btn = document.getElementById("submitBtn");
-
-  /* RESET UI */
-  btn.classList.remove("disabled");
-  document.getElementById("pendingNotice").style.display = "none";
-  document.getElementById("telegramBox").style.display = "none";
-  document.getElementById("internalBox").style.display = "none";
-
-  const oldIdBox = document.getElementById("userAlbukhrIdBox");
-  if(oldIdBox) oldIdBox.remove();
-
+  const email = document.getElementById("email")?.value.trim();
   if(!email) return;
 
   const list = getList();
@@ -234,35 +222,44 @@ function checkStatus(){
 
   if(!record) return;
 
-  /* ===== PENDING ===== */
+  const formSection = document.querySelector(".section");
+  const submitBtn  = document.getElementById("submitBtn");
+
+  /* RESET VISUALS */
+  document.getElementById("pendingNotice").style.display = "none";
+  document.getElementById("telegramBox").style.display = "none";
+  document.getElementById("internalBox").style.display = "none";
+
+  /* =========================
+     PENDING STATE
+  ========================= */
   if(record.status === "pending"){
-    btn.classList.add("disabled");
+
+    submitBtn.classList.add("disabled");
     document.getElementById("pendingNotice").style.display = "block";
     return;
   }
 
-  /* ===== APPROVED ===== */
+  /* =========================
+     APPROVED STATE (FULL LOCK)
+  ========================= */
   if(record.status === "approved"){
 
-    btn.classList.add("disabled");
-    setSession(record.email);
+    /* 🔒 Hide entire form */
+    document.querySelectorAll(".card").forEach(card=>{
+      card.style.display = "none";
+    });
 
-    /* Show Telegram */
-    if(record.telegramUnlocked){
-      document.getElementById("telegramBox").style.display = "block";
-    }
+    submitBtn.style.display = "none";
 
-    /* Show Internal Access */
-    if(record.internalUnlocked){
-      document.getElementById("internalBox").style.display = "block";
-    }
+    /* Save session */
+    localStorage.setItem("albukhr_current_email", record.email);
 
     /* Show Albukhr ID */
     if(record.albukhrId){
 
       const idBox = document.createElement("div");
       idBox.className = "telegram";
-      idBox.id = "userAlbukhrIdBox";
       idBox.innerHTML = `
         🆔 Your Albukhr Internal ID<br>
         <b>${record.albukhrId}</b>
@@ -272,15 +269,34 @@ function checkStatus(){
         </button>
       `;
 
-      document.querySelector(".section").appendChild(idBox);
+      formSection.appendChild(idBox);
+    }
+
+    /* Telegram */
+    if(record.telegramUnlocked){
+      document.getElementById("telegramBox").style.display = "block";
+    }
+
+    /* Internal */
+    if(record.internalUnlocked){
+      document.getElementById("internalBox").style.display = "block";
     }
 
     return;
   }
 
-  /* ===== REJECTED ===== */
+  /* =========================
+     REJECTED STATE
+  ========================= */
   if(record.status === "rejected"){
-    btn.classList.remove("disabled");
+
+    submitBtn.classList.remove("disabled");
+    submitBtn.style.display = "block";
+
+    document.querySelectorAll(".card").forEach(card=>{
+      card.style.display = "block";
+    });
+
   }
 }
 
