@@ -72,6 +72,97 @@ function saveList(l){
   localStorage.setItem(KEY, JSON.stringify(l));
 }
 
+/* ==============================
+   ID GENERATOR (SAFE + UNIQUE)
+================================ */
+function generateAlbukhrId(){
+  const list = getList();
+  let id;
+  let exists = true;
+
+  while(exists){
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    id = "ALB-INT-" + rand;
+    exists = list.some(c => c.albukhrId === id);
+  }
+
+  return id;
+}
+
+/* ==============================
+   COPY ID
+================================ */
+function copyId(index){
+  const list = getList();
+  const id = list[index].albukhrId;
+  if(!id) return;
+
+  navigator.clipboard.writeText(id);
+  alert("ID copied: " + id);
+}
+
+/* ==============================
+   STATUS CONTROL
+================================ */
+function setStatus(index,status){
+  const list = getList();
+
+  if(list[index].status !== "pending") return;
+
+  list[index].status = status;
+
+  if(status === "approved"){
+
+    list[index].telegramUnlocked = false;
+    list[index].internalUnlocked = false;
+
+    /* Generate ID only once */
+    if(!list[index].albukhrId){
+      list[index].albukhrId = generateAlbukhrId();
+    }
+  }
+
+  saveList(list);
+  render();
+}
+
+/* ==============================
+   TELEGRAM UNLOCK
+================================ */
+function unlockTelegram(index){
+  const list = getList();
+
+  if(list[index].status !== "approved"){
+    alert("Contributor must be approved first");
+    return;
+  }
+
+  list[index].telegramUnlocked = true;
+  saveList(list);
+  render();
+}
+
+/* ==============================
+   INTERNAL UNLOCK
+================================ */
+function unlockInternal(index){
+  const list = getList();
+
+  if(list[index].status !== "approved"){
+    alert("Contributor must be approved first");
+    return;
+  }
+
+  list[index].internalUnlocked = true;
+  saveList(list);
+  render();
+
+  alert("Internal project creation access granted.");
+}
+
+/* ==============================
+   RENDER
+================================ */
 function render(){
   const list = getList();
   box.innerHTML = "";
@@ -91,6 +182,18 @@ function render(){
       ? "<span style='color:#0f7a3d;font-weight:700'>Internal: Unlocked</span>"
       : "<span style='color:#b02a37;font-weight:700'>Internal: Locked</span>";
 
+    const idBlock = c.albukhrId
+      ? `
+        <div style="margin-top:10px;font-size:12px;background:#f6fbf8;padding:8px;border-radius:8px">
+          <b>Albukhr Internal ID:</b>
+          <span id="copy-${i}">${c.albukhrId}</span>
+          <button onclick="copyId(${i})" style="margin-left:6px;font-size:10px">
+            Copy
+          </button>
+        </div>
+      `
+      : "";
+
     box.innerHTML += `
       <div class="card">
         <strong>${c.fullName}</strong>
@@ -108,6 +211,8 @@ function render(){
           <b>Experience:</b><br>${c.experience || "—"}<br><br>
           <b>Contribution:</b><br>${c.contribution}
         </div>
+
+        ${idBlock}
 
         <div style="margin-top:10px;font-size:12px">
           ${telegramStatus}<br>
@@ -151,87 +256,8 @@ function render(){
   });
 }
 
-${c.albukhrId ? `
-<div style="margin-top:10px;font-size:12px;background:#f6fbf8;padding:8px;border-radius:8px">
-  <b>Albukhr Internal ID:</b> 
-  <span id="copy-${i}">${c.albukhrId}</span>
-  <button onclick="copyId(${i})" style="margin-left:6px;font-size:10px">
-    Copy
-  </button>
-</div>
-` : ""}
-
-function copyId(index){
-  const list = getList();
-  const id = list[index].albukhrId;
-  navigator.clipboard.writeText(id);
-  alert("ID copied: " + id);
-}
-  
-function generateAlbukhrId(){
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return "ALB-INT-" + rand;
-}
-
-function setStatus(index,status){
-  const list = getList();
-
-  if(list[index].status !== "pending") return;
-
-  list[index].status = status;
-
-  if(status === "approved"){
-    list[index].telegramUnlocked = false;
-    list[index].internalUnlocked = false;
-
-    /* 🔐 AUTO GENERATE ALBUKHR INTERNAL ID */
-    list[index].albukhrId = generateAlbukhrId();
-  }
-
-  saveList(list);
-  render();
-  }
-
-/* ==============================
-   TELEGRAM UNLOCK
-================================ */
-function unlockTelegram(index){
-  const list = getList();
-
-  if(list[index].status !== "approved"){
-    alert("Contributor must be approved first");
-    return;
-  }
-
-  list[index].telegramUnlocked = true;
-  saveList(list);
-  render();
-}
-
-/* ==============================
-   INTERNAL UNLOCK (REAL ACCESS)
-================================ */
-function unlockInternal(index){
-  const list = getList();
-
-  if(list[index].status !== "approved"){
-    alert("Contributor must be approved first");
-    return;
-  }
-
-  list[index].internalUnlocked = true;
-
-  /* 🔐 Grant real internal access */
-  localStorage.setItem("albukhr_internal_access", "granted");
-
-  saveList(list);
-  render();
-
-  alert("Internal project creation access granted.");
-}
-
 render();
-      </script>
+</script>
   
 </body>
 </html>
