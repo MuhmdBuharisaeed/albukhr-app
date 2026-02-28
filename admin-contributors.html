@@ -61,53 +61,82 @@ button{
 <section class="section" id="list"></section>
 
 <script>
+/* =========================================
+   ALBUKHR ADMIN CONTRIBUTORS ENGINE v2
+   - Globally Unique Incremental ID
+   - ID Freeze Protection
+   - Unlock Separation
+========================================= */
+
 const KEY = "albukhr_contributors";
+const ALBUKHR_ID_COUNTER_KEY = "albukhr_id_counter";
 const box = document.getElementById("list");
 
+/* =========================================
+   STORAGE SAFE LAYER
+========================================= */
+
 function getList(){
-  return JSON.parse(localStorage.getItem(KEY)) || [];
+  try{
+    return JSON.parse(localStorage.getItem(KEY)) || [];
+  }catch{
+    return [];
+  }
 }
 
-function saveList(l){
-  localStorage.setItem(KEY, JSON.stringify(l));
+function saveList(newList){
+
+  const existing = getList();
+
+  newList.forEach(item => {
+
+    const old = existing.find(e => e.id === item.id);
+
+    /* 🔒 ID Freeze Enforcement */
+    if(old && old.idFrozen){
+
+      item.albukhrId = old.albukhrId;
+      item.idFrozen  = true;
+
+    }
+
+  });
+
+  localStorage.setItem(KEY, JSON.stringify(newList));
 }
 
-/* ==============================
-   ID GENERATOR (SAFE + UNIQUE)
-================================ */
-function generateAlbukhrId(){
+/* =========================================
+   GLOBAL UNIQUE INCREMENTAL ID
+========================================= */
 
-  const now = new Date();
+function getNextAlbukhrId(){
 
-  const datePart =
-    now.getFullYear().toString() +
-    String(now.getMonth()+1).padStart(2,"0") +
-    String(now.getDate()).padStart(2,"0");
+  let counter = Number(localStorage.getItem(ALBUKHR_ID_COUNTER_KEY) || 0);
 
-  const randomPart = Math.random()
-    .toString(36)
-    .substring(2,7)
-    .toUpperCase();
+  counter++;
 
-  return `ALB-INT-${datePart}-${randomPart}`;
-}
-  
-/* ==============================
-   COPY ID
-================================ */
-function copyId(index){
+  localStorage.setItem(ALBUKHR_ID_COUNTER_KEY, counter);
+
+  const padded = String(counter).padStart(4,"0");
+
+  const newId = "ALB-INT-" + padded;
+
+  /* Double safety check */
   const list = getList();
-  const id = list[index].albukhrId;
-  if(!id) return;
 
-  navigator.clipboard.writeText(id);
-  alert("ID copied: " + id);
+  if(list.some(c => c.albukhrId === newId)){
+    return getNextAlbukhrId();
+  }
+
+  return newId;
 }
 
-/* ==============================
+/* =========================================
    STATUS CONTROL
-================================ */
+========================================= */
+
 function setStatus(index,status){
+
   const list = getList();
 
   if(list[index].status !== "pending") return;
@@ -116,28 +145,29 @@ function setStatus(index,status){
 
   if(status === "approved"){
 
-  list[index].telegramUnlocked = false;
-  list[index].internalUnlocked = false;
+    list[index].telegramUnlocked = false;
+    list[index].internalUnlocked = false;
 
-  let newId;
-  const existingIds = list.map(c => c.albukhrId);
+    /* 🔐 Generate ID only once */
+    if(!list[index].albukhrId){
 
-  do{
-    newId = generateAlbukhrId();
-  }while(existingIds.includes(newId));
+      list[index].albukhrId = getNextAlbukhrId();
+      list[index].idFrozen  = true;
 
-  list[index].albukhrId = newId;
-  }
+    }
+
   }
 
   saveList(list);
   render();
 }
 
-/* ==============================
-   TELEGRAM UNLOCK
-================================ */
+/* =========================================
+   UNLOCK CONTROLS
+========================================= */
+
 function unlockTelegram(index){
+
   const list = getList();
 
   if(list[index].status !== "approved"){
@@ -150,10 +180,8 @@ function unlockTelegram(index){
   render();
 }
 
-/* ==============================
-   INTERNAL UNLOCK
-================================ */
 function unlockInternal(index){
+
   const list = getList();
 
   if(list[index].status !== "approved"){
@@ -164,18 +192,33 @@ function unlockInternal(index){
   list[index].internalUnlocked = true;
   saveList(list);
   render();
-
-  alert("Internal project creation access granted.");
 }
 
-/* ==============================
-   RENDER
-================================ */
+/* =========================================
+   COPY ID
+========================================= */
+
+function copyId(index){
+
+  const list = getList();
+  const id = list[index].albukhrId;
+
+  if(!id) return;
+
+  navigator.clipboard.writeText(id);
+  alert("Albukhr ID copied: " + id);
+}
+
+/* =========================================
+   RENDER UI
+========================================= */
+
 function render(){
+
   const list = getList();
   box.innerHTML = "";
 
-  if(list.length === 0){
+  if(!list.length){
     box.innerHTML = "<div class='empty'>No contributors yet</div>";
     return;
   }
@@ -190,20 +233,19 @@ function render(){
       ? "<span style='color:#0f7a3d;font-weight:700'>Internal: Unlocked</span>"
       : "<span style='color:#b02a37;font-weight:700'>Internal: Locked</span>";
 
-    const idBlock = c.albukhrId
-      ? `
-        <div style="margin-top:10px;font-size:12px;background:#f6fbf8;padding:8px;border-radius:8px">
-          <b>Albukhr Internal ID:</b>
-          <span id="copy-${i}">${c.albukhrId}</span>
-          <button onclick="copyId(${i})" style="margin-left:6px;font-size:10px">
-            Copy
-          </button>
-        </div>
-      `
-      : "";
+    const idBlock = c.albukhrId ? `
+      <div style="margin-top:10px;font-size:12px;background:#f6fbf8;padding:8px;border-radius:8px">
+        <b>Albukhr Internal ID:</b>
+        <span>${c.albukhrId}</span>
+        <button onclick="copyId(${i})" style="margin-left:6px;font-size:10px">
+          Copy
+        </button>
+      </div>
+    ` : "";
 
     box.innerHTML += `
       <div class="card">
+
         <strong>${c.fullName}</strong>
 
         <div class="meta">
@@ -259,6 +301,7 @@ function render(){
           }
 
         </div>
+
       </div>
     `;
   });
