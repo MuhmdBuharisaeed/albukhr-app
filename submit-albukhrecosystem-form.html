@@ -173,8 +173,8 @@ Join Albukhr Ecosystem Telegram Group
 
 <div class="telegram" id="internalBox" style="display:none">
   🏗️ Internal Project Access Granted<br>
-  <a href="internal-registry-form.html">
-    Create Internal Albukhr Project →
+  <a href="#" onclick="openInternal()">
+  Create Internal Albukhr Project →
   </a>
 </div>
   
@@ -270,6 +270,32 @@ function renderStatus(record){
   }
 }
 
+function openInternal(){
+
+  const email = localStorage.getItem("albukhr_current_email");
+  if(!email) return;
+
+  const list = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
+  const record = list.find(r =>
+    r.email?.toLowerCase() === email.toLowerCase()
+  );
+
+  if(!record) return;
+
+  /* 🔐 CREATE TEMP ACCESS TOKEN */
+  const accessToken = "INT-ACCESS-" + Date.now();
+
+  sessionStorage.setItem("albukhr_internal_token", accessToken);
+  sessionStorage.setItem("albukhr_internal_email", record.email);
+
+  /* expire token after 60 seconds */
+  setTimeout(()=>{
+    sessionStorage.removeItem("albukhr_internal_token");
+  }, 60000);
+
+  window.location.href = "internal-registry-form.html";
+  }
+  
 /* STATUS CHECK */
 function checkStatus(){
 
