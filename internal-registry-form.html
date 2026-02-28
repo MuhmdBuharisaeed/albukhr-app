@@ -237,6 +237,94 @@ Register Internal Project
 <script src="internal-registry.js"></script>
 
 <script>
+/* ======================================
+   ALBUKHR CORE INTERNAL SECURITY GATE
+====================================== */
+
+(function(){
+
+  const raw = sessionStorage.getItem("albukhr_core_internal_access");
+
+  if(!raw){
+    redirect();
+    return;
+  }
+
+  let payload;
+
+  try{
+    payload = JSON.parse(raw);
+  }catch{
+    redirect();
+    return;
+  }
+
+  /* ===== 1. TOKEN EXIST ===== */
+  if(!payload.token){
+    redirect();
+    return;
+  }
+
+  /* ===== 2. EXPIRY CHECK (30s) ===== */
+  if(Date.now() - payload.createdAt > 30000){
+    sessionStorage.removeItem("albukhr_core_internal_access");
+    redirect();
+    return;
+  }
+
+  /* ===== 3. DEVICE BIND CHECK ===== */
+  const currentDevice =
+    btoa(
+      navigator.userAgent +
+      screen.width +
+      screen.height +
+      Intl.DateTimeFormat().resolvedOptions().timeZone
+    ).slice(0,25);
+
+  if(payload.device !== currentDevice){
+    redirect();
+    return;
+  }
+
+  /* ===== 4. ONE-TIME USE ===== */
+  if(payload.used === true){
+    redirect();
+    return;
+  }
+
+  /* ===== 5. VALIDATE CONTRIBUTOR AGAIN ===== */
+  const list = JSON.parse(localStorage.getItem("albukhr_contributors")) || [];
+
+  const record = list.find(r =>
+    r.email?.toLowerCase() === payload.email.toLowerCase()
+  );
+
+  if(!record ||
+     record.status !== "approved" ||
+     record.internalUnlocked !== true){
+    redirect();
+    return;
+  }
+
+  /* ===== MARK TOKEN USED ===== */
+  payload.used = true;
+  sessionStorage.setItem(
+    "albukhr_core_internal_access",
+    JSON.stringify(payload)
+  );
+
+  /* SUCCESS */
+  console.log("ALBUKHR CORE ACCESS GRANTED");
+
+  function redirect(){
+    alert("⛔ ALBUKHR CORE: Unauthorized Internal Access");
+    window.location.href = "submit-albukhrecosystem-form.html";
+  }
+
+})();
+    </script>
+  
+<script>
 const STORAGE_KEY = "albukhr_internal_projects";
 const CONTRIB_KEY = "albukhr_contributors";
 
