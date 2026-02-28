@@ -76,19 +76,22 @@ function saveList(l){
    ID GENERATOR (SAFE + UNIQUE)
 ================================ */
 function generateAlbukhrId(){
-  const list = getList();
-  let id;
-  let exists = true;
 
-  while(exists){
-    const rand = Math.floor(1000 + Math.random() * 9000);
-    id = "ALB-INT-" + rand;
-    exists = list.some(c => c.albukhrId === id);
-  }
+  const now = new Date();
 
-  return id;
+  const datePart =
+    now.getFullYear().toString() +
+    String(now.getMonth()+1).padStart(2,"0") +
+    String(now.getDate()).padStart(2,"0");
+
+  const randomPart = Math.random()
+    .toString(36)
+    .substring(2,7)
+    .toUpperCase();
+
+  return `ALB-INT-${datePart}-${randomPart}`;
 }
-
+  
 /* ==============================
    COPY ID
 ================================ */
@@ -113,13 +116,18 @@ function setStatus(index,status){
 
   if(status === "approved"){
 
-    list[index].telegramUnlocked = false;
-    list[index].internalUnlocked = false;
+  list[index].telegramUnlocked = false;
+  list[index].internalUnlocked = false;
 
-    /* Generate ID only once */
-    if(!list[index].albukhrId){
-      list[index].albukhrId = generateAlbukhrId();
-    }
+  let newId;
+  const existingIds = list.map(c => c.albukhrId);
+
+  do{
+    newId = generateAlbukhrId();
+  }while(existingIds.includes(newId));
+
+  list[index].albukhrId = newId;
+  }
   }
 
   saveList(list);
