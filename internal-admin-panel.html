@@ -5,6 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ALBUKHR – Internal Project Admin</title>
 
+<script src="admin-auth.js"></script>
+
+<script>
+/* =====================================
+   ALBUKHR INTERNAL ADMIN ACCESS GUARD
+===================================== */
+
+(function(){
+
+  const admin = getAdmin();
+
+  if(!admin){
+    window.location.href = "admin-login.html";
+    return;
+  }
+
+  /* 🎯 Define who can access internal admin panel */
+  const allowedRoles = [
+    "super_admin",
+    "review_admin"
+  ];
+
+  if(!allowedRoles.includes(admin.role)){
+    alert("Unauthorized Access");
+    window.location.href = "unified-admin-buttons.html";
+    return;
+  }
+
+})();
+</script>
+  
 <style>
 body{background:#f4f7f5;font-family:system-ui}
 .section{padding:16px}
