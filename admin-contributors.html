@@ -72,6 +72,9 @@ button{
   word-break:break-all;
 }
 </style>
+
+<script src="admin-auth.js"></script>
+  
 </head>
 
 <body>
@@ -87,29 +90,7 @@ button{
 </div>
   
 <section class="section" id="list"></section>
-<script src="admin-auth.js"></script>
 
-<script>
-
-/* =====================================
-   ALBUKHR ADMIN ACCESS GUARD
-===================================== */
-
-/* Allow only valid admin roles */
-requireRole([
-  "super_admin",
-  "finance_admin",
-  "review_admin"
-]);
-
-const admin = getAdmin();
-
-if(!admin){
-  window.location.href = "admin-login.html";
-}
-
-</script>
-  
 <script>
 /* =========================================
    ALBUKHR ADMIN CONTRIBUTORS ENGINE v2
@@ -407,6 +388,27 @@ function render(){
 
 render();
 </script>
+
+<script>
+
+/* =====================================
+   ALBUKHR ADMIN ACCESS GUARD
+===================================== */
+
+/* Allow only valid admin roles */
+requireRole([
+  "super_admin",
+  "finance_admin",
+  "review_admin"
+]);
+
+const admin = getAdmin();
+
+if(!admin){
+  window.location.href = "admin-login.html";
+}
+
+</script>  
   
 </body>
 </html>
