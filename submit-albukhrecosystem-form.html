@@ -473,95 +473,102 @@ window.addEventListener("DOMContentLoaded", checkStatus);
 </script>
 
 <script>
-/* ======================================
-   ALBUKHR INVITE SECURITY GATE
-====================================== */
+/* ===============================
+   ALBUKHR INVITE GUARD (CLEAN)
+================================ */
 
-(function(){
+const INVITE_KEY  = "albukhr_invite_tokens";
+const SESSION_KEY = "albukhr_invite_session";
 
+function getToken(){
   const params = new URLSearchParams(window.location.search);
-  const inviteToken = params.get("invite");
+  return params.get("invite");
+}
 
-  if(!inviteToken){
-    redirect();
-    return;
+function block(msg="⛔ Access Restricted"){
+  document.body.innerHTML = `
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      text-align:center;
+      font-family:system-ui;
+      background:#f4f7f6;
+    ">
+      <div>
+        <h2 style="color:#b02a37">${msg}</h2>
+        <p>This page is protected by Albukhr Invite System.</p>
+      </div>
+    </div>
+  `;
+}
+
+function validateInvite(){
+
+  const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+
+  /* Refresh safe mode */
+  if(session && session.expiresAt > Date.now()){
+    showWelcome();
+    return true;
   }
 
-  const invites =
-    JSON.parse(localStorage.getItem("albukhr_invites")) || [];
+  const token = getToken();
+  if(!token){
+    block();
+    return false;
+  }
 
-  const record =
-    invites.find(i => i.token === inviteToken);
+  const tokens = JSON.parse(localStorage.getItem(INVITE_KEY)) || [];
+  const record = tokens.find(t => t.token === token);
 
   if(!record){
-    redirect();
-    return;
+    block();
+    return false;
   }
 
-  /* EXPIRED */
-  if(Date.now() > record.expiresAt){
-    redirect();
-    return;
+  if(record.expiresAt < Date.now()){
+    block("⛔ Invite link expired.");
+    return false;
   }
 
-  /* ALREADY USED */
-  if(record.used === true){
-    redirect();
-    return;
-  }
+  /* Create refresh session */
+  localStorage.setItem(SESSION_KEY, JSON.stringify({
+    token: record.token,
+    expiresAt: record.expiresAt
+  }));
 
-  /* MARK USED (ONE TIME ENTRY) */
-  record.used = true;
-  localStorage.setItem(
-    "albukhr_invites",
-    JSON.stringify(invites)
-  );
+  showWelcome();
+  return true;
+}
 
-  showWelcomeBanner();
+function showWelcome(){
+  if(document.getElementById("inviteBanner")) return;
 
-  function redirect(){
-    document.body.innerHTML = `
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        height:100vh;
-        text-align:center;
-        font-family:system-ui;
-        background:#f4f7f6;
-      ">
-        <div>
-          <h2 style="color:#b02a37">⛔ Access Restricted</h2>
-          <p>This contributor link is invalid or expired.</p>
-        </div>
-      </div>
-    `;
-  }
+  const banner = document.createElement("div");
+  banner.id = "inviteBanner";
+  banner.style.cssText = `
+    background:#e9f9ef;
+    padding:16px;
+    text-align:center;
+    border-bottom:1px solid #d6efe1;
+  `;
+  banner.innerHTML = `
+    <h3 style="margin:0;color:#0f7a3d;">
+      🎉 Congratulations!
+    </h3>
+    <p style="margin:6px 0 0;font-size:13px;">
+      You have been officially invited by 
+      <b>ALBUKHR Ecosystem</b> 
+      to join as a Contributor.
+    </p>
+  `;
+  document.body.prepend(banner);
+}
 
-  function showWelcomeBanner(){
-    const banner = document.createElement("div");
-    banner.style.cssText = `
-      background:#e9f9ef;
-      padding:16px;
-      text-align:center;
-      border-bottom:1px solid #d6efe1;
-      font-family:system-ui;
-    `;
-    banner.innerHTML = `
-      <h3 style="margin:0;color:#0f7a3d;">
-        🎉 Congratulations!
-      </h3>
-      <p style="margin:6px 0 0;font-size:13px;">
-        You have been officially invited by 
-        <b>ALBUKHR Ecosystem</b> 
-        to join as a Contributor.
-      </p>
-    `;
-    document.body.prepend(banner);
-  }
-
-})();
-    </script>
+validateInvite();
+</script>
   
 </body>
 </html>
