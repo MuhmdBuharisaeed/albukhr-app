@@ -3,56 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <title>ALBUKHR Admin – Contributors</title>
-
 <script src="admin-auth.js"></script>
-
 <script>
+
 /* =====================================
-   ALBUKHR ADMIN ACCESS GUARD (HARD)
+   ALBUKHR ADMIN ACCESS GUARD
 ===================================== */
 
-(function(){
+/* Allow only valid admin roles */
+requireRole([
+  "super_admin",
+  "finance_admin",
+  "review_admin"
+]);
 
-  const admin = getAdmin();
+const admin = getAdmin();
 
-  if(!admin){
-    window.location.href = "admin-login.html";
-    return;
-  }
+if(!admin){
+  window.location.href = "admin-login.html";
+}
 
-  const allowedRoles = [
-    "super_admin",
-    "finance_admin",
-    "review_admin"
-  ];
-
-  if(!allowedRoles.includes(admin.role)){
-    alert("Unauthorized Access");
-    window.location.href = "admin-login.html";
-    return;
-  }
-
-})();
 </script>
-
 <style>
 body{font-family:system-ui;background:#f4f7f6;margin:0}
 .section{padding:16px}
-.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:14px}
-.header{padding:14px;background:#0f7a3d;color:#fff;font-weight:800}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px
+}
+.header{
+  padding:14px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:800
+}
 .meta{font-size:12px;color:#555;margin-top:6px}
-.desc{font-size:13px;margin-top:8px;background:#f6fbf8;padding:10px;border-radius:10px;line-height:1.6}
-img.photo{width:90px;height:90px;border-radius:12px;object-fit:cover;border:1px solid #ddd;margin-top:8px}
-button{padding:8px 14px;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;margin-right:6px}
+.desc{
+  font-size:13px;
+  margin-top:8px;
+  background:#f6fbf8;
+  padding:10px;
+  border-radius:10px;
+  line-height:1.6
+}
+img.photo{
+  width:90px;
+  height:90px;
+  border-radius:12px;
+  object-fit:cover;
+  border:1px solid #ddd;
+  margin-top:8px
+}
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  font-size:12px;
+  cursor:pointer;
+  margin-right:6px
+}
 .approve{background:#0f7a3d;color:#fff}
 .reject{background:#eee;color:#333}
+.disabled{opacity:.6;pointer-events:none}
 .approved{color:#0f7a3d;font-weight:800}
 .rejected{color:#b02a37;font-weight:800}
 .empty{text-align:center;color:#777;padding:20px}
 
-.invite-btn{background:#0f7a3d;color:#fff}
-.copy-btn{background:#333;color:#fff;font-size:11px}
-.link-box{margin-top:8px;padding:10px;background:#f6fbf8;border-radius:8px;font-size:11px;word-break:break-all}
+  .invite-btn{
+  background:#0f7a3d;
+  color:#fff;
+}
+
+.copy-btn{
+  background:#333;
+  color:#fff;
+  font-size:11px;
+}
+
+.link-box{
+  margin-top:8px;
+  padding:8px;
+  background:#f6fbf8;
+  border-radius:8px;
+  font-size:11px;
+  word-break:break-all;
+}
 </style>
 </head>
 
@@ -62,24 +100,30 @@ button{padding:8px 14px;border:none;border-radius:8px;font-weight:700;font-size:
 
 <div style="padding:16px">
   <button class="invite-btn" onclick="generateInviteToken()">
-    🎟 Generate Contributor Invite Link
+    🎟 Generate Contributor Invite
   </button>
 
   <div id="inviteOutput" class="link-box" style="display:none"></div>
 </div>
-
+  
 <section class="section" id="list"></section>
 
 <script>
 /* =========================================
-   CONTRIBUTORS ENGINE (SECURE CORE)
+   ALBUKHR ADMIN CONTRIBUTORS ENGINE v2
+   - Globally Unique Incremental ID
+   - ID Freeze Protection
+   - Unlock Separation
 ========================================= */
 
 const KEY = "albukhr_contributors";
-const COUNTER_KEY = "albukhr_id_counter";
+const ALBUKHR_ID_COUNTER_KEY = "albukhr_id_counter";
 const box = document.getElementById("list");
 
-/* SAFE STORAGE */
+/* =========================================
+   STORAGE SAFE LAYER
+========================================= */
+
 function getList(){
   try{
     return JSON.parse(localStorage.getItem(KEY)) || [];
@@ -88,26 +132,57 @@ function getList(){
   }
 }
 
-function saveList(data){
-  localStorage.setItem(KEY, JSON.stringify(data));
+function saveList(newList){
+
+  const existing = getList();
+
+  newList.forEach(item => {
+
+    const old = existing.find(e => e.id === item.id);
+
+    /* 🔒 ID Freeze Enforcement */
+    if(old && old.idFrozen){
+
+      item.albukhrId = old.albukhrId;
+      item.idFrozen  = true;
+
+    }
+
+  });
+
+  localStorage.setItem(KEY, JSON.stringify(newList));
 }
 
 /* =========================================
    GLOBAL UNIQUE INCREMENTAL ID
 ========================================= */
+
 function getNextAlbukhrId(){
 
-  let counter = Number(localStorage.getItem(COUNTER_KEY) || 0);
+  let counter = Number(localStorage.getItem(ALBUKHR_ID_COUNTER_KEY) || 0);
+
   counter++;
 
-  localStorage.setItem(COUNTER_KEY, counter);
+  localStorage.setItem(ALBUKHR_ID_COUNTER_KEY, counter);
 
-  return "ALB-INT-" + String(counter).padStart(4,"0");
+  const padded = String(counter).padStart(4,"0");
+
+  const newId = "ALB-INT-" + padded;
+
+  /* Double safety check */
+  const list = getList();
+
+  if(list.some(c => c.albukhrId === newId)){
+    return getNextAlbukhrId();
+  }
+
+  return newId;
 }
 
 /* =========================================
    STATUS CONTROL
 ========================================= */
+
 function setStatus(index,status){
 
   const list = getList();
@@ -121,19 +196,20 @@ function setStatus(index,status){
     list[index].telegramUnlocked = false;
     list[index].internalUnlocked = false;
 
+    /* 🔐 Generate ID only once */
     if(!list[index].albukhrId){
+
       list[index].albukhrId = getNextAlbukhrId();
-      list[index].idFrozen = true;
+      list[index].idFrozen  = true;
+
     }
+
   }
 
   saveList(list);
   render();
 }
 
-/* =========================================
-   INVITE SYSTEM
-========================================= */
 function generateInviteToken(){
 
   const token =
@@ -143,7 +219,7 @@ function generateInviteToken(){
     crypto.randomUUID().slice(0,8);
 
   const invite = {
-    token,
+    token: token,
     createdAt: Date.now(),
     expiresAt: Date.now() + (48 * 60 * 60 * 1000),
     used: false
@@ -154,7 +230,10 @@ function generateInviteToken(){
 
   invites.push(invite);
 
-  localStorage.setItem("albukhr_invites", JSON.stringify(invites));
+  localStorage.setItem(
+    "albukhr_invites",
+    JSON.stringify(invites)
+  );
 
   const link =
     window.location.origin +
@@ -178,21 +257,34 @@ function copyInviteLink(link){
   navigator.clipboard.writeText(link);
   alert("Invite link copied successfully");
 }
-
+  
 /* =========================================
    UNLOCK CONTROLS
 ========================================= */
+
 function unlockTelegram(index){
+
   const list = getList();
-  if(list[index].status !== "approved") return;
+
+  if(list[index].status !== "approved"){
+    alert("Contributor must be approved first");
+    return;
+  }
+
   list[index].telegramUnlocked = true;
   saveList(list);
   render();
 }
 
 function unlockInternal(index){
+
   const list = getList();
-  if(list[index].status !== "approved") return;
+
+  if(list[index].status !== "approved"){
+    alert("Contributor must be approved first");
+    return;
+  }
+
   list[index].internalUnlocked = true;
   saveList(list);
   render();
@@ -201,16 +293,22 @@ function unlockInternal(index){
 /* =========================================
    COPY ID
 ========================================= */
+
 function copyId(index){
+
   const list = getList();
-  if(!list[index].albukhrId) return;
-  navigator.clipboard.writeText(list[index].albukhrId);
-  alert("Albukhr ID copied");
+  const id = list[index].albukhrId;
+
+  if(!id) return;
+
+  navigator.clipboard.writeText(id);
+  alert("Albukhr ID copied: " + id);
 }
 
 /* =========================================
    RENDER UI
 ========================================= */
+
 function render(){
 
   const list = getList();
@@ -223,10 +321,21 @@ function render(){
 
   list.forEach((c,i)=>{
 
+    const telegramStatus = c.telegramUnlocked
+      ? "<span style='color:#0f7a3d;font-weight:700'>Telegram: Unlocked</span>"
+      : "<span style='color:#b02a37;font-weight:700'>Telegram: Locked</span>";
+
+    const internalStatus = c.internalUnlocked
+      ? "<span style='color:#0f7a3d;font-weight:700'>Internal: Unlocked</span>"
+      : "<span style='color:#b02a37;font-weight:700'>Internal: Locked</span>";
+
     const idBlock = c.albukhrId ? `
-      <div style="margin-top:10px;background:#f6fbf8;padding:8px;border-radius:8px;font-size:12px">
-        <b>Albukhr ID:</b> ${c.albukhrId}
-        <button onclick="copyId(${i})" style="font-size:10px;margin-left:6px">Copy</button>
+      <div style="margin-top:10px;font-size:12px;background:#f6fbf8;padding:8px;border-radius:8px">
+        <b>Albukhr Internal ID:</b>
+        <span>${c.albukhrId}</span>
+        <button onclick="copyId(${i})" style="margin-left:6px;font-size:10px">
+          Copy
+        </button>
       </div>
     ` : "";
 
@@ -251,13 +360,22 @@ function render(){
 
         ${idBlock}
 
+        <div style="margin-top:10px;font-size:12px">
+          ${telegramStatus}<br>
+          ${internalStatus}
+        </div>
+
         <div style="margin-top:12px">
 
           ${
             c.status === "pending"
             ? `
-              <button class="approve" onclick="setStatus(${i},'approved')">Approve</button>
-              <button class="reject" onclick="setStatus(${i},'rejected')">Reject</button>
+              <button class="approve" onclick="setStatus(${i},'approved')">
+                Approve
+              </button>
+              <button class="reject" onclick="setStatus(${i},'rejected')">
+                Reject
+              </button>
             `
             : c.status === "approved"
             ? `<span class="approved">✓ Approved</span>`
@@ -267,8 +385,13 @@ function render(){
           ${
             c.status === "approved"
             ? `
-              <button onclick="unlockTelegram(${i})">🔓 Unlock Telegram</button>
-              <button onclick="unlockInternal(${i})">🏗 Unlock Internal</button>
+              <button onclick="unlockTelegram(${i})">
+                🔓 Unlock Telegram
+              </button>
+
+              <button onclick="unlockInternal(${i})">
+                🏗 Unlock Internal
+              </button>
             `
             : ""
           }
