@@ -149,16 +149,53 @@ function renderSummary(){
   const available      = summary.available || 0;
 
   document.getElementById("adminBalance").innerHTML = `
-    <div style="line-height:1.8">
-      💰 <b>Available Rewards:</b> ${available.toFixed(2)} Pi<br>
-      📈 <b>Gross Rewards:</b> ${grossRewards.toFixed(2)} Pi<br>
-      🏦 <b>Total Stake:</b> ${totalStake.toFixed(2)} Pi<br>
-      🔄 <b>Reward Withdrawals:</b> ${rewardWithdrawals.toFixed(2)} Pi<br>
-      🏗 <b>Capital Withdrawals:</b> ${capitalWithdrawals.toFixed(2)} Pi<br>
-      💸 <b>Total Fees Collected:</b> ${totalFees.toFixed(2)} Pi<br>
-      📊 <b>Total Withdrawn (All):</b> ${totalWithdrawn.toFixed(2)} Pi
+
+  <div style="margin-bottom:14px;">
+    <div style="font-size:13px;color:#666;">Available Rewards</div>
+    <div style="font-size:28px;font-weight:800;color:#0f7a3d;">
+      ${available.toFixed(2)} Pi
     </div>
-  `;
+  </div>
+
+  <div style="
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    font-size:12px;
+  ">
+
+    <div>
+      <div style="color:#666;">Gross Rewards</div>
+      <b>${grossRewards.toFixed(2)} Pi</b>
+    </div>
+
+    <div>
+      <div style="color:#666;">Total Stake</div>
+      <b>${totalStake.toFixed(2)} Pi</b>
+    </div>
+
+    <div>
+      <div style="color:#666;">Reward Withdrawals</div>
+      <b>${rewardWithdrawals.toFixed(2)} Pi</b>
+    </div>
+
+    <div>
+      <div style="color:#666;">Capital Withdrawals</div>
+      <b>${capitalWithdrawals.toFixed(2)} Pi</b>
+    </div>
+
+    <div>
+      <div style="color:#666;">Fees Collected</div>
+      <b>${totalFees.toFixed(2)} Pi</b>
+    </div>
+
+    <div>
+      <div style="color:#666;">Total Withdrawn</div>
+      <b>${totalWithdrawn.toFixed(2)} Pi</b>
+    </div>
+
+  </div>
+`;
 
   document.getElementById("walletStatus").innerText =
     localStorage.getItem("albukhr_wallet_locked") === "true"
