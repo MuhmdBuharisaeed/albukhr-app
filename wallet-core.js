@@ -314,3 +314,47 @@ function getWithdrawHistory(){
 function clearWalletLedger(){
   localStorage.removeItem(WITHDRAW_KEY);
      }
+
+/* =========================================
+   ADMIN COMPATIBILITY LAYER
+   Makes wallet-core readable by admin panel
+========================================= */
+
+const ADMIN_WALLET_KEY = "albukhr_admin_wallet_v1";
+
+/* Build admin wallet object from withdrawals */
+function buildAdminWallet(){
+
+  const withdrawals = getWithdrawals();
+
+  let balance = 0;
+
+  withdrawals.forEach(tx=>{
+    balance -= Number(tx.grossAmount) || 0;
+  });
+
+  return {
+    balance: balance,
+    currency: "Pi",
+    status: localStorage.getItem("albukhr_wallet_status") || "active",
+    transactions: withdrawals.map(tx=>({
+      type: tx.type,
+      amount: tx.grossAmount,
+      address: tx.walletAddress || "internal",
+      at: tx.timestamp,
+      project: tx.project
+    }))
+  };
+}
+
+/* Used by admin-wallet.js */
+function getWallet(){
+  return buildAdminWallet();
+}
+
+/* Save wallet status only (lock/unlock) */
+function saveWallet(wallet){
+  if(wallet?.status){
+    localStorage.setItem("albukhr_wallet_status", wallet.status);
+  }
+}
