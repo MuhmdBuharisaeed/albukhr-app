@@ -33,6 +33,13 @@ small{color:#666}
 .threshold-box input{
   width:100%;padding:8px;border-radius:8px;border:1px solid #ddd
 }
+.tx{
+  font-size:13px;
+  border-bottom:1px solid #eee;
+  padding:10px 0;
+  word-break:break-all;
+  overflow-wrap:anywhere;
+}
 </style>
 
 <!-- LOAD ORDER IMPORTANT -->
@@ -117,12 +124,41 @@ function initAdminWallet(){
 ================================ */
 function renderSummary(){
 
-  if(typeof getWalletSummary !== "function") return;
-
   const summary = getWalletSummary();
+  const history = getWithdrawHistory();
 
-  document.getElementById("adminBalance").innerText =
-    (summary.available || 0).toFixed(2) + " Pi";
+  let totalFees = 0;
+  let rewardWithdrawals = 0;
+  let capitalWithdrawals = 0;
+
+  history.forEach(tx=>{
+    totalFees += Number(tx.fee) || 0;
+
+    if(tx.type === "reward"){
+      rewardWithdrawals += Number(tx.grossAmount) || 0;
+    }
+
+    if(tx.type === "capital"){
+      capitalWithdrawals += Number(tx.grossAmount) || 0;
+    }
+  });
+
+  const totalStake     = summary.totalStake || 0;
+  const grossRewards   = summary.grossRewards || 0;
+  const totalWithdrawn = summary.withdrawn || 0;
+  const available      = summary.available || 0;
+
+  document.getElementById("adminBalance").innerHTML = `
+    <div style="line-height:1.8">
+      💰 <b>Available Rewards:</b> ${available.toFixed(2)} Pi<br>
+      📈 <b>Gross Rewards:</b> ${grossRewards.toFixed(2)} Pi<br>
+      🏦 <b>Total Stake:</b> ${totalStake.toFixed(2)} Pi<br>
+      🔄 <b>Reward Withdrawals:</b> ${rewardWithdrawals.toFixed(2)} Pi<br>
+      🏗 <b>Capital Withdrawals:</b> ${capitalWithdrawals.toFixed(2)} Pi<br>
+      💸 <b>Total Fees Collected:</b> ${totalFees.toFixed(2)} Pi<br>
+      📊 <b>Total Withdrawn (All):</b> ${totalWithdrawn.toFixed(2)} Pi
+    </div>
+  `;
 
   document.getElementById("walletStatus").innerText =
     localStorage.getItem("albukhr_wallet_locked") === "true"
