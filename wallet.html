@@ -333,41 +333,6 @@ body{
 .bottom-nav a:hover span{
   transform:translateY(-2px);
 }
-
-.bottom-nav{
-  display:flex;
-  justify-content:space-around;
-  background:#4d8f67;
-  padding:14px 0;
-  border-radius:28px;
-}
-
-.nav-item{
-  text-align:center;
-  color:#fff;
-  text-decoration:none;
-  font-size:14px;
-  position:relative;
-  flex:1;
-}
-
-.nav-item div{
-  font-size:22px;
-  margin-bottom:4px;
-}
-
-/* ACTIVE DOT */
-.nav-item.active::after{
-  content:"";
-  position:absolute;
-  bottom:-6px;
-  left:50%;
-  transform:translateX(-50%);
-  width:8px;
-  height:8px;
-  background:#fff;
-  border-radius:50%;
-}
 </style>
 </head>
 
@@ -450,29 +415,12 @@ Fee: 1% • Daily Limit: 50 Pi
 <script src="wallet-core.js"></script>
 
 <!-- ===== ALBUKHR BOTTOM NAV ===== -->
-<div class="bottom-nav">
-
-  <a href="home.html" class="nav-item active">
-    <div>🏠</div>
-    <span>Home</span>
-  </a>
-
-  <a href="wallet.html" class="nav-item">
-    <div>💼</div>
-    <span>Wallet</span>
-  </a>
-
-  <a href="services.html" class="nav-item">
-    <div>🛠</div>
-    <span>Services</span>
-  </a>
-
-  <a href="news.html" class="nav-item">
-    <div>📰</div>
-    <span>News</span>
-  </a>
-
-</div>
+<nav class="bottom-nav">
+  <a href="index.html" class="active"><span>🏠</span>Home</a>
+  <a href="wallet.html"><span>💼</span>Wallet</a>
+  <a href="services.html"><span>🛠️</span>Services</a>
+  <a href="news.html"><span>📰</span>News</a>
+</nav>
   
 <script>
 
