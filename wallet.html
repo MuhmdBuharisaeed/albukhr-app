@@ -333,6 +333,17 @@ body{
 .bottom-nav a:hover span{
   transform:translateY(-2px);
 }
+
+.nav-item .icon{
+  display:flex;
+  justify-content:center;
+  margin-bottom:4px;
+  color:#fff;
+}
+
+.nav-item.active .icon{
+  color:#0f7a3d;
+}
 </style>
 </head>
 
@@ -420,6 +431,16 @@ Fee: 1% • Daily Limit: 50 Pi
   <a href="wallet.html"><span>💼</span>Wallet</a>
   <a href="services.html"><span>🛠️</span>Services</a>
   <a href="news.html"><span>📰</span>News</a>
+
+  <a href="wallet.html" class="nav-item">
+  <div class="icon">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+      <path d="M2 7a2 2 0 012-2h14a2 2 0 012 2v2h-2V7H4v10h14v-2h2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V7zm14 4a2 2 0 100 4 2 2 0 000-4z"/>
+    </svg>
+  </div>
+  <span>Wallet</span>
+  </a>
+  
 </nav>
   
 <script>
