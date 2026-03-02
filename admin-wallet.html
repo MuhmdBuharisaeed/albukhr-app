@@ -6,77 +6,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-  font-family:system-ui;
-  background:#f4f6f8;
-  margin:0;
-}
-
-.header{
-  background:#111;
-  color:#fff;
-  padding:14px;
-  font-weight:700;
-  text-align:center;
-}
-
+body{font-family:system-ui;background:#f4f6f8;margin:0}
+.header{background:#111;color:#fff;padding:14px;font-weight:700;text-align:center}
 .card{
   background:#fff;
   margin:16px;
   padding:16px;
   border-radius:16px;
-  box-shadow:0 6px 18px rgba(0,0,0,.06);
+  box-shadow:0 6px 18px rgba(0,0,0,.06)
 }
-
-.stat{
-  font-size:22px;
-  font-weight:800;
-}
-
+.stat{font-size:22px;font-weight:800}
 .btn{
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  font-weight:700;
-  margin-top:10px;
-  width:100%;
-  cursor:pointer;
+  padding:10px;border:none;border-radius:10px;
+  font-weight:700;margin-top:10px;width:100%;cursor:pointer
 }
-
 .lock{background:#c0392b;color:#fff}
 .unlock{background:#27ae60;color:#fff}
-
-.tx{
-  font-size:13px;
-  border-bottom:1px solid #eee;
-  padding:10px 0;
-}
-
+.tx{font-size:13px;border-bottom:1px solid #eee;padding:10px 0}
 .tx-large{
   background:#fff5f5;
   border-left:4px solid #c0392b;
-  padding-left:8px;
+  padding-left:8px
 }
-
 small{color:#666}
-
-.threshold-box{
-  margin-top:10px;
-}
-
+.threshold-box{margin-top:10px}
 .threshold-box input{
-  width:100%;
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #ddd;
+  width:100%;padding:8px;border-radius:8px;border:1px solid #ddd
 }
 </style>
 
-<script src="/js/settings/settings-core.js"></script>
-<script src="/js/core/albukhr-core.js"></script>
-<script src="/js/wallet/wallet-core.js"></script>
-<script src="/js/admin/admin-core.js"></script>
-<script src="/js/admin/admin-wallet.js"></script>
+<!-- LOAD ORDER IMPORTANT -->
+<script src="admin-auth.js"></script>
+<script src="wallet-core.js"></script>
 
 </head>
 
@@ -88,10 +49,10 @@ small{color:#666}
 
 <div class="card">
   <small>Total Available Balance</small>
-  <div class="stat" id="adminBalance">--</div>
+  <div class="stat" id="adminBalance">0.00 Pi</div>
 
   <small>Status</small>
-  <div id="walletStatus">--</div>
+  <div id="walletStatus">ACTIVE</div>
 
   <button class="btn lock" onclick="lockWalletAdmin()">Lock Wallet</button>
   <button class="btn unlock" onclick="unlockWalletAdmin()">Unlock Wallet</button>
@@ -103,11 +64,10 @@ small{color:#666}
 </div>
 
 <div class="card">
-  <h4>Recent Transactions</h4>
+  <h4>Recent Withdrawals</h4>
   <div id="adminTxList"></div>
 </div>
 
-<!-- 🔔 ALERT SOUND -->
 <audio id="alertSound">
   <source src="alert.mp3" type="audio/mpeg">
 </audio>
@@ -115,30 +75,54 @@ small{color:#666}
 <script>
 
 /* ===============================
-   ADMIN AUTH GUARD
+   AUTH GUARD (SAFE)
 ================================ */
+document.addEventListener("DOMContentLoaded", function(){
 
-requireRole(["super_admin","finance_admin"]);
-if(!getAdmin()){
-  window.location.href="admin-login.html";
-}
+  if(typeof requireRole === "function"){
+    requireRole(["super_admin","finance_admin"]);
+  }
+
+  if(typeof getAdmin === "function" && !getAdmin()){
+    window.location.href = "admin-login.html";
+    return;
+  }
+
+  if(typeof getWithdrawHistory !== "function"){
+    document.getElementById("adminTxList").innerHTML =
+      "<small style='color:red'>Wallet engine not loaded</small>";
+    return;
+  }
+
+  initAdminWallet();
+});
 
 /* ===============================
    CONFIG
 ================================ */
-
 const DEFAULT_THRESHOLD = 100;
 let lastAlertedTxId = null;
 
 /* ===============================
-   WALLET SUMMARY
+   INIT
 ================================ */
+function initAdminWallet(){
+  refreshAdminWallet();
+  window.addEventListener("walletUpdated", refreshAdminWallet);
+  setInterval(refreshAdminWallet, 5000);
+}
 
+/* ===============================
+   SUMMARY
+================================ */
 function renderSummary(){
 
+  if(typeof getWalletSummary !== "function") return;
+
   const summary = getWalletSummary();
+
   document.getElementById("adminBalance").innerText =
-    summary.available.toFixed(2) + " Pi";
+    (summary.available || 0).toFixed(2) + " Pi";
 
   document.getElementById("walletStatus").innerText =
     localStorage.getItem("albukhr_wallet_locked") === "true"
@@ -149,32 +133,35 @@ function renderSummary(){
 /* ===============================
    LOCK SYSTEM
 ================================ */
-
 function lockWalletAdmin(){
   localStorage.setItem("albukhr_wallet_locked","true");
   alert("Wallet locked by Admin");
-  renderSummary();
+  refreshAdminWallet();
 }
 
 function unlockWalletAdmin(){
   localStorage.removeItem("albukhr_wallet_locked");
   alert("Wallet unlocked");
-  renderSummary();
+  refreshAdminWallet();
 }
 
 /* ===============================
    TRANSACTIONS
 ================================ */
-
 function renderTransactions(){
 
   const txList = document.getElementById("adminTxList");
   txList.innerHTML="";
 
+  if(typeof getWithdrawHistory !== "function"){
+    txList.innerHTML="<small>Wallet engine not ready</small>";
+    return;
+  }
+
   const history = getWithdrawHistory();
 
-  if(!history.length){
-    txList.innerHTML="<small>No transactions yet</small>";
+  if(!history || !history.length){
+    txList.innerHTML="<small>No withdrawals yet</small>";
     return;
   }
 
@@ -184,7 +171,8 @@ function renderTransactions(){
 
   history.forEach(tx=>{
 
-    const isLarge = Number(tx.grossAmount) >= threshold;
+    const isLarge =
+      Number(tx.grossAmount || 0) >= threshold;
 
     if(isLarge && lastAlertedTxId !== tx.id){
       playAlert();
@@ -193,12 +181,12 @@ function renderTransactions(){
 
     txList.innerHTML += `
       <div class="tx ${isLarge ? "tx-large" : ""}">
-        <strong>${tx.project}</strong><br>
+        <strong>${tx.project || "Unknown Project"}</strong><br>
         Type: ${tx.type}<br>
-        Amount: -${Number(tx.grossAmount).toFixed(2)} Pi<br>
-        Fee: ${Number(tx.fee).toFixed(2)} Pi<br>
-        Received: ${Number(tx.received).toFixed(2)} Pi<br>
-        Wallet: ${tx.walletAddress || "N/A"}<br>
+        Amount: -${Number(tx.grossAmount || 0).toFixed(2)} Pi<br>
+        Fee: ${Number(tx.fee || 0).toFixed(2)} Pi<br>
+        Received: ${Number(tx.received || 0).toFixed(2)} Pi<br>
+        Wallet Address: ${tx.walletAddress || "internal"}<br>
         <small>${new Date(tx.timestamp).toLocaleString()}</small>
       </div>
     `;
@@ -206,9 +194,8 @@ function renderTransactions(){
 }
 
 /* ===============================
-   ALERT SOUND
+   ALERT
 ================================ */
-
 function playAlert(){
   const audio = document.getElementById("alertSound");
   if(audio){
@@ -217,20 +204,12 @@ function playAlert(){
 }
 
 /* ===============================
-   AUTO REFRESH
+   MASTER REFRESH
 ================================ */
-
 function refreshAdminWallet(){
   renderSummary();
   renderTransactions();
 }
-
-window.addEventListener("walletUpdated", refreshAdminWallet);
-
-setInterval(refreshAdminWallet, 5000);
-
-/* INIT */
-refreshAdminWallet();
 
 </script>
 
