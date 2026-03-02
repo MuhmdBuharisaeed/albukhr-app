@@ -334,42 +334,72 @@ body{
   transform:translateY(-2px);
 }
 
+.bottom-nav{
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  width:92%;
+  max-width:520px;
+  background:#4c9c6f;
+  border-radius:40px;
+  padding:14px 10px;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow:0 15px 35px rgba(0,0,0,.18);
+  z-index:1000;
+}
+
+/* Nav item */
 .nav-item{
+  flex:1;
   text-align:center;
+  text-decoration:none;
+  color:#e8f5ee;
+  font-size:13px;
+  font-weight:500;
   position:relative;
-  transition:all .3s ease;
+  transition:.3s ease;
 }
 
-.nav-item .wallet-svg{
-  width:24px;
-  height:24px;
-  fill:#ffffff;
-  transition:all .3s ease;
-}
-
-/* Hover animation */
-.nav-item:hover .wallet-svg{
-  transform:translateY(-4px) scale(1.1);
+/* SVG icon */
+.nav-icon{
+  width:22px;
+  height:22px;
+  fill:#e8f5ee;
+  margin-bottom:4px;
+  transition:.3s ease;
 }
 
 /* Active state */
-.nav-item.active .wallet-svg{
-  fill:#0f7a3d;
-  transform:translateY(-3px);
+.nav-item.active{
+  font-weight:700;
+  color:#ffffff;
 }
 
-/* Active indicator dot */
+.nav-item.active .nav-icon{
+  fill:#ffffff;
+  transform:translateY(-2px);
+}
+
+/* Active dot */
 .nav-item.active::after{
   content:"";
   width:6px;
   height:6px;
-  background:#0f7a3d;
+  background:#ffffff;
   border-radius:50%;
   position:absolute;
-  bottom:-4px;
+  bottom:-6px;
   left:50%;
   transform:translateX(-50%);
-  }
+}
+
+/* Hover effect */
+.nav-item:hover .nav-icon{
+  transform:translateY(-3px);
+}
 </style>
 </head>
 
@@ -448,33 +478,53 @@ Fee: 1% • Daily Limit: 50 Pi
 </div>
 </div>
 
-<script src="staking.js"></script>
-<script src="wallet-core.js"></script>
+<div class="bottom-nav">
 
-<!-- ===== ALBUKHR BOTTOM NAV ===== -->
-<nav class="bottom-nav">
-  <a href="index.html" class="active"><span>🏠</span>Home</a>
-  <a href="wallet.html" class="nav-item" id="walletNav">
-  <div class="icon">
-    <svg class="wallet-svg" viewBox="0 0 24 24">
-      <path d="M2 7a2 2 0 012-2h14a2 2 0 012 2v2h-2V7H4v10h14v-2h2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V7zm14 4a2 2 0 100 4 2 2 0 000-4z"/>
+  <!-- HOME -->
+  <a href="home.html" class="nav-item">
+    <svg viewBox="0 0 24 24" class="nav-icon">
+      <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>
     </svg>
-  </div>
-  <span>Wallet</span>
+    <span>Home</span>
   </a>
-  <a href="services.html"><span>🛠️</span>Services</a>
-  <a href="news.html"><span>📰</span>News</a>
-</nav>
 
-<script>
+  <!-- WALLET -->
+  <a href="wallet.html" class="nav-item">
+    <svg viewBox="0 0 24 24" class="nav-icon">
+      <path d="M3 7a2 2 0 0 1 2-2h14v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
+      <circle cx="16" cy="12" r="1.5"/>
+    </svg>
+    <span>Wallet</span>
+  </a>
+
+  <!-- SERVICES -->
+  <a href="services.html" class="nav-item">
+    <svg viewBox="0 0 24 24" class="nav-icon">
+      <path d="M14 2l2 2-3 3 3 3-2 2-3-3-3 3-2-2 3-3-3-3 2-2 3 3z"/>
+    </svg>
+    <span>Services</span>
+  </a>
+
+  <!-- NEWS -->
+  <a href="news.html" class="nav-item">
+    <svg viewBox="0 0 24 24" class="nav-icon">
+      <path d="M4 4h16v14H4z"/>
+      <path d="M4 18h16v2H4z"/>
+    </svg>
+    <span>News</span>
+  </a>
+
+      </div>
+
+  <script>
 const currentPage = location.pathname.split("/").pop();
 
-document.querySelectorAll(".nav-item").forEach(item=>{
-  if(item.getAttribute("href") === currentPage){
-    item.classList.add("active");
+document.querySelectorAll(".nav-item").forEach(link=>{
+  if(link.getAttribute("href") === currentPage){
+    link.classList.add("active");
   }
 });
-</script>
+  </script>
   
 <script>
 
