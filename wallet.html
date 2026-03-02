@@ -334,16 +334,42 @@ body{
   transform:translateY(-2px);
 }
 
-.nav-item .icon{
-  display:flex;
-  justify-content:center;
-  margin-bottom:4px;
-  color:#fff;
+.nav-item{
+  text-align:center;
+  position:relative;
+  transition:all .3s ease;
 }
 
-.nav-item.active .icon{
-  color:#0f7a3d;
+.nav-item .wallet-svg{
+  width:24px;
+  height:24px;
+  fill:#ffffff;
+  transition:all .3s ease;
 }
+
+/* Hover animation */
+.nav-item:hover .wallet-svg{
+  transform:translateY(-4px) scale(1.1);
+}
+
+/* Active state */
+.nav-item.active .wallet-svg{
+  fill:#0f7a3d;
+  transform:translateY(-3px);
+}
+
+/* Active indicator dot */
+.nav-item.active::after{
+  content:"";
+  width:6px;
+  height:6px;
+  background:#0f7a3d;
+  border-radius:50%;
+  position:absolute;
+  bottom:-4px;
+  left:50%;
+  transform:translateX(-50%);
+  }
 </style>
 </head>
 
@@ -428,20 +454,27 @@ Fee: 1% • Daily Limit: 50 Pi
 <!-- ===== ALBUKHR BOTTOM NAV ===== -->
 <nav class="bottom-nav">
   <a href="index.html" class="active"><span>🏠</span>Home</a>
-  <a href="wallet.html"><span>💼</span>Wallet</a>
-  <a href="services.html"><span>🛠️</span>Services</a>
-  <a href="news.html"><span>📰</span>News</a>
-
-  <a href="wallet.html" class="nav-item">
+  <a href="wallet.html" class="nav-item" id="walletNav">
   <div class="icon">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+    <svg class="wallet-svg" viewBox="0 0 24 24">
       <path d="M2 7a2 2 0 012-2h14a2 2 0 012 2v2h-2V7H4v10h14v-2h2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V7zm14 4a2 2 0 100 4 2 2 0 000-4z"/>
     </svg>
   </div>
   <span>Wallet</span>
   </a>
-  
+  <a href="services.html"><span>🛠️</span>Services</a>
+  <a href="news.html"><span>📰</span>News</a>
 </nav>
+
+<script>
+const currentPage = location.pathname.split("/").pop();
+
+document.querySelectorAll(".nav-item").forEach(item=>{
+  if(item.getAttribute("href") === currentPage){
+    item.classList.add("active");
+  }
+});
+</script>
   
 <script>
 
