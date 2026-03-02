@@ -2,16 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin – Wallet Monitor</title>
+<title>ALBUKHR – Admin Wallet Monitor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{font-family:Arial;background:#f4f6f8;margin:0}
+body{
+  font-family:system-ui;
+  background:#f4f6f8;
+  margin:0
+}
 .header{
-  background:#1e1e1e;
+  background:#0f7a3d;
   color:#fff;
   padding:14px;
-  font-weight:bold;
+  font-weight:700;
   text-align:center
 }
 .card{
@@ -22,15 +26,17 @@ body{font-family:Arial;background:#f4f6f8;margin:0}
 }
 .stat{
   font-size:22px;
-  font-weight:bold
+  font-weight:800;
+  color:#0f7a3d
 }
 .btn{
   padding:10px;
   border:none;
   border-radius:10px;
-  font-weight:bold;
+  font-weight:700;
   margin-top:10px;
-  width:100%
+  width:100%;
+  cursor:pointer
 }
 .lock{background:#c0392b;color:#fff}
 .unlock{background:#27ae60;color:#fff}
@@ -41,35 +47,108 @@ body{font-family:Arial;background:#f4f6f8;margin:0}
 }
 small{color:#666}
 </style>
+
+<script src="admin-auth.js"></script>
 </head>
 
 <body>
 
-<div class="header">🔐 Admin – Wallet Monitor</div>
+<div class="header">🔐 ALBUKHR – Admin Wallet Monitor</div>
 
 <div class="card">
-  <small>Total Balance</small>
-  <div class="stat" id="adminBalance">--</div>
+  <small>Total Available Balance</small>
+  <div class="stat" id="adminBalance">0.00 Pi</div>
 
-  <small>Status</small>
-  <div id="walletStatus">--</div>
+  <small>Wallet Status</small>
+  <div id="walletStatus">Active</div>
 
-  <button class="btn lock" id="lockWalletBtn">Lock Wallet</button>
-  <button class="btn unlock" id="unlockWalletBtn">Unlock Wallet</button>
+  <button class="btn lock" onclick="lockWallet()">Lock Wallet</button>
+  <button class="btn unlock" onclick="unlockWallet()">Unlock Wallet</button>
 </div>
 
 <div class="card">
-  <h4>Recent Transactions</h4>
+  <h4>Recent Withdrawals</h4>
   <div id="adminTxList"></div>
 </div>
 
-<!-- LOAD ORDER (CRITICAL) -->
-<script src="/js/settings/settings-core.js"></script>
-<script src="/js/core/albukhr-core.js"></script>
+<!-- IMPORTANT: Load same wallet-core used by wallet.html -->
+<script src="staking.js"></script>
+<script src="wallet-core.js"></script>
 
-<script src="/js/admin/admin-core.js"></script>
-<script src="/js/wallet/wallet-core.js"></script>
-<script src="/js/admin/admin-wallet.js"></script>
+<script>
+
+/* ===============================
+   ADMIN AUTH GUARD
+================================ */
+requireRole([
+  "super_admin",
+  "finance_admin"
+]);
+
+/* ===============================
+   RENDER WALLET DATA
+================================ */
+
+function renderAdminWallet(){
+
+  if(typeof getWalletSummary !== "function") return;
+
+  const summary = getWalletSummary();
+  const history = getWithdrawHistory();
+
+  document.getElementById("adminBalance").innerText =
+    summary.available.toFixed(2) + " Pi";
+
+  const txList = document.getElementById("adminTxList");
+  txList.innerHTML = "";
+
+  if(!history.length){
+    txList.innerHTML = "<small>No withdrawals yet</small>";
+    return;
+  }
+
+  history.slice(0,20).forEach(tx => {
+
+    txList.innerHTML += `
+      <div class="tx">
+        <b>${tx.project}</b><br>
+        -${Number(tx.grossAmount).toFixed(2)} Pi<br>
+        <small>
+          Type: ${tx.type} |
+          Fee: ${Number(tx.fee).toFixed(2)} |
+          Received: ${Number(tx.received).toFixed(2)}<br>
+          ${new Date(tx.timestamp).toLocaleString()}
+        </small>
+      </div>
+    `;
+  });
+}
+
+/* ===============================
+   WALLET LOCK CONTROL
+================================ */
+
+function lockWallet(){
+  localStorage.setItem("albukhr_wallet_admin_lock", "locked");
+  document.getElementById("walletStatus").innerText = "Locked";
+  alert("Wallet locked by admin");
+}
+
+function unlockWallet(){
+  localStorage.removeItem("albukhr_wallet_admin_lock");
+  document.getElementById("walletStatus").innerText = "Active";
+  alert("Wallet unlocked");
+}
+
+/* ===============================
+   AUTO REFRESH ON WITHDRAW
+================================ */
+
+window.addEventListener("walletUpdated", renderAdminWallet);
+
+window.addEventListener("DOMContentLoaded", renderAdminWallet);
+
+</script>
 
 </body>
 </html>
