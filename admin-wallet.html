@@ -9,26 +9,30 @@
 body{
   font-family:system-ui;
   background:#f4f6f8;
-  margin:0
+  margin:0;
 }
+
 .header{
-  background:#0f7a3d;
+  background:#111;
   color:#fff;
   padding:14px;
   font-weight:700;
-  text-align:center
+  text-align:center;
 }
+
 .card{
   background:#fff;
   margin:16px;
   padding:16px;
-  border-radius:16px
+  border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
 }
+
 .stat{
   font-size:22px;
   font-weight:800;
-  color:#0f7a3d
 }
+
 .btn{
   padding:10px;
   border:none;
@@ -36,117 +40,194 @@ body{
   font-weight:700;
   margin-top:10px;
   width:100%;
-  cursor:pointer
+  cursor:pointer;
 }
+
 .lock{background:#c0392b;color:#fff}
 .unlock{background:#27ae60;color:#fff}
+
 .tx{
   font-size:13px;
   border-bottom:1px solid #eee;
-  padding:8px 0
+  padding:10px 0;
 }
+
+.tx-large{
+  background:#fff5f5;
+  border-left:4px solid #c0392b;
+  padding-left:8px;
+}
+
 small{color:#666}
+
+.threshold-box{
+  margin-top:10px;
+}
+
+.threshold-box input{
+  width:100%;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
 </style>
 
 <script src="admin-auth.js"></script>
+<script src="wallet-core.js"></script>
+
 </head>
 
 <body>
 
-<div class="header">🔐 ALBUKHR – Admin Wallet Monitor</div>
+<div class="header">
+  🔐 ALBUKHR – Admin Wallet Monitor
+</div>
 
 <div class="card">
   <small>Total Available Balance</small>
-  <div class="stat" id="adminBalance">0.00 Pi</div>
+  <div class="stat" id="adminBalance">--</div>
 
-  <small>Wallet Status</small>
-  <div id="walletStatus">Active</div>
+  <small>Status</small>
+  <div id="walletStatus">--</div>
 
-  <button class="btn lock" onclick="lockWallet()">Lock Wallet</button>
-  <button class="btn unlock" onclick="unlockWallet()">Unlock Wallet</button>
+  <button class="btn lock" onclick="lockWalletAdmin()">Lock Wallet</button>
+  <button class="btn unlock" onclick="unlockWalletAdmin()">Unlock Wallet</button>
+
+  <div class="threshold-box">
+    <small>Large Withdrawal Alert Threshold (Pi)</small>
+    <input type="number" id="thresholdInput" placeholder="Default: 100">
+  </div>
 </div>
 
 <div class="card">
-  <h4>Recent Withdrawals</h4>
+  <h4>Recent Transactions</h4>
   <div id="adminTxList"></div>
 </div>
 
-<!-- IMPORTANT: Load same wallet-core used by wallet.html -->
-<script src="staking.js"></script>
-<script src="wallet-core.js"></script>
+<!-- 🔔 ALERT SOUND -->
+<audio id="alertSound">
+  <source src="alert.mp3" type="audio/mpeg">
+</audio>
 
 <script>
 
 /* ===============================
    ADMIN AUTH GUARD
 ================================ */
-requireRole([
-  "super_admin",
-  "finance_admin"
-]);
+
+requireRole(["super_admin","finance_admin"]);
+if(!getAdmin()){
+  window.location.href="admin-login.html";
+}
 
 /* ===============================
-   RENDER WALLET DATA
+   CONFIG
 ================================ */
 
-function renderAdminWallet(){
+const DEFAULT_THRESHOLD = 100;
+let lastAlertedTxId = null;
 
-  if(typeof getWalletSummary !== "function") return;
+/* ===============================
+   WALLET SUMMARY
+================================ */
+
+function renderSummary(){
 
   const summary = getWalletSummary();
-  const history = getWithdrawHistory();
-
   document.getElementById("adminBalance").innerText =
     summary.available.toFixed(2) + " Pi";
 
+  document.getElementById("walletStatus").innerText =
+    localStorage.getItem("albukhr_wallet_locked") === "true"
+    ? "LOCKED"
+    : "ACTIVE";
+}
+
+/* ===============================
+   LOCK SYSTEM
+================================ */
+
+function lockWalletAdmin(){
+  localStorage.setItem("albukhr_wallet_locked","true");
+  alert("Wallet locked by Admin");
+  renderSummary();
+}
+
+function unlockWalletAdmin(){
+  localStorage.removeItem("albukhr_wallet_locked");
+  alert("Wallet unlocked");
+  renderSummary();
+}
+
+/* ===============================
+   TRANSACTIONS
+================================ */
+
+function renderTransactions(){
+
   const txList = document.getElementById("adminTxList");
-  txList.innerHTML = "";
+  txList.innerHTML="";
+
+  const history = getWithdrawHistory();
 
   if(!history.length){
-    txList.innerHTML = "<small>No withdrawals yet</small>";
+    txList.innerHTML="<small>No transactions yet</small>";
     return;
   }
 
-  history.slice(0,20).forEach(tx => {
+  const threshold =
+    Number(document.getElementById("thresholdInput").value)
+    || DEFAULT_THRESHOLD;
+
+  history.forEach(tx=>{
+
+    const isLarge = Number(tx.grossAmount) >= threshold;
+
+    if(isLarge && lastAlertedTxId !== tx.id){
+      playAlert();
+      lastAlertedTxId = tx.id;
+    }
 
     txList.innerHTML += `
-      <div class="tx">
-        <b>${tx.project}</b><br>
-        -${Number(tx.grossAmount).toFixed(2)} Pi<br>
-        <small>
-          Type: ${tx.type} |
-          Fee: ${Number(tx.fee).toFixed(2)} |
-          Received: ${Number(tx.received).toFixed(2)}<br>
-          ${new Date(tx.timestamp).toLocaleString()}
-        </small>
+      <div class="tx ${isLarge ? "tx-large" : ""}">
+        <strong>${tx.project}</strong><br>
+        Type: ${tx.type}<br>
+        Amount: -${Number(tx.grossAmount).toFixed(2)} Pi<br>
+        Fee: ${Number(tx.fee).toFixed(2)} Pi<br>
+        Received: ${Number(tx.received).toFixed(2)} Pi<br>
+        Wallet: ${tx.walletAddress || "N/A"}<br>
+        <small>${new Date(tx.timestamp).toLocaleString()}</small>
       </div>
     `;
   });
 }
 
 /* ===============================
-   WALLET LOCK CONTROL
+   ALERT SOUND
 ================================ */
 
-function lockWallet(){
-  localStorage.setItem("albukhr_wallet_admin_lock", "locked");
-  document.getElementById("walletStatus").innerText = "Locked";
-  alert("Wallet locked by admin");
-}
-
-function unlockWallet(){
-  localStorage.removeItem("albukhr_wallet_admin_lock");
-  document.getElementById("walletStatus").innerText = "Active";
-  alert("Wallet unlocked");
+function playAlert(){
+  const audio = document.getElementById("alertSound");
+  if(audio){
+    audio.play().catch(()=>{});
+  }
 }
 
 /* ===============================
-   AUTO REFRESH ON WITHDRAW
+   AUTO REFRESH
 ================================ */
 
-window.addEventListener("walletUpdated", renderAdminWallet);
+function refreshAdminWallet(){
+  renderSummary();
+  renderTransactions();
+}
 
-window.addEventListener("DOMContentLoaded", renderAdminWallet);
+window.addEventListener("walletUpdated", refreshAdminWallet);
+
+setInterval(refreshAdminWallet, 5000);
+
+/* INIT */
+refreshAdminWallet();
 
 </script>
 
