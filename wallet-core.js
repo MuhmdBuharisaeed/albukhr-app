@@ -358,3 +358,7 @@ function saveWallet(wallet){
     localStorage.setItem("albukhr_wallet_status", wallet.status);
   }
 }
+
+window.dispatchEvent(new CustomEvent("walletUpdated", {
+  detail: { type: "reward-withdraw" }
+}));
