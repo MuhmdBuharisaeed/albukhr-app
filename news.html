@@ -163,22 +163,29 @@ body{
 }
 
 
-.bottom-nav{
+.dock-nav{
   position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#ffffff;
-  border-top:1px solid #e5e7eb;
-  padding:8px 0 6px;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:92%;
+  max-width:520px;
+  background:rgba(255,255,255,0.9);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-radius:40px;
+  padding:12px 8px;
   display:flex;
   justify-content:space-around;
   align-items:center;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.15),
+    inset 0 1px 0 rgba(255,255,255,.6);
   z-index:1000;
 }
 
-/* Nav Item */
-.nav-item{
+/* Items */
+.dock-item{
   flex:1;
   text-align:center;
   text-decoration:none;
@@ -188,33 +195,49 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  transition:.2s ease;
+  transition:.25s ease;
+  position:relative;
 }
 
-/* SVG Icons */
-.nav-icon{
+/* Icons */
+.dock-icon{
   width:24px;
   height:24px;
   fill:none;
   stroke:#8e8e93;
   stroke-width:1.8;
-  margin-bottom:2px;
-  transition:.2s ease;
+  margin-bottom:3px;
+  transition:.25s ease;
 }
 
-/* Active State */
-.nav-item.active{
-  color:#0f7a3d; /* Albukhr green */
+/* Active */
+.dock-item.active{
+  color:#0f7a3d;
+  font-weight:600;
 }
 
-.nav-item.active .nav-icon{
+.dock-item.active .dock-icon{
   stroke:#0f7a3d;
-  transform:scale(1.05);
+  transform:translateY(-2px) scale(1.05);
 }
 
-/* Slight tap animation */
-.nav-item:active .nav-icon{
-  transform:scale(0.95);
+/* Active subtle background bubble */
+.dock-item.active::before{
+  content:"";
+  position:absolute;
+  top:-6px;
+  bottom:-6px;
+  left:50%;
+  transform:translateX(-50%);
+  width:70%;
+  background:rgba(15,122,61,0.08);
+  border-radius:20px;
+  z-index:-1;
+}
+
+/* Tap animation */
+.dock-item:active .dock-icon{
+  transform:scale(0.9);
     }
 </style>
 </head>
@@ -236,38 +259,34 @@ body{
   </div>
 </section>
 
-<!-- ===== TELEGRAM STYLE BOTTOM NAV ===== -->
-<div class="bottom-nav">
+<!-- ===== ALBUKHR FLOATING DOCK NAV ===== -->
+<div class="dock-nav">
 
-  <!-- HOME -->
-  <a href="home.html" class="nav-item">
-    <svg viewBox="0 0 24 24" class="nav-icon">
+  <a href="home.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
       <path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>
     </svg>
     <span>Home</span>
   </a>
 
-  <!-- WALLET -->
-  <a href="wallet.html" class="nav-item">
-    <svg viewBox="0 0 24 24" class="nav-icon">
+  <a href="wallet.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
       <path d="M3 7h15a2 2 0 012 2v8a2 2 0 01-2 2H3z"/>
       <circle cx="17" cy="12" r="1.2"/>
     </svg>
     <span>Wallet</span>
   </a>
 
-  <!-- SERVICES -->
-  <a href="services.html" class="nav-item">
-    <svg viewBox="0 0 24 24" class="nav-icon">
+  <a href="services.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
       <circle cx="12" cy="12" r="3"/>
       <path d="M19.4 15a1 1 0 000-6l2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2l-2-1-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/>
     </svg>
     <span>Services</span>
   </a>
 
-  <!-- NEWS -->
-  <a href="news.html" class="nav-item">
-    <svg viewBox="0 0 24 24" class="nav-icon">
+  <a href="news.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
       <circle cx="12" cy="12" r="9"/>
       <path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>
     </svg>
@@ -277,10 +296,10 @@ body{
 </div>
 
 <script>
-const currentPage = location.pathname.split("/").pop();
+const current = location.pathname.split("/").pop();
 
-document.querySelectorAll(".nav-item").forEach(link=>{
-  if(link.getAttribute("href") === currentPage){
+document.querySelectorAll(".dock-item").forEach(link=>{
+  if(link.getAttribute("href") === current){
     link.classList.add("active");
   }
 });
