@@ -649,10 +649,10 @@ body::before{
     <span>News</span>
   </a>
 
-         </div>
+  </div>
 
 <script>
-const current = location.pathname.split("/").pop();
+const current = location.pathname.split("/").pop() || "index.html";
 
 document.querySelectorAll(".dock-item").forEach(link=>{
   if(link.getAttribute("href") === current){
@@ -660,7 +660,7 @@ document.querySelectorAll(".dock-item").forEach(link=>{
   }
 });
 </script>
-
+   
 <!-- SIDE DRAWER -->
 <div id="sideDrawer" class="side-drawer">
 
