@@ -268,119 +268,101 @@ body::before{
   font-size:16px;
   flex-shrink:0;
 }
-/* ===============================
-   ALBUKHR TELEGRAM-STYLE NAV
-================================ */
 
-.bottom-nav{
+/* ======================================
+   ALBUKHR PREMIUM DOCK NAV (FINAL)
+====================================== */
+
+.dock-nav{
   position:fixed;
-  bottom:20px;                 /* lifted from bottom */
+  bottom:18px;
   left:50%;
   transform:translateX(-50%);
+  width:94%;
+  max-width:520px;
 
-  width:92%;                   /* space left & right */
-  max-width:480px;
+  background:linear-gradient(
+    135deg,
+    #0f7a3d,
+    #149d52
+  );
+
+  border-radius:38px;
+  padding:12px 10px;
 
   display:flex;
-  justify-content:space-around;
+  justify-content:space-between;
   align-items:center;
 
-  padding:10px 0;
-
-  background:rgba(15,122,61,0.75);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-
-  border-radius:40px;          /* capsule shape */
   box-shadow:
-    0 12px 40px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.15);
+    0 14px 40px rgba(0,0,0,.25),
+    inset 0 2px 8px rgba(255,255,255,.15);
 
   z-index:1000;
 }
 
-/* NAV LINKS */
-.bottom-nav a{
+/* ITEM */
+.dock-item{
   flex:1;
   text-align:center;
   text-decoration:none;
+
   font-size:11px;
   font-weight:500;
-  color:rgba(255,255,255,0.75);
+
+  color:rgba(255,255,255,.75);
 
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:3px;
+  justify-content:center;
 
-  transition:.25s ease;
+  gap:4px;
+
   position:relative;
+  transition:.25s ease;
 }
 
 /* ICON */
-.bottom-nav a span{
-  font-size:19px;
+.dock-icon{
+  width:22px;
+  height:22px;
+  stroke:rgba(255,255,255,.75);
+  fill:none;
+  stroke-width:1.8;
   transition:.25s ease;
 }
 
 /* ACTIVE */
-.bottom-nav a.active{
-  color:#fff;
+.dock-item.active{
+  color:#ffffff;
   font-weight:600;
 }
 
-.bottom-nav a.active span{
-  transform:translateY(-3px) scale(1.1);
+.dock-item.active .dock-icon{
+  stroke:#ffffff;
+  transform:translateY(-2px) scale(1.08);
 }
 
-/* Subtle glow */
-.bottom-nav a.active::after{
+/* ACTIVE GREEN GLOW */
+.dock-item.active::before{
   content:"";
   position:absolute;
-  bottom:-6px;
-  width:6px;
-  height:6px;
-  background:#ffffff;
-  border-radius:50%;
-}
-
-/* Hover */
-.bottom-nav a:hover span{
-  transform:translateY(-2px);
-}
-/* ===============================
-   ACTIVE PULSE EFFECT
-================================ */
-
-.bottom-nav a.active span{
-  position:relative;
-}
-
-/* soft breathing glow */
-.bottom-nav a.active span::after{
-  content:"";
-  position:absolute;
-  inset:-6px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(0,255,136,0.35),transparent 70%);
-  animation:activePulse 2.2s ease-in-out infinite;
+  top:-8px;
+  bottom:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  width:70%;
+  background:rgba(255,255,255,.15);
+  border-radius:20px;
   z-index:-1;
 }
 
-@keyframes activePulse{
-  0%{
-    transform:scale(0.9);
-    opacity:.6;
-  }
-  50%{
-    transform:scale(1.15);
-    opacity:.3;
-  }
-  100%{
-    transform:scale(0.9);
-    opacity:.6;
-  }
-                             } 
+/* TAP ANIMATION */
+.dock-item:active .dock-icon{
+  transform:scale(.9);
+}
+
 /* ===============================
    SIDE DRAWER
 ================================ */
@@ -583,85 +565,6 @@ body::before{
   margin-right:6px;
 }  
 
-
-.dock-nav{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  width:92%;
-  max-width:520px;
-  background:linear-gradient(
-    135deg,
-    #0f7a3d,
-    #149d52
-  );
-  border-radius:40px;
-  padding:14px 8px;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  box-shadow:
-    0 12px 35px rgba(0,0,0,.25),
-    inset 0 2px 6px rgba(255,255,255,.15);
-  z-index:1000;
-}
-
-/* Nav item */
-.dock-item{
-  flex:1;
-  text-align:center;
-  text-decoration:none;
-  font-size:12px;
-  font-weight:500;
-  color:#e6f5ec;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  position:relative;
-  transition:.25s ease;
-}
-
-/* SVG icons */
-.dock-icon{
-  width:24px;
-  height:24px;
-  fill:none;
-  stroke:#e6f5ec;
-  stroke-width:1.8;
-  margin-bottom:3px;
-  transition:.25s ease;
-}
-
-/* Active state */
-.dock-item.active{
-  color:#ffffff;
-  font-weight:600;
-}
-
-.dock-item.active .dock-icon{
-  stroke:#ffffff;
-  transform:translateY(-2px) scale(1.05);
-}
-
-/* Active highlight bubble */
-.dock-item.active::before{
-  content:"";
-  position:absolute;
-  top:-6px;
-  bottom:-6px;
-  left:50%;
-  transform:translateX(-50%);
-  width:75%;
-  background:rgba(255,255,255,.15);
-  border-radius:20px;
-  z-index:-1;
-}
-
-/* Tap animation */
-.dock-item:active .dock-icon{
-  transform:scale(.9);
-   }
 </style>
    
 </head>
@@ -746,7 +649,7 @@ body::before{
     <span>News</span>
   </a>
 
-</div>
+         </div>
 
 <script>
 const current = location.pathname.split("/").pop();
