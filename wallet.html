@@ -260,11 +260,7 @@ body{
   transform:translateX(-50%);
   width:92%;
   max-width:520px;
-  background:linear-gradient(
-    135deg,
-    #0f7a3d,
-    #149d52
-  );
+  background:linear-gradient(135deg,#0f7a3d,#149d52);
   border-radius:40px;
   padding:14px 8px;
   display:flex;
@@ -276,7 +272,6 @@ body{
   z-index:1000;
 }
 
-/* Nav item */
 .dock-item{
   flex:1;
   text-align:center;
@@ -291,7 +286,6 @@ body{
   transition:.25s ease;
 }
 
-/* SVG icons */
 .dock-icon{
   width:24px;
   height:24px;
@@ -302,7 +296,6 @@ body{
   transition:.25s ease;
 }
 
-/* Active state */
 .dock-item.active{
   color:#ffffff;
   font-weight:600;
@@ -313,7 +306,6 @@ body{
   transform:translateY(-2px) scale(1.05);
 }
 
-/* Active highlight bubble */
 .dock-item.active::before{
   content:"";
   position:absolute;
@@ -325,11 +317,6 @@ body{
   background:rgba(255,255,255,.15);
   border-radius:20px;
   z-index:-1;
-}
-
-/* Tap animation */
-.dock-item:active .dock-icon{
-  transform:scale(.9);
   }
 </style>
 </head>
