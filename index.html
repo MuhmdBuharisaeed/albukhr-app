@@ -686,7 +686,7 @@ body::before{
 </section>
 
 <div class="popular-section">
-  <div class="popular-title">🔥 Popular Projects</div>
+  <div class="popular-title">📊 Popular Projects</div>
   <div class="popular-scroll" id="popularProjects"></div>
 </div>
 
@@ -941,6 +941,7 @@ function renderAssets(userMap, globalMap){
   const container = document.getElementById("assetsContainer");
   container.innerHTML = "";
 
+  /* MASTER PROJECT LIST */
   const ALL_PROJECTS = [
     "Raheem",
     "Hauwal",
@@ -951,29 +952,30 @@ function renderAssets(userMap, globalMap){
     "Labbaika"
   ];
 
+  /* Merge data */
   const merged = ALL_PROJECTS.map(project => ({
     name: project,
     globalTotal: globalMap[project]?.total || 0,
     userAmount: userMap[project] || 0
   }));
 
+  /* SORT RULE:
+     1. User staked first
+     2. Higher stake first
+     3. Then global popularity
+  */
   merged.sort((a,b)=>{
     if(a.userAmount > 0 && b.userAmount === 0) return -1;
     if(a.userAmount === 0 && b.userAmount > 0) return 1;
+
     if(a.userAmount !== b.userAmount)
       return b.userAmount - a.userAmount;
+
     return b.globalTotal - a.globalTotal;
   });
 
+  /* Render */
   merged.forEach(item => {
-
-    const percentage =
-      item.globalTotal > 0
-        ? Math.min(
-            (item.userAmount / item.globalTotal) * 100,
-            100
-          )
-        : 0;
 
     const div = document.createElement("div");
     div.className = "asset-item";
@@ -986,9 +988,7 @@ function renderAssets(userMap, globalMap){
       </div>
 
       <div class="asset-left">
-
         <div class="asset-name">${item.name}</div>
-
         <div class="asset-stake">
           ${
             item.userAmount > 0
@@ -996,20 +996,6 @@ function renderAssets(userMap, globalMap){
             : "Not Staked"
           }
         </div>
-
-        <div class="asset-progress-row">
-
-          <div class="asset-progress">
-            <div class="asset-progress-bar"
-                 style="width:${percentage}%"></div>
-          </div>
-
-          <div class="asset-percent">
-            ${percentage.toFixed(0)}%
-          </div>
-
-        </div>
-
       </div>
     `;
 
@@ -1017,7 +1003,7 @@ function renderAssets(userMap, globalMap){
 
   });
 
-}
+   }
 
 /* ASSETS VISIBILITY */
 const VISIBILITY_KEY="albukhr_assets_visibility";
