@@ -553,6 +553,48 @@ body::before{
   margin-right:6px;
 }  
 
+/* ===============================
+   ASSET PROGRESS BAR
+================================ */
+
+.asset-progress{
+  margin-top:6px;
+  height:5px;
+  background:#eef5f1;
+  border-radius:10px;
+  overflow:hidden;
+  position:relative;
+}
+
+.asset-progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#0f7a3d,#33c17d);
+  border-radius:10px;
+  transition:width .6s ease;
+}
+
+/* subtle shine animation */
+.asset-progress-bar::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-40%;
+  height:100%;
+  width:40%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.5),
+    transparent
+  );
+  animation:progressShine 2.5s infinite;
+}
+
+@keyframes progressShine{
+  0%{left:-40%;}
+  100%{left:120%;}
+   } 
 </style>
    
 </head>
@@ -841,7 +883,6 @@ function renderAssets(userMap, globalMap){
   const container = document.getElementById("assetsContainer");
   container.innerHTML = "";
 
-  /* MASTER PROJECT LIST */
   const ALL_PROJECTS = [
     "Raheem",
     "Hauwal",
@@ -852,30 +893,29 @@ function renderAssets(userMap, globalMap){
     "Labbaika"
   ];
 
-  /* Merge data */
   const merged = ALL_PROJECTS.map(project => ({
     name: project,
     globalTotal: globalMap[project]?.total || 0,
     userAmount: userMap[project] || 0
   }));
 
-  /* SORT RULE:
-     1. User staked first
-     2. Higher stake first
-     3. Then global popularity
-  */
   merged.sort((a,b)=>{
     if(a.userAmount > 0 && b.userAmount === 0) return -1;
     if(a.userAmount === 0 && b.userAmount > 0) return 1;
-
     if(a.userAmount !== b.userAmount)
       return b.userAmount - a.userAmount;
-
     return b.globalTotal - a.globalTotal;
   });
 
-  /* Render */
   merged.forEach(item => {
+
+    const percentage =
+      item.globalTotal > 0
+        ? Math.min(
+            (item.userAmount / item.globalTotal) * 100,
+            100
+          )
+        : 0;
 
     const div = document.createElement("div");
     div.className = "asset-item";
@@ -889,12 +929,18 @@ function renderAssets(userMap, globalMap){
 
       <div class="asset-left">
         <div class="asset-name">${item.name}</div>
+
         <div class="asset-stake">
           ${
             item.userAmount > 0
             ? item.userAmount.toFixed(2) + " Pi Staked"
             : "Not Staked"
           }
+        </div>
+
+        <div class="asset-progress">
+          <div class="asset-progress-bar"
+               style="width:${percentage}%"></div>
         </div>
       </div>
     `;
@@ -903,7 +949,8 @@ function renderAssets(userMap, globalMap){
 
   });
 
-}
+     }
+
 /* ASSETS VISIBILITY */
 const VISIBILITY_KEY="albukhr_assets_visibility";
 function isAssetsHidden(){return localStorage.getItem(VISIBILITY_KEY)==="hidden";}
