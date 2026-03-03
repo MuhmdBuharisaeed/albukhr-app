@@ -837,29 +837,73 @@ function renderPopular(globalMap){
 }
 
 function renderAssets(userMap, globalMap){
-  const container=document.getElementById("assetsContainer");
-  container.innerHTML="";
-  const projects=Object.keys(globalMap);
-  if(projects.length===0){ container.innerHTML="<p style='font-size:12px;color:#777'>No projects</p>"; return;}
-  const merged=projects.map(p=>({name:p,globalTotal:globalMap[p].total,userAmount:userMap[p]||0}));
-  merged.sort((a,b)=>{
-    if(a.userAmount>0 && b.userAmount===0) return -1;
-    if(a.userAmount===0 && b.userAmount>0) return 1;
-    if(a.userAmount!==b.userAmount) return b.userAmount-a.userAmount;
-    return b.globalTotal-a.globalTotal;
-  }).slice(0,10).forEach(item=>{
-    const div=document.createElement("div");
-    div.className="asset-item";
-    div.onclick=()=> location.href=item.name.toLowerCase()+".html";
-    div.innerHTML=`<div class="asset-icon">${ICONS[item.name]||"📦"}</div>
-    <div class="asset-left">
-      <div class="asset-name">${item.name}</div>
-      <div class="asset-stake">${item.userAmount>0?item.userAmount.toFixed(2)+" Pi Staked":"Not Staked"}</div>
-    </div>`;
-    container.appendChild(div);
-  });
-}
 
+  const container = document.getElementById("assetsContainer");
+  container.innerHTML = "";
+
+  /* MASTER PROJECT LIST */
+  const ALL_PROJECTS = [
+    "Raheem",
+    "Hauwal",
+    "Barsh",
+    "Khairat",
+    "Azman",
+    "Urban",
+    "Labbaika"
+  ];
+
+  /* Merge data */
+  const merged = ALL_PROJECTS.map(project => ({
+    name: project,
+    globalTotal: globalMap[project]?.total || 0,
+    userAmount: userMap[project] || 0
+  }));
+
+  /* SORT RULE:
+     1. User staked first
+     2. Higher stake first
+     3. Then global popularity
+  */
+  merged.sort((a,b)=>{
+    if(a.userAmount > 0 && b.userAmount === 0) return -1;
+    if(a.userAmount === 0 && b.userAmount > 0) return 1;
+
+    if(a.userAmount !== b.userAmount)
+      return b.userAmount - a.userAmount;
+
+    return b.globalTotal - a.globalTotal;
+  });
+
+  /* Render */
+  merged.forEach(item => {
+
+    const div = document.createElement("div");
+    div.className = "asset-item";
+    div.onclick = () =>
+      location.href = item.name.toLowerCase() + ".html";
+
+    div.innerHTML = `
+      <div class="asset-icon">
+        ${ICONS[item.name] || "📦"}
+      </div>
+
+      <div class="asset-left">
+        <div class="asset-name">${item.name}</div>
+        <div class="asset-stake">
+          ${
+            item.userAmount > 0
+            ? item.userAmount.toFixed(2) + " Pi Staked"
+            : "Not Staked"
+          }
+        </div>
+      </div>
+    `;
+
+    container.appendChild(div);
+
+  });
+
+}
 /* ASSETS VISIBILITY */
 const VISIBILITY_KEY="albukhr_assets_visibility";
 function isAssetsHidden(){return localStorage.getItem(VISIBILITY_KEY)==="hidden";}
