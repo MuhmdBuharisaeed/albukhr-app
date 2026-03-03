@@ -321,85 +321,86 @@ body{
   transform:scale(.97);
 }
 
-/* ===============================
-   ALBUKHR TELEGRAM-STYLE NAV
-================================ */
-
-.bottom-nav{
+/* ======================================
+   ALBUKHR PREMIUM DOCK NAV (FINAL)
+====================================== */
+.dock-nav{
   position:fixed;
-  bottom:20px;                 /* lifted from bottom */
+  bottom:20px;
   left:50%;
   transform:translateX(-50%);
-
-  width:92%;                   /* space left & right */
-  max-width:480px;
-
+  width:92%;
+  max-width:520px;
+  background:linear-gradient(
+    135deg,
+    #0f7a3d,
+    #149d52
+  );
+  border-radius:40px;
+  padding:14px 8px;
   display:flex;
   justify-content:space-around;
   align-items:center;
-
-  padding:10px 0;
-
-  background:rgba(15,122,61,0.75);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-
-  border-radius:40px;          /* capsule shape */
   box-shadow:
-    0 12px 40px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.15);
-
+    0 12px 35px rgba(0,0,0,.25),
+    inset 0 2px 6px rgba(255,255,255,.15);
   z-index:1000;
 }
 
-/* NAV LINKS */
-.bottom-nav a{
+/* Nav item */
+.dock-item{
   flex:1;
   text-align:center;
   text-decoration:none;
-  font-size:11px;
+  font-size:12px;
   font-weight:500;
-  color:rgba(255,255,255,0.75);
-
+  color:#e6f5ec;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:3px;
-
-  transition:.25s ease;
   position:relative;
-}
-
-/* ICON */
-.bottom-nav a span{
-  font-size:19px;
   transition:.25s ease;
 }
 
-/* ACTIVE */
-.bottom-nav a.active{
-  color:#fff;
+/* SVG icons */
+.dock-icon{
+  width:24px;
+  height:24px;
+  fill:none;
+  stroke:#e6f5ec;
+  stroke-width:1.8;
+  margin-bottom:3px;
+  transition:.25s ease;
+}
+
+/* Active state */
+.dock-item.active{
+  color:#ffffff;
   font-weight:600;
 }
 
-.bottom-nav a.active span{
-  transform:translateY(-3px) scale(1.1);
+.dock-item.active .dock-icon{
+  stroke:#ffffff;
+  transform:translateY(-2px) scale(1.05);
 }
 
-/* Subtle glow */
-.bottom-nav a.active::after{
+/* Active highlight bubble */
+.dock-item.active::before{
   content:"";
   position:absolute;
+  top:-6px;
   bottom:-6px;
-  width:6px;
-  height:6px;
-  background:#ffffff;
-  border-radius:50%;
+  left:50%;
+  transform:translateX(-50%);
+  width:75%;
+  background:rgba(255,255,255,.15);
+  border-radius:20px;
+  z-index:-1;
 }
 
-/* Hover */
-.bottom-nav a:hover span{
-  transform:translateY(-2px);
+/* Tap animation */
+.dock-item:active .dock-icon{
+  transform:scale(.9);
 }
 
 /* ===== SEARCH INPUT ===== */
