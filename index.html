@@ -595,6 +595,64 @@ body::before{
   0%{left:-40%;}
   100%{left:120%;}
    } 
+
+/* ===============================
+   ASSET PROGRESS ROW
+================================ */
+
+.asset-progress-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:6px;
+}
+
+.asset-progress{
+  flex:1;
+  height:5px;
+  background:#eef5f1;
+  border-radius:10px;
+  overflow:hidden;
+  position:relative;
+}
+
+.asset-progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#0f7a3d,#33c17d);
+  border-radius:10px;
+  transition:width .6s ease;
+  position:relative;
+}
+
+.asset-progress-bar::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-40%;
+  height:100%;
+  width:40%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.5),
+    transparent
+  );
+  animation:progressShine 2.5s infinite;
+}
+
+.asset-percent{
+  font-size:11px;
+  font-weight:600;
+  color:#0f7a3d;
+  min-width:34px;
+  text-align:right;
+}
+
+@keyframes progressShine{
+  0%{left:-40%;}
+  100%{left:120%;}
+   }
 </style>
    
 </head>
@@ -928,6 +986,7 @@ function renderAssets(userMap, globalMap){
       </div>
 
       <div class="asset-left">
+
         <div class="asset-name">${item.name}</div>
 
         <div class="asset-stake">
@@ -938,10 +997,19 @@ function renderAssets(userMap, globalMap){
           }
         </div>
 
-        <div class="asset-progress">
-          <div class="asset-progress-bar"
-               style="width:${percentage}%"></div>
+        <div class="asset-progress-row">
+
+          <div class="asset-progress">
+            <div class="asset-progress-bar"
+                 style="width:${percentage}%"></div>
+          </div>
+
+          <div class="asset-percent">
+            ${percentage.toFixed(0)}%
+          </div>
+
         </div>
+
       </div>
     `;
 
@@ -949,7 +1017,7 @@ function renderAssets(userMap, globalMap){
 
   });
 
-     }
+}
 
 /* ASSETS VISIBILITY */
 const VISIBILITY_KEY="albukhr_assets_visibility";
