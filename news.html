@@ -5,12 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Albukhr News</title>
 
+<link rel="stylesheet" href="style.css">
+
 <style>
 body{
   margin:0;
   font-family:system-ui;
   background:#f4f7f6;
   padding-bottom:110px;
+}
+
+/* ===== HEADER MATCH INDEX ===== */
+.header{
+  background:#0f7a3d;
+  height:60px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.main-logo{
+  height:54px;
+  width:auto;
+}
+
+.menu-icon{
+  width:18px;
+  height:13px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+.menu-icon div{
+  height:2px;
+  background:#fff;
+  border-radius:2px;
 }
 
 /* ===== NEWS SECTION ===== */
@@ -125,30 +162,17 @@ body{
   visibility:visible;
 }
 </style>
-<script src="js/news.js"></script>
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/global-header.css">
-<link rel="stylesheet" href="css/global-buttons.css">  
+
+<link rel="stylesheet" href="global-buttons.css">  
 </head>
 
 <body data-page="news">
 
 <!-- ===== HEADER ===== -->
 <header class="header">
-
   <div class="header-left">
-    <img src="IMG_20260125_183804.png" class="main-logo">
-    <span class="brand">ALBUKHR</span>
+    <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
   </div>
-
-  <div class="header-right">
-
-    <div class="header-btn">
-      🔔
-    </div>
-
-  </div>
-
 </header>
 
 <!-- ===== NEWS CONTENT ===== -->
@@ -269,4 +293,4 @@ renderNews();
 </script>
 
 </body>
-</html>
+        </html>
