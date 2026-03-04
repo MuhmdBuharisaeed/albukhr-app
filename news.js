@@ -1,96 +1,272 @@
-const newsContainer = document.getElementById("newsContainer");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albukhr News</title>
 
-/* =============================
-   VERIFIED PI SOURCES
-============================= */
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f4f7f6;
+  padding-bottom:110px;
+}
 
-const VERIFIED_SOURCES = [
-  "Pi Network Official",
-  "Pi Core Team",
-  "MinePi.com",
-  "Pi News Global",
-  "Pi Open Mainnet"
-];
+/* ===== NEWS SECTION ===== */
+.section{
+  padding:16px;
+}
 
-/* =============================
-   SAMPLE NEWS DATA
-============================= */
+/* Skeleton */
+.skeleton{
+  height:180px;
+  border-radius:16px;
+  margin-bottom:14px;
+  background:linear-gradient(90deg,#eee,#f5f5f5,#eee);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+}
+@keyframes shimmer{
+  0%{background-position:200% 0;}
+  100%{background-position:-200% 0;}
+}
 
-const NEWS_DATA = [
-  {
-    id:"pi1",
-    title:"Pi Network Ecosystem Expansion",
-    content:"Pi Network continues ecosystem development ahead of Open Mainnet phase.",
-    source:"Pi Network Official",
-    date: Date.now(),
-    image:"https://minepi.com/static/media/pi-logo.png",
-    link:"https://minepi.com"
-  },
-  {
-    id:"pi2",
-    title:"Pi Community Global Meetup",
-    content:"Thousands of pioneers gathered for ecosystem update event.",
-    source:"Pi News Global",
-    date: Date.now(),
-    video:"https://www.w3schools.com/html/mov_bbb.mp4"
+/* ===== NEWS CARD ===== */
+.news-card{
+  background:#fff;
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.06);
+  transition:.25s ease;
+}
+.news-card:hover{
+  transform:translateY(-3px);
+}
+
+.news-media{
+  width:100%;
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+.news-media img,
+.news-media video{
+  width:100%;
+  display:block;
+  border-radius:14px;
+}
+
+.news-title{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.news-summary{
+  font-size:13px;
+  color:#444;
+  margin-bottom:8px;
+}
+
+.news-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:11px;
+  color:#777;
+}
+
+.source-badge{
+  background:#e6f6ec;
+  padding:4px 8px;
+  border-radius:20px;
+  font-weight:600;
+  color:#0f7a3d;
+}
+
+.verified-badge{
+  background:#0f7a3d;
+  color:#fff;
+  padding:3px 8px;
+  border-radius:20px;
+  font-size:10px;
+  margin-left:6px;
+}
+
+/* ===== SIDE DRAWER ===== */
+.side-drawer{
+  position: fixed;
+  top:0;
+  right:-280px;
+  width:280px;
+  height:100%;
+  background:#fff;
+  box-shadow:-4px 0 18px rgba(0,0,0,0.12);
+  transition:right .3s ease;
+  z-index:1001;
+  display:flex;
+  flex-direction:column;
+}
+.side-drawer.open{ right:0; }
+
+.drawer-overlay{
+  position: fixed;
+  inset:0;
+  background: rgba(0,0,0,0.2);
+  opacity:0;
+  visibility:hidden;
+  transition:.3s ease;
+  z-index:1000;
+}
+.drawer-overlay.show{
+  opacity:1;
+  visibility:visible;
+}
+</style>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="css/global-buttons.css">  
+</head>
+
+<body data-page="news">
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+
+  <div class="header-left">
+    <img src="IMG_20260125_183804.png" class="main-logo">
+    <span class="brand">ALBUKHR</span>
+  </div>
+
+  <div class="header-right">
+
+    <div class="header-btn">
+      🔔
+    </div>
+
+  </div>
+
+</header>
+
+<!-- ===== NEWS CONTENT ===== -->
+<section class="section">
+  <div id="newsContainer">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</section>
+
+<!-- ===== ALBUKHR FLOATING DOCK NAV ===== -->
+<div class="dock-nav">
+
+  <a href="index.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
+      <path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>
+    </svg>
+    <span>Home</span>
+  </a>
+
+  <a href="wallet.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
+      <path d="M3 7h15a2 2 0 012 2v8a2 2 0 01-2 2H3z"/>
+      <circle cx="17" cy="12" r="1.2"/>
+    </svg>
+    <span>Wallet</span>
+  </a>
+
+  <a href="services.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1 1 0 000-6l2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2l-2-1-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/>
+    </svg>
+    <span>Services</span>
+  </a>
+
+  <a href="news.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>
+    </svg>
+    <span>Pi News</span>
+  </a>
+
+</div>
+
+<script>
+const current = location.pathname.split("/").pop();
+
+document.querySelectorAll(".dock-item").forEach(link=>{
+  if(link.getAttribute("href") === current){
+    link.classList.add("active");
   }
-];
+});
+</script>
+  
+<script src="news-data.js"></script>
 
-/* =============================
-   RENDER FUNCTION
-============================= */
+<script>
+async function renderNews(){
 
-function renderNews(){
+  const container = document.getElementById("newsContainer");
+  container.innerHTML = "";
 
-  newsContainer.innerHTML = "";
+  const news = await getAllNews();
 
-  if(!NEWS_DATA.length){
-    newsContainer.innerHTML = "<p>No news yet</p>";
+  if(!news.length){
+    container.innerHTML = "<p>No news available</p>";
     return;
   }
 
-  NEWS_DATA
-    .sort((a,b)=> b.date - a.date)
-    .forEach(item=>{
+  news.forEach(item=>{
 
-      const card = document.createElement("div");
-      card.className = "news-card";
+    const div = document.createElement("div");
+    div.className = "news-card";
 
-      let mediaHTML = "";
-
-      if(item.video){
-        mediaHTML = `
-          <div class="news-media">
-            <video controls>
-              <source src="${item.video}" type="video/mp4">
-            </video>
-          </div>
-        `;
-      }
-      else if(item.image){
-        mediaHTML = `
-          <div class="news-media">
-            <img src="${item.image}" alt="News Image">
-          </div>
-        `;
+    div.innerHTML = `
+      ${
+        item.image || item.video
+        ? `
+        <div class="news-media">
+          ${
+            item.video
+            ? `<video controls src="${item.video}"></video>`
+            : `<img src="${item.image}" alt="news image">`
+          }
+        </div>`
+        : ""
       }
 
-      card.innerHTML = `
-        ${mediaHTML}
-        <div class="news-title">${item.title}</div>
-        <div class="news-content">${item.content}</div>
-        <div class="news-meta">
-          ${item.source} • ${new Date(item.date).toLocaleString()}
-        </div>
-      `;
+      <div class="news-title">
+        ${item.title}
+        ${
+          item.verified
+          ? `<span class="verified-badge">Verified</span>`
+          : ""
+        }
+      </div>
 
-      if(item.link){
-        card.style.cursor="pointer";
-        card.onclick=()=> window.open(item.link,"_blank");
-      }
+      <div class="news-summary">
+        ${item.summary || ""}
+      </div>
 
-      newsContainer.appendChild(card);
-    });
+      <div class="news-meta">
+        <div class="source-badge">${item.source}</div>
+        <div>${new Date(item.date).toLocaleDateString()}</div>
+      </div>
+    `;
+
+    div.onclick = ()=> window.open(item.link,"_blank");
+
+    container.appendChild(div);
+  });
 }
 
 renderNews();
+
+</script>
+
+</body>
+  </html>
