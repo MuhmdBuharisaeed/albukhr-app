@@ -24,26 +24,6 @@ body{
   padding-bottom:70px; /* kare content daga bottom-nav */
 }
 
-/* ================= HEADER ================= */
-.header{
-  background:#0f7a3d;
-  color:#fff;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.brand{
-  font-size:24px;
-  font-weight:bold;
-}
-
-.header-right{
-  font-size:14px;
-  cursor:pointer;
-}
-
 /* ================= WELCOME BAR ================= */
 .welcome-bar{
   background:#e6f4ec;
