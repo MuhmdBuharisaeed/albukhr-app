@@ -729,3 +729,100 @@ body{
 .asset-progress-faint{
   background:#cfe9db;
 }
+/* ===== MOBILE APP LAYOUT ===== */
+
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f4f7f6;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* Page scroll container */
+.app-content{
+  position:fixed;
+  top:60px;                 /* header height */
+  left:0;
+  right:0;
+  bottom:90px;              /* nav space */
+  overflow-y:auto;
+  padding:16px;
+}
+
+/* Header */
+.header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:60px;
+  background:#0f7a3d;
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  z-index:100;
+}
+
+/* ===== DOCK NAV ===== */
+
+.dock-nav{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:92%;
+  max-width:520px;
+  height:68px;
+
+  background:linear-gradient(135deg,#0f7a3d,#149d52);
+
+  border-radius:40px;
+
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.25),
+    inset 0 2px 6px rgba(255,255,255,.15);
+
+  z-index:1000;
+}
+
+/* nav items */
+
+.dock-item{
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+
+  font-size:11px;
+  color:#e6f5ec;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  transition:.25s ease;
+}
+
+.dock-icon{
+  width:22px;
+  height:22px;
+  stroke:#e6f5ec;
+  margin-bottom:3px;
+}
+
+/* active state */
+
+.dock-item.active{
+  color:#fff;
+  font-weight:600;
+}
+
+.dock-item.active .dock-icon{
+  stroke:#fff;
+  transform:scale(1.05);
+}
