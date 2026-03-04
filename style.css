@@ -647,3 +647,7 @@ body{
 .asset-progress-faint{
   background:#cfe9db;
 }
+
+:root{
+  --albukhr-gold:#d4af37;
+}
