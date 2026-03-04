@@ -715,9 +715,7 @@ body{
   text-align:center;
   text-decoration:none;
 
-  font-size:10px;
-  letter-spacing:.2px;
-
+  font-size:11px;
   color:#e6f5ec;
 
   display:flex;
@@ -728,19 +726,11 @@ body{
   transition:.25s ease;
 }
 
-.dock-item:active .dock-icon{
-  transform:scale(.9);
-}
-
 .dock-icon{
-  width:26px;
-  height:26px;
+  width:22px;
+  height:22px;
   stroke:#e6f5ec;
-  stroke-width:2;
-  margin-bottom:4px;
-  transition:.25s ease;
-
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+  margin-bottom:3px;
 }
 
 /* active state */
@@ -751,8 +741,6 @@ body{
 }
 
 .dock-item.active .dock-icon{
-  stroke:#ffffff;
-  transform:translateY(-2px) scale(1.12);
-
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+  stroke:#fff;
+  transform:scale(1.05);
    }
