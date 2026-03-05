@@ -46,10 +46,10 @@
 /* brand name */
 
 .brand{
-  font-size:14px;
-  font-weight:700;
+  font-size:18px;
+  font-weight:800;
   color:#ffffff;
-  letter-spacing:.4px;
+  letter-spacing:1px;
 }
 
 /* right actions */
@@ -96,4 +96,9 @@
 body{
   padding-top:60px;
   padding-bottom:90px;
+}
+
+.menu-icon{
+  font-size:22px;
+  cursor:pointer;
 }
