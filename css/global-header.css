@@ -50,11 +50,7 @@
   display:block;
 
   position:relative;
-  top:-5px;
-
-  filter:
-    drop-shadow(0 0 3px rgba(212,175,55,.45))
-    drop-shadow(0 0 6px rgba(212,175,55,.30));
+  top:-4px;   /* yana daga logo sama kadan */
 }
 
 /* brand name */
