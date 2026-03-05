@@ -3,721 +3,510 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Wallet</title>
 
-<style>
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#f4f7f6;
-  padding-bottom:110px; /* space for floating nav */
-}
+<title>Albukhr Services</title>
 
-/* ===== WALLET TOP TABS (OUTSIDE HEADER) ===== */
-.wallet-tabs{
-  display:flex;
-  gap:10px;
-  padding:14px 16px;
-  background:#f4f7f6; /* same as body */
-}
-
-/* Smaller refined buttons */
-.nav-btn{
-  flex:1;
-  padding:8px 10px;
-  border-radius:12px;
-  font-size:12px;
-  font-weight:600;
-  cursor:pointer;
-  border:none;
-  transition:.2s ease;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-}
-
-/* Active Wallet */
-.nav-wallet{
-  background:#0f7a3d;
-  color:#fff;
-  box-shadow:0 4px 12px rgba(15,122,61,0.25);
-}
-
-/* Secondary */
-.nav-trans{
-  background:#fff;
-  color:#0f7a3d;
-  border:1px solid #dfeee7;
-}
-
-/* ===== FIXED SUMMARY ===== */
-.summary{
-  background:#fff;
-  padding:16px;
-  border-bottom:1px solid #eee;
-  flex-shrink:0;
-}
-
-.balance{
-  font-size:26px;
-  font-weight:800;
-  color:#0f7a3d;
-}
-
-.sub{font-size:12px;color:#666;margin-top:4px}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  margin-top:6px;
-  font-size:13px;
-}
-
-/* ===== SCROLL AREA ===== */
-.scroll-area{
-  padding:16px;
-}
-
-/* ===== PROJECT CARD ===== */
-.project-card{
-  background:#fff;
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:16px;
-  box-shadow:0 6px 18px rgba(15,122,61,0.06);
-  transition:all .25s ease;
-}
-
-.project-card:hover{
-  transform:translateY(-2px);
-  box-shadow:0 10px 24px rgba(15,122,61,0.12);
-}
-
-.project-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  cursor:pointer;
-}
-
-.project-title{
-  font-weight:700;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:14px;
-}
-
-/* ===== PREMIUM ICON ===== */
-.project-icon{
-  width:36px;
-  height:36px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  font-size:16px;
-  background:linear-gradient(135deg,#e6f7ee,#f3fff8);
-  box-shadow:
-    0 4px 12px rgba(15,122,61,0.15),
-    inset 0 0 6px rgba(255,255,255,0.7);
-  transition:all .3s ease;
-}
-
-.project-card:hover .project-icon{
-  transform:scale(1.08);
-}
-
-/* ===== BODY ===== */
-.project-body{
-  margin-top:12px;
-  display:none;
-  animation:fadeIn .25s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(-4px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-.btn{
-  padding:9px 14px;
-  border:none;
-  border-radius:12px;
-  background:#0f7a3d;
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-  font-size:12px;
-  transition:all .2s ease;
-}
-
-.btn:hover{
-  background:#0c5f2f;
-  transform:scale(1.03);
-}
-
-/* ===== MODAL ===== */
-.modal-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-
-.modal{
-  background:#fff;
-  padding:20px;
-  border-radius:14px;
-  width:90%;
-  max-width:400px;
-}
-
-.modal input{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #ddd;
-}
-
-.modal-actions{
-  display:flex;
-  gap:10px;
-}
-</style>
-
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="css/global-header.css">
 <link rel="stylesheet" href="global-buttons.css">
-  
+
+<style>
+
+html,body{
+margin:0;
+padding:0;
+background:#f4f7f6;
+font-family:system-ui;
+padding-bottom:110px;
+}
+
+/* SECTION */
+
+.section{
+padding:16px;
+}
+
+/* SERVICE CARD */
+
+.service-card{
+
+background:#fff;
+
+border-radius:18px;
+
+padding:16px;
+
+margin-bottom:16px;
+
+display:flex;
+
+gap:14px;
+
+box-shadow:0 6px 18px rgba(0,0,0,0.06);
+
+cursor:pointer;
+
+transition:.25s;
+}
+
+.service-card:hover{
+
+transform:translateY(-2px);
+
+box-shadow:0 10px 24px rgba(0,0,0,0.08);
+}
+
+/* ICON */
+
+.service-icon{
+
+font-size:24px;
+
+width:44px;
+height:44px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+border-radius:12px;
+
+background:#f2f7f4;
+}
+
+/* BODY */
+
+.service-body{
+flex:1;
+}
+
+.service-title{
+
+font-weight:700;
+
+font-size:15px;
+
+margin-bottom:4px;
+}
+
+.service-desc{
+
+font-size:13px;
+
+color:#666;
+
+line-height:1.5;
+}
+
+/* FOOTER */
+
+.service-footer{
+
+margin-top:12px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+}
+
+.service-action{
+
+font-size:13px;
+
+font-weight:600;
+
+color:#0f7a3d;
+}
+
+.arrow{
+font-size:14px;
+color:#0f7a3d;
+}
+
+/* BADGES */
+
+.badge{
+
+display:inline-block;
+
+font-size:10px;
+
+padding:4px 9px;
+
+border-radius:20px;
+
+margin-top:6px;
+
+font-weight:600;
+}
+
+.badge.public{
+
+background:#e6f5ec;
+
+color:#0f7a3d;
+}
+
+.badge.paid{
+
+background:#fff3cd;
+
+color:#856404;
+}
+
+.badge.restricted{
+
+background:#f8d7da;
+
+color:#842029;
+}
+
+.badge.coming{
+
+background:#e7f1ff;
+
+color:#084298;
+}
+
+/* LOCKED */
+
+.locked{
+
+opacity:.55;
+
+pointer-events:none;
+}
+
+/* NOTICE */
+
+.notice{
+
+font-size:12px;
+
+color:#777;
+
+line-height:1.6;
+
+margin-top:20px;
+}
+
+</style>
+
 </head>
-<body>
+
+<body data-page="services">
+
+<!-- ===== ALBUKHR HEADER ===== -->
 
 <header class="header">
 
-  <div class="header-left">
-    <img src="IMG_20260125_183804.png" class="main-logo">
-    <span class="brand">ALBUKHR</span>
-  </div>
+<div class="header-left">
 
-  <div class="header-right">
+<img src="IMG_20260125_183804.png" class="main-logo">
 
-    <div class="header-btn notification-btn" onclick="openNotifications()">
+<span class="brand">ALBUKHR</span>
 
-  🔔
+</div>
 
-  <span id="notifBadge" class="notification-badge"></span>
+<div class="header-right">
 
-    </div>
+<div class="header-btn notification-btn" onclick="openNotifications()">
 
-    <div class="header-btn menu-icon" onclick="toggleMenu()">
-  ☰
-    </div>
+🔔
 
-  </div>
+<span id="notifBadge" class="notification-badge"></span>
+
+</div>
+
+<div class="header-btn menu-icon" onclick="toggleMenu()">
+
+☰
+
+</div>
+
+</div>
 
 </header>
 
-<div class="summary">
-  <div class="balance" id="available">0.00 Pi</div>
-  <div class="sub">Available Reward Balance</div>
+<!-- ===== SERVICES ===== -->
 
-  <div class="row">
-    <div>Total Staked</div>
-    <div id="totalStake">0.00 Pi</div>
-  </div>
+<div class="section">
 
-  <div class="row">
-    <div>Total Rewards (Gross)</div>
-    <div id="totalReward">0.00 Pi</div>
-  </div>
+<!-- CREATE EXTERNAL PROJECT -->
 
-  <div class="row">
-    <div>Total Withdrawn</div>
-    <div id="withdrawn">0.00 Pi</div>
-  </div>
-</div>
+<div class="service-card" onclick="goCreateExternal()">
 
-<div class="wallet-tabs">
-  <button class="nav-btn nav-wallet">
-     Wallet
-  </button>
+<div class="service-icon">🚀</div>
 
-  <button class="nav-btn nav-trans"
-    onclick="window.location.href='transactions.html'">
-     Transactions
-  </button>
-</div>
-  
-<div id="withdrawSuccessBox" style="
-  display:none;
-  margin:12px 16px;
-  padding:12px;
-  border-radius:10px;
-  background:#e9f9ef;
-  color:#0f7a3d;
-  font-size:13px;
-  font-weight:600;
-">
-  Withdraw Successful
-</div>
-  
-<div class="scroll-area" id="projectContainer"></div>
+<div class="service-body">
 
-<!-- WITHDRAW MODAL -->
-<div class="modal-overlay" id="withdrawModal">
-<div class="modal">
-<h3 id="modalProject">Withdraw</h3>
+<div class="service-title">Create External Project</div>
 
-<input type="number" id="withdrawAmount" placeholder="Amount">
-<input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">
+<div class="service-desc">
 
-<div class="modal-actions">
-<button class="btn" onclick="confirmWithdraw()">Confirm</button>
-<button class="btn" style="background:#ccc;color:#333"
-onclick="closeModal()">Cancel</button>
-</div>
-
-<p style="font-size:11px;margin-top:10px;color:#777">
-Fee: 1% • Daily Limit: 50 Pi
-</p>
+Register your independent project under Albukhr escrow protection.
+Projects are reviewed before approval and public listing.
 
 </div>
+
+<span class="badge public">Community</span>
+
+<div class="service-footer">
+
+<span class="service-action">Start</span>
+
+<span class="arrow">→</span>
+
 </div>
 
-<!-- ===== ALBUKHR FLOATING DOCK NAV ===== -->
+</div>
+
+</div>
+
+<!-- PI DAPP SERVICE -->
+
+<div class="service-card" onclick="goDappService()">
+
+<div class="service-icon">📱</div>
+
+<div class="service-body">
+
+<div class="service-title">Pi dApp Launch Service</div>
+
+<div class="service-desc">
+
+Albukhr assists you to create and launch your own Pi Network dApp
+via Pi Studio or Albukhr developers.
+
+</div>
+
+<span class="badge paid">Paid Service</span>
+
+<div class="service-footer">
+
+<span class="service-action">Apply</span>
+
+<span class="arrow">→</span>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- INTERNAL PROJECT -->
+
+<div class="service-card" id="internalProjectCard" onclick="openInternalProject()">
+
+<div class="service-icon">🏗️</div>
+
+<div class="service-body">
+
+<div class="service-title">Internal Project Creation</div>
+
+<div class="service-desc">
+
+Private internal project registry for Albukhr core builders
+and authorized ecosystem architects.
+
+</div>
+
+<span class="badge restricted">Core Only</span>
+
+<div class="service-footer">
+
+<span class="service-action">Access</span>
+
+<span class="arrow">→</span>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- AI VERIFICATION -->
+
+<div class="service-card locked">
+
+<div class="service-icon">🤖</div>
+
+<div class="service-body">
+
+<div class="service-title">AI Project Verification</div>
+
+<div class="service-desc">
+
+Automated seriousness and capability analysis
+for projects before escrow approval.
+
+</div>
+
+<span class="badge coming">Coming Soon</span>
+
+<div class="service-footer">
+
+<span class="service-action">Unavailable</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="notice">
+
+ℹ️ Services are controlled gateways into the Albukhr ecosystem.
+Each service enforces approval rules, access levels, and admin oversight
+to protect contributors and users.
+
+</div>
+
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+
 <div class="dock-nav">
 
-  <a href="index.html" class="dock-item">
-    <svg viewBox="0 0 24 24" class="dock-icon">
-      <path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>
-    </svg>
-    <span>Home</span>
-  </a>
+<a href="index.html" class="dock-item">
 
-  <a href="wallet.html" class="dock-item">
-    <svg viewBox="0 0 24 24" class="dock-icon">
-      <path d="M3 7h15a2 2 0 012 2v8a2 2 0 01-2 2H3z"/>
-      <circle cx="17" cy="12" r="1.2"/>
-    </svg>
-    <span>Wallet</span>
-  </a>
+<svg viewBox="0 0 24 24" class="dock-icon">
 
-  <a href="services.html" class="dock-item">
-    <svg viewBox="0 0 24 24" class="dock-icon">
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M19.4 15a1 1 0 000-6l2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2l-2-1-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/>
-    </svg>
-    <span>Services</span>
-  </a>
+<path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>
 
-  <a href="news.html" class="dock-item">
-    <svg viewBox="0 0 24 24" class="dock-icon">
-      <circle cx="12" cy="12" r="9"/>
-      <path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>
-    </svg>
-    <span>News</span>
-  </a>
+</svg>
+
+<span>Home</span>
+
+</a>
+
+<a href="wallet.html" class="dock-item">
+
+<svg viewBox="0 0 24 24" class="dock-icon">
+
+<path d="M3 7h15a2 2 0 012 2v8a2 2 0 01-2 2H3z"/>
+
+<circle cx="17" cy="12" r="1.2"/>
+
+</svg>
+
+<span>Wallet</span>
+
+</a>
+
+<a href="services.html" class="dock-item">
+
+<svg viewBox="0 0 24 24" class="dock-icon">
+
+<circle cx="12" cy="12" r="3"/>
+
+<path d="M19.4 15a1 1 0 000-6l2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2l-2-1-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/>
+
+</svg>
+
+<span>Services</span>
+
+</a>
+
+<a href="news.html" class="dock-item">
+
+<svg viewBox="0 0 24 24" class="dock-icon">
+
+<circle cx="12" cy="12" r="9"/>
+
+<path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>
+
+</svg>
+
+<span>News</span>
+
+</a>
 
 </div>
 
-<script src="staking.js"></script>
-<script src="wallet-core.js"></script>
-<script src="js/notifications.js"></script>
-  
+<!-- ACTIVE NAV -->
+
 <script>
+
 const current = location.pathname.split("/").pop();
 
 document.querySelectorAll(".dock-item").forEach(link=>{
-  if(link.getAttribute("href") === current){
-    link.classList.add("active");
-  }
-});
-</script>
-  
-<script>
 
-let activeProject = null;
+if(link.getAttribute("href") === current){
 
-function getProjectIcon(name){
-  if(name.toLowerCase().includes("raheem")) return "💊";
-  if(name.toLowerCase().includes("barsh")) return "🌾";
-  if(name.toLowerCase().includes("azman")) return "🧪";
-  if(name.toLowerCase().includes("khairat")) return "♻️";
-  if(name.toLowerCase().includes("urban")) return "🚍";
-  if(name.toLowerCase().includes("hauwal")) return "🌽";
-  if(name.toLowerCase().includes("labbaika")) return "🍞";
-  return "🏢";
+link.classList.add("active");
+
 }
-
-function renderWallet(){
-  const summary = getWalletSummary();
-  totalStake.innerText = summary.totalStake.toFixed(2) + " Pi";
-  totalReward.innerText = summary.grossRewards.toFixed(2) + " Pi";
-  withdrawn.innerText = summary.withdrawn.toFixed(2) + " Pi";
-  available.innerText = summary.available.toFixed(2) + " Pi";
-  renderProjects();
-}
-
-function renderProjects(){
-
-  const container = document.getElementById("projectContainer");
-  container.innerHTML="";
-
-  const breakdown = getProjectWalletBreakdown();
-  const history = getWithdrawHistory();
-
-  const projectNames = new Set();
-
-  breakdown.forEach(p => projectNames.add(p.project));
-  history.forEach(tx => {
-    if(tx.project) projectNames.add(tx.project);
-  });
-
-  const projects = Array.from(projectNames).map(name => {
-
-    const stakeData = breakdown.find(p => p.project === name);
-
-    return stakeData || {
-      project: name,
-      stake: 0,
-      grossReward: 0,
-      withdrawn: history
-        .filter(tx => tx.project === name)
-        .reduce((sum,tx)=>sum+Number(tx.grossAmount||0),0),
-      netReward: 0
-    };
-
-  });
-
-  if(!projects.length){
-    container.innerHTML="<small>No activity yet</small>";
-    return;
-  }
-
-  projects.forEach(p=>{
-
-    const card = document.createElement("div");
-    card.className="project-card";
-
-    card.innerHTML = `
-      <div class="project-header" onclick="toggleBody(this)">
-        <div class="project-title">
-          <div class="project-icon">
-            ${getProjectIcon(p.project)}
-          </div>
-          ${p.project}
-        </div>
-        <div>${(p.netReward || 0).toFixed(2)} Pi</div>
-      </div>
-
-      <div class="project-body">
-
-        <div class="row">
-          <div>Staked</div>
-          <div>${(p.stake || 0).toFixed(2)} Pi</div>
-        </div>
-
-        <div class="row">
-          <div>Gross Reward</div>
-          <div>${(p.grossReward || 0).toFixed(2)} Pi</div>
-        </div>
-
-        <div class="row">
-          <div>Withdrawn</div>
-          <div>${(p.withdrawn || 0).toFixed(2)} Pi</div>
-        </div>
-
-        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn"
-            onclick="openWithdraw('${p.project}')">
-            Reward Withdraw
-          </button>
-
-          <button class="btn"
-            style="background:#333"
-            onclick="withdrawCapitalAction('${p.project}')">
-            Capital Withdraw
-          </button>
-        </div>
-
-        <div id="history-${p.project}"></div>
-
-      </div>
-    `;
-
-    container.appendChild(card);
-    renderProjectHistory(p.project);
-  });
-  }
-
-function toggleBody(el){
-  const body = el.nextElementSibling;
-  body.style.display =
-    body.style.display==="block" ? "none":"block";
-}
-
-function renderProjectHistory(project){
-
-  const div = document.getElementById("history-"+project);
-  if(!div) return;
-
-  const history = getWithdrawHistory()
-    .filter(tx=>tx.project===project)
-    .sort((a,b)=>b.timestamp-a.timestamp);
-
-  if(!history.length){
-    div.innerHTML="<small>No withdrawals yet</small>";
-    return;
-  }
-
-  div.innerHTML="";
-
-  history.forEach(tx=>{
-    div.innerHTML += `
-      <div class="tx">
-        <div class="tx-left">
-          <div class="tx-icon">
-            ${getProjectIcon(project)}
-          </div>
-          <div>
-            Withdraw
-            <small>${new Date(tx.timestamp).toLocaleString()}</small>
-          </div>
-        </div>
-        <div class="tx-right">
-          -${tx.grossAmount.toFixed(2)} Pi
-          <small>
-            Fee: ${tx.fee.toFixed(2)} |
-            Received: ${tx.received.toFixed(2)}
-          </small>
-        </div>
-      </div>
-    `;
-  });
-}
-
-function openWithdraw(project){
-  activeProject = project;
-  modalProject.innerText = "Withdraw from " + project;
-  withdrawModal.style.display="flex";
-}
-
-function closeModal(){
-  withdrawModal.style.display="none";
-}
-
-/* ===============================
-   SECURITY PIN ENGINE
-================================ */
-
-const PIN_KEY = "albukhr_wallet_pin";
-const LOCK_KEY = "albukhr_wallet_lock";
-
-function getSecurity(){
-  try{
-    return JSON.parse(localStorage.getItem("albukhr_security_settings")) || {};
-  }catch{
-    return {};
-  }
-}
-
-function isLocked(){
-  const lockUntil = Number(localStorage.getItem(LOCK_KEY));
-  if(!lockUntil) return false;
-
-  if(Date.now() > lockUntil){
-    localStorage.removeItem(LOCK_KEY);
-    return false;
-  }
-
-  return true;
-}
-
-function lockWallet(seconds=30){
-  localStorage.setItem(LOCK_KEY, Date.now() + (seconds*1000));
-}
-
-function setPin(pin){
-  localStorage.setItem(PIN_KEY, pin);
-}
-
-function verifyPin(){
-  const saved = localStorage.getItem(PIN_KEY);
-  if(!saved){
-    alert("No PIN set. Set PIN in Security Settings.");
-    return false;
-  }
-
-  const input = prompt("Enter Wallet PIN:");
-  if(!input) return false;
-
-  if(input === saved){
-    return true;
-  }
-
-  // failed attempt logic
-  let attempts = Number(localStorage.getItem("albukhr_pin_attempts") || 0);
-  attempts++;
-  localStorage.setItem("albukhr_pin_attempts", attempts);
-
-  if(attempts >= 3){
-    lockWallet(30);
-    localStorage.removeItem("albukhr_pin_attempts");
-    alert("Too many failed attempts. Wallet locked for 30 seconds.");
-  }else{
-    alert("Incorrect PIN");
-  }
-
-  return false;
-    }
-  
-function isSecurityEnabled(){
-  try{
-    const s = JSON.parse(localStorage.getItem("albukhr_security_settings"));
-    return s?.enabled === true;
-  }catch{
-    return false;
-  }
-}
-
-function isValidPiAddress(addr){
-  if(!addr) return false;
-
-  addr = addr.trim();
-
-  if(addr.length < 20) return false;
-  if(!addr.startsWith("G")) return false;
-
-  return true;
-}
-
-function confirmWithdraw(){
-
-  if(isLocked()){
-    alert("Wallet temporarily locked. Try again later.");
-    return;
-  }
-
-  const amt  = withdrawAmount.value.trim();
-  const addr = withdrawAddress.value.trim();
-
-  /* ===== AMOUNT VALIDATION ===== */
-  if(!amt || Number(amt) <= 0){
-    alert("Enter valid withdraw amount");
-    return;
-  }
-
-  /* ===== ADDRESS IS NOW ALWAYS REQUIRED ===== */
-  if(!isValidPiAddress(addr)){
-    alert("Valid Pi wallet address required");
-    return;
-  }
-
-  /* ===== SECURITY PIN CHECK ===== */
-  const security = getSecurity();
-
-  if(security.enabled && security.twofa){
-    if(!verifyPin()){
-      return;
-    }
-  }
-
-  /* ===== PROCESS WITHDRAW ===== */
-  const res = requestWithdraw({
-    project: activeProject,
-    amount: amt,
-    walletAddress: addr
-  });
-
-  if(res.error){
-    alert(res.error);
-    return;
-  }
-
-  withdrawAmount.value="";
-  withdrawAddress.value="";
-  closeModal();
-  renderWallet();
-}
-  
-function withdrawCapitalAction(project){
-
-  const res = requestCapitalWithdraw(project);
-
-  if(res?.error){
-    alert(res.error);
-    return;
-  }
-
-  alert("Capital withdrawn: " + res.grossAmount.toFixed(2) + " Pi");
-
-  renderWallet();
-  }
-
-function handleCapitalWithdraw(project){
-
-  const res = requestCapitalWithdraw(project);
-
-  if(res.error){
-    alert(res.error);
-    return;
-  }
-
-  alert("Capital returned: " + res.amount.toFixed(2) + " Pi");
-
-  renderWallet();
-}
-  
-renderWallet();
-
-</script>
-
-<script>
-
-const withdrawSuccessBox = document.getElementById("withdrawSuccessBox");
-
-/* Track last withdraw timestamp */
-let lastWithdrawTime = 0;
-
-/* Listen for wallet updates */
-window.addEventListener("walletUpdated", function(e){
-
-  if(!e.detail) return;
-
-  const data = e.detail;
-
-  /* Idan withdraw ne */
-  if(data.type === "reward-withdraw" || data.type === "capital-withdraw"){
-
-    const now = Date.now();
-
-    /* Kauce wa duplicate show */
-    if(now - lastWithdrawTime < 1000) return;
-
-    lastWithdrawTime = now;
-
-    showWithdrawSuccess();
-  }
 
 });
 
-function showWithdrawSuccess(){
+</script>
 
-  withdrawSuccessBox.style.display = "block";
-  withdrawSuccessBox.textContent = "Withdraw Successful ✓";
+<!-- SERVICE ROUTES -->
 
-  /* Auto hide after 4 seconds */
-  setTimeout(()=>{
-    withdrawSuccessBox.style.display = "none";
-  },4000);
+<script>
+
+function goCreateExternal(){
+
+window.location.href="external-create.html";
+
 }
 
+function goDappService(){
+
+window.location.href="pi-dapp-service.html";
+
+}
+
+function hasInternalAccess(){
+
+return localStorage.getItem("albukhr_internal_access")==="granted";
+
+}
+
+function openInternalProject(){
+
+if(!hasInternalAccess()){
+
+alert("⛔ Restricted Access\nThis service is reserved for Albukhr core team.");
+
+return;
+
+}
+
+window.location.href="internal-project-dashboard.html";
+
+}
+
+/* UI Lock */
+
+(function(){
+
+const card=document.getElementById("internalProjectCard");
+
+if(!card) return;
+
+if(!hasInternalAccess()){
+
+card.classList.add("locked");
+
+card.querySelector(".service-action").innerText="Restricted";
+
+}else{
+
+card.classList.remove("locked");
+
+card.querySelector(".service-action").innerText="Open →";
+
+}
+
+})();
+
 </script>
-  
+
+<script src="js/notifications.js"></script>
+
 </body>
   </html>
