@@ -147,39 +147,3 @@
 .notification-badge{
   animation:notifPulse 1.5s infinite;
 }
-
-/* logo frame */
-
-.logo-frame{
-
-  position:relative;
-
-  width:48px;
-  height:48px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-}
-
-.logo-circle{
-
-  position:absolute;
-
-  width:100%;
-  height:100%;
-
-  object-fit:contain;
-
-}
-
-.main-logo{
-
-  width:26px;
-  height:auto;
-
-  position:relative;
-  z-index:2;
-
-}
