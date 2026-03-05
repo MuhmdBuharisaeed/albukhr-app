@@ -35,7 +35,7 @@
   display:block;
 
   position:relative;
-  top:-5px;   /* yana daga logo sama kadan */
+  top:-4px;   /* yana daga logo sama kadan */
 }
 
 /* brand name */
@@ -45,16 +45,15 @@
   font-weight:800;
   letter-spacing:1px;
 
+  color:#ffffff;
+
   position:relative;
   top:4px;
 
-  background:linear-gradient(
-    180deg,
-    var(--albukhr-gold-light),
-    var(--albukhr-gold),
-    var(--albukhr-gold-dark)
-  );
-
+  text-shadow:
+    0 0 2px rgba(212,175,55,.6),
+    0 0 6px rgba(212,175,55,.35);
+}
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
