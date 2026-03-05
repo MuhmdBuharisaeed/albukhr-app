@@ -117,7 +117,7 @@
 .notification-badge{
   position:absolute;
 
-  top:-2px;
+  top:4px;      /* ya sauko kasa kadan */
   right:-2px;
 
   min-width:14px;
