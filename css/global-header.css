@@ -30,12 +30,28 @@
 /* logo */
 
 .main-logo{
-  height:42px;
-  width:auto;
-  display:block;
 
-  position:relative;
-  top:-4px;   /* yana daga logo sama kadan */
+  height:36px;
+  width:36px;
+
+  object-fit:contain;
+
+  padding:6px;
+
+  border-radius:50%;
+
+  background:#ffffff;
+
+  box-shadow:
+    0 3px 8px rgba(0,0,0,.25);
+
+}
+
+.main-logo{
+
+  filter:
+    drop-shadow(0 0 0.8px #000)
+    drop-shadow(0 0 1px #000);
 }
 
 /* brand name */
@@ -110,18 +126,25 @@
 .notification-badge{
   position:absolute;
 
-  top:5px;
-  right:6px;
+  top:-2px;
+  right:-2px;
 
-  width:8px;
-  height:8px;
+  min-width:14px;
+  height:14px;
 
   background:#ff3b30;
+  color:#fff;
+
+  font-size:9px;
+  font-weight:700;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
   border-radius:50%;
 
-  box-shadow:
-    0 0 4px rgba(255,59,48,.8);
+  box-shadow:0 0 4px rgba(255,59,48,.8);
 }
 
 @keyframes notifPulse{
@@ -132,4 +155,10 @@
 
 .notification-badge{
   animation:notifPulse 1.5s infinite;
+}
+
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
