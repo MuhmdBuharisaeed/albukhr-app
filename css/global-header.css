@@ -1,6 +1,7 @@
 /* ======================================
    ALBUKHR GLOBAL HEADER
 ====================================== */
+
 :root{
   --albukhr-gold:#d4af37;
   --albukhr-gold-light:#f6d776;
@@ -52,8 +53,8 @@
   top:-3px;
 
   filter:
-    drop-shadow(0 0 2px rgba(212,175,55,.35))
-    drop-shadow(0 0 4px rgba(212,175,55,.25));
+    drop-shadow(0 0 3px rgba(212,175,55,.45))
+    drop-shadow(0 0 6px rgba(212,175,55,.30));
 }
 
 /* brand name */
