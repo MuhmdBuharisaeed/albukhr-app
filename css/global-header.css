@@ -32,14 +32,10 @@
 .main-logo{
   height:42px;
   width:auto;
-
-  border-radius:50%;
-
-  border:3px solid #ffffff;
-
-  padding:2px;
-
   display:block;
+
+  position:relative;
+  top:-4px;   /* yana daga logo sama kadan */
 }
 
 .main-logo{
@@ -152,8 +148,38 @@
   animation:notifPulse 1.5s infinite;
 }
 
-.header-right{
+/* logo frame */
+
+.logo-frame{
+
+  position:relative;
+
+  width:48px;
+  height:48px;
+
   display:flex;
   align-items:center;
-  gap:12px;
+  justify-content:center;
+
+}
+
+.logo-circle{
+
+  position:absolute;
+
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+
+}
+
+.main-logo{
+
+  width:26px;
+  height:auto;
+
+  position:relative;
+  z-index:2;
+
 }
