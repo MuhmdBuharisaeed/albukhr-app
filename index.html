@@ -588,9 +588,12 @@ body::before{
 
   <div class="header-right">
 
-    <div class="header-btn notification-btn">
-      🔔
-      <span class="notification-badge"></span>
+    <div class="header-btn notification-btn" onclick="openNotifications()">
+
+  🔔
+
+  <span id="notifBadge" class="notification-badge"></span>
+
     </div>
 
     <div class="header-btn menu-icon">
