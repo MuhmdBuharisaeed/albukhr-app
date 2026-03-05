@@ -32,10 +32,21 @@
 .main-logo{
   height:42px;
   width:auto;
-  display:block;
 
-  position:relative;
-  top:-4px;   /* yana daga logo sama kadan */
+  border-radius:50%;
+
+  border:3px solid #ffffff;
+
+  padding:2px;
+
+  display:block;
+}
+
+.main-logo{
+
+  filter:
+    drop-shadow(0 0 0.8px #000)
+    drop-shadow(0 0 1px #000);
 }
 
 /* brand name */
