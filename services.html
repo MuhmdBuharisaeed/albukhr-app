@@ -67,6 +67,8 @@
 }
 </style>
 
+
+<link rel="stylesheet" href="css/global-header.css">a
 <link rel="stylesheet" href="global-buttons.css">
 </head>
 
@@ -74,9 +76,28 @@
 
 <!-- ===== ALBUKHR STANDARD HEADER ===== -->
 <header class="header">
+
   <div class="header-left">
-    <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
+    <img src="IMG_20260125_183804.png" class="main-logo">
+    <span class="brand">ALBUKHR</span>
   </div>
+
+  <div class="header-right">
+
+    <div class="header-btn notification-btn" onclick="openNotifications()">
+
+  🔔
+
+  <span id="notifBadge" class="notification-badge"></span>
+
+    </div>
+
+  <div class="header-btn menu-icon" onclick="toggleMenu()">
+  ☰
+    </div>
+
+  </div>
+
 </header>
 
 <section class="section">
@@ -262,6 +283,8 @@ function openInternalProject(){
   }
 })();
 </script>
+
+<script src="js/notifications.js"></script>
   
 </body>
 </html>
