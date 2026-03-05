@@ -1,6 +1,11 @@
 /* ======================================
    ALBUKHR GLOBAL HEADER
 ====================================== */
+:root{
+  --albukhr-gold:#d4af37;
+  --albukhr-gold-light:#f6d776;
+  --albukhr-gold-dark:#b8962e;
+}
 
 .header{
   position:fixed;
@@ -49,11 +54,25 @@
 .brand{
   font-size:18px;
   font-weight:800;
-  color:#ffffff;
   letter-spacing:1px;
 
   position:relative;
-  top:3px;   /* wannan yana saukar da rubutun kadan */
+  top:3px; 
+
+  background:linear-gradient(
+    180deg,
+    var(--albukhr-gold-light),
+    var(--albukhr-gold),
+    var(--albukhr-gold-dark)
+  );
+
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.brand{
+  text-shadow:
+    0 0 6px rgba(212,175,55,.25);
 }
 
 /* right actions */
