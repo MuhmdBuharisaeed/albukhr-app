@@ -41,6 +41,7 @@
 .main-logo{
   height:42px;
   width:auto;
+  display:block;
 }
 
 /* brand name */
@@ -50,6 +51,9 @@
   font-weight:800;
   color:#ffffff;
   letter-spacing:1px;
+
+  position:relative;
+  top:2px;   /* wannan yana saukar da rubutun kadan */
 }
 
 /* right actions */
