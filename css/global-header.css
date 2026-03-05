@@ -1,32 +1,17 @@
 /* ======================================
    ALBUKHR GLOBAL HEADER
 ====================================== */
-
 :root{
   --albukhr-gold:#d4af37;
   --albukhr-gold-light:#f6d776;
   --albukhr-gold-dark:#b8962e;
 }
 
-.header{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-
-  height:60px;
-
+.header-left{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-
-  padding:0 16px;
-
-  background:linear-gradient(
-    135deg,
-    #0f7a3d,
-    #149d52
-  );
+  gap:10px;
+}
 
   box-shadow:
     0 4px 14px rgba(0,0,0,.15);
@@ -47,10 +32,6 @@
 .main-logo{
   height:42px;
   width:auto;
-  display:block;
-
-  position:relative;
-  top:-4px;   /* yana daga logo sama kadan */
 }
 
 /* brand name */
@@ -61,7 +42,7 @@
   letter-spacing:1px;
 
   position:relative;
-  top:3px; 
+  top:4px;
 
   background:linear-gradient(
     180deg,
@@ -72,11 +53,6 @@
 
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-}
-
-.brand{
-  text-shadow:
-    0 0 6px rgba(212,175,55,.25);
 }
 
 /* right actions */
@@ -118,49 +94,4 @@
 
   stroke:#ffffff;
   stroke-width:2;
-}
-
-body{
-  padding-top:60px;
-  padding-bottom:90px;
-}
-
-.menu-icon{
-  font-size:22px;
-  cursor:pointer;
-}
-
-/* notification wrapper */
-
-.notification-btn{
-  position:relative;
-}
-
-/* red badge */
-
-.notification-badge{
-  position:absolute;
-
-  top:5px;
-  right:6px;
-
-  width:8px;
-  height:8px;
-
-  background:#ff3b30;
-
-  border-radius:50%;
-
-  box-shadow:
-    0 0 4px rgba(255,59,48,.8);
-}
-
-@keyframes notifPulse{
-  0%{transform:scale(1)}
-  50%{transform:scale(1.25)}
-  100%{transform:scale(1)}
-}
-
-.notification-badge{
-  animation:notifPulse 1.5s infinite;
 }
