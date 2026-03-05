@@ -7,6 +7,12 @@
   --albukhr-gold-dark:#b8962e;
 }
 
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
 .header-left{
   display:flex;
   align-items:center;
