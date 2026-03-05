@@ -63,12 +63,15 @@
   position:relative;
   top:4px;
 
+  /* black outline */
+  filter:
+    drop-shadow(0 0 0.8px #000)
+    drop-shadow(0 0 1px #000);
+
+  /* soft gold glow */
   text-shadow:
-    0 0 2px rgba(212,175,55,.6),
-    0 0 6px rgba(212,175,55,.35);
-}
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+    0 0 4px rgba(212,175,55,.35),
+    0 0 6px rgba(212,175,55,.25);
 }
 
 /* right actions */
