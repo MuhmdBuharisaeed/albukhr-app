@@ -30,21 +30,12 @@
 /* logo */
 
 .main-logo{
+  height:42px;
+  width:auto;
+  display:block;
 
-  height:36px;
-  width:36px;
-
-  object-fit:contain;
-
-  padding:6px;
-
-  border-radius:50%;
-
-  background:#ffffff;
-
-  box-shadow:
-    0 3px 8px rgba(0,0,0,.25);
-
+  position:relative;
+  top:-4px;   /* yana daga logo sama kadan */
 }
 
 .main-logo{
