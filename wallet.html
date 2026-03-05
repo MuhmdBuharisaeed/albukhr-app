@@ -208,14 +208,36 @@ body{
 }
 </style>
 </head>
-
-<link rel="stylesheet" href="global-buttons.css">  
+  
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="global-buttons.css">
+  
 <body>
 
 <header class="header">
+
   <div class="header-left">
-    <img src="file_000000007bb062439b275f4bcf52e264.png" class="main-logo">
+    <img src="IMG_20260125_183804.png" class="main-logo">
+    <span class="brand">ALBUKHR</span>
   </div>
+
+  <div class="header-right">
+
+    <div class="header-btn notification-btn" onclick="openNotifications()">
+
+  🔔
+
+  <span id="notifBadge" class="notification-badge"></span>
+
+    </div>
+
+    <div class="header-btn menu-icon">
+      ☰
+    </div>
+
+  </div>
+
 </header>
 
 <div class="summary">
@@ -323,6 +345,7 @@ Fee: 1% • Daily Limit: 50 Pi
 
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
+<script src="js/notifications.js"></script>
   
 <script>
 const current = location.pathname.split("/").pop();
