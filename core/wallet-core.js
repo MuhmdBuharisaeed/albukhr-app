@@ -362,3 +362,31 @@ function saveWallet(wallet){
 window.dispatchEvent(new CustomEvent("walletUpdated", {
   detail: { type: "reward-withdraw" }
 }));
+
+const LEDGER_KEY = "albukhr_wallet_ledger";
+
+function getLedger(){
+  try{
+    return JSON.parse(localStorage.getItem(LEDGER_KEY)) || [];
+  }catch{
+    return [];
+  }
+}
+
+function saveLedger(data){
+  localStorage.setItem(LEDGER_KEY, JSON.stringify(data));
+}
+
+function recordTransaction(tx){
+
+  const ledger = getLedger();
+
+  ledger.push({
+    id: "tx_" + Date.now(),
+    timestamp: Date.now(),
+    ...tx
+  });
+
+  saveLedger(ledger);
+
+}
