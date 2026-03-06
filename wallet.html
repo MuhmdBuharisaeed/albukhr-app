@@ -357,6 +357,16 @@ document.querySelectorAll(".dock-item").forEach(link=>{
 
 let activeProject = null;
 
+const withdrawAmount = document.getElementById("withdrawAmount");
+const withdrawAddress = document.getElementById("withdrawAddress");
+const withdrawModal = document.getElementById("withdrawModal");
+const modalProject = document.getElementById("modalProject");
+
+const totalStake = document.getElementById("totalStake");
+const totalReward = document.getElementById("totalReward");
+const withdrawn = document.getElementById("withdrawn");
+const available = document.getElementById("available");
+  
 function getProjectIcon(name){
   if(name.toLowerCase().includes("raheem")) return "💊";
   if(name.toLowerCase().includes("barsh")) return "🌾";
