@@ -388,7 +388,23 @@ function renderWallet(){
 }
 
 function renderProjects(){
+<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
 
+  <button class="btn"
+    data-project="${p.project}"
+    onclick="openWithdraw(this.dataset.project)">
+    Reward Withdraw
+  </button>
+
+  <button class="btn"
+    data-project="${p.project}"
+    style="background:#333"
+    onclick="withdrawCapitalAction(this.dataset.project)">
+    Capital Withdraw
+  </button>
+
+</div>
+  
   const container = document.getElementById("projectContainer");
   container.innerHTML="";
 
