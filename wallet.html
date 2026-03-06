@@ -627,8 +627,8 @@ function confirmWithdraw(){
     return;
   }
 
-  const amt  = withdrawAmount.value.trim();
-  const addr = withdrawAddress.value.trim();
+  const amt  = withdrawAmount?.value.trim();
+const addr = withdrawAddress?.value.trim();
 
   /* ===== AMOUNT VALIDATION ===== */
   if(!amt || Number(amt) <= 0){
