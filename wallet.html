@@ -372,7 +372,10 @@ onclick="window.location.href='transactions.html'">
   font-weight:600;  
 ">  
   Withdraw Successful  
-</div>  <div class="scroll-area" id="projectContainer"></div>  <!-- WITHDRAW MODAL -->  <div class="modal-overlay" id="withdrawModal">  
+</div>  <div class="scroll-area" id="projectContainer"></div>  
+  
+  <!-- WITHDRAW MODAL -->
+  <div class="modal-overlay" id="withdrawModal">  
 <div class="modal">  
 <h3 id="modalProject">Withdraw</h3>  <input type="number" id="withdrawAmount" placeholder="Amount">  
 <input type="text" id="withdrawAddress" placeholder="Pi Wallet Address">  <div class="modal-actions">  
@@ -381,13 +384,22 @@ onclick="window.location.href='transactions.html'">
 onclick="closeModal()">Cancel</button>  
 </div>  <p style="font-size:11px;margin-top:10px;color:#777">  
 Fee: 1% • Daily Limit: 50 Pi  
-</p>  </div>  
-</div>  <script src="staking.js"></script>  <script src="wallet-core.js"></script>  <!-- ===== ALBUKHR BOTTOM NAV ===== -->  <nav class="bottom-nav">  
+</p>  
+</div>  
+</div>
+  
+<script src="staking.js"></script>  
+<script src="wallet-core.js"></script>
+  
+  <!-- ===== ALBUKHR BOTTOM NAV ===== -->
+  <nav class="bottom-nav">  
   <a href="index.html" class="active"><span>🏠</span>Home</a>  
   <a href="wallet.html"><span>💼</span>Wallet</a>  
   <a href="services.html"><span>🛠️</span>Services</a>  
   <a href="news.html"><span>📰</span>News</a>  
-</nav>  <script>  
+</nav>  
+  
+  <script>  
   
 let activeProject = null;  
   
@@ -621,32 +633,54 @@ function isValidPiAddress(addr){
   return true;  
 }  
   
-function confirmWithdraw(){  
-  
-  if(isLocked()){  
-    alert("Wallet temporarily locked. Try again later.");  
-    return;  
-  }  
-  
-  const security = getSecurity();  
-  
-  if(security.enabled && security.twofa){  
-    if(!verifyPin()){  
-      return;  
-    }  
-  }  
-    
-function confirmWithdraw(){  
-  
-  const amt  = withdrawAmount.value.trim();  
-  let addr   = withdrawAddress.value.trim();  
-  
-  /* ===== AMOUNT VALIDATION ===== */  
-  
-  if(!amt || Number(amt) <= 0){  
-    alert("Enter valid withdraw amount");  
-    return;  
-  }  
+function confirmWithdraw(){
+
+  if(isLocked()){
+    alert("Wallet temporarily locked. Try again later.");
+    return;
+  }
+
+  const amt  = withdrawAmount.value.trim();
+  const addr = withdrawAddress.value.trim();
+
+  /* ===== AMOUNT VALIDATION ===== */
+  if(!amt || Number(amt) <= 0){
+    alert("Enter valid withdraw amount");
+    return;
+  }
+
+  /* ===== ADDRESS IS NOW ALWAYS REQUIRED ===== */
+  if(!isValidPiAddress(addr)){
+    alert("Valid Pi wallet address required");
+    return;
+  }
+
+  /* ===== SECURITY PIN CHECK ===== */
+  const security = getSecurity();
+
+  if(security.enabled && security.twofa){
+    if(!verifyPin()){
+      return;
+    }
+  }
+
+  /* ===== PROCESS WITHDRAW ===== */
+  const res = requestWithdraw({
+    project: activeProject,
+    amount: amt,
+    walletAddress: addr
+  });
+
+  if(res.error){
+    alert(res.error);
+    return;
+  }
+
+  withdrawAmount.value="";
+  withdrawAddress.value="";
+  closeModal();
+  renderWallet();
+    } 
   
   /* ===== SECURITY MODE CHECK ===== */  
   
