@@ -410,12 +410,12 @@ ${p.project}
 <div style="display:flex;gap:8px;margin-top:10px">
 
 <button class="btn"
-onclick="openWithdraw('${p.project}')">
+onclick="event.stopPropagation(); openWithdraw('${p.project}')">
 Reward Withdraw
 </button>
 
 <button class="btn secondary"
-onclick="withdrawCapital('${p.project}')">
+onclick="event.stopPropagation(); withdrawCapital('${p.project}')">
 Capital Withdraw
 </button>
 
