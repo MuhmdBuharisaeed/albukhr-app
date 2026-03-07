@@ -517,11 +517,18 @@ function renderProjects(){
   });  
   }  
   
-function toggleBody(el){  
-  const body = el.nextElementSibling;  
-  body.style.display =  
-    body.style.display==="block" ? "none":"block";  
-}  
+function toggleBody(el){
+
+  const card = el.closest(".project-card");
+  const body = card.querySelector(".project-body");
+
+  if(!body) return;
+
+  body.style.display =
+    body.style.display === "block"
+      ? "none"
+      : "block";
+    }  
   
 function renderProjectHistory(project){  
   
