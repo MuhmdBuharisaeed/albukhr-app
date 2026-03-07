@@ -335,16 +335,12 @@ document.querySelectorAll(".dock-item").forEach(link=>{
   
 <script>  
   
-let activeProject = null;  
+let activeProject = null;
+
+const withdrawModal = document.getElementById("withdrawModal");
 const withdrawAmount = document.getElementById("withdrawAmount");
 const withdrawAddress = document.getElementById("withdrawAddress");
-const withdrawModal = document.getElementById("withdrawModal");
 const modalProject = document.getElementById("modalProject");
-
-const totalStake = document.getElementById("totalStake");
-const totalReward = document.getElementById("totalReward");
-const withdrawn = document.getElementById("withdrawn");
-const available = document.getElementById("available");
   
 function getProjectIcon(name){  
   if(name.toLowerCase().includes("raheem")) return "💊";  
@@ -510,12 +506,12 @@ activeProject = project;
 
 modalProject.innerText = "Withdraw from " + project;
 
-withdrawModal.style.display = "flex";
-
 withdrawAmount.value = "";
 withdrawAddress.value = "";
 
-    } 
+withdrawModal.style.display = "flex";
+
+  }
   
 function closeModal(){  
   withdrawModal.style.display="none";  
