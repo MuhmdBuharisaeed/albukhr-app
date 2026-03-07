@@ -341,11 +341,6 @@ const withdrawModal = document.getElementById("withdrawModal");
 const withdrawAmount = document.getElementById("withdrawAmount");
 const withdrawAddress = document.getElementById("withdrawAddress");
 const modalProject = document.getElementById("modalProject");
-
-const totalStake = document.getElementById("totalStake");
-const totalReward = document.getElementById("totalReward");
-const withdrawn = document.getElementById("withdrawn");
-const available = document.getElementById("available");
   
 function getProjectIcon(name){  
   if(name.toLowerCase().includes("raheem")) return "💊";  
@@ -507,13 +502,16 @@ function renderProjectHistory(project){
   
 function openWithdraw(project){
 
-alert("Withdraw button working");
-
 activeProject = project;
+
 modalProject.innerText = "Withdraw from " + project;
+
+withdrawAmount.value = "";
+withdrawAddress.value = "";
+
 withdrawModal.style.display = "flex";
 
-  }
+              }
   
 function closeModal(){  
   withdrawModal.style.display="none";  
