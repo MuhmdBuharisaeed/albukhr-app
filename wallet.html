@@ -1,44 +1,24 @@
-<!DOCTYPE html><html lang="en">  <head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>Albukhr Wallet</title><style>  body{
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Albukhr Wallet</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="global-buttons.css">
+
+<style>
+
+body{
 margin:0;
 font-family:system-ui;
 background:#f4f7f6;
-padding-bottom:110px;
-}
-
-/* WALLET TABS */
-
-.wallet-tabs{
-display:flex;
-gap:10px;
-padding:14px 16px;
-background:#f4f7f6;
-}
-
-.nav-btn{
-flex:1;
-padding:8px 10px;
-border-radius:12px;
-font-size:12px;
-font-weight:600;
-cursor:pointer;
-border:none;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.nav-wallet{
-background:#0f7a3d;
-color:#fff;
-}
-
-.nav-trans{
-background:#fff;
-color:#0f7a3d;
-border:1px solid #dfeee7;
+padding-bottom:120px;
 }
 
 /* SUMMARY */
@@ -50,7 +30,7 @@ border-bottom:1px solid #eee;
 }
 
 .balance{
-font-size:26px;
+font-size:28px;
 font-weight:800;
 color:#0f7a3d;
 }
@@ -68,6 +48,34 @@ margin-top:6px;
 font-size:13px;
 }
 
+/* TABS */
+
+.wallet-tabs{
+display:flex;
+gap:10px;
+padding:14px 16px;
+}
+
+.nav-btn{
+flex:1;
+padding:10px;
+border-radius:12px;
+border:none;
+font-weight:600;
+cursor:pointer;
+}
+
+.nav-wallet{
+background:#0f7a3d;
+color:#fff;
+}
+
+.nav-trans{
+background:#fff;
+border:1px solid #dfeee7;
+color:#0f7a3d;
+}
+
 /* PROJECT */
 
 .scroll-area{
@@ -79,7 +87,7 @@ background:#fff;
 border-radius:16px;
 padding:14px;
 margin-bottom:16px;
-box-shadow:0 6px 18px rgba(15,122,61,0.06);
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
 }
 
 .project-header{
@@ -90,22 +98,39 @@ cursor:pointer;
 }
 
 .project-title{
-font-weight:700;
 display:flex;
 align-items:center;
 gap:10px;
-font-size:14px;
+font-weight:700;
 }
 
 .project-icon{
-width:36px;
-height:36px;
+width:34px;
+height:34px;
+border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-border-radius:50%;
-font-size:16px;
-background:linear-gradient(135deg,#e6f7ee,#f3fff8);
+background:#eaf7ef;
+}
+
+.expand-arrow{
+font-size:18px;
+color:#777;
+transition:transform .25s ease;
+}
+
+.project-progress{
+height:6px;
+background:#e5efe8;
+border-radius:10px;
+margin-top:8px;
+overflow:hidden;
+}
+
+.progress-bar{
+height:100%;
+background:linear-gradient(90deg,#0f7a3d,#1ec777);
 }
 
 .project-body{
@@ -114,26 +139,48 @@ display:none;
 }
 
 .btn{
-padding:9px 14px;
+padding:8px 14px;
 border:none;
-border-radius:12px;
+border-radius:10px;
+font-size:12px;
+cursor:pointer;
 background:#0f7a3d;
 color:#fff;
-font-weight:600;
-cursor:pointer;
+}
+
+.btn.secondary{
+background:#333;
+}
+
+/* HISTORY */
+
+.tx{
+display:flex;
+justify-content:space-between;
+margin-top:10px;
 font-size:12px;
+border-top:1px dashed #eee;
+padding-top:8px;
+}
+
+.tx small{
+display:block;
+color:#888;
 }
 
 /* MODAL */
 
 .modal-overlay{
 position:fixed;
-inset:0;
+top:0;
+left:0;
+right:0;
+bottom:0;
 background:rgba(0,0,0,.4);
 display:none;
 align-items:center;
 justify-content:center;
-z-index:2000;
+z-index:9999;
 }
 
 .modal{
@@ -141,7 +188,7 @@ background:#fff;
 padding:20px;
 border-radius:14px;
 width:90%;
-max-width:400px;
+max-width:420px;
 }
 
 .modal input{
@@ -157,171 +204,287 @@ display:flex;
 gap:10px;
 }
 
-.header{
-background:#0f7a3d;
-height:60px;
-padding:0 16px;
-display:flex;
-align-items:center;
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<div class="header-left">
+<img src="IMG_20260125_183804.png" class="main-logo">
+<span class="brand">ALBUKHR</span>
+</div>
+
+<div class="header-right">
+
+<div class="header-btn notification-btn" onclick="openNotifications()">
+🔔
+<span id="notifBadge" class="notification-badge"></span>
+</div>
+
+</div>
+
+</header>
+
+<div class="summary">
+
+<div class="balance" id="available">0.00 Pi</div>
+<div class="sub">Available Reward Balance</div>
+
+<div class="row">
+<div>Total Staked</div>
+<div id="totalStake">0.00 Pi</div>
+</div>
+
+<div class="row">
+<div>Total Rewards</div>
+<div id="totalReward">0.00 Pi</div>
+</div>
+
+<div class="row">
+<div>Total Withdrawn</div>
+<div id="withdrawn">0.00 Pi</div>
+</div>
+
+</div>
+
+<div class="wallet-tabs">
+
+<button class="nav-btn nav-wallet">
+Wallet
+</button>
+
+<button class="nav-btn nav-trans"
+onclick="window.location.href='transactions.html'">
+Transactions
+</button>
+
+</div>
+
+<div class="scroll-area" id="projectContainer"></div>
+
+<!-- WITHDRAW MODAL -->
+
+<div class="modal-overlay" id="withdrawModal">
+
+<div class="modal">
+
+<h3 id="modalProject">Withdraw</h3>
+
+<input id="withdrawAmount" type="number" placeholder="Amount">
+
+<input id="withdrawAddress" type="text" placeholder="Pi Wallet Address">
+
+<div class="modal-actions">
+
+<button class="btn" onclick="confirmWithdraw()">
+Confirm
+</button>
+
+<button class="btn secondary" onclick="closeModal()">
+Cancel
+</button>
+
+</div>
+
+<p style="font-size:11px;margin-top:10px;color:#777">
+Fee 1% • Daily Limit 50 Pi
+</p>
+
+</div>
+
+</div>
+
+<!-- DOCK NAV -->
+
+<div class="dock-nav">
+
+<a href="index.html" class="dock-item">
+<span>Home</span>
+</a>
+
+<a href="wallet.html" class="dock-item active">
+<span>Wallet</span>
+</a>
+
+<a href="services.html" class="dock-item">
+<span>Services</span>
+</a>
+
+<a href="news.html" class="dock-item">
+<span>News</span>
+</a>
+
+</div>
+
+<script src="staking.js"></script>
+<script src="wallet-core.js"></script>
+<script src="js/notifications.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+let activeProject=null
+
+const withdrawModal=document.getElementById("withdrawModal")
+const withdrawAmount=document.getElementById("withdrawAmount")
+const withdrawAddress=document.getElementById("withdrawAddress")
+const modalProject=document.getElementById("modalProject")
+
+function renderWallet(){
+
+const summary=getWalletSummary()
+
+totalStake.innerText=summary.totalStake.toFixed(2)+" Pi"
+totalReward.innerText=summary.grossRewards.toFixed(2)+" Pi"
+withdrawn.innerText=summary.withdrawn.toFixed(2)+" Pi"
+available.innerText=summary.available.toFixed(2)+" Pi"
+
+renderProjects()
+
 }
 
-.header-left{
-display:flex;
-align-items:center;
-}
+function renderProjects(){
 
-.main-logo{
-height:54px;
-}
+const container=document.getElementById("projectContainer")
+container.innerHTML=""
 
-</style><link rel="stylesheet" href="css/global-header.css">
+const projects=getProjectWalletBreakdown()
 
-<link rel="stylesheet" href="global-buttons.css"></head><body><header class="header"><div class="header-left">  
-<img src="IMG_20260125_183804.png" class="main-logo">  
-<span class="brand">ALBUKHR</span>  
-</div><div class="header-right">  
-<div class="header-btn notification-btn" onclick="openNotifications()">  
-🔔  
-<span id="notifBadge" class="notification-badge"></span>  
-</div>  
-</div></header><div class="summary"><div class="balance" id="available">0.00 Pi</div>  
-<div class="sub">Available Reward Balance</div><div class="row">  
-<div>Total Staked</div>  
-<div id="totalStake">0.00 Pi</div>  
-</div><div class="row">  
-<div>Total Rewards (Gross)</div>  
-<div id="totalReward">0.00 Pi</div>  
-</div><div class="row">  
-<div>Total Withdrawn</div>  
-<div id="withdrawn">0.00 Pi</div>  
-</div></div><div class="wallet-tabs"><button class="nav-btn nav-wallet">  
-Wallet  
-</button><button class="nav-btn nav-trans"  
-onclick="window.location.href='transactions.html'">  
-Transactions  
-</button>  </div><div id="withdrawSuccessBox"  
-style="display:none;margin:12px 16px;padding:12px;border-radius:10px;background:#e9f9ef;color:#0f7a3d;font-size:13px;font-weight:600;">  
-Withdraw Successful  
-</div><div class="scroll-area" id="projectContainer"></div><div class="modal-overlay" id="withdrawModal"><div class="modal"><h3 id="modalProject">Withdraw</h3><input id="withdrawAmount" type="number" placeholder="Amount">  
-<input id="withdrawAddress" type="text" placeholder="Pi Wallet Address"><div class="modal-actions"><button class="btn" onclick="confirmWithdraw()">  
-Confirm  
-</button><button class="btn" style="background:#ccc;color:#333"  
-onclick="closeModal()">  
-Cancel  
-</button>  </div><p style="font-size:11px;margin-top:10px;color:#777">  
-Fee: 1% • Daily Limit: 50 Pi  
-</p></div>  
-</div><div class="dock-nav"><a href="index.html" class="dock-item">Home</a>  
-<a href="wallet.html" class="dock-item">Wallet</a>  
-<a href="services.html" class="dock-item">Services</a>  
-<a href="news.html" class="dock-item">News</a>  </div><script src="staking.js"></script><script src="wallet-core.js"></script><script src="js/notifications.js"></script><script>  let activeProject = null
+projects.forEach(p=>{
 
-const withdrawModal =
-document.getElementById("withdrawModal")
+const progress=Math.min((p.netReward/(p.stake||1))*100,100)
 
-const withdrawAmount =
-document.getElementById("withdrawAmount")
+const card=document.createElement("div")
+card.className="project-card"
 
-const withdrawAddress =
-document.getElementById("withdrawAddress")
+card.innerHTML=`
 
-const modalProject =
-document.getElementById("modalProject")
+<div class="project-header">
 
-function toggleBody(el){
+<div class="project-title">
 
-const body = el.nextElementSibling
+<div class="project-icon">🏢</div>
 
-body.style.display =
-body.style.display==="block" ?
-"none":"block"
+${p.project}
+
+</div>
+
+<div style="display:flex;gap:8px;align-items:center">
+
+<div>${p.netReward.toFixed(2)} Pi</div>
+
+<span class="expand-arrow">⌄</span>
+
+</div>
+
+</div>
+
+<div class="project-progress">
+<div class="progress-bar" style="width:${progress}%"></div>
+</div>
+
+<div class="project-body">
+
+<div class="row">
+<div>Staked</div>
+<div>${p.stake.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Gross Reward</div>
+<div>${p.grossReward.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Withdrawn</div>
+<div>${p.withdrawn.toFixed(2)} Pi</div>
+</div>
+
+<div style="display:flex;gap:8px;margin-top:10px">
+
+<button class="btn" onclick="event.stopPropagation();openWithdraw('${p.project}')">
+Reward Withdraw
+</button>
+
+<button class="btn secondary" onclick="event.stopPropagation();withdrawCapital('${p.project}')">
+Capital Withdraw
+</button>
+
+</div>
+
+<div id="history-${p.project}"></div>
+
+</div>
+`
+
+container.appendChild(card)
+
+})
 
 }
 
 function openWithdraw(project){
 
-activeProject = project
+activeProject=project
 
-modalProject.innerText =
-"Withdraw from " + project
+modalProject.innerText="Withdraw from "+project
 
 withdrawModal.style.display="flex"
 
 }
 
 function closeModal(){
-
 withdrawModal.style.display="none"
-
 }
 
 function confirmWithdraw(){
 
-const amt =
-withdrawAmount.value.trim()
+const amt=withdrawAmount.value.trim()
+const addr=withdrawAddress.value.trim()
 
-const addr =
-withdrawAddress.value.trim()
-
-if(!amt || Number(amt)<=0){
-
+if(!amt||Number(amt)<=0){
 alert("Enter valid amount")
 return
-
 }
 
 if(!addr){
-
 alert("Enter Pi wallet address")
 return
-
 }
 
-const res =
-requestWithdraw({
-
+const res=requestWithdraw({
 project:activeProject,
 amount:amt,
 walletAddress:addr
-
 })
 
 if(res.error){
-
 alert(res.error)
 return
-
 }
 
 withdrawAmount.value=""
 withdrawAddress.value=""
 
 closeModal()
-
 renderWallet()
 
 }
 
-function withdrawCapitalAction(project){
+function withdrawCapital(project){
 
-const res =
-requestCapitalWithdraw(project)
+const res=requestCapitalWithdraw(project)
 
 if(res.error){
-
 alert(res.error)
 return
-
 }
 
-alert(
-"Capital withdrawn: "
-
-res.grossAmount.toFixed(2)
-
-" Pi"
-)
-
+alert("Capital withdrawn: "+res.grossAmount.toFixed(2)+" Pi")
 
 renderWallet()
 
@@ -329,6 +492,9 @@ renderWallet()
 
 renderWallet()
 
-</script></body>
+})
 
-</html>
+</script>
+
+</body>
+  </html>
