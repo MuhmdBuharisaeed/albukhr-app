@@ -251,6 +251,20 @@ body{
   width:auto;
 }
 
+.withdraw-box{
+  margin-top:10px;
+  border-top:1px solid #eee;
+  padding-top:10px;
+}
+
+.withdraw-box input{
+  width:100%;
+  padding:8px;
+  margin-top:6px;
+  border-radius:8px;
+  border:1px solid #ddd;
+  font-size:12px;
+   }   
   </style>
   
 <link rel="stylesheet" href="style.css">  
@@ -583,27 +597,36 @@ function renderProjects(){
           <div>${(p.withdrawn || 0).toFixed(2)} Pi</div>
         </div>
 
-        <div style="display:flex;gap:8px;margin-top:10px">
+        <div class="withdraw-box">
 
-          <button class="btn"
-            onclick="openWithdraw('${p.project}')">
+  <input
+    type="number"
+    placeholder="Amount"
+    id="amount-${p.project}"
+  >
 
-            Reward Withdraw
+  <input
+    type="text"
+    placeholder="Pi Wallet Address"
+    id="address-${p.project}"
+  >
 
-          </button>
+  <div style="display:flex;gap:8px;margin-top:8px">
 
-          <button class="btn"
-            style="background:#333"
-            onclick="withdrawCapitalAction('${p.project}')">
+    <button class="btn"
+      onclick="withdrawReward('${p.project}')">
+      Reward Withdraw
+    </button>
 
-            Capital Withdraw
+    <button class="btn"
+      style="background:#333"
+      onclick="withdrawCapitalAction('${p.project}')">
+      Capital Withdraw
+    </button>
 
-          </button>
+  </div>
 
-        </div>
-
-      </div>
-
+</div>
     `;
 
     container.appendChild(card);
@@ -669,6 +692,37 @@ window.confirmWithdraw = function(){
   renderWallet();
 }
 
+function withdrawReward(project){
+
+  const amount =
+  document.getElementById("amount-"+project).value;
+
+  const address =
+  document.getElementById("address-"+project).value;
+
+  if(!amount || Number(amount) <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(!address){
+    alert("Enter Pi wallet address");
+    return;
+  }
+
+  const res = requestWithdraw({
+    project: project,
+    amount: amount,
+    walletAddress: address
+  });
+
+  if(res.error){
+    alert(res.error);
+    return;
+  }
+
+  renderWallet();
+}   
 /* =========================
    CAPITAL WITHDRAW
 ========================= */
