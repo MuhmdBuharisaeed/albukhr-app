@@ -333,10 +333,17 @@ Fee 1% • Daily Limit 50 Pi
 
 let activeProject=null
 
-const withdrawModal=document.getElementById("withdrawModal")
-const withdrawAmount=document.getElementById("withdrawAmount")
-const withdrawAddress=document.getElementById("withdrawAddress")
-const modalProject=document.getElementById("modalProject")
+let withdrawModal
+let withdrawAmount
+let withdrawAddress
+let modalProject
+
+document.addEventListener("DOMContentLoaded", () => {
+
+withdrawModal = document.getElementById("withdrawModal")
+withdrawAmount = document.getElementById("withdrawAmount")
+withdrawAddress = document.getElementById("withdrawAddress")
+modalProject = document.getElementById("modalProject")
 
 function renderWallet(){
 
