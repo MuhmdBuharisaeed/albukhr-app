@@ -436,12 +436,14 @@ renderProjectHistory(p.project)
 
 function toggleBody(el){
 
-const body=el.nextElementSibling
+const body = el.parentElement.querySelector(".project-body")
 
-body.style.display=
-body.style.display==="block"?"none":"block"
+body.style.display =
+body.style.display === "block"
+? "none"
+: "block"
 
-}
+  }
 
 function openWithdraw(project){
 
