@@ -195,6 +195,12 @@ display:flex;
 gap:10px;
 }
 
+.expand-arrow{
+font-size:18px;
+color:#777;
+transition:transform .25s ease;
+}
+
 </style>
 
 </head>
@@ -356,22 +362,6 @@ renderProjects()
 }
 
 function renderProjects(){
-
-const container=document.getElementById("projectContainer")
-container.innerHTML=""
-
-const projects=getProjectWalletBreakdown()
-const history=getWithdrawHistory()
-
-projects.forEach(p=>{
-
-const progress=Math.min((p.netReward/(p.stake||1))*100,100)
-
-const card=document.createElement("div")
-card.className="project-card"
-
-card.innerHTML=`
-
 <div class="project-header" onclick="toggleBody(this)">
 
 <div class="project-title">
@@ -382,7 +372,13 @@ ${p.project}
 
 </div>
 
+<div style="display:flex;align-items:center;gap:8px">
+
 <div>${p.netReward.toFixed(2)} Pi</div>
+
+<span class="expand-arrow">⌄</span>
+
+</div>
 
 </div>
 
@@ -437,11 +433,19 @@ renderProjectHistory(p.project)
 function toggleBody(el){
 
 const body = el.parentElement.querySelector(".project-body")
+const arrow = el.querySelector(".expand-arrow")
 
-body.style.display =
-body.style.display === "block"
-? "none"
-: "block"
+if(body.style.display === "block"){
+
+body.style.display = "none"
+arrow.style.transform = "rotate(0deg)"
+
+}else{
+
+body.style.display = "block"
+arrow.style.transform = "rotate(180deg)"
+
+}
 
   }
 
