@@ -371,6 +371,8 @@ document.querySelectorAll(".dock-item").forEach(link=>{
 </script>
   
 <script>  
+document.addEventListener("DOMContentLoaded", function(){
+
 let activeProject = null;
 
 /* GET MODAL ELEMENTS */
@@ -766,7 +768,7 @@ function showWithdrawSuccess(){
     withdrawSuccessBox.style.display = "none";  
   },4000);  
 }  
-  
+}); 
 </script>
   
 </body>  
