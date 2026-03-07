@@ -166,12 +166,15 @@ color:#888;
 
 .modal-overlay{
 position:fixed;
-inset:0;
+top:0;
+left:0;
+right:0;
+bottom:0;
 background:rgba(0,0,0,.4);
 display:none;
 align-items:center;
 justify-content:center;
-z-index:2000;
+z-index:9999;
 }
 
 .modal{
@@ -447,14 +450,16 @@ body.style.display === "block"
 
 function openWithdraw(project){
 
-activeProject=project
+activeProject = project
 
-modalProject.innerText=
-"Withdraw from "+project
+modalProject.innerText =
+"Withdraw from " + project
 
-withdrawModal.style.display="flex"
+withdrawModal.style.display = "flex"
+withdrawModal.style.alignItems = "center"
+withdrawModal.style.justifyContent = "center"
 
-}
+  }
 
 function closeModal(){
 withdrawModal.style.display="none"
