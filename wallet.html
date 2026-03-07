@@ -507,16 +507,13 @@ function renderProjectHistory(project){
   
 function openWithdraw(project){
 
+alert("Withdraw button working");
+
 activeProject = project;
-
 modalProject.innerText = "Withdraw from " + project;
-
-withdrawAmount.value = "";
-withdrawAddress.value = "";
-
 withdrawModal.style.display = "flex";
 
-}
+  }
   
 function closeModal(){  
   withdrawModal.style.display="none";  
