@@ -359,10 +359,6 @@ function saveWallet(wallet){
   }
 }
 
-window.dispatchEvent(new CustomEvent("walletUpdated", {
-  detail: { type: "reward-withdraw" }
-}));
-
 const LEDGER_KEY = "albukhr_wallet_ledger";
 
 function getLedger(){
