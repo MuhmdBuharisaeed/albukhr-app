@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Albukhr Marketplace</title>
+
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="global-buttons.css">
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:110px;
+}
+
+.marketplace{
+padding:16px;
+}
+
+.project-card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+margin-bottom:16px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.project-title{
+font-weight:700;
+font-size:16px;
+margin-bottom:6px;
+}
+
+.project-desc{
+font-size:13px;
+color:#666;
+margin-bottom:10px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+margin-top:4px;
+}
+
+.invest-btn{
+margin-top:10px;
+padding:10px;
+border:none;
+border-radius:10px;
+background:#0f7a3d;
+color:#fff;
+font-weight:600;
+cursor:pointer;
+width:100%;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<div class="header-left">
+<img src="IMG_20260125_183804.png" class="main-logo">
+<span class="brand">ALBUKHR</span>
+</div>
+
+</header>
+
+<div class="marketplace" id="projectList"></div>
+
+<script src="project-creation-engine.js"></script>
+<script src="staking.js"></script>
+<script src="smart-liquidity-engine.js"></script>
+
+<script>
+
+function renderMarketplace(){
+
+const container =
+document.getElementById("projectList");
+
+container.innerHTML = "";
+
+const projects = getProjects();
+
+if(!projects.length){
+
+container.innerHTML =
+"<small>No projects available</small>";
+
+return;
+
+}
+
+projects.forEach(project => {
+
+const card =
+document.createElement("div");
+
+card.className = "project-card";
+
+const liquidity =
+getProjectTreasuryStatus(project.name).liquidity;
+
+card.innerHTML = `
+
+<div class="project-title">
+${project.name}
+</div>
+
+<div class="project-desc">
+${project.description || ""}
+</div>
+
+<div class="row">
+<div>ROI</div>
+<div>${project.roi || 0}%</div>
+</div>
+
+<div class="row">
+<div>Liquidity</div>
+<div>${liquidity.toFixed(2)} Pi</div>
+</div>
+
+<button
+class="invest-btn"
+onclick="invest('${project.name}')">
+
+Invest
+
+</button>
+
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+function invest(project){
+
+const amount =
+prompt("Enter investment amount");
+
+if(!amount || Number(amount) <= 0){
+alert("Invalid amount");
+return;
+}
+
+if(typeof createStake !== "function"){
+alert("Staking engine missing");
+return;
+}
+
+createStake({
+project: project,
+amount: Number(amount)
+});
+
+alert("Investment successful");
+
+}
+
+renderMarketplace();
+
+</script>
+
+</body>
+</html>
