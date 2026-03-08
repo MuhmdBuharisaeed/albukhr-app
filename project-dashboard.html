@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Investor Dashboard</title>
+<title>Project Dashboard</title>
 
+<link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/global-header.css">
 <link rel="stylesheet" href="global-buttons.css">
 
@@ -17,103 +17,48 @@ body{
 margin:0;
 font-family:system-ui;
 background:#f4f7f6;
-padding-bottom:120px;
+padding-bottom:100px;
 }
 
-/* HEADER SPACE */
-.page{
+.dashboard{
 padding:16px;
 }
 
-/* SUMMARY CARDS */
-
-.summary-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-margin-bottom:16px;
-}
-
-.summary-card{
+.card{
 background:#fff;
-border-radius:16px;
 padding:16px;
-box-shadow:0 6px 16px rgba(0,0,0,0.06);
-}
-
-.summary-title{
-font-size:13px;
-color:#777;
-margin-bottom:6px;
-}
-
-.summary-value{
-font-size:22px;
-font-weight:800;
-color:#0f7a3d;
-}
-
-/* QUICK ACTIONS */
-
-.quick-actions{
-display:flex;
-gap:10px;
-margin-bottom:16px;
-}
-
-.action-btn{
-flex:1;
-background:#fff;
 border-radius:14px;
-padding:12px;
-text-align:center;
-box-shadow:0 6px 16px rgba(0,0,0,0.05);
-font-size:12px;
-font-weight:600;
-cursor:pointer;
+margin-bottom:16px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
 }
 
-/* INVESTMENTS */
-
-.section-title{
+.title{
 font-weight:700;
 margin-bottom:10px;
 }
 
-.invest-card{
-background:#fff;
-border-radius:16px;
-padding:14px;
-margin-bottom:12px;
-box-shadow:0 6px 16px rgba(0,0,0,0.05);
+.big{
+font-size:24px;
+font-weight:800;
+color:#0f7a3d;
 }
 
-.invest-header{
-display:flex;
-justify-content:space-between;
-font-weight:700;
-margin-bottom:6px;
-}
-
-.row{
-display:flex;
-justify-content:space-between;
-font-size:13px;
-margin-top:4px;
-}
-
-/* WALLET BUTTON */
-
-.wallet-btn{
-margin-top:18px;
+input{
 width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid #ddd;
+margin-top:8px;
+}
+
+button{
+margin-top:8px;
+padding:10px 14px;
+border:none;
+border-radius:10px;
 background:#0f7a3d;
 color:#fff;
-border:none;
-border-radius:14px;
-padding:14px;
-font-weight:700;
-font-size:15px;
+font-weight:600;
 cursor:pointer;
 }
 
@@ -126,207 +71,158 @@ cursor:pointer;
 <header class="header">
 
 <div class="header-left">
-
 <img src="IMG_20260125_183804.png" class="main-logo">
-
 <span class="brand">ALBUKHR</span>
-
-</div>
-
-<div class="header-right">
-
-<div class="header-btn notification-btn" onclick="openNotifications()">
-🔔
-<span id="notifBadge"></span>
-</div>
-
 </div>
 
 </header>
 
-<div class="page">
+<div class="dashboard">
 
-<!-- SUMMARY -->
+<!-- PROJECT INFO -->
 
-<div class="summary-grid">
+<div class="card">
 
-<div class="summary-card">
+<div class="title">Project</div>
 
-<div class="summary-title">
-Total Investment
-</div>
-
-<div class="summary-value" id="totalInvest">
-0.00 Pi
-</div>
+<div id="projectName">Barsh Agro</div>
 
 </div>
 
+<!-- LIQUIDITY -->
 
-<div class="summary-card">
+<div class="card">
 
-<div class="summary-title">
-Total Earnings
-</div>
+<div class="title">Project Liquidity</div>
 
-<div class="summary-value" id="totalEarn">
-0.00 Pi
-</div>
+<div class="big" id="liquidityBalance">0 Pi</div>
 
 </div>
 
-</div>
+<!-- ADD LIQUIDITY -->
 
+<div class="card">
 
-<!-- QUICK ACTIONS -->
+<div class="title">Add Liquidity</div>
 
-<div class="quick-actions">
+<input
+type="number"
+id="addLiquidityAmount"
+placeholder="Amount">
 
-<div class="action-btn"
-onclick="location.href='services.html'">
-Explore Projects
-</div>
-
-<div class="action-btn"
-onclick="location.href='wallet.html'">
-Open Wallet
-</div>
-
-</div>
-
-
-<!-- INVESTMENTS -->
-
-<div class="section-title">
-My Investments
-</div>
-
-<div id="investments"></div>
-
-
-<button class="wallet-btn"
-onclick="location.href='wallet.html'">
-
-Open Wallet
-
+<button onclick="addLiquidity()">
+Add Liquidity
 </button>
 
 </div>
 
+<!-- INTERNAL WITHDRAW -->
 
-<!-- DOCK NAV -->
+<div class="card">
 
-<div class="dock-nav">
+<div class="title">Internal Withdraw</div>
 
-<a href="index.html" class="dock-item">
-🏠
-<span>Home</span>
-</a>
+<input
+type="number"
+id="withdrawAmount"
+placeholder="Amount">
 
-<a href="investor-dashboard.html" class="dock-item active">
-👥
-<span>Investors</span>
-</a>
-
-<a href="wallet.html" class="dock-item">
-💳
-<span>Wallet</span>
-</a>
-
-<a href="services.html" class="dock-item">
-⚙
-<span>Services</span>
-</a>
+<button onclick="internalWithdraw()">
+Withdraw
+</button>
 
 </div>
 
+<!-- ROI -->
 
+<div class="card">
+
+<div class="title">Project ROI</div>
+
+<div id="roiValue">0%</div>
+
+</div>
+
+<!-- INVESTORS -->
+
+<div class="card">
+
+<div class="title">Total Investors</div>
+
+<div id="investorCount">0</div>
+
+</div>
+
+</div>
+
+<script src="wallet-core.js"></script>
+<script src="project-treasury.js"></script>
 <script src="staking.js"></script>
 
 <script>
 
-function renderInvestorDashboard(){
+const currentProject = "Barsh Agro";
 
-if(typeof getAllStakesMerged !== "function") return;
+function updateDashboard(){
 
-const stakes = getAllStakesMerged();
+const liquidity =
+getProjectLiquidity(currentProject);
 
-let totalInvest = 0;
-let totalEarn = 0;
+document.getElementById("liquidityBalance").innerText =
+liquidity.toFixed(2) + " Pi";
 
-const map = {};
+const roi =
+calculateROI(currentProject);
 
-stakes.forEach(s=>{
+document.getElementById("roiValue").innerText =
+roi.toFixed(2) + "%";
 
-totalInvest += Number(s.amount)||0;
+const stakes =
+getAllStakesMerged()
+.filter(s => s.project === currentProject);
 
-const reward = Number(s.remainingReward ?? s.reward)||0;
-
-totalEarn += reward;
-
-if(!map[s.project]){
-
-map[s.project]={
-invest:0,
-earn:0
-};
+document.getElementById("investorCount").innerText =
+stakes.length;
 
 }
 
-map[s.project].invest += Number(s.amount)||0;
+function addLiquidity(){
 
-map[s.project].earn += reward;
+const amount =
+document.getElementById("addLiquidityAmount").value;
 
-});
+const res =
+addProjectLiquidity(currentProject, amount);
 
-document.getElementById("totalInvest").innerText =
-totalInvest.toFixed(2)+" Pi";
+if(res.error){
+alert(res.error);
+return;
+}
 
-document.getElementById("totalEarn").innerText =
-totalEarn.toFixed(2)+" Pi";
-
-const container = document.getElementById("investments");
-
-container.innerHTML="";
-
-Object.keys(map).forEach(project=>{
-
-const card = document.createElement("div");
-
-card.className="invest-card";
-
-card.innerHTML = `
-
-<div class="invest-header">
-
-<div>${project}</div>
-
-<div>${map[project].earn.toFixed(2)} Pi</div>
-
-</div>
-
-<div class="row">
-<div>Invested</div>
-<div>${map[project].invest.toFixed(2)} Pi</div>
-</div>
-
-<div class="row">
-<div>Earnings</div>
-<div>${map[project].earn.toFixed(2)} Pi</div>
-</div>
-
-`;
-
-container.appendChild(card);
-
-});
+updateDashboard();
 
 }
 
-renderInvestorDashboard();
+function internalWithdraw(){
+
+const amount =
+document.getElementById("withdrawAmount").value;
+
+const res =
+projectInternalWithdraw(currentProject, amount);
+
+if(res.error){
+alert(res.error);
+return;
+}
+
+updateDashboard();
+
+}
+
+updateDashboard();
 
 </script>
 
 </body>
-
-</html>
+  </html>
