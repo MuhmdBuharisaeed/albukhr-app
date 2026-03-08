@@ -49,7 +49,7 @@ position:relative;
 }
 
 .dock-item span{
-font-size:13px;
+font-size:34px;
 font-weight:600;
 margin-top:2px;
 }
