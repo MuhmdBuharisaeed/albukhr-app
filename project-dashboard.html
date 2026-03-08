@@ -20,6 +20,58 @@ background:#f4f7f6;
 padding-bottom:100px;
 }
 
+/* ===== PREMIUM FLAT HEADER ===== */
+.header{
+  background:#0f7a3d;
+  height:60px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+/* left side (logo + brand) */
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.main-logo{
+  height:54px;
+  width:auto;
+}
+
+.brand{
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+/* hamburger */
+.menu-icon{
+  width:18px;
+  height:13px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.menu-icon div{
+  height:2px;
+  background: linear-gradient(90deg,#ffffff,#c8f2de);
+  border-radius:2px;
+  box-shadow:0 0 6px rgba(255,255,255,0.6);
+  transition:.3s ease;
+}
+
+.menu-icon:hover div{
+  background: linear-gradient(90deg,#ffffff,#8de0b6);
+  transform:scaleX(1.05);
+}
+
+
 .dashboard{
 padding:16px;
 }
