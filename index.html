@@ -639,9 +639,11 @@ body::before{
   <div id="assetsContainer"></div>
 </section>
 
-<!-- ===== ALBUKHR FLOATING DOCK NAV ===== -->
+<!-- ===== ALBUKHR DOCK NAV ===== -->
+
 <div class="dock-nav">
 
+  <!-- HOME -->
   <a href="index.html" class="dock-item">
     <svg viewBox="0 0 24 24" class="dock-icon">
       <path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>
@@ -649,6 +651,20 @@ body::before{
     <span>Home</span>
   </a>
 
+
+  <!-- INVESTORS -->
+  <a href="investor-dashboard.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon">
+      <path d="M16 11c1.66 0 3-1.34 3-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/>
+      <path d="M8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/>
+      <path d="M2 20v-1c0-2.21 3.58-4 6-4s6 1.79 6 4v1z"/>
+      <path d="M14 20v-1c0-1.5 1.5-2.8 3.5-3.5 2 .7 3.5 2 3.5 3.5v1z"/>
+    </svg>
+    <span>Investors</span>
+  </a>
+
+
+  <!-- WALLET -->
   <a href="wallet.html" class="dock-item">
     <svg viewBox="0 0 24 24" class="dock-icon">
       <path d="M3 7h15a2 2 0 012 2v8a2 2 0 01-2 2H3z"/>
@@ -657,6 +673,8 @@ body::before{
     <span>Wallet</span>
   </a>
 
+
+  <!-- SERVICES -->
   <a href="services.html" class="dock-item">
     <svg viewBox="0 0 24 24" class="dock-icon">
       <circle cx="12" cy="12" r="3"/>
@@ -665,15 +683,7 @@ body::before{
     <span>Services</span>
   </a>
 
-  <a href="news.html" class="dock-item">
-    <svg viewBox="0 0 24 24" class="dock-icon">
-      <circle cx="12" cy="12" r="9"/>
-      <path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>
-    </svg>
-    <span>News</span>
-  </a>
-
-       </div>
+</div>
 
 <script>
 const current = location.pathname.split("/").pop() || "index.html";
