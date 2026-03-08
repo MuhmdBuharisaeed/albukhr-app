@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Investor Dashboard</title>
+
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="global-buttons.css">
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:110px;
+}
+
+.dashboard{
+padding:16px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+margin-bottom:16px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.title{
+font-weight:700;
+margin-bottom:10px;
+}
+
+.big{
+font-size:22px;
+font-weight:800;
+color:#0f7a3d;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+margin-top:6px;
+font-size:13px;
+}
+
+.project-card{
+background:#fff;
+padding:14px;
+border-radius:12px;
+margin-bottom:12px;
+box-shadow:0 4px 12px rgba(0,0,0,0.05);
+}
+
+.project-name{
+font-weight:700;
+margin-bottom:6px;
+}
+
+.wallet-btn{
+margin-top:10px;
+padding:10px;
+border:none;
+border-radius:10px;
+background:#0f7a3d;
+color:#fff;
+cursor:pointer;
+width:100%;
+font-weight:600;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<div class="header-left">
+<img src="IMG_20260125_183804.png" class="main-logo">
+<span class="brand">ALBUKHR</span>
+</div>
+
+</header>
+
+<div class="dashboard">
+
+<!-- TOTAL INVESTMENT -->
+
+<div class="card">
+
+<div class="title">Total Investment</div>
+
+<div class="big" id="totalInvestment">0 Pi</div>
+
+</div>
+
+<!-- TOTAL EARNINGS -->
+
+<div class="card">
+
+<div class="title">Total Earnings</div>
+
+<div class="big" id="totalEarnings">0 Pi</div>
+
+</div>
+
+<!-- PROJECT INVESTMENTS -->
+
+<div class="card">
+
+<div class="title">My Investments</div>
+
+<div id="investmentList"></div>
+
+</div>
+
+<button class="wallet-btn" onclick="goWallet()">
+Open Wallet
+</button>
+
+</div>
+
+<script src="staking.js"></script>
+<script src="wallet-core.js"></script>
+
+<script>
+
+function renderInvestorDashboard(){
+
+const stakes =
+typeof getAllStakesMerged === "function"
+? getAllStakesMerged()
+: [];
+
+const container =
+document.getElementById("investmentList");
+
+container.innerHTML = "";
+
+let totalInvestment = 0;
+let totalEarnings = 0;
+
+const projects = {};
+
+stakes.forEach(s => {
+
+if(!projects[s.project]){
+
+projects[s.project] = {
+stake:0,
+reward:0
+};
+
+}
+
+projects[s.project].stake +=
+Number(s.amount) || 0;
+
+projects[s.project].reward +=
+Number(s.remainingReward ?? s.reward) || 0;
+
+});
+
+Object.keys(projects).forEach(name => {
+
+const data = projects[name];
+
+totalInvestment += data.stake;
+totalEarnings += data.reward;
+
+const card =
+document.createElement("div");
+
+card.className = "project-card";
+
+card.innerHTML = `
+
+<div class="project-name">
+${name}
+</div>
+
+<div class="row">
+<div>Invested</div>
+<div>${data.stake.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Earnings</div>
+<div>${data.reward.toFixed(2)} Pi</div>
+</div>
+
+`;
+
+container.appendChild(card);
+
+});
+
+document.getElementById("totalInvestment").innerText =
+totalInvestment.toFixed(2) + " Pi";
+
+document.getElementById("totalEarnings").innerText =
+totalEarnings.toFixed(2) + " Pi";
+
+}
+
+function goWallet(){
+
+location.href = "wallet.html";
+
+}
+
+renderInvestorDashboard();
+
+</script>
+
+</body>
+</html>
