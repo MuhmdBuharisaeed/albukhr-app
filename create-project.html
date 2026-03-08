@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create Project</title>
+
+<style>
+
+body{
+font-family:system-ui;
+background:#f4f7f6;
+margin:0;
+padding:16px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:12px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+input, textarea{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+button{
+margin-top:12px;
+padding:10px;
+border:none;
+background:#0f7a3d;
+color:#fff;
+border-radius:10px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Create New Project</h2>
+
+<input
+id="projectName"
+placeholder="Project Name">
+
+<textarea
+id="projectDescription"
+placeholder="Project Description"></textarea>
+
+<input
+type="number"
+id="projectROI"
+placeholder="Expected ROI (%)">
+
+<input
+type="number"
+id="initialLiquidity"
+placeholder="Initial Liquidity">
+
+<button onclick="createProject()">
+Create Project
+</button>
+
+</div>
+
+<script src="project-creation-engine.js"></script>
+
+</body>
+</html>
