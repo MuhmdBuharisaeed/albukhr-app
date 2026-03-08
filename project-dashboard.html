@@ -20,57 +20,88 @@ background:#f4f7f6;
 padding-bottom:100px;
 }
 
-/* ===== PREMIUM FLAT HEADER ===== */
+/* ===== ALBUKHR GLOBAL HEADER ===== */
+
 .header{
-  background:#0f7a3d;
-  height:60px;
-  padding:0 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+background:#0f7a3d;
+height:60px;
+padding:0 16px;
+
+display:flex;
+align-items:center;
+justify-content:space-between;
+
+box-shadow:0 2px 8px rgba(0,0,0,0.15);
 }
 
-/* left side (logo + brand) */
+/* LEFT SIDE */
+
 .header-left{
-  display:flex;
-  align-items:center;
-  gap:8px;
+display:flex;
+align-items:center;
+gap:10px;
 }
+
+/* LOGO */
 
 .main-logo{
-  height:54px;
-  width:auto;
+height:46px;
+width:auto;
 }
+
+/* BRAND */
 
 .brand{
-  font-size:15px;
-  font-weight:700;
-  letter-spacing:.5px;
+color:#fff;
+font-size:18px;
+font-weight:700;
+letter-spacing:1px;
 }
 
-/* hamburger */
-.menu-icon{
-  width:18px;
-  height:13px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  cursor:pointer;
+/* RIGHT SIDE */
+
+.header-right{
+display:flex;
+align-items:center;
+gap:12px;
 }
 
-.menu-icon div{
-  height:2px;
-  background: linear-gradient(90deg,#ffffff,#c8f2de);
-  border-radius:2px;
-  box-shadow:0 0 6px rgba(255,255,255,0.6);
-  transition:.3s ease;
+/* HEADER BUTTON */
+
+.header-btn{
+width:36px;
+height:36px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+border-radius:50%;
+cursor:pointer;
 }
 
-.menu-icon:hover div{
-  background: linear-gradient(90deg,#ffffff,#8de0b6);
-  transform:scaleX(1.05);
+/* NOTIFICATION */
+
+.notification-btn{
+font-size:22px;
 }
 
+/* BADGE */
+
+.notification-badge{
+position:absolute;
+top:3px;
+right:3px;
+
+background:red;
+color:#fff;
+
+font-size:10px;
+padding:2px 5px;
+
+border-radius:10px;
+display:none;
+}
 
 .dashboard{
 padding:16px;
