@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Albukhr Admin Control Center</title>
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:100px;
+}
+
+.header{
+background:#0f7a3d;
+color:#fff;
+padding:14px;
+font-weight:700;
+}
+
+.container{
+padding:16px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+margin-bottom:16px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+margin-top:6px;
+font-size:13px;
+}
+
+.project-title{
+font-weight:700;
+margin-bottom:6px;
+}
+
+button{
+margin-top:8px;
+padding:8px 12px;
+border:none;
+border-radius:8px;
+background:#0f7a3d;
+color:#fff;
+cursor:pointer;
+}
+
+.pause{
+background:#b83232;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+Albukhr Admin Control Center
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<div class="project-title">
+Total Projects
+</div>
+
+<div id="projectCount">0</div>
+
+</div>
+
+<div class="card">
+
+<div class="project-title">
+Total Investors
+</div>
+
+<div id="investorCount">0</div>
+
+</div>
+
+<div class="card">
+
+<div class="project-title">
+Projects
+</div>
+
+<div id="projectList"></div>
+
+</div>
+
+</div>
+
+<script src="project-creation-engine.js"></script>
+<script src="staking.js"></script>
+<script src="smart-liquidity-engine.js"></script>
+<script src="project-treasury.js"></script>
+
+<script>
+
+function renderAdmin(){
+
+const projects = getProjects();
+
+document.getElementById("projectCount").innerText =
+projects.length;
+
+const stakes =
+typeof getAllStakesMerged === "function"
+? getAllStakesMerged()
+: [];
+
+document.getElementById("investorCount").innerText =
+stakes.length;
+
+const container =
+document.getElementById("projectList");
+
+container.innerHTML = "";
+
+projects.forEach(project => {
+
+const liquidity =
+getProjectTreasuryStatus(project.name).liquidity;
+
+const investors =
+stakes.filter(s => s.project === project.name).length;
+
+const card =
+document.createElement("div");
+
+card.className = "card";
+
+card.innerHTML = `
+
+<div class="project-title">
+${project.name}
+</div>
+
+<div class="row">
+<div>ROI</div>
+<div>${project.roi}%</div>
+</div>
+
+<div class="row">
+<div>Liquidity</div>
+<div>${liquidity.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Investors</div>
+<div>${investors}</div>
+</div>
+
+<button onclick="openProject('${project.name}')">
+Open Dashboard
+</button>
+
+<button class="pause"
+onclick="pauseProject('${project.name}')">
+
+Pause Project
+
+</button>
+
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+function openProject(name){
+
+alert("Opening dashboard for " + name);
+
+}
+
+function pauseProject(name){
+
+alert("Project paused: " + name);
+
+}
+
+renderAdmin();
+
+</script>
+
+</body>
+</html>
