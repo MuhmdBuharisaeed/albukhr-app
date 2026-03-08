@@ -50,7 +50,6 @@ font-weight:700;
 font-size:18px;
 letter-spacing:1px;
 }
-
 /* PAGE */
 
 .marketplace{
@@ -73,11 +72,32 @@ transform:translateY(-2px);
 box-shadow:0 10px 24px rgba(0,0,0,0.08);
 }
 
+/* HEADER */
+
+.project-header{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:10px;
+}
+
+.project-icon{
+width:38px;
+height:38px;
+border-radius:50%;
+background:#eaf7ef;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:18px;
+}
+
 .project-title{
 font-weight:700;
-font-size:16px;
-margin-bottom:6px;
+font-size:15px;
 }
+
+/* DESC */
 
 .project-desc{
 font-size:13px;
@@ -85,11 +105,28 @@ color:#666;
 margin-bottom:10px;
 }
 
+/* ROW */
+
 .row{
 display:flex;
 justify-content:space-between;
 font-size:13px;
-margin-top:4px;
+margin-top:5px;
+}
+
+/* PROGRESS */
+
+.progress{
+height:6px;
+background:#e5efe8;
+border-radius:10px;
+margin-top:8px;
+overflow:hidden;
+}
+
+.progress-bar{
+height:100%;
+background:linear-gradient(90deg,#0f7a3d,#1ec777);
 }
 
 /* BUTTON */
@@ -104,11 +141,6 @@ color:#fff;
 font-weight:600;
 cursor:pointer;
 width:100%;
-transition:.2s ease;
-}
-
-.invest-btn:hover{
-background:#0c5f2f;
 }
 
 .empty{
@@ -129,11 +161,8 @@ padding:20px;
 <header class="header">
 
 <div class="header-left">
-
 <img src="IMG_20260125_183804.png" class="main-logo">
-
 <span class="brand">ALBUKHR</span>
-
 </div>
 
 <div class="header-right">
@@ -148,94 +177,28 @@ padding:20px;
 </header>
 
 
-<!-- PAGE -->
+<!-- MARKETPLACE -->
 
 <div class="marketplace" id="projectList"></div>
 
-
-<!-- DOCK NAV -->
-
-<div class="dock-nav">
-
-<a href="index.html" class="dock-item">
-
-<svg viewBox="0 0 24 24" class="dock-icon">
-<path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>
-</svg>
-
-<span>Home</span>
-
-</a>
-
-
-<a href="investor-dashboard.html" class="dock-item">
-
-<svg viewBox="0 0 24 24" class="dock-icon">
-<path d="M16 11c1.66 0 3-1.34 3-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/>
-<path d="M8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/>
-<path d="M2 20v-1c0-2.21 3.58-4 6-4s6 1.79 6 4v1z"/>
-</svg>
-
-<span>Investors</span>
-
-</a>
-
-
-<a href="wallet.html" class="dock-item">
-
-<svg viewBox="0 0 24 24" class="dock-icon">
-<path d="M3 7h15a2 2 0 012 2v8a2 2 0 01-2 2H3z"/>
-<circle cx="17" cy="12" r="1.2"/>
-</svg>
-
-<span>Wallet</span>
-
-</a>
-
-
-<a href="services.html" class="dock-item">
-
-<svg viewBox="0 0 24 24" class="dock-icon">
-<circle cx="12" cy="12" r="3"/>
-<path d="M19.4 15a1 1 0 000-6l2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2l-2-1-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/>
-</svg>
-
-<span>Services</span>
-
-</a>
-
-</div>
-
-
-<!-- ENGINES -->
 
 <script src="project-creation-engine.js"></script>
 <script src="staking.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 
 
-<!-- ACTIVE NAV -->
-
 <script>
 
-const current = location.pathname.split("/").pop();
+function getProjectIcon(name){
 
-document.querySelectorAll(".dock-item").forEach(link=>{
+if(name.toLowerCase().includes("agro")) return "🌾";
+if(name.toLowerCase().includes("bakery")) return "🍞";
+if(name.toLowerCase().includes("lab")) return "🧪";
+if(name.toLowerCase().includes("transport")) return "🚍";
 
-if(link.getAttribute("href") === current){
-
-link.classList.add("active");
+return "🏢";
 
 }
-
-});
-
-</script>
-
-
-<!-- MARKETPLACE ENGINE -->
-
-<script>
 
 function renderMarketplace(){
 
@@ -264,17 +227,26 @@ document.createElement("div");
 card.className = "project-card";
 
 const treasury =
-typeof getProjectTreasuryStatus === "function"
-? getProjectTreasuryStatus(project.name)
-: {liquidity:0};
+getProjectTreasuryStatus(project.name);
 
 const liquidity =
 Number(treasury.liquidity) || 0;
 
+const funded =
+Math.min((liquidity / (project.target || 1000))*100,100);
+
 card.innerHTML = `
+
+<div class="project-header">
+
+<div class="project-icon">
+${getProjectIcon(project.name)}
+</div>
 
 <div class="project-title">
 ${project.name}
+</div>
+
 </div>
 
 <div class="project-desc">
@@ -289,6 +261,15 @@ ${project.description || ""}
 <div class="row">
 <div>Liquidity</div>
 <div>${liquidity.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Minimum</div>
+<div>${project.minimum || 1} Pi</div>
+</div>
+
+<div class="progress">
+<div class="progress-bar" style="width:${funded}%"></div>
 </div>
 
 <button
@@ -307,22 +288,14 @@ container.appendChild(card);
 
 }
 
-
 function invest(project){
 
 const amount =
 prompt("Enter investment amount (Pi)");
 
-if(!amount || Number(amount) <= 0){
+if(!amount || Number(amount)<=0){
 
 alert("Invalid amount");
-return;
-
-}
-
-if(typeof createStake !== "function"){
-
-alert("Staking engine missing");
 return;
 
 }
@@ -338,10 +311,9 @@ alert("Investment successful");
 
 }
 
-
 renderMarketplace();
 
 </script>
 
 </body>
-  </html>
+</html>
