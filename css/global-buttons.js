@@ -48,13 +48,19 @@ transition:.25s ease;
 position:relative;
 }
 
+.dock-item span{
+font-size:13px;
+font-weight:600;
+margin-top:2px;
+}
+
 /* ICON SIZE */
 
 .dock-icon{
-width:28px;
-height:28px;
+width:36px;
+height:36px;
 fill:white;
-margin-bottom:2px;
+margin-bottom:4px;
 }
 
 /* WALLET CENTER STYLE */
@@ -65,6 +71,10 @@ border-radius:16px;
 padding:6px 0;
 }
 
+.dock-item.active .dock-icon{
+width:40px;
+height:40px;
+}
 /* WALLET ICON BIGGER */
 
 .dock-item:nth-child(3) .dock-icon{
@@ -95,3 +105,4 @@ bottom:4px;
 .dock-item:hover{
 opacity:.9;
    }
+
