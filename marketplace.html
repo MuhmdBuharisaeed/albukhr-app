@@ -215,6 +215,7 @@ padding:20px;
 <script src="project-creation-engine.js"></script>
 <script src="staking.js"></script>
 <script src="smart-liquidity-engine.js"></script>
+<script src="risk-engine.js"></script>
 <script src="js/notifications.js"></script>
 
 <script>
@@ -272,10 +273,14 @@ const funded =
 Math.min((liquidity / (project.target || 1000))*100,100);
 
 const investors =
-treasury.investors || 0;
+typeof getAllStakesMerged === "function"
+? getAllStakesMerged().filter(s => s.project === project.name).length
+: 0;
 
-const risk =
-project.risk || "low";
+const riskData =
+typeof getProjectRisk === "function"
+? getProjectRisk(project.name)
+: {risk:"LOW"};
 
 card.innerHTML = `
 
@@ -317,8 +322,8 @@ ${project.description || ""}
 
 <div class="row">
 <div>Risk</div>
-<div class="risk ${risk}">
-${risk.toUpperCase()}
+<div class="risk ${riskData.risk.toLowerCase()}">
+${riskData.risk}
 </div>
 </div>
 
