@@ -18,7 +18,6 @@ font-family:system-ui;
 background:#f4f7f6;
 padding-bottom:110px;
 }
-
 .header{
 background:#0f7a3d;
 height:60px;
@@ -50,7 +49,6 @@ font-weight:700;
 font-size:18px;
 letter-spacing:1px;
 }
-/* PAGE */
 
 .marketplace{
 padding:16px;
@@ -71,8 +69,6 @@ transition:.25s ease;
 transform:translateY(-2px);
 box-shadow:0 10px 24px rgba(0,0,0,0.08);
 }
-
-/* HEADER */
 
 .project-header{
 display:flex;
@@ -114,6 +110,30 @@ font-size:13px;
 margin-top:5px;
 }
 
+/* RISK */
+
+.risk{
+font-size:12px;
+font-weight:600;
+padding:2px 6px;
+border-radius:6px;
+}
+
+.risk.low{
+background:#e6f7ee;
+color:#0f7a3d;
+}
+
+.risk.medium{
+background:#fff4e5;
+color:#cc8500;
+}
+
+.risk.high{
+background:#fdecea;
+color:#c0392b;
+}
+
 /* PROGRESS */
 
 .progress{
@@ -127,6 +147,24 @@ overflow:hidden;
 .progress-bar{
 height:100%;
 background:linear-gradient(90deg,#0f7a3d,#1ec777);
+}
+
+/* ROI CALCULATOR */
+
+.roi-box{
+margin-top:10px;
+background:#f4f7f6;
+padding:10px;
+border-radius:10px;
+font-size:13px;
+}
+
+.roi-box input{
+width:100%;
+padding:8px;
+border-radius:6px;
+border:1px solid #ddd;
+margin-top:4px;
 }
 
 /* BUTTON */
@@ -156,8 +194,6 @@ padding:20px;
 
 <body>
 
-<!-- HEADER -->
-
 <header class="header">
 
 <div class="header-left">
@@ -166,26 +202,40 @@ padding:20px;
 </div>
 
 <div class="header-right">
-
-<div class="header-btn notification-btn" onclick="openNotifications()">
+<div class="header-btn notification-btn">
 🔔
 <span id="notifBadge" class="notification-badge"></span>
 </div>
-
 </div>
 
 </header>
 
-
-<!-- MARKETPLACE -->
-
 <div class="marketplace" id="projectList"></div>
 
+<div class="dock-nav">
+
+<a href="index.html" class="dock-item">
+<span>Home</span>
+</a>
+
+<a href="investor-dashboard.html" class="dock-item">
+<span>Investors</span>
+</a>
+
+<a href="wallet.html" class="dock-item">
+<span>Wallet</span>
+</a>
+
+<a href="services.html" class="dock-item">
+<span>Services</span>
+</a>
+
+</div>
 
 <script src="project-creation-engine.js"></script>
 <script src="staking.js"></script>
 <script src="smart-liquidity-engine.js"></script>
-
+<script src="js/notifications.js"></script>
 
 <script>
 
@@ -197,6 +247,12 @@ if(name.toLowerCase().includes("lab")) return "🧪";
 if(name.toLowerCase().includes("transport")) return "🚍";
 
 return "🏢";
+
+}
+
+function calculateROI(amount, roi){
+
+return (amount * roi / 100).toFixed(2);
 
 }
 
@@ -235,6 +291,12 @@ Number(treasury.liquidity) || 0;
 const funded =
 Math.min((liquidity / (project.target || 1000))*100,100);
 
+const investors =
+treasury.investors || 0;
+
+const risk =
+project.risk || "low";
+
 card.innerHTML = `
 
 <div class="project-header">
@@ -264,12 +326,41 @@ ${project.description || ""}
 </div>
 
 <div class="row">
+<div>Investors</div>
+<div>${investors}</div>
+</div>
+
+<div class="row">
 <div>Minimum</div>
 <div>${project.minimum || 1} Pi</div>
 </div>
 
+<div class="row">
+<div>Risk</div>
+<div class="risk ${risk}">
+${risk.toUpperCase()}
+</div>
+</div>
+
 <div class="progress">
 <div class="progress-bar" style="width:${funded}%"></div>
+</div>
+
+<div class="roi-box">
+
+ROI Calculator
+
+<input
+type="number"
+placeholder="Enter amount"
+oninput="this.nextElementSibling.innerText =
+calculateROI(this.value, ${project.roi || 0}) + ' Pi'
+">
+
+<div style="margin-top:4px;font-weight:600">
+0 Pi
+</div>
+
 </div>
 
 <button
@@ -301,10 +392,8 @@ return;
 }
 
 createStake({
-
 project: project,
 amount: Number(amount)
-
 });
 
 alert("Investment successful");
