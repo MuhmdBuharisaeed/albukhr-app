@@ -216,6 +216,7 @@ padding:20px;
 <script src="staking.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 <script src="risk-engine.js"></script>
+<script src="marketplace-engine.js"></script>
 <script src="js/notifications.js"></script>
 
 <script>
@@ -245,7 +246,9 @@ document.getElementById("projectList");
 container.innerHTML = "";
 
 const projects =
-typeof getProjects === "function" ? getProjects() : [];
+typeof getMarketplaceProjects === "function"
+? getMarketplaceProjects()
+: [];
 
 if(!projects.length){
 
