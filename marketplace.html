@@ -217,6 +217,7 @@ padding:20px;
 <script src="smart-liquidity-engine.js"></script>
 <script src="risk-engine.js"></script>
 <script src="marketplace-engine.js"></script>
+<script src="liquidity-pool-engine.js"></script>
 <script src="js/notifications.js"></script>
 
 <script>
@@ -328,6 +329,11 @@ ${project.description || ""}
 <div class="risk ${riskData.risk.toLowerCase()}">
 ${riskData.risk}
 </div>
+</div>
+
+<div class="row">
+<div>Pool Liquidity</div>
+<div>${getPoolStatus(project.name).liquidity.toFixed(2)} Pi</div>
 </div>
 
 <div class="progress">
