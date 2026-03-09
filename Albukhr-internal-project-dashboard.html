@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Albukhr Project Dashboard</title>
+
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="global-buttons.css">
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:110px;
+}
+
+.dashboard{
+padding:16px;
+}
+
+/* GRID */
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-bottom:16px;
+}
+
+/* CARD */
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.title{
+font-size:13px;
+color:#666;
+margin-bottom:6px;
+}
+
+.big{
+font-size:22px;
+font-weight:800;
+color:#0f7a3d;
+}
+
+/* FULL CARD */
+
+.card-full{
+background:#fff;
+padding:16px;
+border-radius:14px;
+margin-bottom:16px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+/* INPUT */
+
+input{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid #ddd;
+margin-top:8px;
+}
+
+/* BUTTON */
+
+button{
+margin-top:10px;
+padding:10px;
+border:none;
+border-radius:10px;
+background:#0f7a3d;
+color:#fff;
+font-weight:600;
+cursor:pointer;
+width:100%;
+}
+
+/* HISTORY */
+
+.tx{
+display:flex;
+justify-content:space-between;
+border-top:1px dashed #eee;
+padding-top:8px;
+margin-top:8px;
+font-size:12px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<div class="header-left">
+<img src="IMG_20260125_183804.png" class="main-logo">
+<span class="brand">ALBUKHR</span>
+</div>
+
+</header>
+
+
+<div class="dashboard">
+
+<!-- PROJECT NAME -->
+
+<div class="card-full">
+
+<div class="title">Project</div>
+<div class="big" id="projectName">Barsh Agro</div>
+
+</div>
+
+
+<!-- STATS -->
+
+<div class="grid">
+
+<div class="card">
+<div class="title">Liquidity</div>
+<div class="big" id="liquidity">0 Pi</div>
+</div>
+
+<div class="card">
+<div class="title">Reserve</div>
+<div class="big" id="reserve">0 Pi</div>
+</div>
+
+<div class="card">
+<div class="title">ROI</div>
+<div class="big" id="roi">0%</div>
+</div>
+
+<div class="card">
+<div class="title">Investors</div>
+<div class="big" id="investors">0</div>
+</div>
+
+</div>
+
+
+<!-- ADD LIQUIDITY -->
+
+<div class="card-full">
+
+<div class="title">Add Liquidity</div>
+
+<input type="number" id="addAmount" placeholder="Amount">
+
+<button onclick="addLiquidity()">
+Add Liquidity
+</button>
+
+</div>
+
+
+<!-- INTERNAL WITHDRAW -->
+
+<div class="card-full">
+
+<div class="title">Internal Withdraw</div>
+
+<input type="number" id="withdrawAmount" placeholder="Amount">
+
+<button onclick="withdrawLiquidity()">
+Withdraw Liquidity
+</button>
+
+</div>
+
+
+<!-- HISTORY -->
+
+<div class="card-full">
+
+<div class="title">Treasury Activity</div>
+
+<div id="history"></div>
+
+</div>
+
+</div>
+
+
+<script src="wallet-core.js"></script>
+<script src="smart-liquidity-engine.js"></script>
+<script src="staking.js"></script>
+
+
+<script>
+
+const currentProject = "Barsh Agro";
+
+function updateDashboard(){
+
+const status =
+getProjectTreasuryStatus(currentProject);
+
+document.getElementById("liquidity").innerText =
+status.liquidity.toFixed(2) + " Pi";
+
+document.getElementById("reserve").innerText =
+status.reserve.toFixed(2) + " Pi";
+
+
+const roi =
+calculateProjectROI(currentProject);
+
+document.getElementById("roi").innerText =
+roi.toFixed(2) + "%";
+
+
+const stakes =
+getAllStakesMerged()
+.filter(s => s.project === currentProject);
+
+document.getElementById("investors").innerText =
+stakes.length;
+
+
+renderHistory();
+
+}
+
+
+function addLiquidity(){
+
+const amount =
+document.getElementById("addAmount").value;
+
+const res =
+addProjectLiquidity(currentProject, amount);
+
+if(res.error){
+alert(res.error);
+return;
+}
+
+alert("Liquidity added");
+
+updateDashboard();
+
+}
+
+
+function withdrawLiquidity(){
+
+const amount =
+document.getElementById("withdrawAmount").value;
+
+if(!amount || Number(amount)<=0){
+alert("Invalid amount");
+return;
+}
+
+const treasury = getTreasury();
+
+if(!treasury[currentProject]){
+alert("Treasury missing");
+return;
+}
+
+if(!canUseLiquidity(currentProject, amount)){
+alert("Reserve protection active");
+return;
+}
+
+treasury[currentProject].liquidity -= Number(amount);
+
+saveTreasury(treasury);
+
+alert("Liquidity withdrawn");
+
+updateDashboard();
+
+}
+
+
+function renderHistory(){
+
+if(typeof getLedger !== "function") return;
+
+const history =
+getLedger()
+.filter(tx => tx.project === currentProject);
+
+const div =
+document.getElementById("history");
+
+div.innerHTML = "";
+
+history.reverse().forEach(tx => {
+
+div.innerHTML += `
+
+<div class="tx">
+
+<div>${tx.type}</div>
+
+<div>${Number(tx.amount).toFixed(2)} Pi</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+updateDashboard();
+
+</script>
+
+
+</body>
+</html>
