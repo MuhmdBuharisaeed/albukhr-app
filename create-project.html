@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create Project</title>
+<title>Albukhr Project Builder</title>
 
 <style>
 
@@ -19,26 +19,46 @@ padding:16px;
 .card{
 background:#fff;
 padding:16px;
-border-radius:12px;
+border-radius:14px;
 box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.title{
+font-size:18px;
+font-weight:700;
+margin-bottom:10px;
+}
+
+.label{
+font-size:13px;
+font-weight:600;
+margin-top:10px;
 }
 
 input, textarea{
 width:100%;
 padding:10px;
-margin-top:10px;
+margin-top:6px;
 border-radius:8px;
 border:1px solid #ddd;
+font-size:14px;
 }
 
 button{
-margin-top:12px;
-padding:10px;
+margin-top:14px;
+padding:12px;
 border:none;
 background:#0f7a3d;
 color:#fff;
 border-radius:10px;
 cursor:pointer;
+font-weight:600;
+}
+
+.notice{
+margin-top:12px;
+font-size:13px;
+color:#0f7a3d;
 }
 
 </style>
@@ -49,33 +69,76 @@ cursor:pointer;
 
 <div class="card">
 
-<h2>Create New Project</h2>
+<div class="title">📈 Project Investment Setup</div>
 
-<input
-id="projectName"
-placeholder="Project Name">
+<div class="label">Project Name</div>
+<input id="projectName">
 
-<textarea
-id="projectDescription"
-placeholder="Project Description"></textarea>
+<div class="label">Description</div>
+<textarea id="projectDescription"></textarea>
 
-<input
-type="number"
-id="projectROI"
-placeholder="Expected ROI (%)">
+<div class="label">Expected ROI (%)</div>
+<input type="number" id="projectROI">
 
-<input
-type="number"
-id="initialLiquidity"
-placeholder="Initial Liquidity">
+<div class="label">Initial Liquidity (Pi)</div>
+<input type="number" id="initialLiquidity">
+
+<div class="label">Minimum Investment (Pi)</div>
+<input type="number" id="minimumInvestment">
+
+<div class="label">Target Funding (Pi)</div>
+<input type="number" id="targetFunding">
 
 <button onclick="createProject()">
-Create Project
+Launch Project
 </button>
+
+<div id="done" class="notice" style="display:none">
+✅ Project successfully created
+</div>
 
 </div>
 
 <script src="project-creation-engine.js"></script>
 
+<script>
+
+function createProject(){
+
+const project = {
+
+name:
+document.getElementById("projectName").value,
+
+description:
+document.getElementById("projectDescription").value,
+
+roi:
+Number(document.getElementById("projectROI").value),
+
+liquidity:
+Number(document.getElementById("initialLiquidity").value),
+
+minimum:
+Number(document.getElementById("minimumInvestment").value),
+
+target:
+Number(document.getElementById("targetFunding").value)
+
+};
+
+if(typeof registerProject !== "function"){
+alert("Project engine missing");
+return;
+}
+
+registerProject(project);
+
+document.getElementById("done").style.display="block";
+
+}
+
+</script>
+
 </body>
-</html>
+  </html>
