@@ -1,25 +1,91 @@
 /* =========================================
-   ALBUKHR SMART LIQUIDITY ENGINE v1
-   Controls project liquidity & reward funding
+   ALBUKHR SMART LIQUIDITY ENGINE v2
+   Liquidity + Reward Funding Engine
 ========================================= */
 
-const TREASURY_KEY = "albukhr_project_treasury_v1";
-const RESERVE_PERCENT = 0.30; // 30% liquidity reserve
+const TREASURY_KEY = "albukhr_project_treasury_v2";
+const RESERVE_PERCENT = 0.30;
 
 /* =========================================
-   SAFE TREASURY ACCESS
+   SAFE STORAGE
 ========================================= */
 
 function getTreasury(){
+
   try{
-    return JSON.parse(localStorage.getItem(TREASURY_KEY)) || {};
+    return JSON.parse(
+      localStorage.getItem(TREASURY_KEY)
+    ) || {};
   }catch{
     return {};
   }
+
 }
 
 function saveTreasury(data){
-  localStorage.setItem(TREASURY_KEY, JSON.stringify(data));
+
+  localStorage.setItem(
+    TREASURY_KEY,
+    JSON.stringify(data)
+  );
+
+}
+
+/* =========================================
+   CREATE PROJECT TREASURY
+========================================= */
+
+function createProjectTreasury(project){
+
+  const treasury = getTreasury();
+
+  if(!treasury[project]){
+
+    treasury[project] = {
+      liquidity:0,
+      created:Date.now()
+    };
+
+    saveTreasury(treasury);
+  }
+
+}
+
+/* =========================================
+   ADD LIQUIDITY (PROJECT OWNER)
+========================================= */
+
+function addProjectLiquidity(project, amount){
+
+  amount = Number(amount);
+
+  if(!amount || amount <= 0){
+    return {error:"Invalid liquidity amount"};
+  }
+
+  const treasury = getTreasury();
+
+  if(!treasury[project]){
+    createProjectTreasury(project);
+  }
+
+  treasury[project].liquidity += amount;
+
+  saveTreasury(treasury);
+
+  if(typeof recordTransaction === "function"){
+    recordTransaction({
+      type:"liquidity-add",
+      project,
+      amount
+    });
+  }
+
+  return {
+    success:true,
+    liquidity:treasury[project].liquidity
+  };
+
 }
 
 /* =========================================
@@ -37,7 +103,7 @@ function checkProjectLiquidity(project, amount){
 }
 
 /* =========================================
-   LIQUIDITY RESERVE PROTECTION
+   RESERVE PROTECTION
 ========================================= */
 
 function canUseLiquidity(project, amount){
@@ -50,7 +116,7 @@ function canUseLiquidity(project, amount){
 
   const reserve = liquidity * RESERVE_PERCENT;
 
-  if(Number(amount) > (liquidity - reserve)){
+  if(amount > (liquidity - reserve)){
     return false;
   }
 
@@ -59,7 +125,7 @@ function canUseLiquidity(project, amount){
 }
 
 /* =========================================
-   FUND REWARD FROM LIQUIDITY
+   FUND REWARD FROM TREASURY
 ========================================= */
 
 function fundRewardFromLiquidity(project, amount){
@@ -73,10 +139,14 @@ function fundRewardFromLiquidity(project, amount){
   }
 
   if(!canUseLiquidity(project, amount)){
-    return {error:"Liquidity reserve protection triggered"};
+    return {error:"Liquidity reserve protection"};
   }
 
   treasury[project].liquidity -= amount;
+
+  if(treasury[project].liquidity < 0){
+    treasury[project].liquidity = 0;
+  }
 
   saveTreasury(treasury);
 
@@ -92,28 +162,6 @@ function fundRewardFromLiquidity(project, amount){
     success:true,
     funded:amount
   };
-
-}
-
-/* =========================================
-   ROI CALCULATION
-========================================= */
-
-function calculateProjectROI(project){
-
-  if(typeof getProjectWalletBreakdown !== "function")
-    return 0;
-
-  const breakdown = getProjectWalletBreakdown();
-
-  const target =
-  breakdown.find(p => p.project === project);
-
-  if(!target) return 0;
-
-  if(target.stake === 0) return 0;
-
-  return (target.grossReward / target.stake) * 100;
 
 }
 
@@ -172,15 +220,13 @@ function getProjectTreasuryStatus(project){
     };
   }
 
-  const liquidity =
-  treasury[project].liquidity;
+  const liquidity = treasury[project].liquidity;
 
-  const reserve =
-  liquidity * RESERVE_PERCENT;
+  const reserve = liquidity * RESERVE_PERCENT;
 
   return {
     liquidity,
     reserve
   };
 
-    }
+                          }
