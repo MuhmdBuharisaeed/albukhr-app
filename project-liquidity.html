@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Project Liquidity</title>
+
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="global-buttons.css">
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:110px;
+}
+
+/* PAGE */
+
+.dashboard{
+padding:16px;
+}
+
+/* CARD */
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+margin-bottom:16px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.title{
+font-weight:700;
+margin-bottom:10px;
+}
+
+.big{
+font-size:24px;
+font-weight:800;
+color:#0f7a3d;
+}
+
+/* ROW */
+
+.row{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+margin-top:6px;
+}
+
+/* INPUT */
+
+input{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid #ddd;
+margin-top:8px;
+}
+
+/* BUTTON */
+
+button{
+margin-top:10px;
+padding:10px;
+border:none;
+border-radius:10px;
+background:#0f7a3d;
+color:#fff;
+font-weight:600;
+cursor:pointer;
+width:100%;
+}
+
+/* HISTORY */
+
+.tx{
+border-top:1px dashed #eee;
+padding-top:8px;
+margin-top:8px;
+font-size:12px;
+display:flex;
+justify-content:space-between;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<div class="header-left">
+<img src="IMG_20260125_183804.png" class="main-logo">
+<span class="brand">ALBUKHR</span>
+</div>
+
+</header>
+
+
+<div class="dashboard">
+
+<div class="card">
+
+<div class="title">Project Treasury</div>
+
+<div class="big" id="liquidity">0 Pi</div>
+
+<div class="row">
+<div>Reserve Protected</div>
+<div id="reserve">0 Pi</div>
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">Add Liquidity</div>
+
+<input type="number" id="liqAmount" placeholder="Liquidity amount">
+
+<button onclick="addLiquidity()">
+Add Liquidity
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">Withdraw Internal Liquidity</div>
+
+<input type="number" id="withdrawAmount" placeholder="Amount">
+
+<button onclick="withdrawLiquidity()">
+Withdraw Liquidity
+</button>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">Treasury History</div>
+
+<div id="history"></div>
+
+</div>
+
+</div>
+
+
+<script src="smart-liquidity-engine.js"></script>
+
+
+<script>
+
+const project = localStorage.getItem("albukhr_active_project");
+
+function renderTreasury(){
+
+const status =
+getProjectTreasuryStatus(project);
+
+document.getElementById("liquidity").innerText =
+status.liquidity.toFixed(2) + " Pi";
+
+document.getElementById("reserve").innerText =
+status.reserve.toFixed(2) + " Pi";
+
+renderHistory();
+
+}
+
+
+function addLiquidity(){
+
+const amt =
+document.getElementById("liqAmount").value;
+
+if(!amt || Number(amt) <= 0){
+alert("Invalid amount");
+return;
+}
+
+const res =
+addProjectLiquidity(project, amt);
+
+if(res.error){
+alert(res.error);
+return;
+}
+
+alert("Liquidity added");
+
+renderTreasury();
+
+}
+
+
+function withdrawLiquidity(){
+
+const amt =
+document.getElementById("withdrawAmount").value;
+
+if(!amt || Number(amt) <= 0){
+alert("Invalid amount");
+return;
+}
+
+const treasury =
+getTreasury();
+
+if(!treasury[project]){
+alert("Treasury missing");
+return;
+}
+
+if(!canUseLiquidity(project, amt)){
+alert("Reserve protection active");
+return;
+}
+
+treasury[project].liquidity -= Number(amt);
+
+saveTreasury(treasury);
+
+alert("Liquidity withdrawn");
+
+renderTreasury();
+
+}
+
+
+function renderHistory(){
+
+if(typeof getLedger !== "function") return;
+
+const history =
+getLedger()
+.filter(tx => tx.project === project);
+
+const div =
+document.getElementById("history");
+
+div.innerHTML = "";
+
+history.reverse().forEach(tx => {
+
+div.innerHTML += `
+
+<div class="tx">
+
+<div>${tx.type}</div>
+
+<div>${Number(tx.amount).toFixed(2)} Pi</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+renderTreasury();
+
+</script>
+
+
+</body>
+  </html>
