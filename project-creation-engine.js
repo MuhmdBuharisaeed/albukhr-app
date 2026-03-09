@@ -1,8 +1,12 @@
 /* =========================================
-   ALBUKHR PROJECT CREATION ENGINE v1
+   ALBUKHR PROJECT CREATION ENGINE v2
 ========================================= */
 
-const PROJECTS_KEY = "albukhr_projects_v1";
+const PROJECTS_KEY = "albukhr_projects_v2";
+
+/* ===============================
+   LOAD PROJECTS
+=============================== */
 
 function getProjects(){
 
@@ -14,68 +18,123 @@ return [];
 
 }
 
-function saveProjects(data){
-localStorage.setItem(PROJECTS_KEY, JSON.stringify(data));
+/* ===============================
+   SAVE PROJECTS
+=============================== */
+
+function saveProjects(list){
+
+localStorage.setItem(
+PROJECTS_KEY,
+JSON.stringify(list)
+);
+
 }
 
-function createProject(){
+/* ===============================
+   REGISTER PROJECT
+=============================== */
 
-const name =
-document.getElementById("projectName").value.trim();
+function registerProject(project){
 
-const desc =
-document.getElementById("projectDescription").value.trim();
-
-const roi =
-Number(document.getElementById("projectROI").value);
-
-const liquidity =
-Number(document.getElementById("initialLiquidity").value);
-
-if(!name){
-alert("Project name required");
-return;
+if(!project?.name){
+return {error:"Project name required"};
 }
 
 const projects = getProjects();
 
-if(projects.find(p=>p.name===name)){
-alert("Project already exists");
-return;
+/* prevent duplicates */
+
+const exists =
+projects.find(p => p.name === project.name);
+
+if(exists){
+return {error:"Project already exists"};
 }
 
-const project = {
+/* project object */
+
+const data = {
 
 id: "PRJ-" + Date.now(),
-name,
-description: desc,
-roi,
-owner:"internal",
+
+name: project.name,
+
+description: project.description || "",
+
+type: project.type || "external",
+
+roi: Number(project.roi) || 0,
+
+liquidity: Number(project.liquidity) || 0,
+
+minimum: Number(project.minimum) || 1,
+
+target: Number(project.target) || 1000,
+
+status: "funding",
+
+investors: 0,
+
 createdAt: Date.now()
 
 };
 
-projects.push(project);
+projects.push(data);
 
 saveProjects(projects);
 
-/* create treasury */
-
-const treasury =
-JSON.parse(localStorage.getItem("albukhr_project_treasury_v1")) || {};
-
-treasury[name] = {
-liquidity: liquidity || 0,
-withdrawn:0
+return {
+success:true,
+project:data
 };
 
-localStorage.setItem(
-"albukhr_project_treasury_v1",
-JSON.stringify(treasury)
-);
+}
 
-alert("Project Created Successfully");
+/* ===============================
+   GET SINGLE PROJECT
+=============================== */
 
-location.href = "project-dashboard.html";
+function getProject(name){
+
+const projects = getProjects();
+
+return projects.find(p => p.name === name);
+
+}
+
+/* ===============================
+   UPDATE STATUS
+=============================== */
+
+function updateProjectStatus(name,status){
+
+const projects = getProjects();
+
+const p = projects.find(x => x.name === name);
+
+if(!p) return;
+
+p.status = status;
+
+saveProjects(projects);
+
+}
+
+/* ===============================
+   INVESTOR COUNT
+=============================== */
+
+function increaseInvestor(project){
+
+const projects = getProjects();
+
+const p = projects.find(x => x.name === project);
+
+if(!p) return;
+
+p.investors++;
+
+saveProjects(projects);
 
 }
