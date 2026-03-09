@@ -210,6 +210,11 @@ padding:20px;
 
 </header>
 
+<div class="row">
+<div>Risk</div>
+<div>${risk.risk}</div>
+</div>
+  
 <div class="marketplace" id="projectList"></div>
 
 <script src="project-creation-engine.js"></script>
@@ -276,6 +281,9 @@ treasury.investors || 0;
 
 const risk =
 project.risk || "low";
+
+const risk =
+getProjectRisk(project.name);
 
 card.innerHTML = `
 
