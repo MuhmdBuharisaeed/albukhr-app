@@ -206,6 +206,19 @@ textarea.input{min-height:90px}
   </select>
 </div>
 
+<!-- 📈 INVESTMENT SETUP -->
+<div class="card">
+
+<h4>📈 Investment Setup (Optional)</h4>
+
+<div class="label">Expected ROI (%)</div>
+<input class="input" id="roi" type="number" placeholder="e.g. 12">
+
+<div class="label">Initial Liquidity (Pi)</div>
+<input class="input" id="liquidity" type="number" placeholder="e.g. 500">
+
+</div>
+
 <!-- CONFIRMATION -->
 <div class="card">
 
@@ -348,6 +361,8 @@ function submitInternalProject(){
     summary: f("summary").value.trim(),
     problem: f("problem").value.trim(),
     solution: f("solution").value.trim(),
+    roi: Number(f("roi")?.value || 0),
+    initialLiquidity: Number(f("liquidity")?.value || 0),
     status: "internal_pending",
     createdAt: Date.now(),
     approvedAt: null
