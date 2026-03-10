@@ -20,6 +20,52 @@ function saveInternalProjects(list){
   localStorage.setItem(INTERNAL_KEY, JSON.stringify(list));
 }
 
+/* ===================================
+   ADMIN APPROVAL
+=================================== */
+
+function approveInternalProject(projectId){
+
+const list = getInternalList();
+
+const project =
+list.find(p => p.id === projectId);
+
+if(!project) return;
+
+project.status = "internal_approved";
+project.approvedAt = Date.now();
+
+saveInternalList(list);
+
+/* =============================
+   REGISTER TO MARKETPLACE
+============================= */
+
+if(typeof registerProject === "function"){
+
+registerProject({
+
+name: project.projectName,
+
+description: project.summary,
+
+roi: project.roi || 0,
+
+liquidity: project.initialLiquidity || 0,
+
+type: "internal",
+
+minimum: 1,
+
+target: 1000
+
+});
+
+}
+
+}
+
 /* ===============================
    HELPERS
 ================================ */
