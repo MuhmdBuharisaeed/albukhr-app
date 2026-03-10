@@ -8,377 +8,227 @@
 <script src="admin-auth.js"></script>
 
 <script>
+/* =====================================
+   ALBUKHR INTERNAL ADMIN ACCESS GUARD
+===================================== */
+
 (function(){
 
-const admin = getAdmin();
+  const admin = getAdmin();
 
-if(!admin){
-window.location.href="admin-login.html";
-return;
-}
+  if(!admin){
+    window.location.href = "admin-login.html";
+    return;
+  }
 
-const allowedRoles=[
-"super_admin",
-"review_admin"
-];
+  /* 🎯 Define who can access internal admin panel */
+  const allowedRoles = [
+    "super_admin",
+    "review_admin"
+  ];
 
-if(!allowedRoles.includes(admin.role)){
-alert("Unauthorized Access");
-window.location.href="unified-admin-buttons.html";
-return;
-}
+  if(!allowedRoles.includes(admin.role)){
+    alert("Unauthorized Access");
+    window.location.href = "unified-admin-buttons.html";
+    return;
+  }
 
 })();
 </script>
-
+  
 <style>
-
-body{
-background:#f4f7f5;
-font-family:system-ui;
-margin:0;
-}
-
-.section{
-padding:16px;
-}
-
+body{background:#f4f7f5;font-family:system-ui}
+.section{padding:16px}
 .card{
-background:#fff;
-border-radius:14px;
-padding:16px;
-margin-bottom:16px;
-box-shadow:0 6px 18px rgba(0,0,0,0.05);
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px
 }
-
-h3,h4{
-margin:4px 0;
-}
-
+h3,h4{margin:4px 0}
 .badge{
-display:inline-block;
-padding:4px 10px;
-font-size:11px;
-border-radius:20px;
-font-weight:700;
+  display:inline-block;
+  padding:4px 10px;
+  font-size:11px;
+  border-radius:20px;
+  font-weight:700
 }
-
-.pending{
-background:#fff4cc;
-color:#8a6d00;
-}
-
-.approved{
-background:#e6f7ee;
-color:#0f7a3d;
-}
-
-.rejected{
-background:#fdecea;
-color:#b00020;
-}
-
-/* RISK BADGES */
-
-.risk-badge{
-padding:4px 10px;
-border-radius:20px;
-font-size:11px;
-font-weight:700;
-}
-
-.risk-low{
-background:#e6f7ee;
-color:#0f7a3d;
-}
-
-.risk-medium{
-background:#fff4e5;
-color:#cc8500;
-}
-
-.risk-high{
-background:#fdecea;
-color:#c0392b;
-}
-
-/* FRAUD BADGE */
-
-.fraud-safe{
-color:#0f7a3d;
-font-weight:700;
-}
-
-.fraud-medium{
-color:#cc8500;
-font-weight:700;
-}
-
-.fraud-high{
-color:#c0392b;
-font-weight:700;
-}
-
-.fraud-critical{
-color:#8b0000;
-font-weight:700;
-}
+.pending{background:#fff4cc;color:#8a6d00}
+.approved{background:#e6f7ee;color:#0f7a3d}
+.rejected{background:#fdecea;color:#b00020}
 
 .btn{
-padding:8px 12px;
-border:none;
-border-radius:8px;
-font-size:12px;
-font-weight:700;
-margin-right:6px;
-cursor:pointer;
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  margin-right:6px;
+  cursor:pointer
 }
-
-.approve{
-background:#0f7a3d;
-color:#fff;
-}
-
-.reject{
-background:#b00020;
-color:#fff;
-}
-
+.approve{background:#0f7a3d;color:#fff}
+.reject{background:#b00020;color:#fff}
+.stage{background:#444;color:#fff}
+small{font-size:12px;color:#555}
 select{
-padding:6px;
-border-radius:6px;
-border:1px solid #ccc;
-font-size:12px;
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:12px
 }
-
-small{
-font-size:12px;
-color:#555;
-}
-
 </style>
 </head>
 
 <body>
 
 <section class="section">
-
 <h3>🛂 Internal Project Admin Panel</h3>
-
 <p style="font-size:13px">
-Manage ALBUKHR internal investment projects
+Manage all ALBUKHR internal projects
 </p>
 
 <div id="projectList"></div>
-
 </section>
 
 <script src="internal-registry.js"></script>
 <script src="project-creation-engine.js"></script>
-<script src="js/admin-risk-engine.js"></script>
-<script src="js/fraud-detection-engine.js"></script>
 
 <script>
-
-const container=document.getElementById("projectList");
+const container = document.getElementById("projectList");
 
 function daysLeft(approvedAt){
-
-const sevenDays=7*24*60*60*1000;
-
-const diff=sevenDays-(Date.now()-approvedAt);
-
-return Math.ceil(diff/(24*60*60*1000));
-
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  const diff = sevenDays - (Date.now() - approvedAt);
+  return Math.ceil(diff / (24 * 60 * 60 * 1000));
 }
 
 function renderAdmin(){
+  const list = getInternalProjects();
+  container.innerHTML = "";
 
-const list=getInternalProjects();
+  if(!list.length){
+    container.innerHTML = "<p>No internal projects found.</p>";
+    return;
+  }
 
-container.innerHTML="";
+  list.slice().reverse().forEach(p=>{
+    const div = document.createElement("div");
+    div.className = "card";
 
-if(!list.length){
+    let badgeClass = "pending";
+    let badgeText  = "Pending Review";
+    let lockInfo   = "";
 
-container.innerHTML="<p>No internal projects found.</p>";
+    if(p.status === "internal_approved"){
+      badgeClass = "approved";
+      badgeText  = "Approved";
 
-return;
+      if(p.approvedAt){
+        const left = daysLeft(p.approvedAt);
+        if(left > 0){
+          lockInfo = `<p style="font-size:12px;color:#b00020">
+            🔒 Locked for ${left} day(s)
+          </p>`;
+        }
+      }
+    }
 
+    if(p.status === "internal_rejected"){
+      badgeClass = "rejected";
+      badgeText  = "Rejected (Resubmission Allowed)";
+    }
+
+    div.innerHTML = `
+      <h4>${p.projectName}</h4>
+      <small>${p.category} • ${p.stage}</small><br>
+
+      <span class="badge ${badgeClass}">
+        ${badgeText}
+      </span>
+
+      ${lockInfo}
+
+      <p style="font-size:13px;margin-top:8px">
+        <b>Owner:</b> ${p.creatorName} (${p.role})<br>
+        <b>Internal ID:</b> ${p.internalId}<br>
+        <b>Risk:</b> ${p.risk || "N/A"}<br>
+        <b>Confidentiality:</b> ${p.confidentiality || "N/A"}
+      </p>
+
+      <details>
+        <summary style="cursor:pointer;font-size:12px">View Details</summary>
+        <p><b>Summary:</b><br>${p.summary}</p>
+        <p><b>Problem:</b><br>${p.problem}</p>
+        <p><b>Solution:</b><br>${p.solution}</p>
+        <p><b>Impact:</b><br>${p.impact || "-"}</p>
+      </details>
+
+      ${
+        p.status === "internal_pending"
+        ? `
+          <div style="margin-top:10px">
+            <button class="btn approve"
+              onclick="approveProject('${p.id}')">
+              Approve
+            </button>
+
+            <button class="btn reject"
+              onclick="rejectProject('${p.id}')">
+              Reject
+            </button>
+
+            <select onchange="changeStage('${p.id}', this.value)">
+              <option value="">Change Stage</option>
+              <option>Concept</option>
+              <option>Pilot</option>
+              <option>Active</option>
+              <option>Scaling</option>
+            </select>
+          </div>
+        `
+        : ""
+      }
+    `;
+
+    container.appendChild(div);
+  });
 }
 
-list.slice().reverse().forEach(p=>{
-
-const riskData=calculateAdminRisk(p);
-
-const fraudData=detectProjectFraud(p);
-
-const div=document.createElement("div");
-
-div.className="card";
-
-let badgeClass="pending";
-let badgeText="Pending Review";
-let lockInfo="";
-
-if(p.status==="internal_approved"){
-
-badgeClass="approved";
-badgeText="Approved";
-
-if(p.approvedAt){
-
-const left=daysLeft(p.approvedAt);
-
-if(left>0){
-
-lockInfo=`<p style="font-size:12px;color:#b00020">
-🔒 Locked for ${left} day(s)
-</p>`;
-
-}
-
-}
-
-}
-
-if(p.status==="internal_rejected"){
-
-badgeClass="rejected";
-badgeText="Rejected";
-
-}
-
-div.innerHTML=`
-
-<h4>${p.projectName}</h4>
-
-<small>${p.category} • ${p.stage}</small><br>
-
-<span class="badge ${badgeClass}">
-${badgeText}
-</span>
-
-${lockInfo}
-
-<p style="font-size:13px;margin-top:10px">
-
-<b>Owner:</b> ${p.creatorName} (${p.role})<br>
-
-<b>Internal ID:</b> ${p.internalId}<br>
-
-<b>Declared Risk:</b> ${p.risk || "N/A"}<br>
-
-<b>AI Risk:</b>
-<span class="risk-badge risk-${riskData.risk.toLowerCase()}">
-${riskData.risk}
-</span>
-(${riskData.score})<br>
-
-<b>Fraud Level:</b>
-<span class="fraud-${fraudData.level.toLowerCase()}">
-${fraudData.level}
-</span><br>
-
-<b>Expected ROI:</b> ${p.roi || 0}%<br>
-
-<b>Initial Liquidity:</b>
-${Number(p.initialLiquidity || 0).toFixed(2)} Pi
-
-</p>
-
-<small>
-${fraudData.warnings.join(", ") || "No suspicious signals"}
-</small>
-
-<details>
-
-<summary style="cursor:pointer;font-size:12px">
-View Details
-</summary>
-
-<p><b>Summary:</b><br>${p.summary}</p>
-
-<p><b>Problem:</b><br>${p.problem}</p>
-
-<p><b>Solution:</b><br>${p.solution}</p>
-
-<p><b>Impact:</b><br>${p.impact || "-"}</p>
-
-</details>
-
-${
-p.status==="internal_pending"
-?
-
-`
-<div style="margin-top:12px">
-
-<button class="btn approve"
-onclick="approveProject('${p.id}')">
-Approve
-</button>
-
-<button class="btn reject"
-onclick="rejectProject('${p.id}')">
-Reject
-</button>
-
-<select onchange="changeStage('${p.id}',this.value)">
-
-<option value="">Change Stage</option>
-
-<option>Concept</option>
-
-<option>Pilot</option>
-
-<option>Active</option>
-
-<option>Scaling</option>
-
-</select>
-
-</div>
-`
-
-: ""
-
-}
-
-`;
-
-container.appendChild(div);
-
-});
-
-}
+/* ===============================
+   ADMIN ACTIONS
+================================ */
 
 function approveProject(id){
 
-if(!confirm("Approve this project?")) return;
+if(confirm("Approve this internal project?")){
 
 updateInternalStatus(id,"internal_approved");
 
-const list=getInternalProjects();
+/* =============================
+   GET PROJECT DATA
+============================= */
 
-const project=list.find(p=>p.id===id);
+const list = getInternalProjects();
 
-if(project && typeof registerProject==="function"){
+const project = list.find(p => p.id === id);
+
+if(project && typeof registerProject === "function"){
 
 registerProject({
 
-name:project.projectName,
+name: project.projectName,
 
-description:project.summary,
+description: project.summary,
 
-roi:project.roi || 0,
+roi: project.roi || 0,
 
-liquidity:project.initialLiquidity || 0,
+liquidity: project.initialLiquidity || 0,
 
-type:"internal",
+type: "internal",
 
-minimum:1,
+minimum: 1,
 
-target:1000
+target: 1000
 
 });
 
@@ -388,30 +238,37 @@ renderAdmin();
 
 }
 
+  }
+
 function rejectProject(id){
-
-if(!confirm("Reject this project?")) return;
-
-updateInternalStatus(id,"internal_rejected");
-
-renderAdmin();
-
+  if(confirm("Reject this internal project?")){
+    updateInternalStatus(id,"internal_rejected");
+    renderAdmin();
+  }
 }
 
+function approve(id){
+
+  updateInternalStatus(id,"internal_approved");
+
+  const registryList = getInternalProjects();
+  const registryProject = registryList.find(p => p.id === id);
+
+  if(registryProject){
+     createInternalLiveProject(registryProject);
+  }
+
+  renderAdmin();
+                                 }
+  
 function changeStage(id,stage){
-
-if(stage){
-
-updateInternalStage(id,stage);
-
-renderAdmin();
-
-}
-
+  if(stage){
+    updateInternalStage(id,stage);
+    renderAdmin();
+  }
 }
 
 renderAdmin();
-
 </script>
 
 </body>
