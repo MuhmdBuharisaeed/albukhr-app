@@ -28,21 +28,23 @@
 /* left area */
 
 .header-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+display:flex;
+align-items:center;
+gap:12px;
+  }
 
 /* logo */
 
 .main-logo{
-  height:42px;
-  width:auto;
-  display:block;
+height:44px;
+width:auto;
+display:block;
+object-fit:contain;
 
-  position:relative;
-  top:-4px;   /* yana daga logo sama kadan */
-}
+filter:
+drop-shadow(0 0 0.8px #000)
+drop-shadow(0 0 1px #000);
+   }
 
 .main-logo{
 
@@ -54,24 +56,22 @@
 /* brand name */
 
 .brand{
-  font-size:18px;
-  font-weight:800;
-  letter-spacing:1px;
+font-size:20px;
+font-weight:800;
+letter-spacing:1px;
 
-  color:#ffffff;
+color:#ffffff;
 
-  position:relative;
-  top:4px;
+display:flex;
+align-items:center;
 
-  /* black outline */
-  filter:
-    drop-shadow(0 0 0.8px #000)
-    drop-shadow(0 0 1px #000);
+filter:
+drop-shadow(0 0 0.8px #000)
+drop-shadow(0 0 1px #000);
 
-  /* soft gold glow */
-  text-shadow:
-    0 0 4px rgba(212,175,55,.35),
-    0 0 6px rgba(212,175,55,.25);
+text-shadow:
+0 0 4px rgba(212,175,55,.35),
+0 0 6px rgba(212,175,55,.25);
 }
 
 /* right actions */
@@ -144,9 +144,20 @@
 
   border-radius:50%;
 
-  box-shadow:0 0 4px rgba(255,59,48,.8);
-}
+.header{
+display:flex;
+align-items:center;
+justify-content:space-between;
 
+padding:0 16px;
+height:64px;
+
+box-shadow:
+0 4px 14px rgba(0,0,0,.15);
+
+z-index:900;
+   }
+   
 @keyframes notifPulse{
   0%{transform:scale(1)}
   50%{transform:scale(1.25)}
