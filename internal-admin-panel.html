@@ -113,6 +113,7 @@ function renderAdmin(){
   }
 
   list.slice().reverse().forEach(p=>{
+   const riskData = calculateAdminRisk(p);  
     const div = document.createElement("div");
     div.className = "card";
 
@@ -153,8 +154,8 @@ function renderAdmin(){
   <b>Owner:</b> ${p.creatorName} (${p.role})<br>
   <b>Internal ID:</b> ${p.internalId}<br>
   <b>Declared Risk:</b> ${p.risk || "N/A"}<br>
-<b>AI Risk Score:</b> ${riskData.risk} (${riskData.score})
-  <b>Confidentiality:</b> ${p.confidentiality || "N/A"}<br>
+  <b>AI Risk Score:</b> ${riskData.risk} (${riskData.score})<br>
+<b>Confidentiality:</b> ${p.confidentiality || "N/A"}<br>
   <b>Expected ROI:</b> ${p.roi || 0}%<br>
   <b>Initial Liquidity:</b> ${(p.initialLiquidity || 0).toFixed ? (p.initialLiquidity || 0).toFixed(2) : p.initialLiquidity || 0} Pi
 </p>
@@ -250,17 +251,6 @@ function rejectProject(id){
     renderAdmin();
   }
 }
-
-function approve(id){
-
-  updateInternalStatus(id,"internal_approved");
-
-  const registryList = getInternalProjects();
-  const registryProject = registryList.find(p => p.id === id);
-
-  if(registryProject){
-     createInternalLiveProject(registryProject);
-  }
 
   renderAdmin();
                                  }
