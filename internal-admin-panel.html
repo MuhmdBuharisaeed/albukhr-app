@@ -92,7 +92,7 @@ Manage all ALBUKHR internal projects
 
 <script src="internal-registry.js"></script>
 <script src="project-creation-engine.js"></script>
-<script src="risk-engine.js"></script>
+<script src="js/admin-risk-engine.js"></script>
 
 <script>
 const container = document.getElementById("projectList");
@@ -152,7 +152,8 @@ function renderAdmin(){
       <p style="font-size:13px;margin-top:8px">
   <b>Owner:</b> ${p.creatorName} (${p.role})<br>
   <b>Internal ID:</b> ${p.internalId}<br>
-  <b>Risk:</b> ${p.risk || "N/A"}<br>
+  <b>Declared Risk:</b> ${p.risk || "N/A"}<br>
+<b>AI Risk Score:</b> ${riskData.risk} (${riskData.score})
   <b>Confidentiality:</b> ${p.confidentiality || "N/A"}<br>
   <b>Expected ROI:</b> ${p.roi || 0}%<br>
   <b>Initial Liquidity:</b> ${(p.initialLiquidity || 0).toFixed ? (p.initialLiquidity || 0).toFixed(2) : p.initialLiquidity || 0} Pi
