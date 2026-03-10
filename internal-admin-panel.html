@@ -91,6 +91,7 @@ Manage all ALBUKHR internal projects
 </section>
 
 <script src="internal-registry.js"></script>
+<script src="project-creation-engine.js"></script>
 
 <script>
 const container = document.getElementById("projectList");
@@ -198,11 +199,46 @@ function renderAdmin(){
 ================================ */
 
 function approveProject(id){
-  if(confirm("Approve this internal project?")){
-    updateInternalStatus(id,"internal_approved");
-    renderAdmin();
-  }
+
+if(confirm("Approve this internal project?")){
+
+updateInternalStatus(id,"internal_approved");
+
+/* =============================
+   GET PROJECT DATA
+============================= */
+
+const list = getInternalProjects();
+
+const project = list.find(p => p.id === id);
+
+if(project && typeof registerProject === "function"){
+
+registerProject({
+
+name: project.projectName,
+
+description: project.summary,
+
+roi: project.roi || 0,
+
+liquidity: project.initialLiquidity || 0,
+
+type: "internal",
+
+minimum: 1,
+
+target: 1000
+
+});
+
 }
+
+renderAdmin();
+
+}
+
+  }
 
 function rejectProject(id){
   if(confirm("Reject this internal project?")){
