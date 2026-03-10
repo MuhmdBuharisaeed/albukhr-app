@@ -149,11 +149,13 @@ function renderAdmin(){
       ${lockInfo}
 
       <p style="font-size:13px;margin-top:8px">
-        <b>Owner:</b> ${p.creatorName} (${p.role})<br>
-        <b>Internal ID:</b> ${p.internalId}<br>
-        <b>Risk:</b> ${p.risk || "N/A"}<br>
-        <b>Confidentiality:</b> ${p.confidentiality || "N/A"}
-      </p>
+  <b>Owner:</b> ${p.creatorName} (${p.role})<br>
+  <b>Internal ID:</b> ${p.internalId}<br>
+  <b>Risk:</b> ${p.risk || "N/A"}<br>
+  <b>Confidentiality:</b> ${p.confidentiality || "N/A"}<br>
+  <b>Expected ROI:</b> ${p.roi || 0}%<br>
+  <b>Initial Liquidity:</b> ${(p.initialLiquidity || 0).toFixed ? (p.initialLiquidity || 0).toFixed(2) : p.initialLiquidity || 0} Pi
+</p>
 
       <details>
         <summary style="cursor:pointer;font-size:12px">View Details</summary>
