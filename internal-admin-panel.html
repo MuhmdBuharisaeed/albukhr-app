@@ -80,6 +80,7 @@ Manage all ALBUKHR internal projects
 </section>
 
 <script src="internal-registry.js"></script>
+<script src="project-registry.js"></script>
 <script src="project-creation-engine.js"></script>
 
 <script>
@@ -188,7 +189,6 @@ function renderAdmin(){
 /* ===============================
    ADMIN ACTIONS
 ================================ */
-
 function approveProject(id){
 
 if(confirm("Approve this internal project?")){
@@ -203,25 +203,32 @@ const list = getInternalProjects();
 
 const project = list.find(p => p.id === id);
 
+/* =============================
+   REGISTER TO MARKETPLACE
+============================= */
+
 if(project && typeof registerProject === "function"){
 
 registerProject({
 
 name: project.projectName,
-
 description: project.summary,
-
 roi: project.roi || 0,
-
 liquidity: project.initialLiquidity || 0,
-
 type: "internal",
-
 minimum: 1,
-
 target: 1000
 
 });
+
+/* =============================
+   UNLOCK OWNER DASHBOARD
+============================= */
+
+localStorage.setItem(
+"albukhr_current_project",
+project.projectName
+);
 
 }
 
@@ -229,7 +236,7 @@ renderAdmin();
 
 }
 
-  }
+}
 
 function rejectProject(id){
   if(confirm("Reject this internal project?")){
@@ -237,21 +244,7 @@ function rejectProject(id){
     renderAdmin();
   }
 }
-
-function approve(id){
-
-  updateInternalStatus(id,"internal_approved");
-
-  const registryList = getInternalProjects();
-  const registryProject = registryList.find(p => p.id === id);
-
-  if(registryProject){
-     createInternalLiveProject(registryProject);
-  }
-
-  renderAdmin();
-                                 }
-  
+ 
 function changeStage(id,stage){
   if(stage){
     updateInternalStage(id,stage);
