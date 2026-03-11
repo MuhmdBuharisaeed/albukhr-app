@@ -194,6 +194,22 @@ font-size:13px;
 padding:20px;
 }
 
+/* SEARCH BAR */
+
+.marketplace-search{
+padding:16px;
+padding-bottom:0;
+}
+
+.marketplace-search input{
+width:100%;
+padding:12px;
+border-radius:12px;
+border:1px solid #ddd;
+font-size:14px;
+background:#fff;
+box-shadow:0 4px 12px rgba(0,0,0,0.04);
+}
 </style>
 
 </head>
@@ -215,6 +231,16 @@ padding:20px;
 </div>
 
 </header>
+
+<div class="marketplace-search">
+
+<input
+type="text"
+id="projectSearch"
+placeholder="Search projects..."
+oninput="renderMarketplace()">
+
+</div>
 
 <div class="marketplace" id="projectList"></div>
 
@@ -253,10 +279,20 @@ document.getElementById("projectList");
 
 container.innerHTML = "";
 
-const projects =
+const allProjects =
 typeof getMarketplaceProjects === "function"
 ? getMarketplaceProjects()
 : [];
+
+const search =
+document.getElementById("projectSearch")?.value
+?.toLowerCase() || "";
+
+const projects =
+allProjects.filter(p =>
+p.name.toLowerCase().includes(search) ||
+(p.description || "").toLowerCase().includes(search)
+);
 
 if(!projects.length){
 
