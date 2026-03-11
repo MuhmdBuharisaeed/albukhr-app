@@ -231,9 +231,19 @@ Withdraw Liquidity
 <script src="smart-liquidity-engine.js"></script>
 <script src="capital-protection-engine.js"></script>
 <script src="staking.js"></script>
-
+<script src="js/ownership-engine.js"></script>
 
 <script>
+const project =
+localStorage.getItem("albukhr_current_project");
+
+if(!isProjectOwner(project)){
+
+alert("Access denied");
+
+window.location.href = "marketplace.html";
+
+}
 
 function verifyOwner(){
 
