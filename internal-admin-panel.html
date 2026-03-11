@@ -81,6 +81,7 @@ Manage all ALBUKHR internal projects
 
 <script src="internal-registry.js"></script>
 <script src="project-registry.js"></script>
+<script src="js/ownership-engine.js"></script>
 <script src="project-creation-engine.js"></script>
 
 <script>
@@ -221,6 +222,16 @@ target: 1000
 
 });
 
+/* REGISTER PROJECT OWNER */
+
+if(typeof registerProjectOwner === "function"){
+
+registerProjectOwner(
+project.projectName,
+project.email
+);
+
+}
 /* =============================
    UNLOCK OWNER DASHBOARD
 ============================= */
