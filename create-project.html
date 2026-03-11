@@ -100,41 +100,150 @@ Launch Project
 </div>
 
 <script src="project-creation-engine.js"></script>
+<script src="capital-protection-engine.js"></script>
 
 <script>
 
+/* ====================================
+   VERIFY CONTRIBUTOR
+==================================== */
+
+function getCurrentContributor(){
+
+const email =
+localStorage.getItem("albukhr_current_email");
+
+if(!email){
+
+alert("Login required");
+
+window.location.href =
+"submit-albukhrecosystem-form.html";
+
+return null;
+
+}
+
+return email;
+
+}
+
+/* ====================================
+   CREATE PROJECT
+==================================== */
+
 function createProject(){
+
+const creator = getCurrentContributor();
+
+if(!creator) return;
+
+const name =
+document.getElementById("projectName").value.trim();
+
+const description =
+document.getElementById("projectDescription").value.trim();
+
+const roi =
+Number(document.getElementById("projectROI").value);
+
+const liquidity =
+Number(document.getElementById("initialLiquidity").value);
+
+const minimum =
+Number(document.getElementById("minimumInvestment").value);
+
+const target =
+Number(document.getElementById("targetFunding").value);
+
+/* ===== VALIDATION ===== */
+
+if(!name || !description){
+
+alert("Please complete required fields");
+
+return;
+
+}
+
+if(liquidity <= 0){
+
+alert("Initial liquidity required");
+
+return;
+
+}
+
+if(roi > 40){
+
+alert("ROI too high. Safety limit is 40%");
+
+return;
+
+}
+
+/* ===== CAPITAL PROTECTION ===== */
+
+if(typeof validateProjectROI === "function"){
+
+const check = validateProjectROI(roi);
+
+if(!check.allowed){
+
+alert(check.reason);
+
+return;
+
+}
+
+}
+
+/* ===== PROJECT OBJECT ===== */
 
 const project = {
 
-name:
-document.getElementById("projectName").value,
+id: "PRJ-" + Date.now(),
 
-description:
-document.getElementById("projectDescription").value,
+name: name,
 
-roi:
-Number(document.getElementById("projectROI").value),
+description: description,
 
-liquidity:
-Number(document.getElementById("initialLiquidity").value),
+roi: roi,
 
-minimum:
-Number(document.getElementById("minimumInvestment").value),
+initialLiquidity: liquidity,
 
-target:
-Number(document.getElementById("targetFunding").value)
+minimum: minimum || 1,
+
+target: target || 1000,
+
+creator: creator,
+
+type: "internal",
+
+status: "project_pending",
+
+createdAt: Date.now()
 
 };
 
+/* ===== SAVE PROJECT ===== */
+
 if(typeof registerProject !== "function"){
+
 alert("Project engine missing");
+
 return;
+
 }
 
 registerProject(project);
 
+/* ===== SUCCESS MESSAGE ===== */
+
 document.getElementById("done").style.display="block";
+
+document.getElementById("done").innerHTML =
+"⏳ Project submitted for admin review";
 
 }
 
