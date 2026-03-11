@@ -153,8 +153,7 @@ font-size:12px;
 <div class="card-full">
 
 <div class="title">Project</div>
-<div class="big" id="projectName">Barsh Agro</div>
-
+<div class="big" id="projectName"></div>
 </div>
 
 
@@ -236,9 +235,46 @@ Withdraw Liquidity
 
 <script>
 
-const currentProject = "Barsh Agro";
+function verifyOwner(){
+
+const email =
+localStorage.getItem("albukhr_current_email");
+
+const projects =
+typeof getMarketplaceProjects === "function"
+? getMarketplaceProjects()
+: [];
+
+const project =
+projects.find(p => p.name === currentProject);
+
+if(!project || project.creator !== email){
+
+alert("Access denied");
+
+window.location.href = "marketplace.html";
+
+}
+
+}
+
+verifyOwner();
+
+const currentProject =
+localStorage.getItem("albukhr_current_project");
+
+if(!currentProject){
+
+alert("Project not found");
+
+window.location.href = "marketplace.html";
+
+}
 
 function updateDashboard(){
+
+document.getElementById("projectName").innerText =
+currentProject;
 
 const status =
 getProjectTreasuryStatus(currentProject);
@@ -300,27 +336,19 @@ alert("Invalid amount");
 return;
 }
 
-const treasury = getTreasury();
+const res =
+projectInternalWithdraw(currentProject, amount);
 
-if(!treasury[currentProject]){
-alert("Treasury missing");
+if(res.error){
+alert(res.error);
 return;
 }
-
-if(!canUseLiquidity(currentProject, amount)){
-alert("Reserve protection active");
-return;
-}
-
-treasury[currentProject].liquidity -= Number(amount);
-
-saveTreasury(treasury);
 
 alert("Liquidity withdrawn");
 
 updateDashboard();
 
-}
+  }
 
 
 function renderHistory(){
@@ -358,7 +386,6 @@ div.innerHTML += `
 updateDashboard();
 
 </script>
-
 
 </body>
 </html>
