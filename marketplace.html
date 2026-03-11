@@ -210,6 +210,39 @@ font-size:14px;
 background:#fff;
 box-shadow:0 4px 12px rgba(0,0,0,0.04);
 }
+
+.market-controls{
+padding:16px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.market-controls input{
+flex:1;
+padding:12px;
+border-radius:12px;
+border:1px solid #ddd;
+font-size:14px;
+background:#fff;
+}
+
+.market-controls select{
+padding:12px;
+border-radius:12px;
+border:1px solid #ddd;
+background:#fff;
+font-size:13px;
+  }
+
+.trend{
+background:#fff4e5;
+color:#cc8500;
+font-size:11px;
+padding:2px 6px;
+border-radius:6px;
+margin-left:6px;
+}
 </style>
 
 </head>
@@ -231,6 +264,23 @@ box-shadow:0 4px 12px rgba(0,0,0,0.04);
 </div>
 
 </header>
+
+<div class="market-controls">
+
+<input
+type="text"
+id="projectSearch"
+placeholder="🔎 Search projects..."
+oninput="renderMarketplace()">
+
+<select id="sortProjects" onchange="renderMarketplace()">
+<option value="">Sort</option>
+<option value="roi">Highest ROI</option>
+<option value="liquidity">Highest Liquidity</option>
+<option value="risk">Lowest Risk</option>
+</select>
+
+</div>
 
 <div class="marketplace-search">
 
@@ -284,15 +334,41 @@ typeof getMarketplaceProjects === "function"
 ? getMarketplaceProjects()
 : [];
 
+/* SEARCH */
+
 const search =
 document.getElementById("projectSearch")?.value
 ?.toLowerCase() || "";
 
-const projects =
+let projects =
 allProjects.filter(p =>
 p.name.toLowerCase().includes(search) ||
 (p.description || "").toLowerCase().includes(search)
 );
+
+/* SORT */
+
+const sort =
+document.getElementById("sortProjects")?.value;
+
+if(sort === "roi"){
+projects.sort((a,b)=>(b.roi||0)-(a.roi||0));
+}
+
+if(sort === "liquidity"){
+projects.sort((a,b)=>
+(getProjectTreasuryStatus(b.name).liquidity||0) -
+(getProjectTreasuryStatus(a.name).liquidity||0)
+);
+}
+
+if(sort === "risk"){
+projects.sort((a,b)=>{
+const ra = getProjectRisk(a.name)?.score || 0;
+const rb = getProjectRisk(b.name)?.score || 0;
+return rb - ra;
+});
+  }
 
 if(!projects.length){
 
@@ -339,6 +415,7 @@ ${getProjectIcon(project.name)}
 
 <div class="project-title">
 ${project.name}
+${investors > 20 ? '<span class="trend">🔥 Trending</span>' : ''}
 </div>
 
 </div>
