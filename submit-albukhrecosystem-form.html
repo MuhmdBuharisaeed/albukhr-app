@@ -106,6 +106,13 @@ Create Internal Project →
 </a>
 </div>
 
+<div class="box" id="projectBox" style="display:none">
+🚀 Project Builder Access<br>
+<a href="create-project.html">
+Create Investment Project →
+</a>
+</div>
+
 </section>
 
 <script>
@@ -212,6 +219,9 @@ if(record.internalUnlocked)
 document.getElementById("internalBox").style.display="block";
 }
 
+if(record.projectCreationUnlocked)
+document.getElementById("projectBox").style.display="block";
+
 function checkStatus(){
 
 let email = document.getElementById("email").value.trim().toLowerCase();
@@ -286,6 +296,7 @@ photo:reader.result,
 status:"pending",
 telegramUnlocked:false,
 internalUnlocked:false,
+projectCreationUnlocked:false,
 albukhrId:null,
 createdAt:Date.now()
 };
