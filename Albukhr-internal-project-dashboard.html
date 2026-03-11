@@ -260,8 +260,70 @@ window.location.href = "marketplace.html";
 
 verifyOwner();
 
+/* ================================
+   GET CURRENT PROJECT
+================================ */
+
 const currentProject =
 localStorage.getItem("albukhr_current_project");
+
+if(!currentProject){
+
+alert("Project not found");
+
+window.location.href = "marketplace.html";
+
+}
+
+/* ================================
+   VERIFY PROJECT OWNER
+================================ */
+
+function verifyOwner(){
+
+const email =
+localStorage.getItem("albukhr_current_email");
+
+if(!email){
+
+alert("Login required");
+
+window.location.href =
+"submit-albukhrecosystem-form.html";
+
+return;
+
+}
+
+const projects =
+typeof getMarketplaceProjects === "function"
+? getMarketplaceProjects()
+: [];
+
+const project =
+projects.find(p => p.name === currentProject);
+
+if(!project){
+
+alert("Project not registered");
+
+window.location.href = "marketplace.html";
+
+return;
+
+}
+
+if(project.creator !== email){
+
+alert("Access denied. You are not the project owner.");
+
+window.location.href = "marketplace.html";
+
+}
+
+}
+
+verifyOwner();
 
 if(!currentProject){
 
