@@ -234,6 +234,33 @@ Withdraw Liquidity
 <script src="js/ownership-engine.js"></script>
 
 <script>
+
+(function(){
+
+const email = localStorage.getItem("albukhr_current_email");
+
+if(!email){
+
+alert("Login required");
+window.location.href="submit-albukhrecosystem-form.html";
+return;
+
+}
+
+const allowed = localStorage.getItem(
+"albukhr_project_dashboard_unlocked_" + email
+);
+
+if(!allowed){
+
+alert("Access denied");
+
+window.location.href="submit-albukhrecosystem-form.html";
+
+}
+
+})();
+
 const project =
 localStorage.getItem("albukhr_current_project");
 
