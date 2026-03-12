@@ -290,6 +290,22 @@ function unlockInternal(index){
   render();
 }
 
+function unlockProjectBuilder(index){
+
+  const list = getList();
+
+  if(list[index].status !== "approved"){
+    alert("Contributor must be approved first");
+    return;
+  }
+
+  list[index].projectCreationUnlocked = true;
+
+  saveList(list);
+
+  render();
+
+}
 /* =========================================
    COPY ID
 ========================================= */
@@ -329,6 +345,10 @@ function render(){
       ? "<span style='color:#0f7a3d;font-weight:700'>Internal: Unlocked</span>"
       : "<span style='color:#b02a37;font-weight:700'>Internal: Locked</span>";
 
+     const projectStatus = c.projectCreationUnlocked
+  ? "<span style='color:#0f7a3d;font-weight:700'>Project Builder: Unlocked</span>"
+  : "<span style='color:#b02a37;font-weight:700'>Project Builder: Locked</span>";
+
     const idBlock = c.albukhrId ? `
       <div style="margin-top:10px;font-size:12px;background:#f6fbf8;padding:8px;border-radius:8px">
         <b>Albukhr Internal ID:</b>
@@ -361,8 +381,9 @@ function render(){
         ${idBlock}
 
         <div style="margin-top:10px;font-size:12px">
-          ${telegramStatus}<br>
-          ${internalStatus}
+        ${telegramStatus}<br>
+        ${internalStatus}<br>
+        ${projectStatus}
         </div>
 
         <div style="margin-top:12px">
@@ -391,6 +412,10 @@ function render(){
 
               <button onclick="unlockInternal(${i})">
                 🏗 Unlock Internal
+              </button>
+
+              <button onclick="unlockProjectBuilder(${i})">
+                🚀 Unlock Project Builder
               </button>
             `
             : ""
