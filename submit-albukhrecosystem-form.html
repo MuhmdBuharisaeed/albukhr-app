@@ -206,7 +206,7 @@ alert("Albukhr ID copied");
 
 function renderApproved(record){
 
-document.querySelectorAll(".card").forEach(c=>c.style.display="none");
+document.getElementById("mainSection").style.display="none";
 document.getElementById("submitBtn").style.display="none";
 
 if(record.albukhrId){
