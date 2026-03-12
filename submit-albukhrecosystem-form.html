@@ -113,6 +113,13 @@ Create Investment Project →
 </a>
 </div>
 
+<div class="box" id="projectDashboardBox" style="display:none">
+📊 Project Dashboard Access<br>
+<a href="Albukhr-internal-project-dashboard.html">
+Open Project Dashboard →
+</a>
+</div>
+
 </section>
 
 <script>
@@ -220,6 +227,14 @@ document.getElementById("internalBox").style.display="block";
 
 if(record.projectCreationUnlocked)
 document.getElementById("projectBox").style.display="block";
+
+}
+
+if(localStorage.getItem(
+"albukhr_project_dashboard_unlocked_" + record.email
+)){
+
+document.getElementById("projectDashboardBox").style.display="block";
 
 }
 
