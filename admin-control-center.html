@@ -61,6 +61,11 @@ cursor:pointer;
 background:#b83232;
 }
 
+.small{
+font-size:12px;
+color:#666;
+}
+
 </style>
 
 </head>
@@ -73,30 +78,36 @@ Albukhr Admin Control Center
 
 <div class="container">
 
+<!-- STATS -->
+
 <div class="card">
-
-<div class="project-title">
-Total Projects
-</div>
-
+<div class="project-title">Total Projects</div>
 <div id="projectCount">0</div>
-
 </div>
 
 <div class="card">
-
-<div class="project-title">
-Total Investors
-</div>
-
+<div class="project-title">Total Investors</div>
 <div id="investorCount">0</div>
-
 </div>
+
+<!-- PENDING PROJECT REQUESTS -->
 
 <div class="card">
 
 <div class="project-title">
-Projects
+Pending Project Requests
+</div>
+
+<div id="pendingProjects"></div>
+
+</div>
+
+<!-- ACTIVE PROJECTS -->
+
+<div class="card">
+
+<div class="project-title">
+Active Projects
 </div>
 
 <div id="projectList"></div>
@@ -105,16 +116,176 @@ Projects
 
 </div>
 
+<!-- ENGINES -->
+
 <script src="project-creation-engine.js"></script>
+<script src="project-registry.js"></script>
 <script src="staking.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 <script src="project-treasury.js"></script>
 
+<!-- MODERATION ENGINE -->
+
 <script>
+
+/* =========================================
+   PROJECT MODERATION ENGINE
+========================================= */
+
+function evaluateProject(project){
+
+let roiScore = 100;
+let liquidityScore = 100;
+let risk = "LOW";
+
+if(project.roi > 50) roiScore = 40;
+else if(project.roi > 30) roiScore = 60;
+else if(project.roi > 20) roiScore = 80;
+
+if(project.liquidity < 100) liquidityScore = 40;
+else if(project.liquidity < 300) liquidityScore = 70;
+
+const score =
+(roiScore * 0.5) +
+(liquidityScore * 0.5);
+
+if(score < 50) risk = "HIGH";
+else if(score < 75) risk = "MEDIUM";
+
+return{
+score:score,
+risk:risk
+};
+
+}
+
+/* =========================================
+   PENDING PROJECTS
+========================================= */
+
+function renderPendingProjects(){
+
+const container =
+document.getElementById("pendingProjects");
+
+container.innerHTML="";
+
+const pending =
+typeof getPendingProjects === "function"
+? getPendingProjects()
+: [];
+
+if(!pending.length){
+
+container.innerHTML =
+"<div class='small'>No pending project requests</div>";
+
+return;
+
+}
+
+pending.forEach(p=>{
+
+const riskData = evaluateProject(p);
+
+const card = document.createElement("div");
+
+card.className="card";
+
+card.innerHTML=`
+
+<div class="project-title">
+${p.name}
+</div>
+
+<div class="row">
+<div>ROI</div>
+<div>${p.roi}%</div>
+</div>
+
+<div class="row">
+<div>Initial Liquidity</div>
+<div>${p.liquidity} Pi</div>
+</div>
+
+<div class="row">
+<div>Risk Level</div>
+<div>${riskData.risk}</div>
+</div>
+
+<div class="row">
+<div>Safety Score</div>
+<div>${riskData.score.toFixed(0)}</div>
+</div>
+
+<button onclick="approveProject('${p.id}')">
+Approve
+</button>
+
+<button class="pause"
+onclick="rejectProject('${p.id}')">
+
+Reject
+
+</button>
+
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+/* =========================================
+   APPROVE PROJECT
+========================================= */
+
+function approveProject(id){
+
+if(typeof approvePendingProject !== "function"){
+alert("Project engine missing");
+return;
+}
+
+approvePendingProject(id);
+
+alert("Project approved");
+
+renderPendingProjects();
+renderAdmin();
+
+}
+
+/* =========================================
+   REJECT PROJECT
+========================================= */
+
+function rejectProject(id){
+
+if(typeof rejectPendingProject !== "function"){
+alert("Project engine missing");
+return;
+}
+
+rejectPendingProject(id);
+
+alert("Project rejected");
+
+renderPendingProjects();
+
+}
+
+/* =========================================
+   ACTIVE PROJECTS
+========================================= */
 
 function renderAdmin(){
 
-const projects = getProjects();
+const projects =
+typeof getProjects === "function"
+? getProjects()
+: [];
 
 document.getElementById("projectCount").innerText =
 projects.length;
@@ -130,22 +301,21 @@ stakes.length;
 const container =
 document.getElementById("projectList");
 
-container.innerHTML = "";
+container.innerHTML="";
 
-projects.forEach(project => {
+projects.forEach(project=>{
 
 const liquidity =
 getProjectTreasuryStatus(project.name).liquidity;
 
 const investors =
-stakes.filter(s => s.project === project.name).length;
+stakes.filter(s=>s.project===project.name).length;
 
-const card =
-document.createElement("div");
+const card = document.createElement("div");
 
-card.className = "card";
+card.className="card";
 
-card.innerHTML = `
+card.innerHTML=`
 
 <div class="project-title">
 ${project.name}
@@ -185,9 +355,19 @@ container.appendChild(card);
 
 }
 
+/* =========================================
+   PROJECT ACTIONS
+========================================= */
+
 function openProject(name){
 
-alert("Opening dashboard for " + name);
+localStorage.setItem(
+"albukhr_current_project",
+name
+);
+
+window.location.href =
+"Albukhr-internal-project-dashboard.html";
 
 }
 
@@ -197,6 +377,11 @@ alert("Project paused: " + name);
 
 }
 
+/* =========================================
+   INIT
+========================================= */
+
+renderPendingProjects();
 renderAdmin();
 
 </script>
