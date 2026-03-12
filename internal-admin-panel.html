@@ -203,6 +203,41 @@ function approveProject(id){
 if(confirm("Approve this internal project?")){
 
 updateInternalStatus(id,"internal_approved");
+const list = getInternalProjects();
+const project = list.find(p => p.id === id);
+
+if(project){
+
+/* mark project approved */
+project.projectApproved = true;
+
+/* save dashboard owner */
+localStorage.setItem(
+"albukhr_project_owner_" + project.creatorEmail,
+project.projectName
+);
+
+localStorage.setItem(
+"albukhr_project_dashboard_unlocked_" + project.creatorEmail,
+true
+);
+
+localStorage.setItem(
+"albukhr_project_creation_locked_" + project.creatorEmail,
+true
+);
+
+localStorage.setItem(
+"albukhr_current_project",
+project.projectName
+);
+
+localStorage.setItem(
+"albukhr_internal_projects",
+JSON.stringify(list)
+);
+
+}
 
 /* =============================
    GET PROJECT DATA
