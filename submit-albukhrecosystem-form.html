@@ -206,7 +206,7 @@ alert("Albukhr ID copied");
 
 function renderApproved(record){
 
-document.getElementById("mainSection").style.display="none";
+document.querySelectorAll(".card").forEach(c=>c.style.display="none");
 document.getElementById("submitBtn").style.display="none";
 
 if(record.albukhrId){
@@ -228,14 +228,11 @@ document.getElementById("internalBox").style.display="block";
 if(record.projectCreationUnlocked)
 document.getElementById("projectBox").style.display="block";
 
-/* dashboard unlock */
-
 if(localStorage.getItem(
 "albukhr_project_dashboard_unlocked_" + record.email
 )){
 document.getElementById("projectDashboardBox").style.display="block";
 }
-
 }
 
 function checkStatus(){
