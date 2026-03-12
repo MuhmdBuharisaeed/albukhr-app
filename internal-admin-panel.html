@@ -268,30 +268,29 @@ container.appendChild(div);
 
 function approveProject(id){
 
-if(!confirm("Approve this internal project?"))
-return;
+if(confirm("Approve this internal project?")){
+
+updateInternalStatus(id,"internal_approved");
 
 const list = getInternalProjects();
+const project = list.find(p => p.id === id);
 
-const project = list.find(p=>p.id===id);
+if(project){
 
-if(!project) return;
-
-/* mark approved */
-
-project.status="internal_approved";
-
-project.approvedAt=Date.now();
-
-/* save owner permissions */
+project.projectApproved = true;
 
 localStorage.setItem(
-"albukhr_project_dashboard_unlocked_"+project.creatorEmail,
+"albukhr_project_owner_" + project.creatorEmail,
+project.projectName
+);
+
+localStorage.setItem(
+"albukhr_project_dashboard_unlocked_" + project.creatorEmail,
 true
 );
 
 localStorage.setItem(
-"albukhr_project_creation_locked_"+project.creatorEmail,
+"albukhr_project_creation_locked_" + project.creatorEmail,
 true
 );
 
@@ -300,46 +299,39 @@ localStorage.setItem(
 project.projectName
 );
 
-/* register project to marketplace */
-
-if(typeof registerProject==="function"){
-
-registerProject({
-
-name:project.projectName,
-
-description:project.summary || "",
-
-roi:project.roi || 0,
-
-liquidity:project.initialLiquidity || 0,
-
-type:"internal",
-
-minimum:1,
-
-target:1000
-
-});
-
-}
-
-/* register project owner */
-
-if(typeof registerProjectOwner==="function"){
-
-registerProjectOwner(
-project.projectName,
-project.creatorEmail
+localStorage.setItem(
+"albukhr_internal_projects",
+JSON.stringify(list)
 );
 
 }
 
-/* save updated list */
+/* REGISTER TO MARKETPLACE */
 
-saveInternalProjects(list);
+if(project && typeof registerProject === "function"){
+
+registerProject({
+name: project.projectName,
+description: project.summary,
+roi: project.roi || 0,
+liquidity: project.initialLiquidity || 0,
+type: "internal",
+minimum: 1,
+target: 1000
+});
+
+if(typeof registerProjectOwner === "function"){
+registerProjectOwner(
+project.projectName,
+project.email
+);
+}
+
+}
 
 renderAdmin();
+
+}
 
 }
 
