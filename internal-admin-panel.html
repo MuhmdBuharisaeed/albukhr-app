@@ -93,6 +93,14 @@ function daysLeft(approvedAt){
   return Math.ceil(diff / (24 * 60 * 60 * 1000));
 }
 
+function getInternalProjects(){
+
+return JSON.parse(
+localStorage.getItem("albukhr_internal_projects")
+) || [];
+
+}
+
 function renderAdmin(){
   const list = getInternalProjects();
   container.innerHTML = "";
