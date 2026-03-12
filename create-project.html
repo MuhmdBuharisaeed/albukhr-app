@@ -157,6 +157,13 @@ Number(document.getElementById("minimumInvestment").value);
 const target =
 Number(document.getElementById("targetFunding").value);
 
+document.getElementById("projectName").value="";
+document.getElementById("projectDescription").value="";
+document.getElementById("projectROI").value="";
+document.getElementById("initialLiquidity").value="";
+document.getElementById("minimumInvestment").value="";
+document.getElementById("targetFunding").value="";
+
 /* ===== VALIDATION ===== */
 
 if(!name || !description){
@@ -227,17 +234,21 @@ createdAt: Date.now()
 
 };
 
-/* ===== SAVE PROJECT ===== */
+/* ====================================
+   SAVE AS PENDING REQUEST
+==================================== */
 
-if(typeof registerProject !== "function"){
+const KEY = "albukhr_pending_projects";
 
-alert("Project engine missing");
+let pending =
+JSON.parse(localStorage.getItem(KEY)) || [];
 
-return;
+pending.push(project);
 
-}
-
-registerProject(project);
+localStorage.setItem(
+KEY,
+JSON.stringify(pending)
+);
 
 /* ===== SUCCESS MESSAGE ===== */
 
