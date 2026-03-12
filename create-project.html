@@ -235,19 +235,53 @@ createdAt: Date.now()
 };
 
 /* ====================================
-   SAVE AS PENDING REQUEST
+   SAVE TO INTERNAL PROJECT REGISTRY
 ==================================== */
 
-const KEY = "albukhr_pending_projects";
+const KEY = "albukhr_internal_projects";
 
-let pending =
+let list =
 JSON.parse(localStorage.getItem(KEY)) || [];
 
-pending.push(project);
+list.push({
+
+id: project.id,
+
+projectName: project.name,
+
+summary: project.description,
+
+roi: project.roi,
+
+initialLiquidity: project.initialLiquidity,
+
+minimum: project.minimum,
+
+target: project.target,
+
+creatorEmail: project.creator,
+
+category: "Investment",
+
+stage: "Concept",
+
+role: "Founder",
+
+risk: "Pending",
+
+confidentiality: "Internal",
+
+status: "internal_pending",
+
+createdAt: Date.now(),
+
+approvedAt: null
+
+});
 
 localStorage.setItem(
 KEY,
-JSON.stringify(pending)
+JSON.stringify(list)
 );
 
 /* ===== SUCCESS MESSAGE ===== */
