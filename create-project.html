@@ -105,6 +105,38 @@ Launch Project
 
 <script>
 
+(function(){
+
+const email = localStorage.getItem("albukhr_current_email");
+
+if(!email) return;
+
+const locked = localStorage.getItem(
+"albukhr_project_creation_locked_" + email
+);
+
+if(locked){
+
+document.body.innerHTML = `
+<div style="padding:30px;font-family:system-ui">
+
+<h2>🚫 Project Already Created</h2>
+
+<p>
+Your project has already been approved.
+</p>
+
+<p>
+Access your dashboard from contributor panel.
+</p>
+
+</div>
+`;
+
+}
+
+})();
+
 /* ====================================
    VERIFY CONTRIBUTOR
 ==================================== */
