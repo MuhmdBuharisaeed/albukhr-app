@@ -230,3 +230,68 @@ function getProjectTreasuryStatus(project){
   };
 
                           }
+
+/* =========================================
+   INTERNAL WITHDRAW (PROJECT OWNER)
+========================================= */
+
+function projectInternalWithdraw(project, amount){
+
+amount = Number(amount);
+
+/* BASIC VALIDATION */
+
+if(!amount || amount <= 0){
+return {error:"Invalid withdraw amount"};
+}
+
+const treasury = getTreasury();
+
+if(!treasury[project]){
+return {error:"Project treasury missing"};
+}
+
+/* RESERVE PROTECTION */
+
+if(!canUseLiquidity(project, amount)){
+return {error:"Reserve protection active"};
+}
+
+/* ANTI RUG PROTECTION */
+
+if(typeof checkRugRisk === "function"){
+
+const risk = checkRugRisk(project, amount);
+
+if(!risk.allowed){
+return {error:risk.reason};
+}
+
+}
+
+/* EXECUTE WITHDRAW */
+
+treasury[project].liquidity -= amount;
+
+if(treasury[project].liquidity < 0){
+treasury[project].liquidity = 0;
+}
+
+saveTreasury(treasury);
+
+/* RECORD TRANSACTION */
+
+if(typeof recordTransaction === "function"){
+recordTransaction({
+type:"internal-withdraw",
+project,
+amount
+});
+}
+
+return {
+success:true,
+liquidity:treasury[project].liquidity
+};
+
+}
