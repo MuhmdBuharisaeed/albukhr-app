@@ -211,9 +211,26 @@ ${badgeText}
 
 <b>ROI:</b> ${p.roi || 0}%<br>
 
-<b>Initial Liquidity:</b> ${(p.initialLiquidity || 0)} Pi
+<b>Initial Liquidity:</b> ${(p.initialLiquidity || 0)} Pi<br><br>
+
+<b>Project Description:</b><br>
+${p.summary || p.description || "No description provided"}
 
 </p>
+
+<details style="margin-top:6px">
+
+<summary style="cursor:pointer;font-size:12px">
+View Project Description
+</summary>
+
+<p style="font-size:13px;margin-top:6px">
+
+${p.summary || p.description || "No description provided"}
+
+</p>
+
+</details>
 
 ${
 p.status==="internal_pending"
@@ -312,7 +329,7 @@ if(project && typeof registerProject === "function"){
 
 registerProject({
 name: project.projectName,
-description: project.summary,
+description: project.summary || project.description,
 roi: project.roi || 0,
 liquidity: project.initialLiquidity || 0,
 type: "internal",
