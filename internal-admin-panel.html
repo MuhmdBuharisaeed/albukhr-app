@@ -125,6 +125,7 @@ Manage all ALBUKHR internal projects
 <script src="internal-registry.js"></script>
 <script src="project-registry.js"></script>
 <script src="project-creation-engine.js"></script>
+<script src="js/project-intelligence-engine.js"></script>
 <script src="js/ownership-engine.js"></script>
 
 <script>
@@ -189,6 +190,11 @@ badgeClass="rejected";
 badgeText="Rejected";
 }
 
+const intel =
+typeof analyzeProject === "function"
+? analyzeProject(p)
+: null;
+
 div.innerHTML=`
 
 <h4>${p.projectName}</h4>
@@ -212,6 +218,20 @@ ${badgeText}
 <b>ROI:</b> ${p.roi || 0}%<br>
 
 <b>Initial Liquidity:</b> ${(p.initialLiquidity || 0)} Pi<br><br>
+
+<div style="margin-top:10px;font-size:12px;background:#f6fbf8;padding:10px;border-radius:10px">
+
+<b>Project Intelligence</b><br>
+
+Risk Level: ${intel ? intel.risk : "N/A"}<br>
+
+Liquidity Safety: ${intel ? intel.liquiditySafety : "0"}%<br>
+
+ROI Pressure: ${intel ? intel.roiPressure : "N/A"}<br>
+
+Sustainability Score: ${intel ? intel.score : "0"}/100
+
+</div>
 
 </p>
 
