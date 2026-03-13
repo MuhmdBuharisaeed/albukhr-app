@@ -241,11 +241,27 @@ Sustainability Score: ${intel ? intel.score : "0"}/100
 View Project Description
 </summary>
 
-<p style="font-size:13px;margin-top:6px">
+<div style="font-size:13px;margin-top:8px">
 
-${p.summary || p.description || "No description provided"}
+<b>Project Summary</b><br>
+${p.summary || p.description || "-"}
 
-</p>
+<br><br>
+
+<b>Problem Statement</b><br>
+${p.problem || "-"}
+
+<br><br>
+
+<b>Solution / Innovation</b><br>
+${p.solution || "-"}
+
+<br><br>
+
+<b>Expected Impact</b><br>
+${p.impact || "-"}
+
+</div>
 
 </details>
 
