@@ -333,13 +333,30 @@ return;
 
 }
 
-const projects =
-typeof getMarketplaceProjects === "function"
-? getMarketplaceProjects()
-: [];
+let project = null;
 
-const project =
-projects.find(p => p.name === currentProject);
+/* check marketplace first */
+
+if(typeof getMarketplaceProjects === "function"){
+
+const projects = getMarketplaceProjects();
+
+project = projects.find(p => p.name === currentProject);
+
+}
+
+/* if not found check internal projects */
+
+if(!project){
+
+const internal =
+JSON.parse(localStorage.getItem("albukhr_internal_projects")) || [];
+
+project = internal.find(p => p.projectName === currentProject);
+
+}
+
+/* if still not found */
 
 if(!project){
 
