@@ -308,9 +308,20 @@ const box = document.getElementById("marketInsights");
 
 if(!box) return;
 
-const hot = getHotProjects();
-const investors = getTopInvestors();
-const liquidity = getLiquidityLeaderboard();
+const hot =
+typeof getHotProjects === "function"
+? getHotProjects()
+: [];
+
+const investors =
+typeof getTopInvestors === "function"
+? getTopInvestors()
+: [];
+
+const liquidity =
+typeof getLiquidityLeaderboard === "function"
+? getLiquidityLeaderboard()
+: [];
 
 box.innerHTML = `
 
@@ -422,8 +433,8 @@ document.getElementById("projectList");
 container.innerHTML = "";
 
 const allProjects =
-typeof getMarketplaceProjects === "function"
-? getMarketplaceProjects()
+typeof getProjects === "function"
+? getProjects()
 : [];
 
 /* SEARCH */
@@ -479,7 +490,9 @@ document.createElement("div");
 card.className = "project-card";
 
 const treasury =
-getProjectTreasuryStatus(project.name);
+typeof getProjectTreasuryStatus === "function"
+? getProjectTreasuryStatus(project.name)
+: {liquidity:0};
 
 const liquidity =
 Number(treasury.liquidity) || 0;
@@ -612,6 +625,7 @@ alert("Investment successful");
 
 renderMarketplace();
 renderMarketInsights();
+renderDiscovery();
 
 /* AUTO REFRESH */
 
