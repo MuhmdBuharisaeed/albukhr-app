@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-
-<meta charset="UTF-8">
+<!DOCTYPE html><html lang="en">
+<head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Albukhr Marketplace</title>
-
-<link rel="stylesheet" href="css/global-header.css">
-<link rel="stylesheet" href="global-buttons.css">
-
-<style>
+<title>Albukhr Marketplace</title><link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="global-buttons.css"><style>
 
 body{
 margin:0;
@@ -18,6 +10,7 @@ font-family:system-ui;
 background:#f4f7f6;
 padding-bottom:110px;
 }
+
 .header{
 background:#0f7a3d;
 height:60px;
@@ -33,34 +26,40 @@ align-items:center;
 gap:10px;
 }
 
-.header-right{
-display:flex;
-align-items:center;
-}
-
 .main-logo{
 height:56px;
-width:auto;
-display:block;
 object-fit:contain;
-
-filter:
-drop-shadow(0 0 0.8px #000)
-drop-shadow(0 0 1px #000);
 }
 
 .brand{
 color:white;
 font-weight:700;
 font-size:18px;
-letter-spacing:1px;
+}
+
+.market-controls{
+padding:16px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.market-controls input{
+flex:1;
+padding:12px;
+border-radius:12px;
+border:1px solid #ddd;
+}
+
+.market-controls select{
+padding:12px;
+border-radius:12px;
+border:1px solid #ddd;
 }
 
 .marketplace{
 padding:16px;
 }
-
-/* PROJECT CARD */
 
 .project-card{
 background:#fff;
@@ -68,12 +67,6 @@ padding:16px;
 border-radius:16px;
 margin-bottom:16px;
 box-shadow:0 6px 18px rgba(0,0,0,0.05);
-transition:.25s ease;
-}
-
-.project-card:hover{
-transform:translateY(-2px);
-box-shadow:0 10px 24px rgba(0,0,0,0.08);
 }
 
 .project-header{
@@ -99,15 +92,11 @@ font-weight:700;
 font-size:15px;
 }
 
-/* DESC */
-
 .project-desc{
 font-size:13px;
 color:#666;
 margin-bottom:10px;
 }
-
-/* ROW */
 
 .row{
 display:flex;
@@ -115,32 +104,6 @@ justify-content:space-between;
 font-size:13px;
 margin-top:5px;
 }
-
-/* RISK */
-
-.risk{
-font-size:12px;
-font-weight:600;
-padding:2px 6px;
-border-radius:6px;
-}
-
-.risk.low{
-background:#e6f7ee;
-color:#0f7a3d;
-}
-
-.risk.medium{
-background:#fff4e5;
-color:#cc8500;
-}
-
-.risk.high{
-background:#fdecea;
-color:#c0392b;
-}
-
-/* PROGRESS */
 
 .progress{
 height:6px;
@@ -154,8 +117,6 @@ overflow:hidden;
 height:100%;
 background:linear-gradient(90deg,#0f7a3d,#1ec777);
 }
-
-/* ROI CALCULATOR */
 
 .roi-box{
 margin-top:10px;
@@ -173,8 +134,6 @@ border:1px solid #ddd;
 margin-top:4px;
 }
 
-/* BUTTON */
-
 .invest-btn{
 margin-top:12px;
 padding:10px;
@@ -190,50 +149,8 @@ width:100%;
 .empty{
 text-align:center;
 color:#777;
-font-size:13px;
 padding:20px;
 }
-
-/* SEARCH BAR */
-
-.marketplace-search{
-padding:16px;
-padding-bottom:0;
-}
-
-.marketplace-search input{
-width:100%;
-padding:12px;
-border-radius:12px;
-border:1px solid #ddd;
-font-size:14px;
-background:#fff;
-box-shadow:0 4px 12px rgba(0,0,0,0.04);
-}
-
-.market-controls{
-padding:16px;
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
-
-.market-controls input{
-flex:1;
-padding:12px;
-border-radius:12px;
-border:1px solid #ddd;
-font-size:14px;
-background:#fff;
-}
-
-.market-controls select{
-padding:12px;
-border-radius:12px;
-border:1px solid #ddd;
-background:#fff;
-font-size:13px;
-  }
 
 .trend{
 background:#fff4e5;
@@ -243,31 +160,11 @@ padding:2px 6px;
 border-radius:6px;
 margin-left:6px;
 }
-</style>
 
-</head>
-
-<body>
-
-<header class="header">
-
-<div class="header-left">
+</style></head><body><header class="header"><div class="header-left">
 <img src="file_000000007c187246b1c01967ee086dc4.png" class="main-logo">
 <span class="brand">ALBUKHR</span>
-</div>
-
-<div class="header-right">
-<div class="header-btn notification-btn">
-🔔
-<span id="notifBadge" class="notification-badge"></span>
-</div>
-</div>
-
-</header>
-
-<div class="market-controls">
-
-<input
+</div></header><div class="market-controls"><input
 type="text"
 id="projectSearch"
 placeholder="🔎 Search projects..."
@@ -278,29 +175,9 @@ oninput="renderMarketplace()">
 <option value="roi">Highest ROI</option>
 <option value="liquidity">Highest Liquidity</option>
 <option value="risk">Lowest Risk</option>
-</select>
+</select></div><div id="marketInsights" style="padding:16px"></div><div class="marketplace" id="projectList"></div><script src="project-registry.js"></script><script src="staking.js"></script><script src="smart-liquidity-engine.js"></script><script src="risk-engine.js"></script><script src="js/core-liquidity-engine.js"></script><script src="marketplace-engine.js"></script><script src="project-discovery-engine.js"></script><script src="liquidity-pool-engine.js"></script><script src="capital-protection-engine.js"></script><script src="js/notifications.js"></script><script src="js/ownership-engine.js"></script><script src="js/marketplace-pro-engine.js"></script><script>
 
-</div>
-
-<div id="marketInsights" style="padding:16px"></div>
-
-<div class="marketplace" id="projectList"></div>
-
-<script src="project-creation-engine.js"></script>
-<script src="project-registry.js"></script>
-<script src="staking.js"></script>
-<script src="smart-liquidity-engine.js"></script>
-<script src="js/core-liquidity-engine.js"></script>
-<script src="risk-engine.js"></script>
-<script src="marketplace-engine.js"></script>
-<script src="project-discovery-engine.js"></script>
-<script src="liquidity-pool-engine.js"></script>
-<script src="capital-protection-engine.js"></script>
-<script src="js/notifications.js"></script>
-<script src="js/ownership-engine.js"></script>
-<script src="js/marketplace-pro-engine.js"></script>
-
-<script>
+/* ICON SYSTEM */
 
 function getProjectIcon(name){
 
@@ -318,59 +195,55 @@ return "🏢";
 
 }
 
+/* ROI CALCULATOR */
+
 function calculateROI(amount, roi){
 
 return (amount * roi / 100).toFixed(2);
 
 }
 
+
+/* MAIN RENDER */
+
 function renderMarketplace(){
 
-const container =
-document.getElementById("projectList");
-
-container.innerHTML = "";
+const container = document.getElementById("projectList");
+container.innerHTML="";
 
 const allProjects =
-typeof getProjects === "function"
+typeof getProjects==="function"
 ? getProjects()
 : [];
-  
-/* SEARCH */
 
 const search =
-document.getElementById("projectSearch")?.value
-?.toLowerCase() || "";
+document.getElementById("projectSearch").value.toLowerCase();
 
 let projects =
 allProjects.filter(p =>
 p.name.toLowerCase().includes(search) ||
-(p.description || "").toLowerCase().includes(search)
+(p.description||"").toLowerCase().includes(search)
 );
+
 
 /* SORT */
 
 const sort =
-document.getElementById("sortProjects")?.value;
+document.getElementById("sortProjects").value;
 
-if(sort === "roi"){
+if(sort==="roi"){
 projects.sort((a,b)=>(b.roi||0)-(a.roi||0));
 }
 
-if(sort === "liquidity"){
+if(sort==="liquidity" && typeof getProjectTreasuryStatus==="function"){
 projects.sort((a,b)=>
 (getProjectTreasuryStatus(b.name).liquidity||0) -
 (getProjectTreasuryStatus(a.name).liquidity||0)
 );
 }
 
-if(sort === "risk"){
-projects.sort((a,b)=>{
-const ra = getProjectRisk(a.name)?.score || 0;
-const rb = getProjectRisk(b.name)?.score || 0;
-return rb - ra;
-});
-  }
+
+/* EMPTY */
 
 if(!projects.length){
 
@@ -381,33 +254,32 @@ return;
 
 }
 
-projects.forEach(project => {
 
-const card =
-document.createElement("div");
+/* CARDS */
 
-card.className = "project-card";
+projects.forEach(project=>{
 
 const treasury =
-getProjectTreasuryStatus(project.name);
+typeof getProjectTreasuryStatus==="function"
+? getProjectTreasuryStatus(project.name)
+: {liquidity:0};
 
 const liquidity =
-Number(treasury.liquidity) || 0;
-
-const funded =
-Math.min((liquidity / (project.target || 1000))*100,100);
+Number(treasury.liquidity)||0;
 
 const investors =
-typeof getAllStakesMerged === "function"
-? getAllStakesMerged().filter(s => s.project === project.name).length
+typeof getAllStakesMerged==="function"
+? getAllStakesMerged().filter(s=>s.project===project.name).length
 : 0;
 
-const riskData =
-typeof getProjectRisk === "function"
-? getProjectRisk(project.name)
-: {risk:"LOW"};
+const funded =
+Math.min((liquidity/(project.target||1000))*100,100);
 
-card.innerHTML = `
+
+const card=document.createElement("div");
+card.className="project-card";
+
+card.innerHTML=`
 
 <div class="project-header">
 
@@ -417,18 +289,18 @@ ${getProjectIcon(project.name)}
 
 <div class="project-title">
 ${project.name}
-${investors > 20 ? '<span class="trend">🔥 Trending</span>' : ''}
+${investors>20?'<span class="trend">🔥 Trending</span>':''}
 </div>
 
 </div>
 
 <div class="project-desc">
-${project.description || ""}
+${project.description||""}
 </div>
 
 <div class="row">
 <div>ROI</div>
-<div>${project.roi || 0}%</div>
+<div>${project.roi||0}%</div>
 </div>
 
 <div class="row">
@@ -443,21 +315,7 @@ ${project.description || ""}
 
 <div class="row">
 <div>Minimum</div>
-<div>${project.minimum || 1} Pi</div>
-</div>
-
-<div class="row">
-<div>Risk</div>
-<div class="risk ${riskData.risk.toLowerCase()}">
-${getRiskBadge(riskData.risk)}
-</div>
-</div>
-
-<div class="row">
-<div>Pool Liquidity</div>
-<div>${(typeof getPoolStatus==="function"
-? getPoolStatus(project.name)?.liquidity || 0
-: 0).toFixed(2)} Pi</div>
+<div>${project.minimum||1} Pi</div>
 </div>
 
 <div class="progress">
@@ -472,8 +330,7 @@ ROI Calculator
 type="number"
 placeholder="Enter amount"
 oninput="this.nextElementSibling.innerText =
-calculateROI(this.value, ${project.roi || 0}) + ' Pi'
-">
+calculateROI(this.value,${project.roi||0})+' Pi'">
 
 <div style="margin-top:4px;font-weight:600">
 0 Pi
@@ -497,68 +354,75 @@ container.appendChild(card);
 
 }
 
+
+/* MARKET INSIGHTS */
+
 function renderMarketInsights(){
 
-const box = document.getElementById("marketInsights");
+const box=document.getElementById("marketInsights");
 
 if(!box) return;
 
-const hot = getHotProjects();
-const investors = getTopInvestors();
-const liquidity = getLiquidityLeaderboard();
+if(typeof getHotProjects!=="function") return;
 
-box.innerHTML = `
+const hot=getHotProjects();
+const investors=getTopInvestors();
+const liquidity=getLiquidityLeaderboard();
+
+box.innerHTML=`
 
 <div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
 
 <b>🔥 Hot Projects</b><br>
-${hot.map(p=>`${p.name}`).join("<br>")}
+${hot.map(p=>p.name).join("<br>")}
 
 </div>
 
 <div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
 
 <b>🏆 Top Investors</b><br>
-${investors.map(i=>`${i.user} — ${i.amount.toFixed(2)} Pi`).join("<br>")}
+${investors.map(i=>i.user+" — "+i.amount.toFixed(2)+" Pi").join("<br>")}
 
 </div>
 
 <div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
 
 <b>💧 Liquidity Leaders</b><br>
-${liquidity.map(p=>`${p.name} — ${p.liquidity.toFixed(2)} Pi`).join("<br>")}
+${liquidity.map(p=>p.name+" — "+p.liquidity.toFixed(2)+" Pi").join("<br>")}
 
 </div>
 
 `;
 
-  }
+}
+
+
+/* INVEST */
 
 function invest(project){
 
-const amount =
-prompt("Enter investment amount (Pi)");
+const amount=prompt("Enter investment amount (Pi)");
 
-if(!amount || Number(amount)<=0){
-
+if(!amount||Number(amount)<=0){
 alert("Invalid amount");
 return;
-
 }
 
 createStake({
-project: project,
-amount: Number(amount)
+project:project,
+amount:Number(amount)
 });
 
 alert("Investment successful");
 
 }
 
+
 /* INITIAL LOAD */
 
 renderMarketplace();
 renderMarketInsights();
+
 
 /* AUTO REFRESH */
 
@@ -569,16 +433,5 @@ renderMarketInsights();
 
 },5000);
 
-/* REFRESH ON TAB FOCUS */
-
-window.addEventListener("focus",()=>{
-
-renderMarketplace();
-renderMarketInsights();
-
-});
-
-</script>
-
-</body>
+</script></body>
 </html>
