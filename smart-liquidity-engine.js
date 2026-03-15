@@ -229,56 +229,7 @@ function getProjectTreasuryStatus(project){
     reserve
   };
 
-  }
-
-/* =========================================
-   ALBUKHR CORE LIQUIDITY BOOTSTRAP
-========================================= */
-
-const ALBUKHR_CORE_PROJECTS = [
-
-"Barsh Agro",
-"Labbaika Bakery",
-"Raheem Pharma",
-"Urban Transport",
-"Khairat Recycling",
-"Azman Chemical",
-"Hauwal Maize"
-
-];
-
-function bootstrapCoreLiquidity(){
-
-let treasury = getTreasury();
-
-if(!treasury){
-treasury = {};
-}
-
-ALBUKHR_CORE_PROJECTS.forEach(project => {
-
-if(!treasury[project]){
-
-treasury[project] = {
-liquidity:1000,
-created:Date.now()
-};
-
-}
-
-});
-
-saveTreasury(treasury);
-
-}
-
-/* RUN CORE LIQUIDITY AFTER PAGE LOAD */
-
-window.addEventListener("DOMContentLoaded", () => {
-
-bootstrapCoreLiquidity();
-
-});
+                          }
 
 /* =========================================
    INTERNAL WITHDRAW (PROJECT OWNER)
