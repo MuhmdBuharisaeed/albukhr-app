@@ -323,26 +323,6 @@ typeof getLiquidityLeaderboard === "function"
 : [];
 
 box.innerHTML = `
-
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
-
-<b>🔥 Hot Projects</b><br>
-${hot.map(p=>`${p.name}`).join("<br>")}
-
-</div>
-
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
-
-<b>🏆 Top Investors</b><br>
-${investors.map(i=>`${i.user} — ${i.amount.toFixed(2)} Pi`).join("<br>")}
-
-</div>
-
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
-
-<b>💧 Liquidity Leaders</b><br>
-${liquidity.map(p=>`${p.name} — ${p.liquidity.toFixed(2)} Pi`).join("<br>")}
-</div>
 `;
 }
 /* =====================================
