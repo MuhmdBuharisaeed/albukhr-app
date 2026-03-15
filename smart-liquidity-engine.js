@@ -272,11 +272,13 @@ saveTreasury(treasury);
 
 }
 
-/* RUN ONCE */
+/* RUN CORE LIQUIDITY AFTER PAGE LOAD */
 
-setTimeout(()=>{
+window.addEventListener("DOMContentLoaded", () => {
+
 bootstrapCoreLiquidity();
-},100);
+
+});
 
 /* =========================================
    INTERNAL WITHDRAW (PROJECT OWNER)
