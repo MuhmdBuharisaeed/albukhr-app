@@ -242,6 +242,13 @@ padding:2px 6px;
 border-radius:6px;
 margin-left:6px;
 }
+#discoverySection{
+margin-bottom:6px;
+}
+
+#marketInsights{
+margin-bottom:6px;
+}
 </style>
 
 </head>
@@ -281,8 +288,8 @@ oninput="renderMarketplace()">
 
 </div>
 
-<div id="marketInsights" style="padding:16px"></div>
-<div id="discoverySection" style="padding:16px"></div>
+<div id="marketInsights" style="padding:10px 12px"></div>
+<div id="discoverySection" style="padding:0 12px"></div>
 <div class="marketplace" id="projectList"></div>
 
 <script src="project-creation-engine.js"></script>
@@ -324,21 +331,21 @@ typeof getLiquidityLeaderboard === "function"
 
 box.innerHTML = `
 
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:8px">
 
 <b>🔥 Hot Projects</b><br>
 ${hot.map(p=>`${p.name}`).join("<br>")}
 
 </div>
 
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:8px">
 
 <b>🏆 Top Investors</b><br>
 ${investors.map(i=>`${i.user} — ${i.amount.toFixed(2)} Pi`).join("<br>")}
 
 </div>
 
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:8px">
 
 <b>💧 Liquidity Leaders</b><br>
 ${liquidity.map(p=>`${p.name} — ${p.liquidity.toFixed(2)} Pi`).join("<br>")}
