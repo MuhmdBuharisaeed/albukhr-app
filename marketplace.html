@@ -283,7 +283,7 @@ oninput="renderMarketplace()">
 </div>
 
 <div id="marketInsights" style="padding:16px"></div>
-
+<div id="discoverySection" style="padding:16px"></div>
 <div class="marketplace" id="projectList"></div>
 
 <script src="project-creation-engine.js"></script>
@@ -299,6 +299,7 @@ oninput="renderMarketplace()">
 <script src="js/notifications.js"></script>
 <script src="js/ownership-engine.js"></script>
 <script src="js/marketplace-pro-engine.js"></script>
+<script src="js/project-discovery-algorithm.js"></script>
 
 <script>
 function renderMarketInsights(){
@@ -331,6 +332,59 @@ ${investors.map(i=>`${i.user} — ${i.amount.toFixed(2)} Pi`).join("<br>")}
 
 <b>💧 Liquidity Leaders</b><br>
 ${liquidity.map(p=>`${p.name} — ${p.liquidity.toFixed(2)} Pi`).join("<br>")}
+
+</div>
+
+`;
+
+}
+
+/* =====================================
+   RENDER DISCOVERY
+===================================== */
+
+function renderDiscovery(){
+
+const box =
+document.getElementById("discoverySection");
+
+if(!box) return;
+
+const trending =
+typeof getTrendingProjects==="function"
+? getTrendingProjects()
+: [];
+
+const newest =
+typeof getNewProjects==="function"
+? getNewProjects()
+: [];
+
+const invested =
+typeof getMostInvestedProjects==="function"
+? getMostInvestedProjects()
+: [];
+
+box.innerHTML = `
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>🔥 Trending Projects</b><br>
+${trending.map(p=>p.name).join("<br>")}
+
+</div>
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>🆕 New Projects</b><br>
+${newest.map(p=>p.name).join("<br>")}
+
+</div>
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>💰 Most Invested</b><br>
+${invested.map(p=>p.name).join("<br>")}
 
 </div>
 
@@ -565,9 +619,10 @@ setInterval(()=>{
 
 renderMarketplace();
 renderMarketInsights();
+renderDiscovery();
 
 },5000);
-  
+
 </script>
 
 </body>
