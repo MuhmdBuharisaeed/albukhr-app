@@ -19,8 +19,10 @@ return getProjects();
 
 function getProjectMetrics(project){
 
-const treasury =
-getProjectTreasuryStatus(project);
+const stakes =
+typeof getAllStakesMerged === "function"
+? getAllStakesMerged().filter(s => s.project === project)
+: [];
 
 const stakes =
 getAllStakesMerged()
