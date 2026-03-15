@@ -272,11 +272,29 @@ saveTreasury(treasury);
 
 }
 
-/* RUN CORE LIQUIDITY AFTER PAGE LOAD */
+/* =========================================
+   RUN CORE LIQUIDITY SAFELY (ONCE)
+========================================= */
+
+function runCoreLiquidityBootstrap(){
+
+if(localStorage.getItem("albukhr_core_liquidity_done"))
+return;
+
+bootstrapCoreLiquidity();
+
+localStorage.setItem(
+"albukhr_core_liquidity_done",
+true
+);
+
+}
+
+/* RUN AFTER PAGE LOAD */
 
 window.addEventListener("DOMContentLoaded", () => {
 
-bootstrapCoreLiquidity();
+runCoreLiquidityBootstrap();
 
 });
 
