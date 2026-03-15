@@ -323,58 +323,27 @@ typeof getLiquidityLeaderboard === "function"
 : [];
 
 box.innerHTML = `
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>🔥 Hot Projects</b><br>
+${hot.map(p=>`${p.name}`).join("<br>")}
+
+</div>
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>🏆 Top Investors</b><br>
+${investors.map(i=>`${i.user} — ${i.amount.toFixed(2)} Pi`).join("<br>")}
+
+</div>
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>💧 Liquidity Leaders</b><br>
+${liquidity.map(p=>`${p.name} — ${p.liquidity.toFixed(2)} Pi`).join("<br>")}
+</div>
 `;
-}
-/* =====================================
-   RENDER DISCOVERY
-===================================== */
-function renderDiscovery(){
-
-const box =
-document.getElementById("discoverySection");
-
-if(!box) return;
-
-const trending =
-typeof getTrendingProjects==="function"
-? getTrendingProjects()
-: [];
-
-const newest =
-typeof getNewProjects==="function"
-? getNewProjects()
-: [];
-
-const invested =
-typeof getMostInvestedProjects==="function"
-? getMostInvestedProjects()
-: [];
-
-box.innerHTML = `
-
-<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:12px">
-
-<b>🔥 Trending Projects</b><br>
-${trending.map(p=>p.name).join("<br>")}
-
-</div>
-
-<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:12px">
-
-<b>🆕 New Projects</b><br>
-${newest.map(p=>p.name).join("<br>")}
-
-</div>
-
-<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:12px">
-
-<b>💰 Most Invested</b><br>
-${invested.map(p=>p.name).join("<br>")}
-
-</div>
-
-`;
-
 }
 
 function getProjectIcon(name){
