@@ -326,32 +326,16 @@ return (amount * roi / 100).toFixed(2);
 
 function renderMarketplace(){
 
-/* ======================================
-   AUTO REFRESH MARKETPLACE
-====================================== */
-
-setInterval(()=>{
-
-renderMarketplace();
-
-},5000);
-
-window.addEventListener("focus",()=>{
-
-renderMarketplace();
-
-});
-
 const container =
 document.getElementById("projectList");
 
 container.innerHTML = "";
 
 const allProjects =
-typeof getMarketplaceProjects === "function"
-? getMarketplaceProjects()
+typeof getProjects === "function"
+? getProjects()
 : [];
-
+  
 /* SEARCH */
 
 const search =
@@ -571,7 +555,28 @@ alert("Investment successful");
 
 }
 
+/* INITIAL LOAD */
+
 renderMarketplace();
+renderMarketInsights();
+
+/* AUTO REFRESH */
+
+setInterval(()=>{
+
+renderMarketplace();
+renderMarketInsights();
+
+},5000);
+
+/* REFRESH ON TAB FOCUS */
+
+window.addEventListener("focus",()=>{
+
+renderMarketplace();
+renderMarketInsights();
+
+});
 
 </script>
 
