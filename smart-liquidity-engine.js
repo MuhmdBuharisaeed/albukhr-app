@@ -233,7 +233,6 @@ function getProjectTreasuryStatus(project){
 
 /* =========================================
    ALBUKHR CORE LIQUIDITY BOOTSTRAP
-   Initializes ecosystem base liquidity
 ========================================= */
 
 const ALBUKHR_CORE_PROJECTS = [
@@ -250,18 +249,19 @@ const ALBUKHR_CORE_PROJECTS = [
 
 function bootstrapCoreLiquidity(){
 
-const treasury = getTreasury();
+let treasury = getTreasury();
+
+if(!treasury){
+treasury = {};
+}
 
 ALBUKHR_CORE_PROJECTS.forEach(project => {
 
 if(!treasury[project]){
 
 treasury[project] = {
-
 liquidity:1000,
-created:Date.now(),
-core:true
-
+created:Date.now()
 };
 
 }
@@ -272,9 +272,11 @@ saveTreasury(treasury);
 
 }
 
-/* AUTO INITIALIZE CORE LIQUIDITY */
+/* RUN ONCE */
 
+setTimeout(()=>{
 bootstrapCoreLiquidity();
+},100);
 
 /* =========================================
    INTERNAL WITHDRAW (PROJECT OWNER)
