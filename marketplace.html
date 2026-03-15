@@ -57,18 +57,17 @@ letter-spacing:1px;
 }
 
 .marketplace{
-padding:16px;
+padding:10px 12px;
 }
 
 /* PROJECT CARD */
 
 .project-card{
 background:#fff;
-padding:16px;
-border-radius:16px;
-margin-bottom:16px;
-box-shadow:0 6px 18px rgba(0,0,0,0.05);
-transition:.25s ease;
+padding:12px;
+border-radius:14px;
+margin-bottom:12px;
+box-shadow:0 4px 12px rgba(0,0,0,0.05);
 }
 
 .project-card:hover{
@@ -113,7 +112,7 @@ margin-bottom:10px;
 display:flex;
 justify-content:space-between;
 font-size:13px;
-margin-top:5px;
+margin-top:3px;
 }
 
 /* RISK */
@@ -158,9 +157,9 @@ background:linear-gradient(90deg,#0f7a3d,#1ec777);
 /* ROI CALCULATOR */
 
 .roi-box{
-margin-top:10px;
+margin-top:8px;
 background:#f4f7f6;
-padding:10px;
+padding:8px;
 border-radius:10px;
 font-size:13px;
 }
@@ -176,8 +175,8 @@ margin-top:4px;
 /* BUTTON */
 
 .invest-btn{
-margin-top:12px;
-padding:10px;
+margin-top:8px;
+padding:9px;
 border:none;
 border-radius:10px;
 background:#0f7a3d;
@@ -212,9 +211,9 @@ box-shadow:0 4px 12px rgba(0,0,0,0.04);
 }
 
 .market-controls{
-padding:16px;
+padding:12px;
 display:flex;
-gap:10px;
+gap:8px;
 flex-wrap:wrap;
 }
 
@@ -378,21 +377,21 @@ typeof getMostInvestedProjects==="function"
 
 box.innerHTML = `
 
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:12px">
 
 <b>🔥 Trending Projects</b><br>
 ${trending.map(p=>p.name).join("<br>")}
 
 </div>
 
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:12px">
 
 <b>🆕 New Projects</b><br>
 ${newest.map(p=>p.name).join("<br>")}
 
 </div>
 
-<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+<div style="background:#fff;padding:12px;border-radius:14px;margin-bottom:12px">
 
 <b>💰 Most Invested</b><br>
 ${invested.map(p=>p.name).join("<br>")}
