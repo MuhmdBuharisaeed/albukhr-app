@@ -282,12 +282,15 @@ oninput="renderMarketplace()">
 
 </div>
 
+<div id="marketInsights" style="padding:16px"></div>
+
 <div class="marketplace" id="projectList"></div>
 
 <script src="project-creation-engine.js"></script>
 <script src="project-registry.js"></script>
 <script src="staking.js"></script>
 <script src="smart-liquidity-engine.js"></script>
+<script src="js/core-liquidity-engine.js"></script>
 <script src="risk-engine.js"></script>
 <script src="marketplace-engine.js"></script>
 <script src="project-discovery-engine.js"></script>
@@ -295,15 +298,21 @@ oninput="renderMarketplace()">
 <script src="capital-protection-engine.js"></script>
 <script src="js/notifications.js"></script>
 <script src="js/ownership-engine.js"></script>
+<script src="js/marketplace-pro-engine.js"></script>
 
 <script>
 
 function getProjectIcon(name){
 
-if(name.toLowerCase().includes("agro")) return "🌾";
-if(name.toLowerCase().includes("bakery")) return "🍞";
-if(name.toLowerCase().includes("lab")) return "🧪";
-if(name.toLowerCase().includes("transport")) return "🚍";
+name = name.toLowerCase();
+
+if(name.includes("agro")) return "🌾";
+if(name.includes("bakery")) return "🍞";
+if(name.includes("pharma")) return "💊";
+if(name.includes("transport")) return "🚍";
+if(name.includes("recycling")) return "♻️";
+if(name.includes("chemical")) return "🧪";
+if(name.includes("maize")) return "🌽";
 
 return "🏢";
 
@@ -316,6 +325,22 @@ return (amount * roi / 100).toFixed(2);
 }
 
 function renderMarketplace(){
+
+/* ======================================
+   AUTO REFRESH MARKETPLACE
+====================================== */
+
+setInterval(()=>{
+
+renderMarketplace();
+
+},5000);
+
+window.addEventListener("focus",()=>{
+
+renderMarketplace();
+
+});
 
 const container =
 document.getElementById("projectList");
@@ -440,13 +465,15 @@ ${project.description || ""}
 <div class="row">
 <div>Risk</div>
 <div class="risk ${riskData.risk.toLowerCase()}">
-${riskData.risk}
+${getRiskBadge(riskData.risk)}
 </div>
 </div>
 
 <div class="row">
 <div>Pool Liquidity</div>
-<div>${getPoolStatus(project.name).liquidity.toFixed(2)} Pi</div>
+<div>${(typeof getPoolStatus==="function"
+? getPoolStatus(project.name)?.liquidity || 0
+: 0).toFixed(2)} Pi</div>
 </div>
 
 <div class="progress">
@@ -485,6 +512,43 @@ container.appendChild(card);
 });
 
 }
+
+function renderMarketInsights(){
+
+const box = document.getElementById("marketInsights");
+
+if(!box) return;
+
+const hot = getHotProjects();
+const investors = getTopInvestors();
+const liquidity = getLiquidityLeaderboard();
+
+box.innerHTML = `
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>🔥 Hot Projects</b><br>
+${hot.map(p=>`${p.name}`).join("<br>")}
+
+</div>
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>🏆 Top Investors</b><br>
+${investors.map(i=>`${i.user} — ${i.amount.toFixed(2)} Pi`).join("<br>")}
+
+</div>
+
+<div style="background:#fff;padding:16px;border-radius:14px;margin-bottom:16px">
+
+<b>💧 Liquidity Leaders</b><br>
+${liquidity.map(p=>`${p.name} — ${p.liquidity.toFixed(2)} Pi`).join("<br>")}
+
+</div>
+
+`;
+
+  }
 
 function invest(project){
 
