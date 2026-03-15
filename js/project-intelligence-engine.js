@@ -1,5 +1,5 @@
 /* ======================================
-ALBUKHR PROJECT INTELLIGENCE ENGINE
+ALBUKHR PROJECT INTELLIGENCE ENGINE v2
 ====================================== */
 
 function analyzeProject(project){
@@ -50,6 +50,29 @@ let risk = "LOW";
 if(sustainability < 50) risk = "HIGH";
 else if(sustainability < 70) risk = "MEDIUM";
 
+
+/* TRENDING SCORE */
+
+let investors = 0;
+
+if(typeof getAllStakesMerged === "function"){
+investors =
+getAllStakesMerged()
+.filter(s => s.project === project.name).length;
+}
+
+let trendingScore =
+investors * 3 +
+liquiditySafety * 0.5 +
+(project.roi || 0);
+
+
+/* INVESTMENT SCORE */
+
+let investmentScore =
+sustainability +
+liquiditySafety;
+
 return {
 
 risk: risk,
@@ -58,7 +81,11 @@ roiPressure: roiRisk,
 
 liquiditySafety: liquiditySafety.toFixed(0),
 
-score: sustainability
+score: sustainability,
+
+trendingScore: trendingScore,
+
+investmentScore: investmentScore
 
 };
 
