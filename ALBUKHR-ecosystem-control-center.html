@@ -113,6 +113,9 @@ ALBUKHR Ecosystem Control Center
 </div>
 
 <div id="projectList"></div>
+<h3 style="margin-top:20px">Treasury Requests</h3>
+
+<div id="treasuryRequests"></div>
 
 </div>
 
@@ -161,6 +164,68 @@ document.getElementById("totalReserve").innerText =
 totalReserve.toFixed(2) + " Pi";
 
 renderProjects(projects);
+
+}
+
+function renderTreasuryRequests(){
+
+const container =
+document.getElementById("treasuryRequests");
+
+const requests =
+JSON.parse(localStorage.getItem(TREASURY_REQUEST_KEY)) || [];
+
+container.innerHTML = "";
+
+if(!requests.length){
+
+container.innerHTML =
+"<div style='font-size:13px;color:#777'>No treasury requests</div>";
+
+return;
+
+}
+
+requests.slice().reverse().forEach(req => {
+
+const div =
+document.createElement("div");
+
+div.className = "project-card";
+
+div.innerHTML = `
+
+<b>${req.project}</b>
+
+<div class="row">
+<div>Amount</div>
+<div>${req.amount} Pi</div>
+</div>
+
+<div class="row">
+<div>Reason</div>
+<div>${req.reason}</div>
+</div>
+
+<div class="row">
+<div>Status</div>
+<div>${req.status}</div>
+</div>
+
+<button onclick="approveTreasuryFunding('${req.id}')">
+Approve
+</button>
+
+<button class="pause"
+onclick="rejectTreasuryFunding('${req.id}')">
+Reject
+</button>
+
+`;
+
+container.appendChild(div);
+
+});
 
 }
 
@@ -299,9 +364,11 @@ alert("Project paused: " + name);
 }
 
 renderControlCenter();
+renderTreasuryRequests();
 
 setInterval(()=>{
 renderControlCenter();
+renderTreasuryRequests();
 },5000);
 
 </script>
