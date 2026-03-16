@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Albukhr Core Projects Dashboard</title>
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:80px;
+}
+
+.header{
+background:#0f7a3d;
+color:white;
+padding:16px;
+font-weight:700;
+}
+
+.container{
+padding:16px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.project-title{
+font-weight:700;
+margin-bottom:8px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+margin-top:6px;
+}
+
+button{
+margin-top:10px;
+padding:10px;
+border:none;
+border-radius:10px;
+background:#0f7a3d;
+color:white;
+font-weight:600;
+cursor:pointer;
+width:100%;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+ALBUKHR Core Projects Dashboard
+</div>
+
+<div class="container">
+
+<div class="grid" id="projectsGrid"></div>
+
+</div>
+
+<script src="project-registry.js"></script>
+<script src="smart-liquidity-engine.js"></script>
+<script src="staking.js"></script>
+<script src="capital-protection-engine.js"></script>
+
+<script>
+
+/* ===============================
+CORE PROJECTS
+=============================== */
+
+const CORE_PROJECTS = [
+
+"Barsh Agro",
+"Labbaika Bakery",
+"Raheem Pharma",
+"Urban Transport",
+"Khairat Recycling",
+"Azman Chemical",
+"Hauwal Maize"
+
+];
+
+/* ===============================
+RENDER DASHBOARD
+=============================== */
+
+function renderDashboard(){
+
+const container =
+document.getElementById("projectsGrid");
+
+container.innerHTML = "";
+
+const projects =
+typeof getProjects === "function"
+? getProjects()
+: [];
+
+CORE_PROJECTS.forEach(name => {
+
+const project =
+projects.find(p => p.name === name);
+
+if(!project) return;
+
+const treasury =
+getProjectTreasuryStatus(name);
+
+const liquidity =
+treasury.liquidity || 0;
+
+const reserve =
+treasury.reserve || 0;
+
+const investors =
+typeof getAllStakesMerged === "function"
+? getAllStakesMerged()
+.filter(s => s.project === name).length
+: 0;
+
+const roi =
+typeof calculateProjectROI === "function"
+? calculateProjectROI(name)
+: project.roi || 0;
+
+const card =
+document.createElement("div");
+
+card.className = "card";
+
+card.innerHTML = `
+
+<div class="project-title">
+${name}
+</div>
+
+<div class="row">
+<div>Liquidity</div>
+<div>${liquidity.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Reserve</div>
+<div>${reserve.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Investors</div>
+<div>${investors}</div>
+</div>
+
+<div class="row">
+<div>ROI</div>
+<div>${roi}%</div>
+</div>
+
+<button onclick="openProject('${name}')">
+Open Dashboard
+</button>
+
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+/* ===============================
+OPEN PROJECT DASHBOARD
+=============================== */
+
+function openProject(name){
+
+localStorage.setItem(
+"albukhr_current_project",
+name
+);
+
+window.location.href =
+"Albukhr-internal-project-dashboard.html";
+
+}
+
+/* ===============================
+AUTO REFRESH
+=============================== */
+
+renderDashboard();
+
+setInterval(()=>{
+renderDashboard();
+},4000);
+
+</script>
+
+</body>
+</html>
