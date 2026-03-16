@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Albukhr Ecosystem Dashboard</title>
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:80px;
+}
+
+.header{
+background:#0f7a3d;
+color:white;
+padding:16px;
+font-weight:700;
+}
+
+.container{
+padding:16px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+margin-bottom:16px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.big{
+font-size:22px;
+font-weight:800;
+color:#0f7a3d;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+margin-top:6px;
+}
+
+.project-card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+margin-bottom:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+ALBUKHR Ecosystem Master Dashboard
+</div>
+
+<div class="container">
+
+<div class="grid">
+
+<div class="card">
+<div>Total Projects</div>
+<div class="big" id="totalProjects">0</div>
+</div>
+
+<div class="card">
+<div>Total Liquidity</div>
+<div class="big" id="totalLiquidity">0 Pi</div>
+</div>
+
+<div class="card">
+<div>Total Investors</div>
+<div class="big" id="totalInvestors">0</div>
+</div>
+
+<div class="card">
+<div>Total Reserve</div>
+<div class="big" id="totalReserve">0 Pi</div>
+</div>
+
+</div>
+
+<div id="projectList"></div>
+
+</div>
+
+<script src="project-registry.js"></script>
+<script src="smart-liquidity-engine.js"></script>
+<script src="staking.js"></script>
+<script src="capital-protection-engine.js"></script>
+
+<script>
+
+function renderDashboard(){
+
+const projects =
+typeof getProjects === "function"
+? getProjects()
+: [];
+
+const stakes =
+typeof getAllStakesMerged === "function"
+? getAllStakesMerged()
+: [];
+
+let totalLiquidity = 0;
+let totalReserve = 0;
+
+projects.forEach(project => {
+
+const treasury =
+getProjectTreasuryStatus(project.name);
+
+totalLiquidity += treasury.liquidity || 0;
+totalReserve += treasury.reserve || 0;
+
+});
+
+document.getElementById("totalProjects").innerText =
+projects.length;
+
+document.getElementById("totalLiquidity").innerText =
+totalLiquidity.toFixed(2) + " Pi";
+
+document.getElementById("totalInvestors").innerText =
+stakes.length;
+
+document.getElementById("totalReserve").innerText =
+totalReserve.toFixed(2) + " Pi";
+
+renderProjects(projects);
+
+}
+
+function renderProjects(projects){
+
+const container =
+document.getElementById("projectList");
+
+container.innerHTML = "";
+
+projects.forEach(project => {
+
+const treasury =
+getProjectTreasuryStatus(project.name);
+
+const investors =
+typeof getAllStakesMerged === "function"
+? getAllStakesMerged()
+.filter(s => s.project === project.name).length
+: 0;
+
+const roi =
+typeof calculateProjectROI === "function"
+? calculateProjectROI(project.name)
+: project.roi || 0;
+
+const div =
+document.createElement("div");
+
+div.className = "project-card";
+
+div.innerHTML = `
+
+<b>${project.name}</b>
+
+<div class="row">
+<div>Liquidity</div>
+<div>${treasury.liquidity.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Reserve</div>
+<div>${treasury.reserve.toFixed(2)} Pi</div>
+</div>
+
+<div class="row">
+<div>Investors</div>
+<div>${investors}</div>
+</div>
+
+<div class="row">
+<div>ROI</div>
+<div>${roi}%</div>
+</div>
+
+`;
+
+container.appendChild(div);
+
+});
+
+}
+
+renderDashboard();
+
+setInterval(()=>{
+renderDashboard();
+},5000);
+
+</script>
+
+</body>
+</html>
