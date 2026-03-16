@@ -119,6 +119,7 @@ ALBUKHR Ecosystem Control Center
 <script src="project-registry.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 <script src="staking.js"></script>
+<script src="albukhr-treasury-engine.js"></script>
 
 <script>
 
@@ -160,6 +161,63 @@ document.getElementById("totalReserve").innerText =
 totalReserve.toFixed(2) + " Pi";
 
 renderProjects(projects);
+
+}
+
+function approveTreasuryFunding(requestId){
+
+const requests =
+JSON.parse(localStorage.getItem(TREASURY_REQUEST_KEY)) || [];
+
+const req =
+requests.find(r => r.id === requestId);
+
+if(!req) return {error:"Request not found"};
+
+if(req.status !== "pending")
+return {error:"Already processed"};
+
+const treasury = getEcosystemTreasury();
+
+if(treasury.balance < req.amount){
+return {error:"Treasury insufficient"};
+}
+
+/* execute funding */
+
+treasury.balance -= req.amount;
+
+saveEcosystemTreasury(treasury);
+
+addProjectLiquidity(req.project, req.amount);
+
+req.status = "approved";
+
+localStorage.setItem(
+TREASURY_REQUEST_KEY,
+JSON.stringify(requests)
+);
+
+return {success:true};
+
+}
+
+function rejectTreasuryFunding(requestId){
+
+const requests =
+JSON.parse(localStorage.getItem(TREASURY_REQUEST_KEY)) || [];
+
+const req =
+requests.find(r => r.id === requestId);
+
+if(!req) return;
+
+req.status = "rejected";
+
+localStorage.setItem(
+TREASURY_REQUEST_KEY,
+JSON.stringify(requests)
+);
 
 }
 
