@@ -40,7 +40,7 @@ body{
 /* SCROLL ONLY HISTORY */
 .scroll-area{
   position:fixed;
-  top:340px;
+  top:320px;   /* instead of 120px */
   bottom:0;
   left:0;
   right:0;
@@ -136,8 +136,8 @@ input,select{
 
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
-    <button onclick="goToWithdraw()" class="btn secondary">
-      💸 Withdraw Rewards
+    <button onclick="withdrawRewardFromAzman()" class="btn secondary">
+💸 Withdraw Rewards
     </button>
   </div>
 
@@ -317,15 +317,42 @@ function load(){
     });
 }
 
-function goToWithdraw(){
-  const summary = getWalletSummary();
+function withdrawRewardFromAzman(){
 
-  if(summary.available <= 0){
-    alert("No available rewards to withdraw.");
+  const data = getProjectTotals("Azman");
+
+  let totalReward = 0;
+
+  data.stakes.forEach(s=>{
+    totalReward += Number(s.remainingReward ?? 0);
+  });
+
+  if(totalReward <= 0){
+    alert("No rewards available.");
     return;
   }
 
-  window.location.href = "wallet.html";
+  const stakes = data.stakes;
+
+  stakes.forEach(s=>{
+
+    if(s.remainingReward > 0){
+
+      withdrawStakeReward(s.id);
+
+      recordWithdraw({
+        project:"Azman",
+        grossAmount:s.remainingReward,
+        timestamp:Date.now()
+      });
+
+    }
+
+  });
+
+  alert("Rewards withdrawn successfully.");
+
+  load();
 }
 
 load();
