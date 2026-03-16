@@ -5,6 +5,8 @@
 
 const TREASURY_MAIN_KEY = "albukhr_ecosystem_treasury";
 
+const TREASURY_REQUEST_KEY = "albukhr_treasury_requests";
+
 /* =========================================
    STORAGE
 ========================================= */
@@ -43,6 +45,42 @@ localStorage.setItem(
 TREASURY_MAIN_KEY,
 JSON.stringify(data)
 );
+
+}
+
+function requestTreasuryFunding(project, amount, reason){
+
+amount = Number(amount);
+
+if(!amount || amount <= 0){
+return {error:"Invalid funding request"};
+}
+
+const requests =
+JSON.parse(localStorage.getItem(TREASURY_REQUEST_KEY)) || [];
+
+const request = {
+
+id:"TR-" + Date.now(),
+project,
+amount,
+reason,
+status:"pending",
+created:Date.now()
+
+};
+
+requests.push(request);
+
+localStorage.setItem(
+TREASURY_REQUEST_KEY,
+JSON.stringify(requests)
+);
+
+return {
+success:true,
+requestId:request.id
+};
 
 }
 
