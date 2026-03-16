@@ -249,6 +249,16 @@ margin-bottom:6px;
 #marketInsights{
 margin-bottom:6px;
 }
+
+.core-badge{
+background:#e8f7ee;
+color:#0f7a3d;
+font-size:10px;
+font-weight:700;
+padding:2px 6px;
+border-radius:6px;
+margin-left:6px;
+}
 </style>
 
 </head>
@@ -369,6 +379,10 @@ return "🏢";
 
 }
 
+function isCoreProject(name){
+return ALBUKHR_CORE_PROJECTS.includes(name);
+}
+
 function calculateROI(amount, roi){
 
 return (amount * roi / 100).toFixed(2);
@@ -469,10 +483,16 @@ ${getProjectIcon(project.name)}
 </div>
 
 <div class="project-title">
-${project.name}
-${investors > 20 ? '<span class="trend">🔥 Trending</span>' : ''}
-</div>
 
+${project.name}
+
+${isCoreProject(project.name) ? 
+'<span class="core-badge">CORE</span>' : ''}
+
+${investors > 20 ? 
+'<span class="trend">🔥 Trending</span>' : ''}
+
+</div>
 </div>
 
 <div class="project-desc">
