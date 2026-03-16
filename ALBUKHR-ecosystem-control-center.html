@@ -113,6 +113,11 @@ ALBUKHR Ecosystem Control Center
 </div>
 
 <div id="projectList"></div>
+
+<h3 style="margin-top:25px">Economic Intelligence</h3>
+
+<div id="economicPanel"></div>
+
 <h3 style="margin-top:20px">Treasury Requests</h3>
 
 <div id="treasuryRequests"></div>
@@ -227,6 +232,79 @@ Reject
 container.appendChild(div);
 
 });
+
+}
+
+function renderEconomicPanel(){
+
+const container =
+document.getElementById("economicPanel");
+
+if(!container) return;
+
+const liquidityPriority =
+typeof getLiquidityPriority === "function"
+? getLiquidityPriority(3)
+: [];
+
+const profitProjects =
+typeof getTopProfitProjects === "function"
+? getTopProfitProjects(3)
+: [];
+
+const riskProjects =
+typeof getHighRiskProjects === "function"
+? getHighRiskProjects(3)
+: [];
+
+container.innerHTML = `
+
+<div class="card">
+
+<b>Projects Needing Liquidity</b>
+
+<br><br>
+
+${liquidityPriority.map(p=>`
+<div class="row">
+<div>${p.project}</div>
+<div>${p.liquidityNeed}</div>
+</div>
+`).join("")}
+
+</div>
+
+<div class="card" style="margin-top:10px">
+
+<b>Top Profit Projects</b>
+
+<br><br>
+
+${profitProjects.map(p=>`
+<div class="row">
+<div>${p.project}</div>
+<div>${p.profitScore}</div>
+</div>
+`).join("")}
+
+</div>
+
+<div class="card" style="margin-top:10px">
+
+<b>High Risk Projects</b>
+
+<br><br>
+
+${riskProjects.map(p=>`
+<div class="row">
+<div>${p.project}</div>
+<div>${p.risk}</div>
+</div>
+`).join("")}
+
+</div>
+
+`;
 
 }
 
@@ -366,10 +444,12 @@ alert("Project paused: " + name);
 
 renderControlCenter();
 renderTreasuryRequests();
+renderEconomicPanel();
 
 setInterval(()=>{
 renderControlCenter();
 renderTreasuryRequests();
+renderEconomicPanel();
 },5000);
 
 </script>
