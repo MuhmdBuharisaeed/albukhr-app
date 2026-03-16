@@ -149,6 +149,34 @@ function getProjectTotals(project){
 }
 
 /* ======================================
+   WITHDRAW REWARD (DASHBOARD)
+====================================== */
+function withdrawStakeReward(stakeId){
+
+const stakes = _safeParse(INTERNAL_KEY);
+
+const stake = stakes.find(s => s.id === stakeId);
+
+if(!stake) return {error:"Stake not found"};
+
+if(!stake.remainingReward || stake.remainingReward <= 0){
+return {error:"No reward available"};
+}
+
+const amount = Number(stake.remainingReward);
+
+stake.remainingReward = 0;
+
+_save(INTERNAL_KEY,stakes);
+
+return {
+success:true,
+amount
+};
+
+}
+
+/* ======================================
    LEGACY WRAPPERS
 ====================================== */
 function getStakes(){ return getAllStakesMerged(); }
