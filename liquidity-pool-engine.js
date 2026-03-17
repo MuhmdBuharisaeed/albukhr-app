@@ -111,9 +111,14 @@ pools[project].liquidity -= amount;
 
 savePools(pools);
 
+/* ✅ ADD THIS HERE */
+if(typeof recordLiquidityTx === "function"){
+  recordLiquidityTx(project, -amount); // 🔥 negative = usage
+}
+
 return {
-success:true,
-remaining: pools[project].liquidity
+  success:true,
+  remaining: pools[project].liquidity
 };
 
 }
