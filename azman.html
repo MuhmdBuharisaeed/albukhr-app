@@ -375,23 +375,22 @@ function withdrawRewardFromAzman(){
     return;
   }
 
-  data.stakes.forEach(s=>{
+  stakes.forEach(s=>{
 
-    const amount = Number(s.remainingReward) || 0; // ✅ save first
+  const amount = Number(s.remainingReward) || 0; // ✅ SAVE FIRST
 
-    if(amount > 0){
+  if(amount > 0){
 
-      withdrawStakeReward(s.id);
+    withdrawStakeReward(s.id);
 
-      recordWithdraw({
-        project:"Azman",
-        grossAmount:amount, // ✅ FIX
-        timestamp:Date.now()
-      });
-
+    /* ✅ ADD THIS HERE */
+    if(typeof recordWithdrawTx === "function"){
+      recordWithdrawTx("Azman", amount);
     }
 
-  });
+  }
+
+});
 
   alert("Rewards withdrawn successfully.");
 
