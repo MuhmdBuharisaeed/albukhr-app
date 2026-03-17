@@ -158,6 +158,7 @@
   </div>
 </div>
 
+<script src="js/albukhr-transaction-engine.js"></script>
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
@@ -267,72 +268,67 @@ function load(){
 
   azmanHistory.innerHTML = "";
 
-  const merged = [];
+/* =====================================
+   TRANSACTION ENGINE VIEW
+===================================== */
 
-  data.stakes.forEach(s=>{
-    merged.push({ type:"stake", data:s, timestamp:s.timestamp });
-  });
+const txs = getTxByProject("Azman");
 
-  getWithdrawHistory()
-    .filter(tx=>tx.project==="Azman")
-    .forEach(tx=>{
-      merged.push({ type:"withdraw", data:tx, timestamp:tx.timestamp });
-    });
+if(!txs.length){
+  azmanHistory.innerHTML =
+    "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+  return;
+}
 
-  if(merged.length === 0){
-    azmanHistory.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
-    return;
+txs
+.sort((a,b)=>b.timestamp - a.timestamp)
+.forEach(tx=>{
+
+  const div = document.createElement("div");
+  div.className="project-tx";
+
+  let icon = "🧪";
+  let label = "Transaction";
+  let color = "success-status";
+  let sign = "+";
+
+  if(tx.type === "withdraw"){
+    icon = "💸";
+    label = "Withdraw";
+    color = "withdraw-status";
+    sign = "-";
   }
 
-  merged
-    .sort((a,b)=>b.timestamp - a.timestamp)
-    .forEach(item=>{
+  if(tx.type === "stake"){
+    label = "Stake";
+  }
 
-      if(item.type==="stake"){
-        const s = item.data;
-        const t = formatDateTime(s);
+  if(tx.type === "reward"){
+    icon = "🎁";
+    label = "Reward";
+  }
 
-        const div = document.createElement("div");
-        div.className="project-tx";
-        div.innerHTML=`
-          <div class="project-icon">🧪</div>
-          <div class="project-body">
-            <div class="project-title">Stake</div>
-            <div class="project-date">${t.date} • ${t.time}</div>
-          </div>
-          <div class="project-right">
-            <div class="project-amount">+${Number(s.amount).toFixed(2)} Pi</div>
-            <div class="project-status success-status">Staked</div>
-          </div>
-        `;
-        azmanHistory.appendChild(div);
-      }
+  div.innerHTML = `
+    <div class="project-icon">${icon}</div>
 
-      if(item.type==="withdraw"){
-        const tx = item.data;
+    <div class="project-body">
+      <div class="project-title">${label}</div>
+      <div class="project-date">
+        ${new Date(tx.timestamp).toLocaleString()}
+      </div>
+    </div>
 
-        const div = document.createElement("div");
-        div.className="project-tx";
-        div.innerHTML=`
-          <div class="project-icon">💸</div>
-          <div class="project-body">
-            <div class="project-title">Reward Withdrawal</div>
-            <div class="project-date">
-              ${new Date(tx.timestamp).toLocaleString()}
-            </div>
-          </div>
-          <div class="project-right">
-            <div class="project-amount withdraw-status">
-              -${Number(tx.grossAmount).toFixed(2)} Pi
-            </div>
-            <div class="project-status withdraw-status">Withdrawn</div>
-          </div>
-        `;
-        azmanHistory.appendChild(div);
-      }
+    <div class="project-right">
+      <div class="project-amount ${color}">
+        ${sign}${Number(tx.amount).toFixed(2)} Pi
+      </div>
+    </div>
+  `;
 
-    });
+  azmanHistory.appendChild(div);
+
+});
+
 }
 
 function getWithdrawHistory(){
