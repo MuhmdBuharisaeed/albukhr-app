@@ -196,9 +196,17 @@ const successModal = document.getElementById("successModal");
 const infoModal = document.getElementById("infoModal");
 
 function openModal(){
+
+  /* ✅ RESET FORM BEFORE OPEN */
+  amountInput.value = "";
+  durationSelect.value = "180";
+
   stakeModal.style.display="flex";
-  minHint.innerText = "Minimum stake: " + getMinStake("Azman") + " Pi";
-}
+
+  minHint.innerText =
+    "Minimum stake: " + getMinStake("Azman") + " Pi";
+    }
+
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
 function openInfo(){ infoModal.style.display="flex"; }
@@ -224,10 +232,14 @@ function confirmStake(){
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days in Azman Futures Lab.`;
 
+  /* ✅ CLEAR FORM HERE */
+  amountInput.value = "";
+  durationSelect.value = "180";
+
   closeModal();
   successModal.style.display="flex";
   load();
-}
+  }
 
 /* =========================================
    FILTERS
