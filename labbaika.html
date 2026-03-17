@@ -6,84 +6,69 @@
 <title>Labbaika Bakery Center</title>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/global-core.css">
+<link rel="stylesheet" href="css/global-layout.css">
+<link rel="stylesheet" href="css/global-components.css">
+<link rel="stylesheet" href="css/global-style.css">
 
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#f5f7f6;
-  display:flex;
-  flex-direction:column;
-  height:100vh;
-}
-
-/* HEADER FIXED */
-.header{
-  flex-shrink:0;
-}
-
-/* TOP FIXED AREA */
-.fixed-area{
-  padding:16px;
-  flex-shrink:0;
-  background:#f5f7f6;
-}
-
-/* STATS */
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
-.stat-card span{display:block;color:#666;font-size:14px}
-.stat-card strong{font-size:18px;margin-top:6px;display:block}
-
-/* INFO */
-.short-info{
-  background:#fff;border-radius:12px;padding:12px;
-  font-size:13px;color:#444;line-height:1.5;margin-bottom:14px
-}
-
-/* BUTTONS */
-.btns{display:flex;gap:12px;margin-top:12px}
-.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-
-/* SCROLL AREA */
-.scroll-area{
+.btn{
   flex:1;
-  overflow-y:auto;
-  padding:16px;
+  padding:12px;
+  border-radius:var(--radius-md);
+  font-weight:600;
+  font-size:15px;
 }
 
-/* TRANSACTIONS */
-.project-tx{
-  background:#fff;border-radius:12px;padding:10px 12px;
-  margin-bottom:8px;display:flex;align-items:center;gap:10px
+.btn-primary{
+  background:var(--albukhr-green);
+  color:#fff;
+  border:none;
 }
-.project-icon{font-size:18px}
-.project-body{flex:1}
-.project-title{font-size:14px;font-weight:600}
-.project-date{font-size:11px;color:#777}
-.project-right{text-align:right}
-.project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
 
-/* MODALS */
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.4);
-  display:none;align-items:center;justify-content:center;z-index:1000
+.btn-outline{
+  background:#fff;
+  border:1px solid var(--albukhr-green);
+  color:var(--albukhr-green);
 }
-.modal-box{
-  background:#fff;width:90%;max-width:420px;
-  padding:20px;border-radius:16px
+
+.card{
+  background:var(--card);
+  border-radius:var(--radius-lg);
+  padding:14px;
+  font-size:14px;
+  line-height:1.5;
+  color:var(--subtext);
 }
-label{margin-top:12px;display:block}
-input,select{
-  width:100%;padding:12px;margin-top:6px;
-  border-radius:10px;border:1px solid #ccc;font-size:16px
+
+.tx{
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
-.success{text-align:center}
-.success h3{color:#0f7a3d;margin-bottom:8px}
+
+.tx-title{
+  font-size:13px;
+  font-weight:600;
+}
+
+.tx-date{
+  font-size:11px;
+  color:#777;
+}
+
+.tx-amount{
+  font-weight:bold;
+}
+
+.tx-success{color:var(--success)}
+.tx-danger{color:var(--danger)}
 </style>
+
 </head>
 
 <body>
