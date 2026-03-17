@@ -200,6 +200,59 @@ function confirmStake(){
   load();
 }
 
+/* =========================================
+   FILTERS
+========================================= */
+
+function getTxByProject(project){
+  return getTransactions()
+    .filter(t => t.project === project);
+}
+
+function getTxByType(type){
+  return getTransactions()
+    .filter(t => t.type === type);
+}
+
+function getRecentTx(limit = 20){
+  return getTransactions()
+    .slice()
+    .reverse()
+    .slice(0, limit);
+  }
+
+function recordStake(project, amount){
+  return recordTx({
+    type:"stake",
+    project,
+    amount
+  });
+}
+
+function recordWithdrawTx(project, amount){
+  return recordTx({
+    type:"withdraw",
+    project,
+    amount
+  });
+}
+
+function recordRewardTx(project, amount){
+  return recordTx({
+    type:"reward",
+    project,
+    amount
+  });
+}
+
+function recordLiquidityTx(project, amount){
+  return recordTx({
+    type:"liquidity",
+    project,
+    amount
+  });
+}
+
 function load(){
 
   const data = getProjectTotals("Azman");
