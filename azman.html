@@ -101,7 +101,7 @@
 
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
-    <button onclick="withdrawRewardFromAzman()" class="btn secondary">
+    <button onclick="openWithdrawModal()" class="btn secondary">
 💸 Withdraw Rewards
     </button>
   </div>
@@ -155,6 +155,23 @@
       prototyping, advanced training, and long-term technology development.
     </p>
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
+  </div>
+</div>
+
+<div class="modal" id="withdrawModal">
+  <div class="modal-box">
+    <h3>Withdraw Rewards</h3>
+
+    <label>Amount (Pi)</label>
+    <input type="number" id="withdrawAmount">
+
+    <label>Wallet Address</label>
+    <input type="text" id="walletAddress">
+
+    <div class="btns" style="margin-top:16px">
+      <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -361,6 +378,74 @@ function formatDateTime(s){
   };
 
 }
+
+function openWithdrawModal(){
+  document.getElementById("withdrawModal").style.display = "flex";
+}
+
+function closeWithdraw(){
+  document.getElementById("withdrawModal").style.display = "none";
+}
+
+function confirmWithdraw(){
+
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  const wallet = document.getElementById("walletAddress").value;
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(!wallet){
+    alert("Enter wallet address");
+    return;
+  }
+
+  const data = getProjectTotals("Azman");
+
+  let available = 0;
+
+  data.stakes.forEach(s=>{
+    available += Number(s.remainingReward) || 0;
+  });
+
+  if(amount > available){
+    alert("Insufficient reward balance");
+    return;
+  }
+
+  /* DISTRIBUTE WITHDRAW */
+  let remaining = amount;
+
+  data.stakes.forEach(s=>{
+
+    if(remaining <= 0) return;
+
+    let r = Number(s.remainingReward) || 0;
+
+    if(r > 0){
+
+      let take = Math.min(r, remaining);
+
+      withdrawStakeReward(s.id, take);
+
+      remaining -= take;
+
+    }
+
+  });
+
+  /* RECORD TX */
+  if(typeof recordWithdrawTx === "function"){
+    recordWithdrawTx("Azman", amount);
+  }
+
+  alert("Withdrawal successful");
+
+  closeWithdraw();
+  load();
+  }
 
 function withdrawRewardFromAzman(){
 
