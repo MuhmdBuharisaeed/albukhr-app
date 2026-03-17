@@ -27,13 +27,16 @@ stake.remainingReward =
 });
 
 localStorage.setItem(
-STAKE_KEY,
-JSON.stringify(stakes)
+  STAKE_KEY,
+  JSON.stringify(stakes)
 );
 
-return true;
-
+/* SAFE CALL */
+if(typeof recordRewardTx === "function"){
+  recordRewardTx(projectId, amount);
 }
+
+return true;
 
 /* SYNC PROJECT REWARDS */
 
