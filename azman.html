@@ -163,10 +163,21 @@
     <h3>Withdraw Rewards</h3>
 
     <label>Amount (Pi)</label>
-    <input type="number" id="withdrawAmount">
+    <div style="display:flex; gap:8px">
+      <input type="number" id="withdrawAmount" style="flex:1">
+      <button class="btn secondary" onclick="setMaxWithdraw()">MAX</button>
+    </div>
+
+    <small id="availableBalance" style="color:#0f7a3d;display:block;margin-top:6px">
+      Available: 0 Pi
+    </small>
 
     <label>Wallet Address</label>
     <input type="text" id="walletAddress">
+
+    <small style="color:#777;display:block;margin-top:6px">
+      Fee: 2%
+    </small>
 
     <div class="btns" style="margin-top:16px">
       <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
@@ -446,6 +457,120 @@ function confirmWithdraw(){
   closeWithdraw();
   load();
   }
+
+function openWithdrawModal(){
+
+  const data = getProjectTotals("Azman");
+
+  let total = 0;
+
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
+
+  document.getElementById("availableBalance").innerText =
+    "Available: " + total.toFixed(2) + " Pi";
+
+  /* AUTO WALLET (if exists) */
+  const wallet = localStorage.getItem("user_wallet") || "";
+  document.getElementById("walletAddress").value = wallet;
+
+  document.getElementById("withdrawModal").style.display = "flex";
+    }
+
+function setMaxWithdraw(){
+
+  const data = getProjectTotals("Azman");
+
+  let total = 0;
+
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
+
+  document.getElementById("withdrawAmount").value =
+    total.toFixed(2);
+    }
+
+function confirmWithdraw(){
+
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  const wallet = document.getElementById("walletAddress").value;
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(!wallet){
+    alert("Enter wallet address");
+    return;
+  }
+
+  const data = getProjectTotals("Azman");
+
+  let available = 0;
+
+  data.stakes.forEach(s=>{
+    available += Number(s.remainingReward) || 0;
+  });
+
+  if(amount > available){
+    alert("Insufficient balance");
+    return;
+  }
+
+  /* 💸 FEE SYSTEM */
+  const fee = amount * 0.02;
+  const net = amount - fee;
+
+  /* PROCESS UI */
+  document.querySelector("#withdrawModal h3").innerText = "Processing...";
+
+  setTimeout(()=>{
+
+    let remaining = amount;
+
+    data.stakes.forEach(s=>{
+
+      if(remaining <= 0) return;
+
+      let r = Number(s.remainingReward) || 0;
+
+      if(r > 0){
+
+        let take = Math.min(r, remaining);
+
+        withdrawStakeReward(s.id, take);
+
+        remaining -= take;
+
+      }
+
+    });
+
+    /* SAVE WALLET */
+    localStorage.setItem("user_wallet", wallet);
+
+    /* RECORD TX */
+    if(typeof recordWithdrawTx === "function"){
+      recordWithdrawTx("Azman", amount);
+    }
+
+    alert(`Withdraw successful\n\nAmount: ${amount} Pi\nFee: ${fee.toFixed(2)} Pi\nYou receive: ${net.toFixed(2)} Pi`);
+
+    document.querySelector("#withdrawModal h3").innerText = "Withdraw Rewards";
+
+    closeWithdraw();
+    load();
+
+  }, 1200); // simulate processing
+
+  }
+
+function closeWithdraw(){
+  document.getElementById("withdrawModal").style.display = "none";
+}
 
 function withdrawRewardFromAzman(){
 
