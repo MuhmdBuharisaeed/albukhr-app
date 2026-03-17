@@ -506,6 +506,9 @@ function confirmWithdraw(){
     alert("Enter wallet address");
     return;
   }
+  
+/* 🧠 AI LAYER */
+  const status = aiApproveWithdraw(amount);
 
   const data = getProjectTotals("Azman");
 
@@ -571,6 +574,19 @@ function confirmWithdraw(){
 function closeWithdraw(){
   document.getElementById("withdrawModal").style.display = "none";
 }
+
+function aiApproveWithdraw(amount){
+
+  if(amount < 100){
+    return "approved"; // small → auto
+  }
+
+  if(amount < 500){
+    return "review"; // medium → semi-auto
+  }
+
+  return "flagged"; // large → risk
+  }
 
 function withdrawRewardFromAzman(){
 
