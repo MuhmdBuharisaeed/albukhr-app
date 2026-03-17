@@ -452,7 +452,24 @@ function confirmWithdraw(){
     recordWithdrawTx("Azman", amount);
   }
 
-  alert("Withdrawal successful");
+  /* AFTER SUCCESS */
+
+const save = confirm(
+  "✅ Withdraw successful\n\nDo you want to save this wallet address for future use?"
+);
+
+if(save){
+  localStorage.setItem("user_wallet", wallet);
+}else{
+  localStorage.removeItem("user_wallet");
+}
+
+/* CLEAR ONLY AMOUNT (NOT WALLET) */
+document.getElementById("withdrawAmount").value = "";
+
+/* CLOSE + REFRESH */
+closeWithdraw();
+load();
 
   closeWithdraw();
   load();
