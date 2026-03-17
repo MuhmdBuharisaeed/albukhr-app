@@ -282,32 +282,57 @@ function load(){
     });
 }
 
+function getWithdrawHistory(){
+  return JSON.parse(localStorage.getItem("albukhr_withdrawals")) || [];
+}
+
+function recordWithdraw(data){
+
+  const list =
+  JSON.parse(localStorage.getItem("albukhr_withdrawals")) || [];
+
+  list.push({
+    ...data,
+    id:"WD-"+Date.now()
+  });
+
+  localStorage.setItem(
+    "albukhr_withdrawals",
+    JSON.stringify(list)
+  );
+    }
+
+function formatDateTime(s){
+
+  const d = new Date(s.timestamp);
+
+  return {
+    date: d.toLocaleDateString(),
+    time: d.toLocaleTimeString()
+  };
+
+}
+
 function withdrawRewardFromAzman(){
 
   const data = getProjectTotals("Azman");
 
-  let totalReward = 0;
-
-  data.stakes.forEach(s=>{
-    totalReward += Number(s.remainingReward ?? 0);
-  });
-
-  if(totalReward <= 0){
+  if(!data.stakes.length){
     alert("No rewards available.");
     return;
   }
 
-  const stakes = data.stakes;
+  data.stakes.forEach(s=>{
 
-  stakes.forEach(s=>{
+    const amount = Number(s.remainingReward) || 0; // ✅ save first
 
-    if(s.remainingReward > 0){
+    if(amount > 0){
 
       withdrawStakeReward(s.id);
 
       recordWithdraw({
         project:"Azman",
-        grossAmount:s.remainingReward,
+        grossAmount:amount, // ✅ FIX
         timestamp:Date.now()
       });
 
@@ -318,7 +343,7 @@ function withdrawRewardFromAzman(){
   alert("Rewards withdrawn successfully.");
 
   load();
-}
+  }
 
 load();
 </script>
