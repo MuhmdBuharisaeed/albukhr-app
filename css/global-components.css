@@ -1,0 +1,19 @@
+.stat-card{
+  flex:1;
+  background:var(--card);
+  border-radius:var(--radius-lg);
+  padding:14px;
+  text-align:center;
+}
+
+.stat-card span{
+  font-size:12px;
+  color:var(--subtext);
+}
+
+.stat-card strong{
+  display:block;
+  margin-top:4px;
+  font-size:18px;
+  color:var(--albukhr-green);
+}
