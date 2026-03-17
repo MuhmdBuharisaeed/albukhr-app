@@ -97,6 +97,7 @@ function addStake({project,amount,duration}){
   });
 
   _save(INTERNAL_KEY,stakes);
+  recordStake(project, safeAmount);
   return true;
 }
 
