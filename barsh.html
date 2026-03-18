@@ -285,9 +285,7 @@ function load(){
           <div class="project-icon">🌾</div>
           <div class="project-body">
             <div class="project-title">Stake</div>
-<!-- ===============================
-   SCRIPTS
-=============================== -->
+          
 <script src="js/albukhr-transaction-engine.js"></script>
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
@@ -302,7 +300,6 @@ const infoModal = document.getElementById("infoModal");
 ========================= */
 function openModal(){
 
-  /* RESET FORM */
   amountInput.value = "";
   durationSelect.value = "180";
 
@@ -342,7 +339,7 @@ function confirmStake(){
     return;
   }
 
-  /* ✅ RECORD TX */
+  /* RECORD TRANSACTION */
   recordTx({
     type:"stake",
     project:"Barsh",
@@ -352,7 +349,6 @@ function confirmStake(){
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days in Barsh Agro.`;
 
-  /* CLEAR FORM */
   amountInput.value = "";
   durationSelect.value = "180";
 
@@ -362,22 +358,20 @@ function confirmStake(){
 }
 
 /* =========================
-   SAFE FORMAT
+   FORMAT
 ========================= */
 function safe(n){
   return Number(n || 0).toFixed(2);
 }
 
 /* =========================
-   LOAD DASHBOARD + HISTORY
+   LOAD
 ========================= */
 function load(){
 
   const data = getProjectTotals("Barsh");
 
-  /* LIVE REWARD */
   let reward = 0;
-
   data.stakes.forEach(s=>{
     reward += Number(s.remainingReward ?? s.reward) || 0;
   });
@@ -387,9 +381,7 @@ function load(){
 
   barshHistory.innerHTML = "";
 
-  /* ===============================
-     UNIFIED TRANSACTION VIEW
-  =============================== */
+  /* ===== TRANSACTION ENGINE ===== */
 
   const txs = getTransactions()
     .filter(t => t.project === "Barsh");
@@ -447,7 +439,7 @@ function load(){
 }
 
 /* =========================
-   WITHDRAW (TEMP → WALLET)
+   WITHDRAW
 ========================= */
 function goToWithdraw(){
 
@@ -461,9 +453,7 @@ function goToWithdraw(){
   window.location.href = "wallet.html";
 }
 
-/* =========================
-   INIT
-========================= */
+/* INIT */
 load();
 </script>
 
