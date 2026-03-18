@@ -6,106 +6,117 @@
 <title>Barsh Agro</title>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/global-core.css">
+<link rel="stylesheet" href="css/global-layout.css">
+<link rel="stylesheet" href="css/global-components.css">
+<link rel="stylesheet" href="css/global-style.css">
 
 <style>
 body{
   margin:0;
-  font-family:Arial;
-  background:#f5f7f6;
-  overflow:hidden;
+  font-family:system-ui;
+  background:#f4f7f6;
 }
 
-/* HEADER FIXED */
+/* HEADER */
 .header{
   position:fixed;
   top:0;
   left:0;
   right:0;
+  height:60px;
+  background:#0f7a3d;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  color:#fff;
   z-index:1000;
 }
 
-/* FIXED TOP CONTENT */
-.fixed-area{
-  position:fixed;
-  top:60px;
-  left:0;
-  right:0;
-  background:#f5f7f6;
+/* CONTENT */
+.container{
   padding:16px;
-  z-index:999;
+  padding-top:80px;
 }
 
-/* SCROLLABLE HISTORY */
-.scroll-area{
-  position:fixed;
-  top:340px;
-  bottom:0;
-  left:0;
-  right:0;
-  overflow-y:auto;
-  padding:16px;
+/* STATS */
+.stats{display:flex;gap:10px;margin-bottom:14px}
+.stat-card{
+  flex:1;background:#fff;border-radius:14px;
+  padding:14px;text-align:center;
+  box-shadow:0 4px 10px rgba(0,0,0,0.04);
+}
+.stat-card span{font-size:12px;color:#777}
+.stat-card strong{
+  display:block;margin-top:6px;font-size:18px;color:#0f7a3d;
 }
 
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
-.stat-card span{display:block;color:#666;font-size:14px}
-.stat-card strong{font-size:18px;margin-top:6px;display:block}
-
+/* INFO */
 .short-info{
   background:#fff;border-radius:14px;padding:14px;
-  margin-top:14px;font-size:14px;color:#444;line-height:1.6
+  font-size:13px;color:#555;line-height:1.5;margin-bottom:12px;
 }
 
-.btns{display:flex;gap:12px;margin-top:12px}
-.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
+/* BUTTONS */
+.btns{display:flex;gap:10px;margin-top:10px}
+.btn{
+  flex:1;padding:12px;border-radius:12px;
+  font-weight:600;font-size:14px;
+}
+.primary{background:#0f7a3d;color:#fff;border:none}
+.secondary{
+  background:#fff;border:1px solid #0f7a3d;color:#0f7a3d;
+}
+
+/* SECTION */
+.section-title{
+  margin:16px 0 8px;
+  font-size:14px;font-weight:600;
+}
+
+/* HISTORY */
+.scroll-area{
+  padding:0 16px 20px;
+}
 
 .project-tx{
-  background:#fff;border-radius:12px;padding:10px 12px;
-  margin-bottom:8px;display:flex;align-items:center;gap:10px
+  background:#fff;border-radius:12px;
+  padding:12px;margin-bottom:10px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.04);
 }
-.project-icon{font-size:18px}
+
 .project-body{flex:1}
-.project-title{font-size:14px;font-weight:600}
-.project-date{font-size:11px;color:#777}
+.project-title{font-size:13px;font-weight:600}
+.project-date{font-size:11px;color:#888}
 .project-right{text-align:right}
-.project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
+.project-amount{font-weight:bold;font-size:14px}
 
-.info-indicator{
-  display:flex;align-items:center;gap:6px;
-  font-size:13px;color:#0f7a3d;cursor:pointer
-}
-
+/* MODALS */
 .modal{
   position:fixed;inset:0;background:rgba(0,0,0,.4);
-  display:none;align-items:center;justify-content:center;z-index:2000
+  display:none;align-items:center;justify-content:center;
 }
 .modal-box{
-  background:#fff;width:90%;max-width:420px;
-  padding:20px;border-radius:16px
+  background:#fff;width:90%;max-width:400px;
+  padding:20px;border-radius:16px;
 }
 input,select{
   width:100%;padding:12px;margin-top:6px;
-  border-radius:10px;border:1px solid #ccc;font-size:16px
+  border-radius:10px;border:1px solid #ddd;
 }
-label{margin-top:12px;display:block}
-.success{text-align:center}
-.success h3{color:#0f7a3d;margin-bottom:8px}
 </style>
 </head>
 
 <body>
 
 <header class="header">
-  <div class="header-left">
-    <span>🌾 Barsh Agro</span>
-  </div>
-  <div class="header-right info-indicator" onclick="openInfo()">ℹ️</div>
+  <div>🌾 Barsh Agro</div>
+  <div onclick="openInfo()">ℹ️</div>
 </header>
 
-<div class="fixed-area">
+<div class="container">
 
   <div class="stats">
     <div class="stat-card">
@@ -119,8 +130,7 @@ label{margin-top:12px;display:block}
   </div>
 
   <div class="short-info">
-    <strong>Barsh Agro</strong> is an ALBUKHR mechanized farming and livestock
-    project focused on large-scale crop production and sustainable agriculture.
+    Barsh Agro is ALBUKHR’s mechanized farming and livestock ecosystem.
   </div>
 
   <div class="btns">
@@ -130,10 +140,11 @@ label{margin-top:12px;display:block}
     </button>
   </div>
 
+  <div class="section-title">Transaction History</div>
+
 </div>
 
 <div class="scroll-area">
-  <h3 style="font-size:15px;margin-bottom:10px">Transaction History</h3>
   <div id="barshHistory"></div>
 </div>
 
@@ -142,12 +153,8 @@ label{margin-top:12px;display:block}
   <div class="modal-box">
     <h3>Stake in Barsh Agro</h3>
 
-    <label>Amount (Pi)</label>
+    <label>Amount</label>
     <input type="number" id="amountInput">
-
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
-    </small>
 
     <label>Duration</label>
     <select id="durationSelect">
@@ -164,217 +171,118 @@ label{margin-top:12px;display:block}
 </div>
 
 <div class="modal" id="successModal">
-  <div class="modal-box success">
+  <div class="modal-box">
     <h3>Stake Successful</h3>
     <p id="successText"></p>
-    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
   </div>
 </div>
 
 <div class="modal" id="infoModal">
   <div class="modal-box">
     <h3>About Barsh Agro</h3>
-    <p style="font-size:14px;line-height:1.6;color:#444">
-      Barsh Agro scales food production through mechanized farming,
-      irrigation systems, and structured livestock management.
-    </p>
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
+    <p>Large-scale farming and livestock production.</p>
   </div>
 </div>
 
+<script src="js/albukhr-transaction-engine.js"></script>
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
-const stakeModal = document.getElementById("stakeModal");
-const successModal = document.getElementById("successModal");
-const infoModal = document.getElementById("infoModal");
-
 function openModal(){
+  amountInput.value="";
+  durationSelect.value="180";
   stakeModal.style.display="flex";
-  minHint.innerText = "Minimum stake: " + getMinStake("Barsh") + " Pi";
 }
+
 function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
 
 function confirmStake(){
 
   const amount = Number(amountInput.value);
-  const duration = Number(durationSelect.value);
-  const min = getMinStake("Barsh");
 
-  if(!amount || amount < min){
-    alert("Minimum stake is " + min + " Pi");
+  if(!amount){
+    alert("Enter amount");
     return;
   }
 
-  const ok = addStake({ project:"Barsh", amount, duration });
+  const ok = addStake({
+    project:"Barsh",
+    amount,
+    duration:Number(durationSelect.value)
+  });
 
   if(!ok){
-    alert("Stake failed.");
+    alert("Stake failed");
     return;
   }
 
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in Barsh Agro.`;
+  recordTx({type:"stake",project:"Barsh",amount});
+
+  successText.innerText = `You staked ${amount} Pi`;
 
   closeModal();
   successModal.style.display="flex";
   load();
 }
 
-/* =========================
-   CAPITAL WITHDRAW
-========================= */
-function withdrawCapital(stakeId){
-
-  if(typeof withdrawStakeCapital !== "function"){
-    alert("Capital withdraw not available.");
-    return;
-  }
-
-  const res = withdrawStakeCapital(stakeId);
-
-  if(res?.error){
-    alert(res.error);
-    return;
-  }
-
-  load();
-}
-
-function safe(n){ return Number(n || 0).toFixed(2); }
-
-/* =========================
-   MERGED HISTORY
-========================= */
 function load(){
 
   const data = getProjectTotals("Barsh");
 
-  /* ===== LIVE REWARD ===== */
   let reward = 0;
   data.stakes.forEach(s=>{
-    reward += Number(s.remainingReward ?? s.reward) || 0;
+    reward += Number(s.remainingReward||0);
   });
 
-  bStake.innerText  = safe(data.stake) + " Pi";
-  bReward.innerText = safe(reward) + " Pi";
+  bStake.innerText = data.stake.toFixed(2)+" Pi";
+  bReward.innerText = reward.toFixed(2)+" Pi";
 
-  barshHistory.innerHTML = "";
+  barshHistory.innerHTML="";
 
-  const merged = [];
+  const txs = getTransactions()
+    .filter(t=>t.project==="Barsh");
 
-  /* STAKES */
-  data.stakes.forEach(s=>{
-    merged.push({
-      type:"stake",
-      data:s,
-      timestamp:s.timestamp
-    });
-  });
-
-  /* WITHDRAWALS */
-  getWithdrawHistory()
-    .filter(tx=>tx.project==="Barsh")
-    .forEach(tx=>{
-      merged.push({
-        type:"withdraw",
-        data:tx,
-        timestamp:tx.timestamp
-      });
-    });
-
-  if(merged.length === 0){
-    barshHistory.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+  if(!txs.length){
+    barshHistory.innerHTML="No transactions yet";
     return;
   }
 
-  merged
-    .sort((a,b)=>b.timestamp - a.timestamp)
-    .forEach(item=>{
+  txs.sort((a,b)=>b.timestamp-a.timestamp)
+  .forEach(tx=>{
 
-      if(item.type==="stake"){
+    const div=document.createElement("div");
+    div.className="project-tx";
 
-        const s = item.data;
-        const t = formatDateTime(s);
+    let sign="+";
+    let color="#0f7a3d";
 
-        let capitalBtn = "";
+    if(tx.type==="withdraw"){
+      sign="-";
+      color="#c0392b";
+    }
 
-        if(s.matured && !s.capitalWithdrawn){
-          capitalBtn = `
-            <button 
-              onclick="withdrawCapital('${s.id}')"
-              style="margin-top:4px;font-size:10px;padding:4px 6px">
-              Withdraw Capital
-            </button>
-          `;
-        }
+    div.innerHTML=`
+      <div class="project-body">
+        <div class="project-title">${tx.type}</div>
+        <div class="project-date">
+          ${new Date(tx.timestamp).toLocaleString()}
+        </div>
+      </div>
+      <div class="project-right">
+        <div class="project-amount" style="color:${color}">
+          ${sign}${tx.amount.toFixed(2)} Pi
+        </div>
+      </div>
+    `;
 
-        const div = document.createElement("div");
-        div.className="project-tx";
-        div.innerHTML=`
-          <div class="project-icon">🌾</div>
-          <div class="project-body">
-            <div class="project-title">Stake</div>
-            <div class="project-date">${t.date} • ${t.time}</div>
-            ${capitalBtn}
-          </div>
-          <div class="project-right">
-            <div class="project-amount">
-              +${safe(s.amount)} Pi
-            </div>
-            <div class="project-status">
-              ${s.capitalWithdrawn ? "Capital Withdrawn" : "Staked"}
-            </div>
-          </div>
-        `;
-        barshHistory.appendChild(div);
-      }
+    barshHistory.appendChild(div);
+  });
 
-      if(item.type==="withdraw"){
-
-        const tx = item.data;
-
-        const div = document.createElement("div");
-        div.className="project-tx";
-        div.innerHTML=`
-          <div class="project-icon">🌾</div>
-          <div class="project-body">
-            <div class="project-title">Reward Withdrawal</div>
-            <div class="project-date">
-              ${new Date(tx.timestamp).toLocaleString()}
-            </div>
-          </div>
-          <div class="project-right">
-            <div class="project-amount" style="color:#c0392b">
-              -${safe(tx.grossAmount)} Pi
-            </div>
-            <div class="project-status">Withdrawn</div>
-          </div>
-        `;
-        barshHistory.appendChild(div);
-      }
-
-    });
 }
 
-/* =========================
-   WALLET NAVIGATION
-========================= */
 function goToWithdraw(){
-
-  const summary = getWalletSummary();
-
-  if(summary.available <= 0){
-    alert("No available rewards to withdraw.");
-    return;
-  }
-
-  window.location.href = "wallet.html";
+  window.location.href="wallet.html";
 }
 
 load();
