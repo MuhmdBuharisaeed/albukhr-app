@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ALBUKHR Dashboard</title>
+
+<link rel="stylesheet" href="css/global-style.css">
+
+<style>
+
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f4f7f6;
+}
+
+/* HEADER */
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:16px;
+  font-weight:600;
+}
+
+/* BALANCE */
+.balance{
+  background:#0f7a3d;
+  color:#fff;
+  padding:20px;
+}
+
+.balance h2{
+  margin:0;
+  font-size:26px;
+}
+
+/* CARDS */
+.card{
+  background:#fff;
+  margin:12px;
+  padding:16px;
+  border-radius:14px;
+}
+
+/* GRID */
+.grid{
+  display:flex;
+  gap:10px;
+}
+
+.grid .card{
+  flex:1;
+  text-align:center;
+}
+
+/* PROJECT LIST */
+.project{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+/* TX */
+.tx{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+  font-size:13px;
+}
+
+.green{color:#0f7a3d}
+.red{color:#c0392b}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  ALBUKHR Dashboard
+</div>
+
+<div class="balance">
+  <div>Total Balance</div>
+  <h2 id="totalBalance">0 Pi</h2>
+</div>
+
+<div class="grid">
+
+  <div class="card">
+    <div>Total Invested</div>
+    <strong id="totalInvested">0 Pi</strong>
+  </div>
+
+  <div class="card">
+    <div>Total Earnings</div>
+    <strong id="totalEarnings">0 Pi</strong>
+  </div>
+
+</div>
+
+<div class="card">
+  <h3>Projects</h3>
+  <div id="projectList"></div>
+</div>
+
+<div class="card">
+  <h3>Recent Transactions</h3>
+  <div id="txList"></div>
+</div>
+
+<script src="js/albukhr-transaction-engine.js"></script>
+<script src="staking.js"></script>
+
+<script>
+
+/* ===========================
+   LOAD DASHBOARD
+=========================== */
+
+function loadDashboard(){
+
+  const stakes = getAllStakesMerged();
+  const txs = getTransactions();
+
+  let totalStake = 0;
+  let totalReward = 0;
+
+  stakes.forEach(s=>{
+    totalStake += Number(s.amount) || 0;
+    totalReward += Number(s.remainingReward || 0);
+  });
+
+  totalBalance.innerText =
+    (totalStake + totalReward).toFixed(2) + " Pi";
+
+  totalInvested.innerText =
+    totalStake.toFixed(2) + " Pi";
+
+  totalEarnings.innerText =
+    totalReward.toFixed(2) + " Pi";
+
+  /* PROJECTS */
+  const grouped = {};
+
+  stakes.forEach(s=>{
+    if(!grouped[s.project]){
+      grouped[s.project] = {
+        stake:0,
+        reward:0
+      };
+    }
+
+    grouped[s.project].stake += Number(s.amount) || 0;
+    grouped[s.project].reward += Number(s.remainingReward || 0);
+  });
+
+  projectList.innerHTML = "";
+
+  Object.keys(grouped).forEach(p=>{
+
+    const div = document.createElement("div");
+    div.className="project";
+
+    div.innerHTML = `
+      <div>${p}</div>
+      <div>${grouped[p].stake.toFixed(2)} Pi</div>
+    `;
+
+    projectList.appendChild(div);
+
+  });
+
+  /* TRANSACTIONS */
+  txList.innerHTML = "";
+
+  txs
+  .slice()
+  .reverse()
+  .slice(0,10)
+  .forEach(tx=>{
+
+    let color = "green";
+    let sign = "+";
+
+    if(tx.type === "withdraw"){
+      color = "red";
+      sign = "-";
+    }
+
+    const div = document.createElement("div");
+    div.className="tx";
+
+    div.innerHTML = `
+      <div>${tx.project}</div>
+      <div class="${color}">
+        ${sign}${tx.amount.toFixed(2)} Pi
+      </div>
+    `;
+
+    txList.appendChild(div);
+
+  });
+
+}
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
