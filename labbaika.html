@@ -375,89 +375,82 @@ function load(){
   });
 
   /* ===== WITHDRAWALS ===== */
-  getWithdrawHistory()
-    .filter(tx=>tx.project==="Labbaika")
-    .forEach(tx=>{
-      merged.push({
-        type:"withdraw",
-        data:tx,
-        timestamp:tx.timestamp
-      });
-    });
+const txs = getTxByProject("Labbaika");
 
-  if(merged.length === 0){
-    labbaikaHistory.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
-    return;
+if(!txs.length){
+  labbaikaHistory.innerHTML =
+    "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+  return;
+}
+
+labbaikaHistory.innerHTML = "";
+
+txs
+.sort((a,b)=>b.timestamp - a.timestamp)
+.forEach(tx=>{
+
+  const div = document.createElement("div");
+  div.className = "project-tx";
+
+  let icon = "🍞";
+  let label = "Stake";
+  let color = "#0f7a3d";
+  let sign = "+";
+
+  if(tx.type === "withdraw"){
+    label = "Withdraw";
+    color = "#c0392b";
+    sign = "-";
   }
 
-  merged
-    .sort((a,b)=>b.timestamp - a.timestamp)
-    .forEach(item=>{
+  if(tx.type === "reward"){
+    label = "Reward";
+    color = "#1e90ff";
+  }
 
-      if(item.type==="stake"){
+  div.innerHTML = `
+    <div class="project-icon">${icon}</div>
 
-        const s = item.data;
-        const t = formatDateTime(s);
+    <div class="project-body">
+      <div class="project-title">${label}</div>
+      <div class="project-date">
+        ${new Date(tx.timestamp).toLocaleString()}
+      </div>
+    </div>
 
-        let capitalButton = "";
+    <div class="project-right">
+      <div class="project-amount" style="color:${color}">
+        ${sign}${Number(tx.amount).toFixed(2)} Pi
+      </div>
+    </div>
+  `;
 
-        if(s.matured && !s.capitalWithdrawn){
-          capitalButton = `
-            <button 
-              onclick="withdrawCapital('${s.id}')"
-              style="margin-top:4px;font-size:10px;padding:4px 6px">
-              Withdraw Capital
-            </button>
-          `;
-        }
+  labbaikaHistory.appendChild(div);
 
-        const div = document.createElement("div");
-        div.className="project-tx";
-        div.innerHTML=`
-          <div class="project-icon">🍞</div>
-          <div class="project-body">
-            <div class="project-title">Stake</div>
-            <div class="project-date">${t.date} • ${t.time}</div>
-            ${capitalButton}
-          </div>
-          <div class="project-right">
-            <div class="project-amount">
-              +${Number(s.amount).toFixed(2)} Pi
-            </div>
-            <div class="project-status">
-              ${s.capitalWithdrawn ? "Capital Withdrawn" : "Staked"}
-            </div>
-          </div>
-        `;
-        labbaikaHistory.appendChild(div);
-      }
+});
 
-      if(item.type==="withdraw"){
+/* =========================================
+   FILTER HELPERS
+========================================= */
 
-        const tx = item.data;
+/* BY PROJECT */
+function getTxByProject(project){
+  return getTransactions()
+    .filter(tx => tx.project === project);
+}
 
-        const div = document.createElement("div");
-        div.className="project-tx";
-        div.innerHTML=`
-          <div class="project-icon">🍞</div>
-          <div class="project-body">
-            <div class="project-title">Reward Withdrawal</div>
-            <div class="project-date">
-              ${new Date(tx.timestamp).toLocaleString()}
-            </div>
-          </div>
-          <div class="project-right">
-            <div class="project-amount" style="color:#c0392b">
-              -${tx.grossAmount.toFixed(2)} Pi
-            </div>
-            <div class="project-status">Withdrawn</div>
-          </div>
-        `;
-        labbaikaHistory.appendChild(div);
-      }
+/* BY TYPE */
+function getTxByType(type){
+  return getTransactions()
+    .filter(tx => tx.type === type);
+}
 
-    });
+/* RECENT */
+function getRecentTx(limit = 20){
+  return getTransactions()
+    .slice()
+    .reverse()
+    .slice(0, limit);
 }
 
 /* ===============================
