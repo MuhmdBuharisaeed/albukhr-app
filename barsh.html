@@ -186,15 +186,30 @@ function confirmStake(){
     return;
   }
 
-  const ok = addStake({ project:"Barsh", amount, duration });
+  const ok = addStake({
+    project:"Barsh",
+    amount,
+    duration
+  });
 
   if(!ok){
     alert("Stake failed.");
     return;
   }
 
+  /* ✅ IMPORTANT: RECORD TRANSACTION */
+  recordTx({
+    type:"stake",
+    project:"Barsh",
+    amount
+  });
+
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days in Barsh Agro.`;
+
+  /* ✅ RESET FORM (prevents old values bug) */
+  amountInput.value = "";
+  durationSelect.value = "180";
 
   closeModal();
   successModal.style.display="flex";
