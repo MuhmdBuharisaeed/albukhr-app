@@ -6,6 +6,10 @@
 <title>Barsh Agro</title>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/global-core.css">
+<link rel="stylesheet" href="css/global-layout.css">
+<link rel="stylesheet" href="css/global-components.css">
+<link rel="stylesheet" href="css/global-style.css">
 
 <style>
 body{
@@ -182,46 +186,7 @@ label{margin-top:12px;display:block}
   </div>
 </div>
 
-<script src="staking.js"></script>
-<script src="wallet-core.js"></script>
-
-<script>
-const stakeModal = document.getElementById("stakeModal");
-const successModal = document.getElementById("successModal");
-const infoModal = document.getElementById("infoModal");
-
-function openModal(){
-  stakeModal.style.display="flex";
-  minHint.innerText = "Minimum stake: " + getMinStake("Barsh") + " Pi";
-}
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
-
-function confirmStake(){
-
-  const amount = Number(amountInput.value);
-  const duration = Number(durationSelect.value);
-  const min = getMinStake("Barsh");
-
-  if(!amount || amount < min){
-    alert("Minimum stake is " + min + " Pi");
-    return;
-  }
-
-  const ok = addStake({ project:"Barsh", amount, duration });
-
-  if(!ok){
-    alert("Stake failed.");
-    return;
-  }
-
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in Barsh Agro.`;
-
-  closeModal();
-  successModal.style.display="flex";
+.display="flex";
   load();
 }
 
@@ -320,50 +285,169 @@ function load(){
           <div class="project-icon">🌾</div>
           <div class="project-body">
             <div class="project-title">Stake</div>
-            <div class="project-date">${t.date} • ${t.time}</div>
-            ${capitalBtn}
-          </div>
-          <div class="project-right">
-            <div class="project-amount">
-              +${safe(s.amount)} Pi
-            </div>
-            <div class="project-status">
-              ${s.capitalWithdrawn ? "Capital Withdrawn" : "Staked"}
-            </div>
-          </div>
-        `;
-        barshHistory.appendChild(div);
-      }
+<!-- ===============================
+   SCRIPTS
+=============================== -->
+<script src="js/albukhr-transaction-engine.js"></script>
+<script src="staking.js"></script>
+<script src="wallet-core.js"></script>
 
-      if(item.type==="withdraw"){
+<script>
+const stakeModal = document.getElementById("stakeModal");
+const successModal = document.getElementById("successModal");
+const infoModal = document.getElementById("infoModal");
 
-        const tx = item.data;
+/* =========================
+   MODALS
+========================= */
+function openModal(){
 
-        const div = document.createElement("div");
-        div.className="project-tx";
-        div.innerHTML=`
-          <div class="project-icon">🌾</div>
-          <div class="project-body">
-            <div class="project-title">Reward Withdrawal</div>
-            <div class="project-date">
-              ${new Date(tx.timestamp).toLocaleString()}
-            </div>
-          </div>
-          <div class="project-right">
-            <div class="project-amount" style="color:#c0392b">
-              -${safe(tx.grossAmount)} Pi
-            </div>
-            <div class="project-status">Withdrawn</div>
-          </div>
-        `;
-        barshHistory.appendChild(div);
-      }
+  /* RESET FORM */
+  amountInput.value = "";
+  durationSelect.value = "180";
 
-    });
+  stakeModal.style.display="flex";
+
+  minHint.innerText =
+    "Minimum stake: " + getMinStake("Barsh") + " Pi";
+}
+
+function closeModal(){ stakeModal.style.display="none"; }
+function closeSuccess(){ successModal.style.display="none"; }
+function openInfo(){ infoModal.style.display="flex"; }
+function closeInfo(){ infoModal.style.display="none"; }
+
+/* =========================
+   STAKE
+========================= */
+function confirmStake(){
+
+  const amount = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+  const min = getMinStake("Barsh");
+
+  if(!amount || amount < min){
+    alert("Minimum stake is " + min + " Pi");
+    return;
+  }
+
+  const ok = addStake({
+    project:"Barsh",
+    amount,
+    duration
+  });
+
+  if(!ok){
+    alert("Stake failed.");
+    return;
+  }
+
+  /* ✅ RECORD TX */
+  recordTx({
+    type:"stake",
+    project:"Barsh",
+    amount
+  });
+
+  successText.innerText =
+    `You staked ${amount} Pi for ${duration} days in Barsh Agro.`;
+
+  /* CLEAR FORM */
+  amountInput.value = "";
+  durationSelect.value = "180";
+
+  closeModal();
+  successModal.style.display="flex";
+  load();
 }
 
 /* =========================
-   WALLET NAVIGATION
+   SAFE FORMAT
+========================= */
+function safe(n){
+  return Number(n || 0).toFixed(2);
+}
+
+/* =========================
+   LOAD DASHBOARD + HISTORY
+========================= */
+function load(){
+
+  const data = getProjectTotals("Barsh");
+
+  /* LIVE REWARD */
+  let reward = 0;
+
+  data.stakes.forEach(s=>{
+    reward += Number(s.remainingReward ?? s.reward) || 0;
+  });
+
+  bStake.innerText  = safe(data.stake) + " Pi";
+  bReward.innerText = safe(reward) + " Pi";
+
+  barshHistory.innerHTML = "";
+
+  /* ===============================
+     UNIFIED TRANSACTION VIEW
+  =============================== */
+
+  const txs = getTransactions()
+    .filter(t => t.project === "Barsh");
+
+  if(!txs.length){
+    barshHistory.innerHTML =
+      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+    return;
+  }
+
+  txs
+  .sort((a,b)=>b.timestamp - a.timestamp)
+  .forEach(tx=>{
+
+    const div = document.createElement("div");
+    div.className="project-tx";
+
+    let icon = "🌾";
+    let label = "Stake";
+    let color = "#0f7a3d";
+    let sign = "+";
+
+    if(tx.type === "withdraw"){
+      label = "Withdraw";
+      color = "#c0392b";
+      sign = "-";
+    }
+
+    if(tx.type === "reward"){
+      label = "Reward";
+      color = "#1e90ff";
+    }
+
+    div.innerHTML = `
+      <div class="project-icon">${icon}</div>
+
+      <div class="project-body">
+        <div class="project-title">${label}</div>
+        <div class="project-date">
+          ${new Date(tx.timestamp).toLocaleString()}
+        </div>
+      </div>
+
+      <div class="project-right">
+        <div class="project-amount" style="color:${color}">
+          ${sign}${tx.amount.toFixed(2)} Pi
+        </div>
+      </div>
+    `;
+
+    barshHistory.appendChild(div);
+
+  });
+
+}
+
+/* =========================
+   WITHDRAW (TEMP → WALLET)
 ========================= */
 function goToWithdraw(){
 
@@ -377,6 +461,9 @@ function goToWithdraw(){
   window.location.href = "wallet.html";
 }
 
+/* =========================
+   INIT
+========================= */
 load();
 </script>
 
