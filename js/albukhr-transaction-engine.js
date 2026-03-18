@@ -1,5 +1,5 @@
 /* =========================================
-   ALBUKHR UNIFIED TRANSACTION ENGINE v1
+   ALBUKHR UNIFIED TRANSACTION ENGINE v1.1
 ========================================= */
 
 const TX_KEY = "albukhr_transactions";
@@ -47,4 +47,28 @@ function recordTx({
   saveTransactions(list);
 
   return tx;
+}
+
+/* =========================================
+   FILTER HELPERS
+========================================= */
+
+/* BY PROJECT */
+function getTxByProject(project){
+  return getTransactions()
+    .filter(tx => tx.project === project);
+}
+
+/* BY TYPE */
+function getTxByType(type){
+  return getTransactions()
+    .filter(tx => tx.type === type);
+}
+
+/* RECENT */
+function getRecentTx(limit = 20){
+  return getTransactions()
+    .slice()
+    .reverse()
+    .slice(0, limit);
 }
