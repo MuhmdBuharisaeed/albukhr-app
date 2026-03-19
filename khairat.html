@@ -145,27 +145,6 @@
 <script src="wallet-core.js"></script>
 
 <script>
-function getKhairatDailyRate(duration){
-
-  duration = Number(duration);
-
-  if(duration === 60)  return 0.006;  // 0.6%
-  if(duration === 120) return 0.008;  // 0.8%
-  if(duration === 180) return 0.01;   // 1%
-
-  return 0.006;
-}
-
-function updateProjection(){
-
-  const amount   = Number(amountInput.value);
-  const duration = Number(durationSelect.value);
-
-  if(!amount || amount <= 0){
-    projectionBox.style.display="none";
-    return;
-  }
-
 /* ===============================
    MODALS
 ================================ */
