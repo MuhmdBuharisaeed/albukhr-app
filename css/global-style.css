@@ -24,8 +24,7 @@ body{
   z-index:1000;
 }
 
-/* ===== FIXED SECTION ===== */
-
+===== FIXED SECTION (NOW SAFE) ===== */
 .fixed-section{
   position:fixed;
   top:60px;
@@ -37,7 +36,6 @@ body{
 }
 
 /* ===== SCROLL AREA ===== */
-
 .scroll-area{
   position:fixed;
   top:340px;
