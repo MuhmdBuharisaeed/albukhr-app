@@ -13,6 +13,10 @@
 
 <style>
 .btn{
+/* ======================
+   BUTTONS
+====================== */
+.btn{
   flex:1;
   padding:12px;
   border-radius:var(--radius-md);
@@ -20,18 +24,21 @@
   font-size:15px;
 }
 
-.btn-primary{
+.primary{
   background:var(--albukhr-green);
   color:#fff;
   border:none;
 }
 
-.btn-outline{
+.secondary{
   background:#fff;
   border:1px solid var(--albukhr-green);
   color:var(--albukhr-green);
 }
 
+/* ======================
+   CARD
+====================== */
 .card{
   background:var(--card);
   border-radius:var(--radius-lg);
@@ -41,7 +48,10 @@
   color:var(--subtext);
 }
 
-.tx{
+/* ======================
+   TRANSACTION
+====================== */
+.project-tx{
   background:#fff;
   border-radius:12px;
   padding:10px 12px;
@@ -51,22 +61,27 @@
   gap:10px;
 }
 
-.tx-title{
+.project-title{
   font-size:13px;
   font-weight:600;
 }
 
-.tx-date{
+.project-date{
   font-size:11px;
   color:#777;
 }
 
-.tx-amount{
+.project-amount{
   font-weight:bold;
 }
 
-.tx-success{color:var(--success)}
-.tx-danger{color:var(--danger)}
+.success-status{
+  color:var(--success);
+}
+
+.withdraw-status{
+  color:var(--danger);
+  }
     </style>
 
 </head>
