@@ -11,79 +11,6 @@
 <link rel="stylesheet" href="css/global-components.css">
 <link rel="stylesheet" href="css/global-style.css">
 
-<style>
-.btn{
-/* ======================
-   BUTTONS
-====================== */
-.btn{
-  flex:1;
-  padding:12px;
-  border-radius:var(--radius-md);
-  font-weight:600;
-  font-size:15px;
-}
-
-.primary{
-  background:var(--albukhr-green);
-  color:#fff;
-  border:none;
-}
-
-.secondary{
-  background:#fff;
-  border:1px solid var(--albukhr-green);
-  color:var(--albukhr-green);
-}
-
-/* ======================
-   CARD
-====================== */
-.card{
-  background:var(--card);
-  border-radius:var(--radius-lg);
-  padding:14px;
-  font-size:14px;
-  line-height:1.5;
-  color:var(--subtext);
-}
-
-/* ======================
-   TRANSACTION
-====================== */
-.project-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.project-title{
-  font-size:13px;
-  font-weight:600;
-}
-
-.project-date{
-  font-size:11px;
-  color:#777;
-}
-
-.project-amount{
-  font-weight:bold;
-}
-
-.success-status{
-  color:var(--success);
-}
-
-.withdraw-status{
-  color:var(--danger);
-  }
-    </style>
-
 </head>
 
 <body>
@@ -92,19 +19,19 @@
   <div class="header-left">
     <span>🌾 Barsh Agro</span>
   </div>
-  <div class="header-right info-indicator" onclick="openInfo()">ℹ️</div>
+  <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
-<div class="fixed-area">
+<div class="fixed-section">
 
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
-      <strong id="bStake">0.00 Pi</strong>
+      <strong id="lStake">0.00 Pi</strong>
     </div>
     <div class="stat-card">
       <span>Your Reward</span>
-      <strong id="bReward">0.00 Pi</strong>
+      <strong id="lReward">0.00 Pi</strong>
     </div>
   </div>
 
@@ -115,29 +42,27 @@
 
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
-    <button onclick="goToWithdraw()" class="btn secondary">
+    <button onclick="openWithdrawModal()" class="btn secondary">
       💸 Withdraw Rewards
     </button>
   </div>
 
+  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
 </div>
 
 <div class="scroll-area">
-  <h3 style="font-size:15px;margin-bottom:10px">Transaction History</h3>
   <div id="barshHistory"></div>
 </div>
 
-<!-- MODALS -->
+<!-- STAKE MODAL -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
-    <h3>Stake in Barsh Agro</h3>
+    <h3>Stake in Barsh</h3>
 
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
-    </small>
+    <small id="minHint"></small>
 
     <label>Duration</label>
     <select id="durationSelect">
@@ -146,35 +71,38 @@
       <option value="430">430 Days</option>
     </select>
 
-    <div class="btns" style="margin-top:16px">
+    <div class="btns">
       <button class="btn primary" onclick="confirmStake()">Confirm</button>
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
-<div class="modal" id="successModal">
-  <div class="modal-box success">
-    <h3>Stake Successful</h3>
-    <p id="successText"></p>
-    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
-  </div>
-</div>
-
-<div class="modal" id="infoModal">
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal">
   <div class="modal-box">
-    <h3>About Barsh Agro</h3>
-    <p style="font-size:14px;line-height:1.6;color:#444">
-      Barsh Agro scales food production through mechanized farming,
-      irrigation systems, and structured livestock management.
-    </p>
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
+    <h3>Withdraw Rewards</h3>
+
+    <label>Amount</label>
+    <input type="number" id="withdrawAmount">
+
+    <small id="availableBalance"></small>
+
+    <label>Wallet Address</label>
+    <input type="text" id="walletAddress">
+
+    <div class="btns">
+      <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
+    </div>
   </div>
 </div>
 
 <script src="js/albukhr-transaction-engine.js"></script>
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
+
+<script>
 
 <script>
 const stakeModal = document.getElementById("stakeModal");
