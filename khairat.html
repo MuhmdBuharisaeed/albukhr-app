@@ -6,105 +6,11 @@
 <title>Khairat Fertiliser</title>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/global-core.css">
+<link rel="stylesheet" href="css/global-layout.css">
+<link rel="stylesheet" href="css/global-components.css">
+<link rel="stylesheet" href="css/global-style.css">
 
-<style>
-body{
-  background:#f5f7f6;
-  font-family:Arial;
-  margin:0;
-  height:80vh;
-  display:flex;
-  flex-direction:column;
-}
-
-/* HEADER */
-.header{
-  flex-shrink:0;
-}
-
-/* TOP SECTION */
-.fixed-top{
-  background:#f5f7f6;
-  padding:16px;
-  flex-shrink:0;
-}
-
-/* SCROLLABLE HISTORY */
-.history-wrapper{
-  flex:1;
-  overflow-y:auto;
-  padding:0 16px 90px 16px;
-}
-
-.stats{display:flex;gap:12px;margin-bottom:16px}
-.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
-.stat-card span{display:block;color:#666;font-size:14px}
-.stat-card strong{font-size:18px;margin-top:6px;display:block}
-
-.btns{display:flex;gap:12px;margin-top:12px}
-.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-
-.short-info{
-  background:#fff;
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:14px;
-  font-size:14px;
-  color:#444;
-  line-height:1.6
-}
-
-.project-tx{
-  background:#fff;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:10px
-}
-
-.project-icon{font-size:18px}
-.project-body{flex:1}
-.project-title{font-size:14px;font-weight:600}
-.project-date{font-size:11px;color:#777}
-.project-right{text-align:right}
-.project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px;color:#0f7a3d}
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000
-}
-
-.modal-box{
-  background:#fff;
-  width:90%;
-  max-width:420px;
-  padding:20px;
-  border-radius:16px
-}
-
-label{margin-top:12px;display:block}
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:6px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px
-}
-
-.success{text-align:center}
-.success h3{color:#0f7a3d;margin-bottom:8px}
-</style>
 </head>
 
 <body>
@@ -116,16 +22,16 @@ input,select{
   <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
-<div class="fixed-top">
+<div class="fixed-section">
 
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
-      <strong id="kStake">0.00 Pi</strong>
+      <strong id="lStake">0.00 Pi</strong>
     </div>
     <div class="stat-card">
       <span>Your Reward</span>
-      <strong id="kReward">0.00 Pi</strong>
+      <strong id="lReward">0.00 Pi</strong>
     </div>
   </div>
 
@@ -137,17 +43,16 @@ input,select{
 
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
-    <button onclick="goToWithdraw()" class="btn secondary">
+    <button onclick="openWithdrawModal()" class="btn secondary">
       💸 Withdraw Rewards
     </button>
   </div>
 
   <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
-
 </div>
 
-<div class="history-wrapper">
-  <div id="khairatHistory"></div>
+<div class="scroll-area">
+  <div id="KhairatHistory"></div>
 </div>
 
 <!-- STAKE MODAL -->
@@ -158,9 +63,7 @@ input,select{
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
-    </small>
+    <small id="minHint"></small>
 
     <label>Duration</label>
     <select id="durationSelect">
@@ -168,7 +71,34 @@ input,select{
       <option value="120">120 Days</option>
       <option value="180">180 Days</option>
     </select>
-    
+
+    <div class="btns">
+      <button class="btn primary" onclick="confirmStake()">Confirm</button>
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal">
+  <div class="modal-box">
+    <h3>Withdraw Rewards</h3>
+
+    <label>Amount</label>
+    <input type="number" id="withdrawAmount">
+
+    <small id="availableBalance"></small>
+
+    <label>Wallet Address</label>
+    <input type="text" id="walletAddress">
+
+    <div class="btns">
+      <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div id="projectionBox" style="
   margin-top:14px;
   background:#f6fbf8;
@@ -210,185 +140,231 @@ input,select{
   </div>
 </div>
 
+<script src="js/albukhr-transaction-engine.js"></script>
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
-const stakeModal   = document.getElementById("stakeModal");
-const successModal = document.getElementById("successModal");
-const infoModal    = document.getElementById("infoModal");
+
+/* ===============================
+   MODALS
+================================ */
 
 function openModal(){
+  amountInput.value = "";
+  durationSelect.value = "30";
   stakeModal.style.display="flex";
-  minHint.innerText="Minimum stake: "+getMinStake("Khairat")+" Pi";
-}
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
 
-function getKhairatDailyRate(duration){
-
-  duration = Number(duration);
-
-  if(duration === 60)  return 0.006;  // 0.6%
-  if(duration === 120) return 0.008;  // 0.8%
-  if(duration === 180) return 0.01;   // 1%
-
-  return 0.006;
+  minHint.innerText =
+    "Minimum stake: " + getMinStake("Khairat") + " Pi";
 }
 
-function updateProjection(){
-
-  const amount   = Number(amountInput.value);
-  const duration = Number(durationSelect.value);
-
-  if(!amount || amount <= 0){
-    projectionBox.style.display="none";
-    return;
-  }
-
-  const rate = getKhairatDailyRate(duration);
-
-  const reward = amount * rate * duration;
-  const total  = amount + reward;
-
-  estReward.innerText = reward.toFixed(2);
-  estTotal.innerText  = total.toFixed(2);
-
-  projectionBox.style.display="block";
+function closeModal(){
+  stakeModal.style.display="none";
 }
 
-/* LIVE EVENTS */
-amountInput.addEventListener("input", updateProjection);
-durationSelect.addEventListener("change", updateProjection);
-  
+function openWithdrawModal(){
+
+  const data = getProjectTotals("Khairat");
+
+  let total = 0;
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
+
+  availableBalance.innerText =
+    "Available: " + total.toFixed(2) + " Pi";
+
+  const saved =
+    localStorage.getItem("user_wallet") || "";
+
+  walletAddress.value = saved;
+
+  withdrawAmount.value = "";
+
+  withdrawModal.style.display="flex";
+}
+
+function closeWithdraw(){
+  withdrawModal.style.display="none";
+}
+
+/* ===============================
+   STAKE
+================================ */
+
 function confirmStake(){
 
-  const amount=Number(amountInput.value);
-  const duration=Number(durationSelect.value);
-  const min=getMinStake("Khairat");
+  const amount = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+  const min = getMinStake("Labbaika");
 
-  if(isNaN(amount)||amount<min){
-    alert("Minimum stake is "+min+" Pi");
+  if(!amount || amount < min){
+    alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  const ok=addStake({
+  const ok = addStake({
     project:"Khairat",
-    amount:amount,
-    duration:duration
+    amount,
+    duration
   });
 
   if(!ok){
-    alert("Stake failed.");
+    alert("Stake failed");
     return;
   }
 
-  amountInput.value="";
+  /* RECORD TX */
+  recordTx({
+    type:"stake",
+    project:"Khairat",
+    amount
+  });
+
+  amountInput.value = "";
+
   closeModal();
-  loadKhairat();
-  successModal.style.display="flex";
+  load();
 }
 
-/* ===== MERGED HISTORY ===== */
-function loadKhairat(){
+/* ===============================
+   WITHDRAW
+================================ */
 
-  const data=getProjectTotals("Khairat");
+function confirmWithdraw(){
 
-  let reward=0;
-  data.stakes.forEach(s=>{
-    reward+=Number(s.remainingReward ?? s.reward)||0;
-  });
+  const amount = Number(withdrawAmount.value);
+  const wallet = walletAddress.value;
 
-  kStake.innerText=data.stake.toFixed(2)+" Pi";
-  kReward.innerText=reward.toFixed(2)+" Pi";
-
-  khairatHistory.innerHTML="";
-
-  const merged=[];
-
-  data.stakes.forEach(s=>{
-    merged.push({
-      type:"stake",
-      data:s,
-      timestamp:s.timestamp
-    });
-  });
-
-  getWithdrawHistory()
-    .filter(tx=>tx.project==="Khairat")
-    .forEach(tx=>{
-      merged.push({
-        type:"withdraw",
-        data:tx,
-        timestamp:tx.timestamp
-      });
-    });
-
-  merged
-    .sort((a,b)=>b.timestamp-a.timestamp)
-    .forEach(item=>{
-
-      const div=document.createElement("div");
-      div.className="project-tx";
-
-      if(item.type==="stake"){
-
-        const s=item.data;
-        const t=formatDateTime(s);
-
-        div.innerHTML=`
-          <div class="project-icon">♻️</div>
-          <div class="project-body">
-            <div class="project-title">Stake</div>
-            <div class="project-date">${t.date} • ${t.time}</div>
-          </div>
-          <div class="project-right">
-            <div class="project-amount">
-              +${Number(s.amount).toFixed(2)} Pi
-            </div>
-            <div class="project-status">Staked</div>
-          </div>
-        `;
-      }
-
-      if(item.type==="withdraw"){
-
-        const tx=item.data;
-
-        div.innerHTML=`
-          <div class="project-icon">♻️</div>
-          <div class="project-body">
-            <div class="project-title">Reward Withdrawal</div>
-            <div class="project-date">
-              ${new Date(tx.timestamp).toLocaleString()}
-            </div>
-          </div>
-          <div class="project-right">
-            <div class="project-amount" style="color:#c0392b">
-              -${tx.grossAmount.toFixed(2)} Pi
-            </div>
-            <div class="project-status">Withdrawn</div>
-          </div>
-        `;
-      }
-
-      khairatHistory.appendChild(div);
-    });
-
-  if(!merged.length){
-    khairatHistory.innerHTML=
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+  if(!amount || amount <= 0){
+    alert("Invalid amount");
+    return;
   }
+
+  if(!wallet){
+    alert("Enter wallet");
+    return;
+  }
+
+  const data = getProjectTotals("Khairat");
+
+  let total = 0;
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
+
+  if(amount > total){
+    alert("Insufficient balance");
+    return;
+  }
+
+  let remaining = amount;
+
+  data.stakes.forEach(s=>{
+
+    if(remaining <= 0) return;
+
+    let r = Number(s.remainingReward) || 0;
+
+    if(r > 0){
+
+      let take = Math.min(r, remaining);
+
+      withdrawStakeReward(s.id, take);
+
+      remaining -= take;
+
+    }
+
+  });
+
+  /* SAVE WALLET */
+  localStorage.setItem("user_wallet", wallet);
+
+  /* RECORD TX */
+  recordTx({
+    type:"withdraw",
+    project:"Khairat",
+    amount
+  });
+
+  withdrawAmount.value = "";
+
+  closeWithdraw();
+  load();
 }
 
-function goToWithdraw(){
-  window.location.href="wallet.html";
+/* ===============================
+   HISTORY (UNIFIED ENGINE)
+================================ */
+
+function load(){
+
+  const data = getProjectTotals("Khairat");
+
+  let reward = 0;
+  data.stakes.forEach(s=>{
+    reward += Number(s.remainingReward || 0);
+  });
+
+  lStake.innerText =
+    (data.stake || 0).toFixed(2) + " Pi";
+
+  lReward.innerText =
+    reward.toFixed(2) + " Pi";
+
+  labbaikaHistory.innerHTML = "";
+
+  const txs = getTransactions()
+    .filter(t => t.project === "Khairat");
+
+  if(!txs.length){
+    labbaikaHistory.innerHTML =
+      "<p style='color:#777'>No transactions yet</p>";
+    return;
+  }
+
+  txs
+  .sort((a,b)=>b.timestamp - a.timestamp)
+  .forEach(tx=>{
+
+    let icon="♻️";
+    let sign="+";
+    let color="#0f7a3d";
+    let label="Stake";
+
+    if(tx.type==="withdraw"){
+      sign="-";
+      color="#c0392b";
+      label="Withdraw";
+    }
+
+    const div = document.createElement("div");
+    div.className="project-tx";
+
+    div.innerHTML = `
+      <div>${icon}</div>
+      <div style="flex:1">
+        <div>${label}</div>
+        <div style="font-size:11px;color:#777">
+          ${new Date(tx.timestamp).toLocaleString()}
+        </div>
+      </div>
+      <div style="color:${color}">
+        ${sign}${tx.amount.toFixed(2)} Pi
+      </div>
+    `;
+
+    KhairatHistory.appendChild(div);
+
+  });
+
 }
 
-loadKhairat();
+load();
+
 </script>
 
 </body>
-</html>
+  </html>
