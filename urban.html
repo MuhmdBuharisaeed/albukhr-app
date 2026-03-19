@@ -6,93 +6,11 @@
 <title>Urban Mobility</title>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/global-core.css">
+<link rel="stylesheet" href="css/global-layout.css">
+<link rel="stylesheet" href="css/global-components.css">
+<link rel="stylesheet" href="css/global-style.css">
 
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#f5f7f6;
-  height:100vh;
-  overflow:hidden;
-}
-
-/* ===== HEADER FIXED ===== */
-.header{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  z-index:1000;
-}
-
-/* ===== TOP FIXED AREA ===== */
-.fixed-area{
-  position:fixed;
-  top:60px;
-  left:0;
-  right:0;
-  background:#f5f7f6;
-  padding:16px;
-  z-index:999;
-}
-
-.stats{display:flex;gap:12px;margin:16px 0}
-.stat-card{flex:1;background:#fff;border-radius:14px;padding:16px;text-align:center}
-.stat-card span{display:block;color:#666;font-size:14px}
-.stat-card strong{font-size:18px;margin-top:6px;display:block}
-
-.short-info{
-  background:#fff;border-radius:12px;padding:12px;
-  font-size:13px;color:#444;line-height:1.5;margin-bottom:14px
-}
-
-.btns{display:flex;gap:12px;margin-top:12px}
-.btn{flex:1;padding:14px;border-radius:12px;border:none;font-weight:bold;font-size:16px}
-.primary{background:#0f7a3d;color:#fff}
-.secondary{background:#fff;border:1px solid #0f7a3d;color:#0f7a3d}
-
-/* ===== SCROLL AREA ===== */
-.scroll-area{
-  position:fixed;
-  top:330px;
-  bottom:0;
-  left:0;
-  right:0;
-  overflow-y:auto;
-  padding:16px;
-}
-
-.project-tx{
-  background:#fff;border-radius:12px;padding:10px 12px;
-  margin-bottom:8px;display:flex;align-items:center;gap:10px
-}
-.project-icon{font-size:18px}
-.project-body{flex:1}
-.project-title{font-size:14px;font-weight:600}
-.project-date{font-size:11px;color:#777}
-.project-right{text-align:right}
-.project-amount{font-size:14px;font-weight:bold}
-.project-status{font-size:11px}
-.success-status{color:#0f7a3d}
-.withdraw-status{color:#c0392b}
-
-/* MODALS */
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.4);
-  display:none;align-items:center;justify-content:center;z-index:2000
-}
-.modal-box{
-  background:#fff;width:90%;max-width:420px;
-  padding:20px;border-radius:16px
-}
-label{margin-top:12px;display:block}
-input,select{
-  width:100%;padding:12px;margin-top:6px;
-  border-radius:10px;border:1px solid #ccc;font-size:16px
-}
-.success{text-align:center}
-.success h3{color:#0f7a3d;margin-bottom:8px}
-</style>
 </head>
 
 <body>
@@ -104,16 +22,16 @@ input,select{
   <div class="header-right" onclick="openInfo()">ℹ️</div>
 </header>
 
-<div class="fixed-area">
+<div class="fixed-section">
 
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
-      <strong id="uStake">0.00 Pi</strong>
+      <strong id="lStake">0.00 Pi</strong>
     </div>
     <div class="stat-card">
       <span>Your Reward</span>
-      <strong id="uReward">0.00 Pi</strong>
+      <strong id="lReward">0.00 Pi</strong>
     </div>
   </div>
 
@@ -125,48 +43,57 @@ input,select{
 
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
-    <button onclick="goToWithdraw()" class="btn secondary">
+    <button onclick="openWithdrawModal()" class="btn secondary">
       💸 Withdraw Rewards
     </button>
   </div>
 
+  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
 </div>
 
 <div class="scroll-area">
-  <h3 style="font-size:15px;margin-bottom:10px">Transaction History</h3>
-  <div id="urbanHistory"></div>
+  <div id="UrbanHistory"></div>
 </div>
 
 <!-- STAKE MODAL -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
-    <h3>Stake in Urban Mobility</h3>
+    <h3>Stake in Urban</h3>
 
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
-    </small>
+    <small id="minHint"></small>
 
     <label>Duration</label>
     <select id="durationSelect">
       <option value="430">430 Days</option>
     </select>
 
-    <div class="btns" style="margin-top:16px">
+    <div class="btns">
       <button class="btn primary" onclick="confirmStake()">Confirm</button>
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- SUCCESS -->
-<div class="modal" id="successModal">
-  <div class="modal-box success">
-    <h3>Stake Successful</h3>
-    <p id="successText"></p>
-    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal">
+  <div class="modal-box">
+    <h3>Withdraw Rewards</h3>
+
+    <label>Amount</label>
+    <input type="number" id="withdrawAmount">
+
+    <small id="availableBalance"></small>
+
+    <label>Wallet Address</label>
+    <input type="text" id="walletAddress">
+
+    <div class="btns">
+      <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -183,113 +110,231 @@ input,select{
   </div>
 </div>
 
+<script src="js/albukhr-transaction-engine.js"></script>
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
-const stakeModal = document.getElementById("stakeModal");
-const successModal = document.getElementById("successModal");
-const infoModal = document.getElementById("infoModal");
+
+/* ===============================
+   MODALS
+================================ */
 
 function openModal(){
+  amountInput.value = "";
+  durationSelect.value = "30";
   stakeModal.style.display="flex";
-  minHint.innerText = "Minimum stake: " + getMinStake("Urban") + " Pi";
-}
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
 
-function safe(n){ return Number(n || 0).toFixed(2); }
+  minHint.innerText =
+    "Minimum stake: " + getMinStake("Urban") + " Pi";
+}
+
+function closeModal(){
+  stakeModal.style.display="none";
+}
+
+function openWithdrawModal(){
+
+  const data = getProjectTotals("Urban");
+
+  let total = 0;
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
+
+  availableBalance.innerText =
+    "Available: " + total.toFixed(2) + " Pi";
+
+  const saved =
+    localStorage.getItem("user_wallet") || "";
+
+  walletAddress.value = saved;
+
+  withdrawAmount.value = "";
+
+  withdrawModal.style.display="flex";
+}
+
+function closeWithdraw(){
+  withdrawModal.style.display="none";
+}
+
+/* ===============================
+   STAKE
+================================ */
 
 function confirmStake(){
+
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
   const min = getMinStake("Urban");
 
-  if(isNaN(amount) || amount <= 0){
-    alert("Please enter a valid amount");
-    return;
-  }
-
-  if(amount < min){
+  if(!amount || amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  addStake({ project:"Urban", amount, duration });
+  const ok = addStake({
+    project:"Urban",
+    amount,
+    duration
+  });
 
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in Urban Mobility.`;
+  if(!ok){
+    alert("Stake failed");
+    return;
+  }
+
+  /* RECORD TX */
+  recordTx({
+    type:"stake",
+    project:"Urban",
+    amount
+  });
+
+  amountInput.value = "";
 
   closeModal();
-  successModal.style.display="flex";
   load();
 }
 
-function load(){
+/* ===============================
+   WITHDRAW
+================================ */
+
+function confirmWithdraw(){
+
+  const amount = Number(withdrawAmount.value);
+  const wallet = walletAddress.value;
+
+  if(!amount || amount <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  if(!wallet){
+    alert("Enter wallet");
+    return;
+  }
+
   const data = getProjectTotals("Urban");
 
-  uStake.innerText = safe(data.stake) + " Pi";
-  uReward.innerText = safe(data.reward) + " Pi";
+  let total = 0;
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
 
-  urbanHistory.innerHTML = "";
-
-  if(!data.stakes || data.stakes.length === 0){
-    urbanHistory.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+  if(amount > total){
+    alert("Insufficient balance");
     return;
   }
 
-  data.stakes
-    .slice()
-    .sort((a,b)=>(b.timestamp||0)-(a.timestamp||0))
-    .forEach(s=>{
-      const t = formatDateTime(s);
+  let remaining = amount;
 
-      const isWithdraw = s.type === "withdraw";
+  data.stakes.forEach(s=>{
 
-      const div = document.createElement("div");
-      div.className="project-tx";
-      div.innerHTML=`
-        <div class="project-icon">${isWithdraw ? "💸" : "🚍"}</div>
-        <div class="project-body">
-          <div class="project-title">
-            ${isWithdraw ? "Urban Withdrawal" : "Urban Stake"}
-          </div>
-          <div class="project-date">${t.date} • ${t.time}</div>
-        </div>
-        <div class="project-right">
-          <div class="project-amount">
-            ${isWithdraw ? "-" : ""}${Number(s.amount).toFixed(2)} Pi
-          </div>
-          <div class="project-status ${isWithdraw ? "withdraw-status" : "success-status"}">
-            ${isWithdraw ? "Withdrawn" : "Successful"}
-          </div>
-        </div>
-      `;
-      urbanHistory.appendChild(div);
-    });
+    if(remaining <= 0) return;
+
+    let r = Number(s.remainingReward) || 0;
+
+    if(r > 0){
+
+      let take = Math.min(r, remaining);
+
+      withdrawStakeReward(s.id, take);
+
+      remaining -= take;
+
+    }
+
+  });
+
+  /* SAVE WALLET */
+  localStorage.setItem("user_wallet", wallet);
+
+  /* RECORD TX */
+  recordTx({
+    type:"withdraw",
+    project:"Urban",
+    amount
+  });
+
+  withdrawAmount.value = "";
+
+  closeWithdraw();
+  load();
 }
 
-function goToWithdraw(){
-  const totals = getTotals();
-  const withdrawn = typeof getTotalWithdrawn === "function"
-    ? getTotalWithdrawn()
-    : 0;
+/* ===============================
+   HISTORY (UNIFIED ENGINE)
+================================ */
 
-  const available = totals.totalReward - withdrawn;
+function load(){
 
-  if(available <= 0){
-    alert("No available rewards to withdraw.");
+  const data = getProjectTotals("Urban");
+
+  let reward = 0;
+  data.stakes.forEach(s=>{
+    reward += Number(s.remainingReward || 0);
+  });
+
+  lStake.innerText =
+    (data.stake || 0).toFixed(2) + " Pi";
+
+  lReward.innerText =
+    reward.toFixed(2) + " Pi";
+
+  labbaikaHistory.innerHTML = "";
+
+  const txs = getTransactions()
+    .filter(t => t.project === "Urban");
+
+  if(!txs.length){
+    labbaikaHistory.innerHTML =
+      "<p style='color:#777'>No transactions yet</p>";
     return;
   }
 
-  window.location.href = "wallet.html";
+  txs
+  .sort((a,b)=>b.timestamp - a.timestamp)
+  .forEach(tx=>{
+
+    let icon="🚍";
+    let sign="+";
+    let color="#0f7a3d";
+    let label="Stake";
+
+    if(tx.type==="withdraw"){
+      sign="-";
+      color="#c0392b";
+      label="Withdraw";
+    }
+
+    const div = document.createElement("div");
+    div.className="project-tx";
+
+    div.innerHTML = `
+      <div>${icon}</div>
+      <div style="flex:1">
+        <div>${label}</div>
+        <div style="font-size:11px;color:#777">
+          ${new Date(tx.timestamp).toLocaleString()}
+        </div>
+      </div>
+      <div style="color:${color}">
+        ${sign}${tx.amount.toFixed(2)} Pi
+      </div>
+    `;
+
+    UrbanHistory.appendChild(div);
+
+  });
+
 }
 
 load();
+
 </script>
 
 </body>
-    </html>
+  </html>
