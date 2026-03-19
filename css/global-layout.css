@@ -45,10 +45,9 @@ body{
 =============================== */
 .fixed-section{
   position:relative;
-  margin-top:70px; /* 🔥 fix header overlap */
+  margin-top:80px;   /* 🔥 daga 70 → 80 */
   padding-top:10px;
 }
-
 /* ===============================
    SCROLL AREA (NORMAL FLOW)
 =============================== */
@@ -63,4 +62,16 @@ body{
 .flex{
   display:flex;
   gap:10px;
+}
+
+.stats{
+  margin-top:10px;
+}
+
+.short-info{
+  margin-top:12px;
+}
+
+.btns{
+  margin-top:12px;
 }
