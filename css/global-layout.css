@@ -37,13 +37,16 @@ body{
   padding:16px;
   padding-top:80px; /* pushes below header */
 }
-
+.stats{
+  margin-top:10px;
+}
 /* ===============================
    TOP SECTION (NO MORE FIXED)
 =============================== */
 .fixed-section{
   position:relative;
-  margin-bottom:10px;
+  margin-top:70px; /* 🔥 fix header overlap */
+  padding-top:10px;
 }
 
 /* ===============================
