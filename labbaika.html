@@ -53,7 +53,7 @@
     Transaction History
   </h3>
 
-  <div id="azmanHistory"></div>
+  <div id="labbaikaHistory"></div> ✅
 
 </div>
 
@@ -95,7 +95,7 @@
   <div class="modal-box">
     <h3>About Labbaika Bakery Center</h3>
     <p style="font-size:14px;line-height:1.6;color:#444">
-      <strong>Labbaika<strong> Labbaika Bakery Center is a food production project focused on modern
+      <strong>Labbaika</strong> ✅ Labbaika Bakery Center is a food production project focused on modern
     bread and flour processing within the Albukhr ecosystem.
     </p>
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
@@ -172,7 +172,13 @@ function confirmStake(){
     alert("Stake failed.");
     return;
   }
-
+  
+  recordTx({
+  type:"stake",
+  project:"Labbaika",
+  amount
+  });
+  
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days in Labbaika.`;
 
@@ -240,7 +246,7 @@ function recordLiquidityTx(project, amount){
 
 function load(){
 
-  const data = getProjectTotals("Labbaika");
+  const data = getProjectTotals("Labbaika") ✅
 
   let reward = 0;
   data.stakes.forEach(s=>{
@@ -256,7 +262,7 @@ function load(){
    TRANSACTION ENGINE VIEW
 ===================================== */
 
-const txs = getTxByProject("Azman");
+const txs = getTxByProject("Labbaika"); ✅
 
 if(!txs.length){
   labbaikaHistory.innerHTML =
@@ -405,7 +411,7 @@ function confirmWithdraw(){
 
   /* RECORD TX */
   if(typeof recordWithdrawTx === "function"){
-    recordWithdrawTx("Azman", amount);
+    recordWithdrawTx("Labbaika", amount);
   }
 
   /* AFTER SUCCESS */
@@ -453,7 +459,7 @@ function openWithdrawModal(){
 
 function setMaxWithdraw(){
 
-  const data = getProjectTotals("Azman");
+  const data = getProjectTotals("Labbaika");
 
   let total = 0;
 
@@ -580,7 +586,7 @@ function withdrawRewardFromAzman(){
 
     /* ✅ ADD THIS HERE */
     if(typeof recordWithdrawTx === "function"){
-      recordWithdrawTx("Labbaika", amount);
+      recordWithdrawTx("Labbaika", amount); ✅
     }
 
   }
