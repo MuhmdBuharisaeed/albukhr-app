@@ -37,9 +37,7 @@ body{
   padding:16px;
   padding-top:80px; /* pushes below header */
 }
-.stats{
-  margin-top:10px;
-}
+
 /* ===============================
    TOP SECTION (NO MORE FIXED)
 =============================== */
@@ -49,14 +47,20 @@ body{
   background:var(--bg);
   z-index:900;
   padding:14px;
+
+  margin-bottom:20px; /* 🔥 THIS FIXES EVERYTHING */
 }
 /* ===============================
    SCROLL AREA (NORMAL FLOW)
 =============================== */
 .scroll-area{
-  position:relative;   /* ✅ FIX */
-  margin-top:20px;
+  position:relative;
   padding:14px;
+  padding-top:10px; /* better alignment */
+}
+.scroll-area h3{
+  margin-top:0;
+  margin-bottom:10px;
 }
 /* ===============================
    FLEX UTIL
