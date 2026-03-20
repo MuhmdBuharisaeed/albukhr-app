@@ -42,7 +42,7 @@ body{
    TOP SECTION (NO MORE FIXED)
 =============================== */
 .fixed-section{
-  position:sticky;
+  position:relative;
   top:60px;
   background:var(--bg);
   z-index:900;
