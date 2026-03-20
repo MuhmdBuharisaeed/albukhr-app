@@ -47,12 +47,15 @@
 💸 Withdraw Rewards
     </button>
   </div>
-
-  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
-</div>
-
+ 
 <div class="scroll-area">
+
+  <h3 style="margin-bottom:10px;font-size:15px">
+    Transaction History
+  </h3>
+
   <div id="azmanHistory"></div>
+
 </div>
 
 <!-- MODALS (UNCHANGED STRUCTURE) -->
@@ -366,6 +369,9 @@ function confirmWithdraw(){
     alert("Enter wallet address");
     return;
   }
+  
+/* 🧠 AI LAYER */
+  const status = aiApproveWithdraw(amount);
 
   const data = getProjectTotals("Azman");
 
@@ -376,7 +382,7 @@ function confirmWithdraw(){
   });
 
   if(amount > available){
-    alert("Insufficient reward balance");
+    alert("Insufficient balance");
     return;
   }
 
@@ -462,37 +468,6 @@ function setMaxWithdraw(){
   document.getElementById("withdrawAmount").value =
     total.toFixed(2);
     }
-
-function confirmWithdraw(){
-
-  const amount = Number(document.getElementById("withdrawAmount").value);
-  const wallet = document.getElementById("walletAddress").value;
-
-  if(!amount || amount <= 0){
-    alert("Enter valid amount");
-    return;
-  }
-
-  if(!wallet){
-    alert("Enter wallet address");
-    return;
-  }
-  
-/* 🧠 AI LAYER */
-  const status = aiApproveWithdraw(amount);
-
-  const data = getProjectTotals("Azman");
-
-  let available = 0;
-
-  data.stakes.forEach(s=>{
-    available += Number(s.remainingReward) || 0;
-  });
-
-  if(amount > available){
-    alert("Insufficient balance");
-    return;
-  }
 
   /* 💸 FEE SYSTEM */
   const fee = amount * 0.02;
