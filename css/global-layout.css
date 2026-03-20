@@ -44,10 +44,11 @@ body{
    TOP SECTION (NO MORE FIXED)
 =============================== */
 .fixed-section{
-  position:relative;
-  margin-top:80px;   /* 🔥 daga 70 → 80 */
-  margin-bottom:10px;
-  padding-top:10px;
+  position:sticky;
+  top:60px;
+  background:var(--bg);
+  z-index:900;
+  padding:14px;
 }
 /* ===============================
    SCROLL AREA (NORMAL FLOW)
