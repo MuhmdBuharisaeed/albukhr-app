@@ -46,19 +46,17 @@ body{
 .fixed-section{
   position:relative;
   margin-top:80px;   /* 🔥 daga 70 → 80 */
-  margin-bottom:12px;
+  margin-bottom:10px;
   padding-top:10px;
 }
 /* ===============================
    SCROLL AREA (NORMAL FLOW)
 =============================== */
 .scroll-area{
-  position:relative;
+  position:relative;   /* ✅ FIX */
+  margin-top:20px;
   padding:14px;
-  margin-top:10px; /* 🔥 ADD THIS */
-  margin-bottom:10px
 }
-
 /* ===============================
    FLEX UTIL
 =============================== */
