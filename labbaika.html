@@ -98,6 +98,7 @@
   </div>
 </div>
 
+<!-- ✅ SUCCESS MODAL -->
 <div class="modal" id="successModal">
   <div class="modal-box success">
     <h3>Stake Successful</h3>
@@ -105,16 +106,14 @@
     <button class="btn primary" onclick="closeSuccess()">OK</button>
   </div>
 </div>
-  
+
 <script src="js/albukhr-transaction-engine.js"></script>
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
 
-/* ===============================
-   MODALS
-================================ */
+/* ================= MODALS ================= */
 
 function openModal(){
   amountInput.value = "";
@@ -129,22 +128,24 @@ function closeModal(){
   stakeModal.style.display="none";
 }
 
+function closeSuccess(){
+  successModal.style.display="none";
+}
+
 function openWithdrawModal(){
 
   const data = getProjectTotals("Labbaika");
 
   let total = 0;
   data.stakes.forEach(s=>{
-    total += Number(s.remainingReward) || 0;
+    total += Number(s.remainingReward ?? 0);
   });
 
   availableBalance.innerText =
     "Available: " + total.toFixed(2) + " Pi";
 
-  const saved =
+  walletAddress.value =
     localStorage.getItem("user_wallet") || "";
-
-  walletAddress.value = saved;
 
   withdrawAmount.value = "";
 
@@ -155,49 +156,7 @@ function closeWithdraw(){
   withdrawModal.style.display="none";
 }
 
-/* ===============================
-   STAKE
-================================ */
-
-function confirmStake(){
-
-  const amount = Number(amountInput.value);
-  const duration = Number(durationSelect.value);
-  const min = getMinStake("Labbaika");
-
-  if(!amount || amount < min){
-    alert("Minimum stake is " + min + " Pi");
-    return;
-  }
-  
-  const ok = addStake({
-    project:"Labbaika",
-    amount,
-    duration
-  });
-  
-  if(!ok){
-    alert("Stake failed");
-    return;
-  }
-
-  /* RECORD TX */
-  recordTx({
-    type:"stake",
-    project:"Labbaika",
-    amount
-  });
-  alert(`Stake successful!\n\nYou staked ${amount} Pi for ${duration} days.`);
-
-  amountInput.value = "";
-
-  closeModal();
-  load();
-}
-
-/* ===============================
-   WITHDRAW
-================================ */
+/* ================= STAKE ================= */
 
 function confirmStake(){
 
@@ -221,28 +180,79 @@ function confirmStake(){
     return;
   }
 
-  /* RECORD TX */
   recordTx({
     type:"stake",
     project:"Labbaika",
     amount
   });
 
-  /* SUCCESS UI */
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days in Labbaika.`;
-
-  amountInput.value = "";
 
   closeModal();
   successModal.style.display="flex";
 
   load();
-    }
+}
 
-/* ===============================
-   HISTORY (UNIFIED ENGINE)
-================================ */
+/* ================= WITHDRAW ================= */
+
+function confirmWithdraw(){
+
+  const amount = Number(withdrawAmount.value);
+  const wallet = walletAddress.value;
+
+  if(!amount || amount <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  if(!wallet){
+    alert("Enter wallet");
+    return;
+  }
+
+  const data = getProjectTotals("Labbaika");
+
+  let total = 0;
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward ?? 0);
+  });
+
+  if(amount > total){
+    alert("Insufficient balance");
+    return;
+  }
+
+  let remaining = amount;
+
+  data.stakes.forEach(s=>{
+    if(remaining <= 0) return;
+
+    let r = Number(s.remainingReward ?? 0);
+
+    if(r > 0){
+      let take = Math.min(r, remaining);
+      withdrawStakeReward(s.id, take);
+      remaining -= take;
+    }
+  });
+
+  localStorage.setItem("user_wallet", wallet);
+
+  recordTx({
+    type:"withdraw",
+    project:"Labbaika",
+    amount
+  });
+
+  withdrawAmount.value = "";
+
+  closeWithdraw();
+  load();
+}
+
+/* ================= LOAD ================= */
 
 function load(){
 
@@ -250,14 +260,11 @@ function load(){
 
   let reward = 0;
   data.stakes.forEach(s=>{
-  reward += Number(s.remainingReward ?? s.reward ?? 0);
+    reward += Number(s.remainingReward ?? s.reward ?? 0);
   });
 
-  lStake.innerText =
-    (data.stake || 0).toFixed(2) + " Pi";
-
-  lReward.innerText =
-    reward.toFixed(2) + " Pi";
+  lStake.innerText = (data.stake || 0).toFixed(2) + " Pi";
+  lReward.innerText = reward.toFixed(2) + " Pi";
 
   labbaikaHistory.innerHTML = "";
 
@@ -285,19 +292,27 @@ function load(){
       label="Withdraw";
     }
 
+    if(tx.type==="reward"){
+      icon="🎁";
+      color="#1e90ff";
+      label="Reward";
+    }
+
     const div = document.createElement("div");
     div.className="project-tx";
 
     div.innerHTML = `
       <div class="project-icon">${icon}</div>
-      <div style="flex:1">
-        <div>${label}</div>
-        <div style="font-size:11px;color:#777">
+      <div class="project-body">
+        <div class="project-title">${label}</div>
+        <div class="project-date">
           ${new Date(tx.timestamp).toLocaleString()}
         </div>
       </div>
-      <div style="color:${color}">
-        ${sign}${tx.amount.toFixed(2)} Pi
+      <div class="project-right">
+        <div class="project-amount" style="color:${color}">
+          ${sign}${tx.amount.toFixed(2)} Pi
+        </div>
       </div>
     `;
 
