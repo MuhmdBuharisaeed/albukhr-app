@@ -54,7 +54,8 @@ body{
 .scroll-area{
   position:relative;
   padding:14px;
-  margin-top:8px; /* 🔥 ADD THIS */
+  margin-top:10px; /* 🔥 ADD THIS */
+  margin-bottom:10px
 }
 
 /* ===============================
