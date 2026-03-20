@@ -56,7 +56,8 @@ body{
 .scroll-area{
   position:relative;
   padding:14px;
-  padding-top:10px; /* better alignment */
+
+  margin-top:80px;  /* 🔥 THIS IS THE REAL FIX */
 }
 .scroll-area h3{
   margin-top:15;
