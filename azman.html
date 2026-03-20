@@ -47,7 +47,7 @@
 💸 Withdraw Rewards
     </button>
   </div>
- 
+
 <div class="scroll-area">
 
   <h3 style="margin-bottom:10px;font-size:15px">
@@ -96,7 +96,7 @@
   <div class="modal-box">
     <h3>About Azman Futures Makers Lab</h3>
     <p style="font-size:14px;line-height:1.6;color:#444">
-      Azman is ALBUKHR’s flagship innovation ecosystem supporting research,
+      <strong>Azman<strong> is ALBUKHR’s flagship innovation ecosystem supporting research,
       prototyping, advanced training, and long-term technology development.
     </p>
     <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
@@ -369,9 +369,6 @@ function confirmWithdraw(){
     alert("Enter wallet address");
     return;
   }
-  
-/* 🧠 AI LAYER */
-  const status = aiApproveWithdraw(amount);
 
   const data = getProjectTotals("Azman");
 
@@ -382,7 +379,7 @@ function confirmWithdraw(){
   });
 
   if(amount > available){
-    alert("Insufficient balance");
+    alert("Insufficient reward balance");
     return;
   }
 
@@ -468,6 +465,37 @@ function setMaxWithdraw(){
   document.getElementById("withdrawAmount").value =
     total.toFixed(2);
     }
+
+function confirmWithdraw(){
+
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  const wallet = document.getElementById("walletAddress").value;
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(!wallet){
+    alert("Enter wallet address");
+    return;
+  }
+  
+/* 🧠 AI LAYER */
+  const status = aiApproveWithdraw(amount);
+
+  const data = getProjectTotals("Azman");
+
+  let available = 0;
+
+  data.stakes.forEach(s=>{
+    available += Number(s.remainingReward) || 0;
+  });
+
+  if(amount > available){
+    alert("Insufficient balance");
+    return;
+  }
 
   /* 💸 FEE SYSTEM */
   const fee = amount * 0.02;
@@ -569,4 +597,4 @@ load();
 </script>
 
 </body>
-        </html>
+</html>
