@@ -27,37 +27,34 @@
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
-      <strong id="aStake">0.00 Pi</strong>
+      <strong id="lStake">0.00 Pi</strong>
     </div>
     <div class="stat-card">
       <span>Your Reward</span>
-      <strong id="aReward">0.00 Pi</strong>
+      <strong id="lReward">0.00 Pi</strong>
     </div>
   </div>
 
   <div class="short-info">
-  <strong>Labbaika Bakery Center</strong> is a food production project focused on modern
+    Labbaika Bakery Center is a food production project focused on modern
     bread and flour processing within the Albukhr ecosystem.
   </div>
 
   <div class="btns">
     <button class="btn primary" onclick="openModal()">Stake</button>
     <button onclick="openWithdrawModal()" class="btn secondary">
-💸 Withdraw Rewards
+      💸 Withdraw Rewards
     </button>
   </div>
 
-<div class="scroll-area">
-
-  <h3 style="margin-bottom:10px;font-size:15px">
-    Transaction History
-  </h3>
-
-  <div id="labbaikaHistory"></div> ✅
-
+  <h3 style="margin-top:20px;font-size:15px">Transaction History</h3>
 </div>
 
-<!-- MODALS (UNCHANGED STRUCTURE) -->
+<div class="scroll-area">
+  <div id="labbaikaHistory"></div>
+</div>
+
+<!-- STAKE MODAL -->
 <div class="modal" id="stakeModal">
   <div class="modal-box">
     <h3>Stake in Labbaika</h3>
@@ -65,9 +62,7 @@
     <label>Amount (Pi)</label>
     <input type="number" id="amountInput">
 
-    <small id="minHint" style="color:#0f7a3d;display:block;margin-top:6px">
-      Minimum stake: --
-    </small>
+    <small id="minHint"></small>
 
     <label>Duration</label>
     <select id="durationSelect">
@@ -76,54 +71,27 @@
       <option value="90">90 Days</option>
     </select>
 
-    <div class="btns" style="margin-top:16px">
+    <div class="btns">
       <button class="btn primary" onclick="confirmStake()">Confirm</button>
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
-<div class="modal" id="successModal">
-  <div class="modal-box success">
-    <h3>Stake Successful</h3>
-    <p id="successText"></p>
-    <button class="btn primary" style="margin-top:16px" onclick="closeSuccess()">OK</button>
-  </div>
-</div>
-
-<div class="modal" id="infoModal">
-  <div class="modal-box">
-    <h3>About Labbaika Bakery Center</h3>
-    <p style="font-size:14px;line-height:1.6;color:#444">
-      <strong>Labbaika</strong> ✅ Labbaika Bakery Center is a food production project focused on modern
-    bread and flour processing within the Albukhr ecosystem.
-    </p>
-    <button class="btn secondary" style="margin-top:16px" onclick="closeInfo()">Close</button>
-  </div>
-</div>
-
+<!-- WITHDRAW MODAL -->
 <div class="modal" id="withdrawModal">
   <div class="modal-box">
     <h3>Withdraw Rewards</h3>
 
-    <label>Amount (Pi)</label>
-    <div style="display:flex; gap:8px">
-      <input type="number" id="withdrawAmount" style="flex:1">
-      <button class="btn secondary" onclick="setMaxWithdraw()">MAX</button>
-    </div>
+    <label>Amount</label>
+    <input type="number" id="withdrawAmount">
 
-    <small id="availableBalance" style="color:#0f7a3d;display:block;margin-top:6px">
-      Available: 0 Pi
-    </small>
+    <small id="availableBalance"></small>
 
     <label>Wallet Address</label>
     <input type="text" id="walletAddress">
 
-    <small style="color:#777;display:block;margin-top:6px">
-      Fee: 2%
-    </small>
-
-    <div class="btns" style="margin-top:16px">
+    <div class="btns">
       <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
       <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
     </div>
@@ -135,260 +103,120 @@
 <script src="wallet-core.js"></script>
 
 <script>
-const stakeModal = document.getElementById("stakeModal");
-const successModal = document.getElementById("successModal");
-const infoModal = document.getElementById("infoModal");
+
+/* ===============================
+   MODALS
+================================ */
 
 function openModal(){
-
-  /* ✅ RESET FORM BEFORE OPEN */
   amountInput.value = "";
-  durationSelect.value = "180";
-
+  durationSelect.value = "30";
   stakeModal.style.display="flex";
 
   minHint.innerText =
     "Minimum stake: " + getMinStake("Labbaika") + " Pi";
-    }
+}
 
-function closeModal(){ stakeModal.style.display="none"; }
-function closeSuccess(){ successModal.style.display="none"; }
-function openInfo(){ infoModal.style.display="flex"; }
-function closeInfo(){ infoModal.style.display="none"; }
+function closeModal(){
+  stakeModal.style.display="none";
+}
+
+function openWithdrawModal(){
+
+  const data = getProjectTotals("Labbaika");
+
+  let total = 0;
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
+
+  availableBalance.innerText =
+    "Available: " + total.toFixed(2) + " Pi";
+
+  const saved =
+    localStorage.getItem("user_wallet") || "";
+
+  walletAddress.value = saved;
+
+  withdrawAmount.value = "";
+
+  withdrawModal.style.display="flex";
+}
+
+function closeWithdraw(){
+  withdrawModal.style.display="none";
+}
+
+/* ===============================
+   STAKE
+================================ */
 
 function confirmStake(){
+
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
   const min = getMinStake("Labbaika");
 
-  if(isNaN(amount) || amount < min){
+  if(!amount || amount < min){
     alert("Minimum stake is " + min + " Pi");
     return;
   }
 
-  const ok = addStake({ project:"Labbaika", amount, duration });
+  const ok = addStake({
+    project:"Labbaika",
+    amount,
+    duration
+  });
 
   if(!ok){
-    alert("Stake failed.");
+    alert("Stake failed");
     return;
   }
-  
-  recordTx({
-  type:"stake",
-  project:"Labbaika",
-  amount
-  });
-  
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in Labbaika.`;
 
-  /* ✅ CLEAR FORM HERE */
+  /* RECORD TX */
+  recordTx({
+    type:"stake",
+    project:"Labbaika",
+    amount
+  });
+
   amountInput.value = "";
-  durationSelect.value = "180";
 
   closeModal();
-  successModal.style.display="flex";
   load();
-  }
-
-/* =========================================
-   FILTERS
-========================================= */
-
-function getTxByProject(project){
-  return getTransactions()
-    .filter(t => t.project === project);
 }
 
-function getTxByType(type){
-  return getTransactions()
-    .filter(t => t.type === type);
-}
-
-function getRecentTx(limit = 20){
-  return getTransactions()
-    .slice()
-    .reverse()
-    .slice(0, limit);
-  }
-
-function recordStake(project, amount){
-  return recordTx({
-    type:"stake",
-    project,
-    amount
-  });
-}
-
-function recordWithdrawTx(project, amount){
-  return recordTx({
-    type:"withdraw",
-    project,
-    amount
-  });
-}
-
-function recordRewardTx(project, amount){
-  return recordTx({
-    type:"reward",
-    project,
-    amount
-  });
-}
-
-function recordLiquidityTx(project, amount){
-  return recordTx({
-    type:"liquidity",
-    project,
-    amount
-  });
-}
-
-function load(){
-
-  const data = getProjectTotals("Labbaika") ✅
-
-  let reward = 0;
-  data.stakes.forEach(s=>{
-    reward += Number(s.remainingReward ?? s.reward) || 0;
-  });
-
-  aStake.innerText  = (data.stake || 0).toFixed(2) + " Pi";
-  aReward.innerText = reward.toFixed(2) + " Pi";
-
-  labbaikaHistory.innerHTML = "";
-
-/* =====================================
-   TRANSACTION ENGINE VIEW
-===================================== */
-
-const txs = getTxByProject("Labbaika"); ✅
-
-if(!txs.length){
-  labbaikaHistory.innerHTML =
-    "<p style='font-size:12px;color:#777'>No transactions yet</p>";
-  return;
-}
-
-txs
-.sort((a,b)=>b.timestamp - a.timestamp)
-.forEach(tx=>{
-
-  const div = document.createElement("div");
-  div.className="project-tx";
-
-  let icon = "🍞";
-  let label = "Transaction";
-  let color = "success-status";
-  let sign = "+";
-
-  if(tx.type === "withdraw"){
-    icon = "💸";
-    label = "Withdraw";
-    color = "withdraw-status";
-    sign = "-";
-  }
-
-  if(tx.type === "stake"){
-    label = "Stake";
-  }
-
-  if(tx.type === "reward"){
-    icon = "🎁";
-    label = "Reward";
-  }
-
-  div.innerHTML = `
-    <div class="project-icon">${icon}</div>
-
-    <div class="project-body">
-      <div class="project-title">${label}</div>
-      <div class="project-date">
-        ${new Date(tx.timestamp).toLocaleString()}
-      </div>
-    </div>
-
-    <div class="project-right">
-      <div class="project-amount ${color}">
-        ${sign}${Number(tx.amount).toFixed(2)} Pi
-      </div>
-    </div>
-  `;
-
-  labbaikaHistory.appendChild(div);
-
-});
-
-}
-
-function getWithdrawHistory(){
-  return JSON.parse(localStorage.getItem("albukhr_withdrawals")) || [];
-}
-
-function recordWithdraw(data){
-
-  const list =
-  JSON.parse(localStorage.getItem("albukhr_withdrawals")) || [];
-
-  list.push({
-    ...data,
-    id:"WD-"+Date.now()
-  });
-
-  localStorage.setItem(
-    "albukhr_withdrawals",
-    JSON.stringify(list)
-  );
-    }
-
-function formatDateTime(s){
-
-  const d = new Date(s.timestamp);
-
-  return {
-    date: d.toLocaleDateString(),
-    time: d.toLocaleTimeString()
-  };
-
-}
-
-function openWithdrawModal(){
-  document.getElementById("withdrawModal").style.display = "flex";
-}
-
-function closeWithdraw(){
-  document.getElementById("withdrawModal").style.display = "none";
-}
+/* ===============================
+   WITHDRAW
+================================ */
 
 function confirmWithdraw(){
 
-  const amount = Number(document.getElementById("withdrawAmount").value);
-  const wallet = document.getElementById("walletAddress").value;
+  const amount = Number(withdrawAmount.value);
+  const wallet = walletAddress.value;
 
   if(!amount || amount <= 0){
-    alert("Enter valid amount");
+    alert("Invalid amount");
     return;
   }
 
   if(!wallet){
-    alert("Enter wallet address");
+    alert("Enter wallet");
     return;
   }
 
   const data = getProjectTotals("Labbaika");
 
-  let available = 0;
-
+  let total = 0;
   data.stakes.forEach(s=>{
-    available += Number(s.remainingReward) || 0;
+    total += Number(s.remainingReward) || 0;
   });
 
-  if(amount > available){
-    alert("Insufficient reward balance");
+  if(amount > total){
+    alert("Insufficient balance");
     return;
   }
 
-  /* DISTRIBUTE WITHDRAW */
   let remaining = amount;
 
   data.stakes.forEach(s=>{
@@ -409,197 +237,92 @@ function confirmWithdraw(){
 
   });
 
-  /* RECORD TX */
-  if(typeof recordWithdrawTx === "function"){
-    recordWithdrawTx("Labbaika", amount);
-  }
-
-  /* AFTER SUCCESS */
-
-const save = confirm(
-  "✅ Withdraw successful\n\nDo you want to save this wallet address for future use?"
-);
-
-if(save){
+  /* SAVE WALLET */
   localStorage.setItem("user_wallet", wallet);
-}else{
-  localStorage.removeItem("user_wallet");
-}
 
-/* CLEAR ONLY AMOUNT (NOT WALLET) */
-document.getElementById("withdrawAmount").value = "";
+  /* RECORD TX */
+  recordTx({
+    type:"withdraw",
+    project:"Labbaika",
+    amount
+  });
 
-/* CLOSE + REFRESH */
-closeWithdraw();
-load();
+  withdrawAmount.value = "";
 
   closeWithdraw();
   load();
-  }
-
-function openWithdrawModal(){
-
-  const data = getProjectTotals("Labbaika");
-
-  let total = 0;
-
-  data.stakes.forEach(s=>{
-    total += Number(s.remainingReward) || 0;
-  });
-
-  document.getElementById("availableBalance").innerText =
-    "Available: " + total.toFixed(2) + " Pi";
-
-  /* AUTO WALLET (if exists) */
-  const wallet = localStorage.getItem("user_wallet") || "";
-  document.getElementById("walletAddress").value = wallet;
-
-  document.getElementById("withdrawModal").style.display = "flex";
-    }
-
-function setMaxWithdraw(){
-
-  const data = getProjectTotals("Labbaika");
-
-  let total = 0;
-
-  data.stakes.forEach(s=>{
-    total += Number(s.remainingReward) || 0;
-  });
-
-  document.getElementById("withdrawAmount").value =
-    total.toFixed(2);
-    }
-
-function confirmWithdraw(){
-
-  const amount = Number(document.getElementById("withdrawAmount").value);
-  const wallet = document.getElementById("walletAddress").value;
-
-  if(!amount || amount <= 0){
-    alert("Enter valid amount");
-    return;
-  }
-
-  if(!wallet){
-    alert("Enter wallet address");
-    return;
-  }
-  
-/* 🧠 AI LAYER */
-  const status = aiApproveWithdraw(amount);
-
-  const data = getProjectTotals("Azman");
-
-  let available = 0;
-
-  data.stakes.forEach(s=>{
-    available += Number(s.remainingReward) || 0;
-  });
-
-  if(amount > available){
-    alert("Insufficient balance");
-    return;
-  }
-
-  /* 💸 FEE SYSTEM */
-  const fee = amount * 0.02;
-  const net = amount - fee;
-
-  /* PROCESS UI */
-  document.querySelector("#withdrawModal h3").innerText = "Processing...";
-
-  setTimeout(()=>{
-
-    let remaining = amount;
-
-    data.stakes.forEach(s=>{
-
-      if(remaining <= 0) return;
-
-      let r = Number(s.remainingReward) || 0;
-
-      if(r > 0){
-
-        let take = Math.min(r, remaining);
-
-        withdrawStakeReward(s.id, take);
-
-        remaining -= take;
-
-      }
-
-    });
-
-    /* SAVE WALLET */
-    localStorage.setItem("user_wallet", wallet);
-
-    /* RECORD TX */
-    if(typeof recordWithdrawTx === "function"){
-      recordWithdrawTx("Labbaika", amount);
-    }
-
-    alert(`Withdraw successful\n\nAmount: ${amount} Pi\nFee: ${fee.toFixed(2)} Pi\nYou receive: ${net.toFixed(2)} Pi`);
-
-    document.querySelector("#withdrawModal h3").innerText = "Withdraw Rewards";
-
-    closeWithdraw();
-    load();
-
-  }, 1200); // simulate processing
-
-  }
-
-function closeWithdraw(){
-  document.getElementById("withdrawModal").style.display = "none";
 }
 
-function aiApproveWithdraw(amount){
+/* ===============================
+   HISTORY (UNIFIED ENGINE)
+================================ */
 
-  if(amount < 100){
-    return "approved"; // small → auto
-  }
-
-  if(amount < 500){
-    return "review"; // medium → semi-auto
-  }
-
-  return "flagged"; // large → risk
-  }
-
-function withdrawRewardFromAzman(){
+function load(){
 
   const data = getProjectTotals("Labbaika");
 
-  if(!data.stakes.length){
-    alert("No rewards available.");
+  let reward = 0;
+  data.stakes.forEach(s=>{
+    reward += Number(s.remainingReward || 0);
+  });
+
+  lStake.innerText =
+    (data.stake || 0).toFixed(2) + " Pi";
+
+  lReward.innerText =
+    reward.toFixed(2) + " Pi";
+
+  labbaikaHistory.innerHTML = "";
+
+  const txs = getTransactions()
+    .filter(t => t.project === "Labbaika");
+
+  if(!txs.length){
+    labbaikaHistory.innerHTML =
+      "<p style='color:#777'>No transactions yet</p>";
     return;
   }
 
-  stakes.forEach(s=>{
+  txs
+  .sort((a,b)=>b.timestamp - a.timestamp)
+  .forEach(tx=>{
 
-  const amount = Number(s.remainingReward) || 0; // ✅ SAVE FIRST
+    let icon="🍞";
+    let sign="+";
+    let color="#0f7a3d";
+    let label="Stake";
 
-  if(amount > 0){
-
-    withdrawStakeReward(s.id);
-
-    /* ✅ ADD THIS HERE */
-    if(typeof recordWithdrawTx === "function"){
-      recordWithdrawTx("Labbaika", amount); ✅
+    if(tx.type==="withdraw"){
+      sign="-";
+      color="#c0392b";
+      label="Withdraw";
     }
 
-  }
+    const div = document.createElement("div");
+    div.className="project-tx";
 
-});
+    div.innerHTML = `
+      <div>${icon}</div>
+      <div style="flex:1">
+        <div>${label}</div>
+        <div style="font-size:11px;color:#777">
+          ${new Date(tx.timestamp).toLocaleString()}
+        </div>
+      </div>
+      <div style="color:${color}">
+        ${sign}${tx.amount.toFixed(2)} Pi
+      </div>
+    `;
 
-  alert("Rewards withdrawn successfully.");
+    labbaikaHistory.appendChild(div);
 
-  load();
-  }
+  });
+
+}
 
 load();
+
 </script>
 
 </body>
-      </html>
+</html>
