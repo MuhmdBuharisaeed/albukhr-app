@@ -1,7 +1,7 @@
 /* ======================================
    ALBUKHR – UNIFIED TRANSACTIONS LAYER
-   READ-ONLY • SAFE • NON-DESTRUCTIVE
-   ====================================== */
+   CLEAN • SAFE • NON-DESTRUCTIVE
+====================================== */
 
 function getAllTransactionsUnified(){
 
@@ -53,8 +53,13 @@ function getAllTransactionsUnified(){
     });
   }
 
+  /* SORT */
   return txs.sort((a,b)=>b.timestamp - a.timestamp);
 }
+
+/* ======================================
+   TOTALS (SAFE + FLEXIBLE)
+====================================== */
 
 function getUnifiedTotals(){
 
@@ -78,25 +83,10 @@ function getUnifiedTotals(){
   return { totalStake, totalReward };
 }
 
-  /* SORT: newest first */
-  return txs.sort((a,b)=>b.timestamp - a.timestamp);
-}
+/* ======================================
+   RECENT
+====================================== */
 
-/* TOTALS (HOME SAFE) */
-function getUnifiedTotals(){
-  const txs = getAllTransactionsUnified();
-
-  let totalStake = 0;
-  let totalReward = 0;
-
-  txs.forEach(t=>{
-    if(t.type === "stake" && t.status === "Successful"){
-      totalStake += Number(t.amount) || 0;
-    }
-    if(t.type === "reward" && t.status === "Successful"){
-      totalReward += Number(t.amount) || 0;
-    }
-  });
-
-  return { totalStake, totalReward };
-}
+function getUnifiedRecent(limit = 5){
+  return getAllTransactionsUnified().slice(0, limit);
+       }
