@@ -1,0 +1,192 @@
+<script>
+/* ======================================
+   PROJECT CONFIG LOADER
+====================================== */
+const params = new URLSearchParams(window.location.search);
+const PROJECT_NAME = params.get("project") || "Azman";
+
+/* ICON MAP */
+const PROJECT_ICONS = {
+  Azman:"🧪",
+  Labbaika:"🍞",
+  Khairat:"🌾",
+  Urban:"🏙️",
+  Barsh:"🏗️",
+  Hauwal:"💧",
+  Raheem:"🌱"
+};
+
+const PROJECT_ICON = PROJECT_ICONS[PROJECT_NAME] || "📦";
+
+/* ======================================
+   DYNAMIC UI TITLE
+====================================== */
+document.querySelector(".header-left span").innerText =
+  `${PROJECT_ICON} ${PROJECT_NAME}`;
+
+/* ======================================
+   DOM
+====================================== */
+const projectHistory = document.getElementById("projectHistory");
+
+/* ======================================
+   STAKE
+====================================== */
+function confirmStake(){
+
+  const amount = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+  const min = getMinStake(PROJECT_NAME);
+
+  if(!amount || amount < min){
+    alert("Minimum stake is " + min + " Pi");
+    return;
+  }
+
+  const ok = addStake({
+    project: PROJECT_NAME,
+    amount,
+    duration
+  });
+
+  if(!ok){
+    alert("Stake failed.");
+    return;
+  }
+
+  successText.innerText =
+    `You staked ${amount} Pi for ${duration} days in ${PROJECT_NAME}.`;
+
+  successModal.style.display="flex";
+  load();
+}
+
+/* ======================================
+   LOAD
+====================================== */
+function load(){
+
+  const data = getProjectTotals(PROJECT_NAME);
+
+  let reward = 0;
+  data.stakes.forEach(s=>{
+    reward += Number(s.remainingReward ?? s.reward) || 0;
+  });
+
+  document.getElementById("aStake").innerText =
+    (data.stake || 0).toFixed(2) + " Pi";
+
+  document.getElementById("aReward").innerText =
+    reward.toFixed(2) + " Pi";
+
+  renderHistory();
+}
+
+/* ======================================
+   HISTORY
+====================================== */
+function renderHistory(){
+
+  projectHistory.innerHTML = "";
+
+  const txs = getTransactions()
+    .filter(t => t.project === PROJECT_NAME)
+    .sort((a,b)=>b.timestamp - a.timestamp);
+
+  if(!txs.length){
+    projectHistory.innerHTML =
+      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+    return;
+  }
+
+  txs.forEach(tx=>{
+
+    let icon = PROJECT_ICON;
+    let label = "Stake";
+    let sign = "+";
+    let color = "success-status";
+
+    if(tx.type === "withdraw"){
+      icon = "💸";
+      label = "Withdraw";
+      sign = "-";
+      color = "withdraw-status";
+    }
+
+    const div = document.createElement("div");
+    div.className="project-tx";
+
+    div.innerHTML = `
+      <div class="project-icon">${icon}</div>
+      <div class="project-body">
+        <div class="project-title">${label}</div>
+        <div class="project-date">
+          ${new Date(tx.timestamp).toLocaleString()}
+        </div>
+      </div>
+      <div class="project-right">
+        <div class="project-amount ${color}">
+          ${sign}${tx.amount.toFixed(2)} Pi
+        </div>
+      </div>
+    `;
+
+    projectHistory.appendChild(div);
+  });
+}
+
+/* ======================================
+   WITHDRAW
+====================================== */
+function confirmWithdraw(){
+
+  const amount = Number(withdrawAmount.value);
+  const wallet = walletAddress.value;
+
+  if(!amount || amount <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  const data = getProjectTotals(PROJECT_NAME);
+
+  let total = 0;
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
+
+  if(amount > total){
+    alert("Insufficient balance");
+    return;
+  }
+
+  let remaining = amount;
+
+  data.stakes.forEach(s=>{
+    if(remaining <= 0) return;
+
+    let r = Number(s.remainingReward) || 0;
+    if(r > 0){
+      let take = Math.min(r, remaining);
+      withdrawStakeReward(s.id, take);
+      remaining -= take;
+    }
+  });
+
+  recordTx({
+    type:"withdraw",
+    project:PROJECT_NAME,
+    amount
+  });
+
+  localStorage.setItem("user_wallet", wallet);
+
+  closeWithdraw();
+  load();
+}
+
+/* ======================================
+   INIT
+====================================== */
+load();
+  </script>
