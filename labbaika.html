@@ -180,19 +180,30 @@ function confirmStake(){
     return;
   }
 
-  recordTx({
-    type:"stake",
-    project:"Labbaika",
-    amount
-  });
+  /* ✅ USE SAME ENGINE AS AZMAN */
+  if(typeof recordStake === "function"){
+    recordStake("Labbaika", amount);
+  }
 
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in Labbaika.`;
+    `You staked ${amount} Pi for ${duration} days in Labbaika Bakery Center.`;
+
+  amountInput.value = "";
 
   closeModal();
   successModal.style.display="flex";
-
   load();
+}
+
+/* ================= RECORDSTAKE ================= */
+  
+function recordStake(project, amount){
+  return recordTx({
+    type:"stake",
+    project,
+    amount,
+    timestamp: Date.now()
+  });
 }
 
 /* ================= WITHDRAW ================= */
@@ -241,10 +252,11 @@ function confirmWithdraw(){
   localStorage.setItem("user_wallet", wallet);
 
   recordTx({
-    type:"withdraw",
-    project:"Labbaika",
-    amount
-  });
+  type: "stake",
+  project: "Labbaika",
+  amount: amount,
+  timestamp: Date.now()
+});
 
   withdrawAmount.value = "";
 
