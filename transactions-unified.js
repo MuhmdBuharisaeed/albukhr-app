@@ -4,6 +4,7 @@
    ====================================== */
 
 function getAllTransactionsUnified(){
+
   let txs = [];
 
   /* -------- INTERNAL -------- */
@@ -13,44 +14,69 @@ function getAllTransactionsUnified(){
         source: "internal",
         projectId: s.project,
         user: "internal",
-        amount: s.amount,
-        status: s.status,
-        timestamp: s.timestamp,
+        amount: Number(s.amount) || 0,
+        status: s.status || "Successful",
+        timestamp: s.timestamp || Date.now(),
         type: "stake"
       });
     });
   }
 
   /* -------- EXTERNAL -------- */
-  if(localStorage.getItem("albukhr_external_stakes")){
-    JSON.parse(localStorage.getItem("albukhr_external_stakes") || "[]")
-      .forEach(s=>{
-        txs.push({
-          source: "external",
-          projectId: s.projectId,
-          user: s.userPiUID,
-          amount: s.amount,
-          status: s.status,
-          timestamp: s.timestamp,
-          type: "stake"
-        });
-      });
-  }
+  const external =
+    JSON.parse(localStorage.getItem("albukhr_external_stakes") || "[]");
 
-  /* -------- CORE (OPTIONAL) -------- */
+  external.forEach(s=>{
+    txs.push({
+      source: "external",
+      projectId: s.projectId,
+      user: s.userPiUID,
+      amount: Number(s.amount) || 0,
+      status: s.status || "Successful",
+      timestamp: s.timestamp || Date.now(),
+      type: "stake"
+    });
+  });
+
+  /* -------- CORE -------- */
   if(typeof getTransactions === "function"){
     getTransactions().forEach(t=>{
       txs.push({
         source: "core",
-        projectId: t.projectId || "-",
+        projectId: t.project || t.projectId || "-",
         user: t.user || "-",
-        amount: t.amount,
-        status: t.status,
-        timestamp: t.timestamp,
-        type: t.type
+        amount: Number(t.amount) || 0,
+        status: t.status || "Successful",
+        timestamp: t.timestamp || Date.now(),
+        type: (t.type || "stake").toLowerCase()
       });
     });
   }
+
+  return txs.sort((a,b)=>b.timestamp - a.timestamp);
+}
+
+function getUnifiedTotals(){
+
+  const txs = getAllTransactionsUnified();
+
+  let totalStake = 0;
+  let totalReward = 0;
+
+  txs.forEach(t=>{
+
+    if(t.type === "stake"){
+      totalStake += t.amount;
+    }
+
+    if(t.type === "reward"){
+      totalReward += t.amount;
+    }
+
+  });
+
+  return { totalStake, totalReward };
+}
 
   /* SORT: newest first */
   return txs.sort((a,b)=>b.timestamp - a.timestamp);
@@ -73,9 +99,4 @@ function getUnifiedTotals(){
   });
 
   return { totalStake, totalReward };
-}
-
-/* RECENT TRANSACTIONS */
-function getUnifiedRecent(limit = 3){
-  return getAllTransactionsUnified().slice(0, limit);
 }
