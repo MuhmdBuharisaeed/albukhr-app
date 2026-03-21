@@ -54,7 +54,7 @@
     Transaction History
   </h3>
 
-  <div id="azmanHistory"></div>
+  <div id="projectHistory"></div>
 
 </div>
 
@@ -136,6 +136,9 @@
 <script src="wallet-core.js"></script>
 
 <script>
+const PROJECT_NAME = "Azman";
+const PROJECT_TITLE = "Azman";
+const PROJECT_ICON = "🧪";
 const stakeModal = document.getElementById("stakeModal");
 const successModal = document.getElementById("successModal");
 const infoModal = document.getElementById("infoModal");
@@ -148,9 +151,8 @@ function openModal(){
 
   stakeModal.style.display="flex";
 
-  minHint.innerText =
-    "Minimum stake: " + getMinStake("Azman") + " Pi";
-    }
+ minHint.innerText =
+  `Minimum stake: ${getMinStake(PROJECT_NAME)} Pi`;
 
 function closeModal(){ stakeModal.style.display="none"; }
 function closeSuccess(){ successModal.style.display="none"; }
@@ -167,15 +169,14 @@ function confirmStake(){
     return;
   }
 
-  const ok = addStake({ project:"Azman", amount, duration });
-
+  const ok = addStake({ project:PROJECT_NAME, amount, duration });
   if(!ok){
     alert("Stake failed.");
     return;
   }
 
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in Azman Futures Lab.`;
+  `You staked ${amount} Pi for ${duration} days in ${PROJECT_NAME}.`;
 
   /* ✅ CLEAR FORM HERE */
   amountInput.value = "";
@@ -241,7 +242,7 @@ function recordLiquidityTx(project, amount){
 
 function load(){
 
-  const data = getProjectTotals("Azman");
+  const data = getProjectTotals(PROJECT_NAME);
 
   let reward = 0;
   data.stakes.forEach(s=>{
@@ -257,7 +258,7 @@ function load(){
    TRANSACTION ENGINE VIEW
 ===================================== */
 
-const txs = getTxByProject("Azman");
+const txs = getTxByProject(PROJECT_NAME);
 
 if(!txs.length){
   azmanHistory.innerHTML =
@@ -272,7 +273,7 @@ txs
   const div = document.createElement("div");
   div.className="project-tx";
 
-  let icon = "🧪";
+  let icon = PROJECT_ICON;
   let label = "Transaction";
   let color = "success-status";
   let sign = "+";
@@ -310,7 +311,10 @@ txs
     </div>
   `;
 
-  azmanHistory.appendChild(div);
+  const projectHistory = document.getElementById("projectHistory");
+
+projectHistory.innerHTML = "";
+projectHistory.appendChild(div);
 
 });
 
@@ -366,7 +370,7 @@ function confirmWithdraw(){
     return;
   }
 
-  const data = getProjectTotals("Azman");
+  const data = getProjectTotals(PROJECT_NAME);
 
   let available = 0;
 
@@ -400,10 +404,9 @@ function confirmWithdraw(){
 
   });
 
-  /* RECORD TX */
   if(typeof recordWithdrawTx === "function"){
-    recordWithdrawTx("Azman", amount);
-  }
+  recordWithdrawTx(PROJECT_NAME, amount);
+      }
 
   /* AFTER SUCCESS */
 
@@ -430,7 +433,7 @@ load();
 
 function openWithdrawModal(){
 
-  const data = getProjectTotals("Azman");
+  const data = getProjectTotals(PROJECT_NAME);
 
   let total = 0;
 
@@ -450,7 +453,7 @@ function openWithdrawModal(){
 
 function setMaxWithdraw(){
 
-  const data = getProjectTotals("Azman");
+  const data = getProjectTotals(PROJECT_NAME);
 
   let total = 0;
 
@@ -480,7 +483,7 @@ function confirmWithdraw(){
 /* 🧠 AI LAYER */
   const status = aiApproveWithdraw(amount);
 
-  const data = getProjectTotals("Azman");
+  const data = getProjectTotals(PROJECT_NAME);
 
   let available = 0;
 
@@ -525,9 +528,8 @@ function confirmWithdraw(){
     /* SAVE WALLET */
     localStorage.setItem("user_wallet", wallet);
 
-    /* RECORD TX */
     if(typeof recordWithdrawTx === "function"){
-      recordWithdrawTx("Azman", amount);
+  recordWithdrawTx(PROJECT_NAME, amount);
     }
 
     alert(`Withdraw successful\n\nAmount: ${amount} Pi\nFee: ${fee.toFixed(2)} Pi\nYou receive: ${net.toFixed(2)} Pi`);
@@ -560,7 +562,7 @@ function aiApproveWithdraw(amount){
 
 function withdrawRewardFromAzman(){
 
-  const data = getProjectTotals("Azman");
+  const data = getProjectTotals(PROJECT_NAME);
 
   if(!data.stakes.length){
     alert("No rewards available.");
@@ -575,9 +577,8 @@ function withdrawRewardFromAzman(){
 
     withdrawStakeReward(s.id);
 
-    /* ✅ ADD THIS HERE */
     if(typeof recordWithdrawTx === "function"){
-      recordWithdrawTx("Azman", amount);
+  recordWithdrawTx(PROJECT_NAME, amount);
     }
 
   }
