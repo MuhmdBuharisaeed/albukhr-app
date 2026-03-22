@@ -1,37 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Project</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/global-core.css">
+<link rel="stylesheet" href="css/global-layout.css">
+<link rel="stylesheet" href="css/global-components.css">
+<link rel="stylesheet" href="css/global-style.css">
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <span id="projectTitle"></span>
+  </div>
+  <div class="header-right" onclick="openInfo()">ℹ️</div>
+</header>
+
+<div class="fixed-section">
+
+  <div class="stats">
+    <div class="stat-card">
+      <span>Your Stake</span>
+      <strong id="aStake">0.00 Pi</strong>
+    </div>
+    <div class="stat-card">
+      <span>Your Reward</span>
+      <strong id="aReward">0.00 Pi</strong>
+    </div>
+  </div>
+
+  <div class="short-info" id="projectDescription"></div>
+
+  <div class="btns">
+    <button class="btn primary" onclick="openModal()">Stake</button>
+    <button class="btn secondary" onclick="openWithdrawModal()">
+      💸 Withdraw Rewards
+    </button>
+  </div>
+
+  <div class="scroll-area">
+    <h3 style="margin-bottom:10px;font-size:15px">
+      Transaction History
+    </h3>
+    <div id="projectHistory"></div>
+  </div>
+
+</div>
+
+<!-- STAKE MODAL -->
+<div class="modal" id="stakeModal">
+  <div class="modal-box">
+    <h3 id="stakeTitle"></h3>
+
+    <label>Amount (Pi)</label>
+    <input type="number" id="amountInput">
+
+    <small id="minHint"></small>
+
+    <label>Duration</label>
+    <select id="durationSelect"></select>
+
+    <div class="btns">
+      <button class="btn primary" onclick="confirmStake()">Confirm</button>
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal" id="successModal">
+  <div class="modal-box success">
+    <h3>Stake Successful</h3>
+    <p id="successText"></p>
+    <button class="btn primary" onclick="closeSuccess()">OK</button>
+  </div>
+</div>
+
+<!-- INFO MODAL -->
+<div class="modal" id="infoModal">
+  <div class="modal-box">
+    <h3 id="infoTitle"></h3>
+    <p id="infoText"></p>
+    <button class="btn secondary" onclick="closeInfo()">Close</button>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal">
+  <div class="modal-box">
+    <h3>Withdraw Rewards</h3>
+
+    <label>Amount</label>
+    <input type="number" id="withdrawAmount">
+
+    <small id="availableBalance"></small>
+
+    <label>Wallet Address</label>
+    <input type="text" id="walletAddress">
+
+    <div class="btns">
+      <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="js/project-config.js"></script>
+<script src="js/unified-transactions.js"></script>
+<script src="js/albukhr-transaction-engine.js"></script>
+<script src="staking.js"></script>
+<script src="wallet-core.js"></script>
+
 <script>
-/* ======================================
-   PROJECT CONFIG LOADER
-====================================== */
+
+/* ===============================
+   CONFIG LOAD
+=============================== */
 const params = new URLSearchParams(window.location.search);
 const PROJECT_NAME = params.get("project") || "Azman";
+const CONFIG = getProjectConfig(PROJECT_NAME);
 
-/* ICON MAP */
-const PROJECT_ICONS = {
-  Azman:"🧪",
-  Labbaika:"🍞",
-  Khairat:"🌾",
-  Urban:"🏙️",
-  Barsh:"🏗️",
-  Hauwal:"💧",
-  Raheem:"🌱"
-};
+/* ===============================
+   INIT UI
+=============================== */
+pageTitle.innerText = CONFIG.title;
 
-const PROJECT_ICON = PROJECT_ICONS[PROJECT_NAME] || "📦";
+projectTitle.innerText =
+  `${CONFIG.icon} ${CONFIG.title}`;
 
-/* ======================================
-   DYNAMIC UI TITLE
-====================================== */
-document.querySelector(".header-left span").innerText =
-  `${PROJECT_ICON} ${PROJECT_NAME}`;
+projectDescription.innerText = CONFIG.desc;
 
-/* ======================================
+infoTitle.innerText = `About ${CONFIG.title}`;
+infoText.innerText = CONFIG.info;
+
+stakeTitle.innerText = `Stake in ${CONFIG.title}`;
+
+/* ===============================
    DOM
-====================================== */
+=============================== */
 const projectHistory = document.getElementById("projectHistory");
 
-/* ======================================
+/* ===============================
+   MODALS
+=============================== */
+function openModal(){
+
+  amountInput.value = "";
+
+  minHint.innerText =
+    `Minimum stake: ${getMinStake(PROJECT_NAME)} Pi`;
+
+  durationSelect.innerHTML = "";
+
+  CONFIG.durations.forEach(d=>{
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.innerText = d + " Days";
+    durationSelect.appendChild(opt);
+  });
+
+  stakeModal.style.display="flex";
+}
+
+function closeModal(){ stakeModal.style.display="none"; }
+function closeSuccess(){ successModal.style.display="none"; }
+function openInfo(){ infoModal.style.display="flex"; }
+function closeInfo(){ infoModal.style.display="none"; }
+
+function openWithdrawModal(){
+
+  const data = getProjectTotals(PROJECT_NAME);
+
+  let total = 0;
+  data.stakes.forEach(s=>{
+    total += Number(s.remainingReward) || 0;
+  });
+
+  availableBalance.innerText =
+    "Available: " + total.toFixed(2) + " Pi";
+
+  walletAddress.value =
+    localStorage.getItem("user_wallet") || "";
+
+  withdrawModal.style.display="flex";
+}
+
+function closeWithdraw(){
+  withdrawModal.style.display="none";
+}
+
+/* ===============================
    STAKE
-====================================== */
+=============================== */
 function confirmStake(){
 
   const amount = Number(amountInput.value);
@@ -55,15 +221,17 @@ function confirmStake(){
   }
 
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in ${PROJECT_NAME}.`;
+    `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
 
+  closeModal();
   successModal.style.display="flex";
+
   load();
 }
 
-/* ======================================
+/* ===============================
    LOAD
-====================================== */
+=============================== */
 function load(){
 
   const data = getProjectTotals(PROJECT_NAME);
@@ -73,35 +241,33 @@ function load(){
     reward += Number(s.remainingReward ?? s.reward) || 0;
   });
 
-  document.getElementById("aStake").innerText =
+  aStake.innerText =
     (data.stake || 0).toFixed(2) + " Pi";
 
-  document.getElementById("aReward").innerText =
+  aReward.innerText =
     reward.toFixed(2) + " Pi";
 
   renderHistory();
 }
 
-/* ======================================
-   HISTORY
-====================================== */
+/* ===============================
+   HISTORY (UNIFIED)
+=============================== */
 function renderHistory(){
 
   projectHistory.innerHTML = "";
 
-  const txs = getTransactions()
-    .filter(t => t.project === PROJECT_NAME)
-    .sort((a,b)=>b.timestamp - a.timestamp);
+  const txs = getProjectTx(PROJECT_NAME);
 
   if(!txs.length){
     projectHistory.innerHTML =
-      "<p style='font-size:12px;color:#777'>No transactions yet</p>";
+      "<p style='color:#777'>No transactions yet</p>";
     return;
   }
 
   txs.forEach(tx=>{
 
-    let icon = PROJECT_ICON;
+    let icon = CONFIG.icon;
     let label = "Stake";
     let sign = "+";
     let color = "success-status";
@@ -111,6 +277,11 @@ function renderHistory(){
       label = "Withdraw";
       sign = "-";
       color = "withdraw-status";
+    }
+
+    if(tx.type === "reward"){
+      icon = "🎁";
+      label = "Reward";
     }
 
     const div = document.createElement("div");
@@ -135,9 +306,9 @@ function renderHistory(){
   });
 }
 
-/* ======================================
+/* ===============================
    WITHDRAW
-====================================== */
+=============================== */
 function confirmWithdraw(){
 
   const amount = Number(withdrawAmount.value);
@@ -166,6 +337,7 @@ function confirmWithdraw(){
     if(remaining <= 0) return;
 
     let r = Number(s.remainingReward) || 0;
+
     if(r > 0){
       let take = Math.min(r, remaining);
       withdrawStakeReward(s.id, take);
@@ -185,8 +357,12 @@ function confirmWithdraw(){
   load();
 }
 
-/* ======================================
+/* ===============================
    INIT
-====================================== */
+=============================== */
 load();
-  </script>
+
+</script>
+
+</body>
+   </html>
