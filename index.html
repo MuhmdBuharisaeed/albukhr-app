@@ -848,20 +848,12 @@ Security is enforced to protect your assets and projects.
 </div>
 
 <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
-   
+
+<script src="js/project-config.js"></script>   
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
-const ICONS = {
-  Raheem:"💊",
-  Hauwal:"🌽",
-  Barsh:"🌾",
-  Khairat:"♻️",
-  Azman:"🧪",
-  Urban:"🚍",
-  Labbaika:"🍞"
-};
 
 function loadHome(){
   if(typeof getAllStakesMerged !== "function") return;
@@ -893,19 +885,38 @@ function loadHome(){
 }
 
 function renderPopular(globalMap){
-  const container=document.getElementById("popularProjects");
-  container.innerHTML="";
-  const sorted = Object.entries(globalMap).sort((a,b)=>b[1].total-a[1].total).slice(0,10);
+
+  const container = document.getElementById("popularProjects");
+  container.innerHTML = "";
+
+  const sorted = Object.entries(globalMap)
+    .sort((a,b)=>b[1].total - a[1].total)
+    .slice(0,10);
+
   sorted.forEach(([project,data],index)=>{
-    const div=document.createElement("div");
+
+    const config = PROJECT_CONFIG[project];
+
+    if(!config) return;
+
+    const div = document.createElement("div");
     div.className="popular-card";
+
     div.setAttribute("data-rank","#"+(index+1));
-    div.onclick=()=> location.href=project.toLowerCase()+".html";
-    div.innerHTML=`<div class="popular-icon">${ICONS[project]||"📦"}</div>
-    <div class="popular-name">${project}</div>
-    <div class="popular-amount">${data.total.toFixed(2)} Pi</div>`;
+
+    div.onclick = () =>
+      location.href = `project.html?project=${project}`;
+
+    div.innerHTML = `
+      <div class="popular-icon">${config.icon}</div>
+      <div class="popular-name">${config.title}</div>
+      <div class="popular-amount">${data.total.toFixed(2)} Pi</div>
+    `;
+
     container.appendChild(div);
+
   });
+
 }
 
 function renderAssets(userMap, globalMap){
@@ -913,30 +924,19 @@ function renderAssets(userMap, globalMap){
   const container = document.getElementById("assetsContainer");
   container.innerHTML = "";
 
-  /* MASTER PROJECT LIST */
-  const ALL_PROJECTS = [
-    "Raheem",
-    "Hauwal",
-    "Barsh",
-    "Khairat",
-    "Azman",
-    "Urban",
-    "Labbaika"
-  ];
+  const merged = Object.keys(PROJECT_CONFIG).map(project => ({
 
-  /* Merge data */
-  const merged = ALL_PROJECTS.map(project => ({
     name: project,
+    config: PROJECT_CONFIG[project],
+
     globalTotal: globalMap[project]?.total || 0,
     userAmount: userMap[project] || 0
+
   }));
 
-  /* SORT RULE:
-     1. User staked first
-     2. Higher stake first
-     3. Then global popularity
-  */
+  /* SORT LOGIC */
   merged.sort((a,b)=>{
+
     if(a.userAmount > 0 && b.userAmount === 0) return -1;
     if(a.userAmount === 0 && b.userAmount > 0) return 1;
 
@@ -944,23 +944,28 @@ function renderAssets(userMap, globalMap){
       return b.userAmount - a.userAmount;
 
     return b.globalTotal - a.globalTotal;
+
   });
 
-  /* Render */
   merged.forEach(item => {
 
     const div = document.createElement("div");
     div.className = "asset-item";
+
     div.onclick = () =>
-      location.href = item.name.toLowerCase() + ".html";
+      location.href = `project.html?project=${item.name}`;
 
     div.innerHTML = `
       <div class="asset-icon">
-        ${ICONS[item.name] || "📦"}
+        ${item.config.icon}
       </div>
 
       <div class="asset-left">
-        <div class="asset-name">${item.name}</div>
+
+        <div class="asset-name">
+          ${item.config.title}
+        </div>
+
         <div class="asset-stake">
           ${
             item.userAmount > 0
@@ -968,6 +973,18 @@ function renderAssets(userMap, globalMap){
             : "Not Staked"
           }
         </div>
+
+        <div class="asset-progress-row">
+          <div class="asset-progress">
+            <div class="asset-progress-bar"
+              style="width:${Math.min(item.userAmount,100)}%">
+            </div>
+          </div>
+          <div class="asset-percent">
+            ${item.userAmount > 0 ? "Active" : "0%"}
+          </div>
+        </div>
+
       </div>
     `;
 
