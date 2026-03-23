@@ -302,10 +302,10 @@ oninput="renderMarketplace()">
 <div id="discoverySection" style="padding:0 12px"></div>
 <div class="marketplace" id="projectList"></div>
 
+<script src="js/project-config.js"></script>
 <script src="project-creation-engine.js"></script>
 <script src="project-registry.js"></script>
 <script src="staking.js"></script>
-<script src="js/project-config.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 <script src="js/core-liquidity-engine.js"></script>
 <script src="risk-engine.js"></script>
@@ -471,7 +471,7 @@ ${PROJECT_CONFIG[project.name]?.icon || "📦"}
 
 <div class="project-title">
 
-${project.name}
+${PROJECT_CONFIG[project.name]?.title || project.name}
 
 ${PROJECT_CONFIG[project.name] ? 
 '<span class="core-badge">CORE</span>' : ''}
@@ -481,9 +481,8 @@ ${investors > 20 ?
 
 </div>
 </div>
-
 <div class="project-desc">
-${project.description || ""}
+${PROJECT_CONFIG[project.name]?.desc || project.description || ""}
 </div>
 
 <div class="row">
@@ -503,7 +502,7 @@ ${project.description || ""}
 
 <div class="row">
 <div>Minimum</div>
-<div>${project.minimum || 1} Pi</div>
+<div>${getMinStake ? getMinStake(project.name) : (project.minimum || 1)} Pi</div>
 </div>
 
 <div class="row">
