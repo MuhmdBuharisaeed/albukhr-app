@@ -302,6 +302,7 @@ oninput="renderMarketplace()">
 <div id="discoverySection" style="padding:0 12px"></div>
 <div class="marketplace" id="projectList"></div>
 
+<script src="js/project-config.js"></script>
 <script src="project-creation-engine.js"></script>
 <script src="project-registry.js"></script>
 <script src="staking.js"></script>
@@ -317,6 +318,7 @@ oninput="renderMarketplace()">
 <script src="js/marketplace-pro-engine.js"></script>
 <script src="js/project-discovery-algorithm.js"></script>
 <script src="albukhr-economic-intelligence-engine.js"></script>
+
 <script>
 function renderMarketInsights(){
 
@@ -361,22 +363,6 @@ ${investors.map(i=>`${i.user} — ${i.amount.toFixed(2)} Pi`).join("<br>")}
 ${liquidity.map(p=>`${p.name} — ${p.liquidity.toFixed(2)} Pi`).join("<br>")}
 </div>
 `;
-}
-
-function getProjectIcon(name){
-
-name = name.toLowerCase();
-
-if(name.includes("agro")) return "🌾";
-if(name.includes("bakery")) return "🍞";
-if(name.includes("pharma")) return "💊";
-if(name.includes("transport")) return "🚍";
-if(name.includes("recycling")) return "♻️";
-if(name.includes("chemical")) return "🧪";
-if(name.includes("maize")) return "🌽";
-
-return "🏢";
-
 }
 
 function isCoreProject(name){
@@ -447,6 +433,8 @@ return;
 }
 
 projects.forEach(project => {
+card.onclick = () =>
+  location.href = `project.html?project=${project.name}`;
 
 const card =
 document.createElement("div");
@@ -479,16 +467,15 @@ card.innerHTML = `
 <div class="project-header">
 
 <div class="project-icon">
-${getProjectIcon(project.name)}
+${PROJECT_CONFIG[project.name]?.icon || "📦"}
 </div>
 
 <div class="project-title">
 
 ${project.name}
 
-${isCoreProject(project.name) ? 
+${PROJECT_CONFIG[project.name] ? 
 '<span class="core-badge">CORE</span>' : ''}
-
 ${investors > 20 ? 
 '<span class="trend">🔥 Trending</span>' : ''}
 
@@ -556,7 +543,11 @@ calculateROI(this.value, ${project.roi || 0}) + ' Pi'
 
 <button
 class="invest-btn"
-onclick="invest('${project.name}')">
+onclick="event.stopPropagation(); invest('${project.name}')">
+
+Invest
+
+</button>
 
 Invest
 
