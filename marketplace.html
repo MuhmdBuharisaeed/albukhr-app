@@ -302,10 +302,10 @@ oninput="renderMarketplace()">
 <div id="discoverySection" style="padding:0 12px"></div>
 <div class="marketplace" id="projectList"></div>
 
-<script src="js/project-config.js"></script>
 <script src="project-creation-engine.js"></script>
 <script src="project-registry.js"></script>
 <script src="staking.js"></script>
+<script src="js/project-config.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 <script src="js/core-liquidity-engine.js"></script>
 <script src="risk-engine.js"></script>
@@ -318,7 +318,6 @@ oninput="renderMarketplace()">
 <script src="js/marketplace-pro-engine.js"></script>
 <script src="js/project-discovery-algorithm.js"></script>
 <script src="albukhr-economic-intelligence-engine.js"></script>
-
 <script>
 function renderMarketInsights(){
 
@@ -433,11 +432,11 @@ return;
 }
 
 projects.forEach(project => {
-card.onclick = () =>
-  location.href = `project.html?project=${project.name}`;
 
 const card =
 document.createElement("div");
+card.onclick = () =>
+  location.href = `project.html?project=${project.name}`;
 
 card.className = "project-card";
 
@@ -476,6 +475,7 @@ ${project.name}
 
 ${PROJECT_CONFIG[project.name] ? 
 '<span class="core-badge">CORE</span>' : ''}
+
 ${investors > 20 ? 
 '<span class="trend">🔥 Trending</span>' : ''}
 
@@ -549,10 +549,6 @@ Invest
 
 </button>
 
-Invest
-
-</button>
-
 `;
 
 container.appendChild(card);
@@ -601,4 +597,4 @@ renderDiscovery();
 </script>
 
 </body>
-  </html>
+</html>
