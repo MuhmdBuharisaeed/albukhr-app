@@ -188,9 +188,6 @@ function openWithdrawModal(){
   availableBalance.innerText =
     "Available: " + total.toFixed(2) + " Pi";
 
-  walletAddress.value =
-    localStorage.getItem("user_wallet") || "";
-
   withdrawModal.style.display="flex";
 }
 
@@ -333,6 +330,11 @@ function confirmWithdraw(){
     return;
   }
 
+  if(!wallet){
+    alert("Enter wallet address");
+    return;
+  }
+
   const data = getProjectTotals(PROJECT_NAME);
 
   let total = 0;
@@ -360,17 +362,18 @@ function confirmWithdraw(){
   });
 
   recordTx({
-  type:"withdraw",
-  project:PROJECT_NAME,
-  amount,
-  timestamp:Date.now()
-});
+    type:"withdraw",
+    project:PROJECT_NAME,
+    amount,
+    timestamp:Date.now()
+  });
 
-  localStorage.setItem("user_wallet", wallet);
+  /* CLEAR WALLET */
+  walletAddress.value = "";
 
   closeWithdraw();
   load();
-}
+  }
 
 /* ===============================
    INIT
