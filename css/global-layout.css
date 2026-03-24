@@ -48,7 +48,7 @@ body{
   z-index:900;
   padding:14px;
 
-  margin-bottom:5px; /* 🔥 THIS FIXES EVERYTHING */
+  margin-bottom:20px; /* 🔥 THIS FIXES EVERYTHING */
 }
 /* ===============================
    SCROLL AREA (NORMAL FLOW)
@@ -57,7 +57,7 @@ body{
   position:relative;
   padding:14px;
 
-  margin-top:40px;  /* 🔥 THIS IS THE REAL FIX */
+  margin-top:30px;  /* 🔥 THIS IS THE REAL FIX */
 }
 .scroll-area h3{
   margin-top:15;
