@@ -100,6 +100,9 @@ Transaction History
 
     <small id="availableBalance"></small>
 
+    <label>Wallet Address</label>
+    <input type="text" id="walletAddress">
+
     <div class="btns">
       <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
       <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
@@ -184,6 +187,9 @@ function openWithdrawModal(){
 
   availableBalance.innerText =
     "Available: " + total.toFixed(2) + " Pi";
+
+  walletAddress.value =
+    localStorage.getItem("user_wallet") || "";
 
   withdrawModal.style.display="flex";
 }
@@ -320,6 +326,7 @@ function renderHistory(){
 function confirmWithdraw(){
 
   const amount = Number(withdrawAmount.value);
+  const wallet = walletAddress.value;
 
   if(!amount || amount <= 0){
     alert("Invalid amount");
@@ -359,6 +366,8 @@ function confirmWithdraw(){
   timestamp:Date.now()
 });
 
+  localStorage.setItem("user_wallet", wallet);
+
   closeWithdraw();
   load();
 }
@@ -371,4 +380,4 @@ load();
 </script>
 
 </body>
-   </html>
+        </html>
