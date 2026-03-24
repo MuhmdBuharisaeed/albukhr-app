@@ -414,6 +414,15 @@ return map[name] || name;
 
   }
 
+function calculateROI(amount, roi){
+
+amount = Number(amount) || 0;
+roi = Number(roi) || 0;
+
+return (amount * roi / 100).toFixed(2);
+
+}
+
 function renderMarketplace(){
 
 const container =
@@ -611,15 +620,6 @@ ${riskData.risk}
 <div class="progress">
 <div class="progress-bar" style="width:${funded}%"></div>
 </div>
-
-function calculateROI(amount, roi){
-
-amount = Number(amount) || 0;
-roi = Number(roi) || 0;
-
-return (amount * roi / 100).toFixed(2);
-
-  }
 
 <div class="roi-box">
 
