@@ -48,7 +48,7 @@ body{
   z-index:900;
   padding:14px;
 
-  margin-bottom:20px; /* 🔥 THIS FIXES EVERYTHING */
+  margin-bottom:18px; /* 🔥 THIS FIXES EVERYTHING */
 }
 /* ===============================
    SCROLL AREA (NORMAL FLOW)
