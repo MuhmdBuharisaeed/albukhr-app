@@ -268,27 +268,25 @@ function renderHistory(){
 
   projectHistory.innerHTML = "";
 
-  const txs = getProjectTx(PROJECT_NAME);
+  const txs = getTransactions()
+    .filter(tx => tx.project === PROJECT_NAME)
+    .sort((a,b)=>b.timestamp - a.timestamp);
 
   if(!txs.length){
     projectHistory.innerHTML = `
-<div style="text-align:center;padding:20px;color:#777">
-${CONFIG.icon}
-<br><br>
-No transactions yet
-</div>
-`;
+      <div style="text-align:center;padding:20px;color:#777">
+        ${CONFIG.icon}
+        <br><br>
+        No transactions yet
+      </div>
+    `;
     return;
   }
 
   txs.forEach(tx=>{
 
     let icon = CONFIG.icon;
-    let label = "Stake Added";
-    if(tx.type === "stake"){
-  icon = CONFIG.icon;
-  label = "Stake Added";
-    }
+    let label = "Stake";
     let sign = "+";
     let color = "success-status";
 
@@ -317,14 +315,16 @@ No transactions yet
       </div>
       <div class="project-right">
         <div class="project-amount ${color}">
-          ${sign}${tx.amount.toFixed(2)} Pi
+          ${sign}${Number(tx.amount).toFixed(2)} Pi
         </div>
       </div>
     `;
 
     projectHistory.appendChild(div);
+
   });
-}
+
+  }
 
 /* ===============================
    WITHDRAW
