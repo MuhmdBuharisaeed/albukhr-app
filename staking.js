@@ -161,7 +161,7 @@ function getProjectTotals(project){
 /* ======================================
    WITHDRAW REWARD (DASHBOARD)
 ====================================== */
-function withdrawStakeReward(stakeId){
+function withdrawStakeReward(stakeId, amount){
 
 const stakes = _safeParse(INTERNAL_KEY);
 
@@ -169,19 +169,25 @@ const stake = stakes.find(s => s.id === stakeId);
 
 if(!stake) return {error:"Stake not found"};
 
-if(!stake.remainingReward || stake.remainingReward <= 0){
+const totalReward = Number(stake.reward) || 0;
+const withdrawn   = Number(stake.withdrawnReward) || 0;
+
+const remaining = totalReward - withdrawn;
+
+if(remaining <= 0){
 return {error:"No reward available"};
 }
 
-const amount = Number(stake.remainingReward);
+const take = Math.min(Number(amount)||0, remaining);
 
-stake.remainingReward = 0;
+stake.withdrawnReward =
+  (stake.withdrawnReward || 0) + take;
 
 _save(INTERNAL_KEY,stakes);
 
 return {
 success:true,
-amount
+amount:take
 };
 
 }
