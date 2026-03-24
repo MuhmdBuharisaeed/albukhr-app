@@ -44,8 +44,8 @@
   </div>
 
   <div class="scroll-area">
-    <h3 style="margin-bottom:10px;font-size:15px">
-      Transaction History
+    <h3 id="txTitle" style="margin-bottom:10px;font-size:15px">
+Transaction History
     </h3>
     <div id="projectHistory"></div>
   </div>
@@ -125,11 +125,14 @@
 const params = new URLSearchParams(window.location.search);
 const PROJECT_NAME = params.get("project") || "Azman";
 const CONFIG = getProjectConfig(PROJECT_NAME);
+txTitle.innerText =
+`${CONFIG.title} Transactions`;
 
 /* ===============================
    INIT UI
 =============================== */
-pageTitle.innerText = CONFIG.title;
+document.title =
+`${CONFIG.title} • ALBUKHR`;
 
 projectTitle.innerText =
   `${CONFIG.icon} ${CONFIG.title}`;
@@ -221,8 +224,12 @@ function confirmStake(){
   }
 
   successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
+`${CONFIG.icon} Stake successful
 
+Amount: ${amount.toFixed(2)} Pi
+Duration: ${duration} Days
+Project: ${CONFIG.title}`;
+  
   closeModal();
   successModal.style.display="flex";
 
@@ -260,15 +267,24 @@ function renderHistory(){
   const txs = getProjectTx(PROJECT_NAME);
 
   if(!txs.length){
-    projectHistory.innerHTML =
-      "<p style='color:#777'>No transactions yet</p>";
+    projectHistory.innerHTML = `
+<div style="text-align:center;padding:20px;color:#777">
+${CONFIG.icon}
+<br><br>
+No transactions yet
+</div>
+`;
     return;
   }
 
   txs.forEach(tx=>{
 
     let icon = CONFIG.icon;
-    let label = "Stake";
+    let label = "Stake Added";
+    if(tx.type === "stake"){
+  icon = CONFIG.icon;
+  label = "Stake Added";
+    }
     let sign = "+";
     let color = "success-status";
 
