@@ -222,16 +222,7 @@ function confirmStake(){
     alert("Stake failed.");
     return;
   }
-
-  /* RECORD TRANSACTION */
-  recordTx({
-  type:"stake",
-  project:PROJECT_NAME,
-  amount,
-  duration,
-  timestamp:Date.now()
-});
-
+  
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
 
