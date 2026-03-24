@@ -225,11 +225,12 @@ function confirmStake(){
 
   /* RECORD TRANSACTION */
   recordTx({
-    type:"stake",
-    project:PROJECT_NAME,
-    amount,
-    duration
-  });
+  type:"stake",
+  project:PROJECT_NAME,
+  amount,
+  duration,
+  timestamp:Date.now()
+});
 
   successText.innerText =
     `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
@@ -270,7 +271,9 @@ function renderHistory(){
 
   const txs = getTransactions()
     .filter(tx => tx.project === PROJECT_NAME)
-    .sort((a,b)=>b.timestamp - a.timestamp);
+    .sort((a,b)=>
+      (b.timestamp || 0) - (a.timestamp || 0)
+    );
 
   if(!txs.length){
     projectHistory.innerHTML = `
@@ -366,10 +369,11 @@ function confirmWithdraw(){
   });
 
   recordTx({
-    type:"withdraw",
-    project:PROJECT_NAME,
-    amount
-  });
+  type:"withdraw",
+  project:PROJECT_NAME,
+  amount,
+  timestamp:Date.now()
+});
 
   localStorage.setItem("user_wallet", wallet);
 
