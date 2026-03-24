@@ -87,7 +87,6 @@ function addStake({project,amount,duration}){
     duration:safeDuration,
     reward:Number(reward)||0,
 
-    // 🔥 IMPORTANT FOR WALLET
     remainingReward:Number(reward)||0,
     capitalWithdrawn:false,
 
@@ -97,10 +96,20 @@ function addStake({project,amount,duration}){
   });
 
   _save(INTERNAL_KEY,stakes);
-  recordStake(project, safeAmount);
+
+  /* UNIFIED TRANSACTION RECORD */
+  if(typeof recordTx === "function"){
+    recordTx({
+      type:"stake",
+      project,
+      amount:safeAmount,
+      duration:safeDuration,
+      timestamp:Date.now()
+    });
+  }
+
   return true;
 }
-
 /* ======================================
    MERGED STAKES (WALLET SAFE)
 ====================================== */
