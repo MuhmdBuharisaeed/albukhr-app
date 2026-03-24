@@ -399,15 +399,28 @@ function normalizeProjectName(name){
 if(!name) return name;
 
 const map = {
+
 "Barsh Agro":"Barsh",
+"Barsh Agro & Livestock":"Barsh",
+
 "Labbaika Bakery":"Labbaika",
 "Labbaika Bakery Center":"Labbaika",
+
 "Raheem Pharma":"Raheem",
 "Raheem Pharmacy":"Raheem",
-"Hauwal Sumonviter":"Hauwal",
+
 "Urban Mobility":"Urban",
+"Urban Transport":"Urban",
+
 "Khairat Fertiliser":"Khairat",
-"Azman Futures Makers Lab":"Azman"
+"Khairat Recycling":"Khairat",
+
+"Azman Futures Makers Lab":"Azman",
+"Azman Chemical":"Azman",
+
+"Hauwal Sumonviter":"Hauwal",
+"Hauwal Maize":"Hauwal"
+
 };
 
 return map[name] || name;
