@@ -394,20 +394,25 @@ return ALBUKHR_CORE_PROJECTS.includes(key);
 
 }
 
+function normalizeProjectName(name){
+
+if(!name) return name;
+
 const map = {
-  "Barsh Agro":"Barsh",
-  "Labbaika Bakery":"Labbaika",
-  "Labbaika Bakery Center":"Labbaika",
-  "Raheem Pharma":"Raheem",
-  "Raheem Pharmacy":"Raheem",
-  "Hauwal Sumonviter":"Hauwal",
-  "Urban Mobility":"Urban",
-  "Khairat Fertiliser":"Khairat",
-  "Azman Futures Makers Lab":"Azman"
+"Barsh Agro":"Barsh",
+"Labbaika Bakery":"Labbaika",
+"Labbaika Bakery Center":"Labbaika",
+"Raheem Pharma":"Raheem",
+"Raheem Pharmacy":"Raheem",
+"Hauwal Sumonviter":"Hauwal",
+"Urban Mobility":"Urban",
+"Khairat Fertiliser":"Khairat",
+"Azman Futures Makers Lab":"Azman"
 };
 
 return map[name] || name;
-}
+
+  }
 
 function renderMarketplace(){
 
@@ -509,8 +514,6 @@ location.href = `project.html?project=${projectKey}`;
 
 card.className = "project-card";
 
-const card = document.createElement("div");
-
 card.onclick = () =>
   location.href = `project.html?project=${projectKey}`;
 
@@ -608,6 +611,15 @@ ${riskData.risk}
 <div class="progress">
 <div class="progress-bar" style="width:${funded}%"></div>
 </div>
+
+function calculateROI(amount, roi){
+
+amount = Number(amount) || 0;
+roi = Number(roi) || 0;
+
+return (amount * roi / 100).toFixed(2);
+
+  }
 
 <div class="roi-box">
 
