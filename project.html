@@ -182,7 +182,11 @@ function openWithdrawModal(){
 
   let total = 0;
   data.stakes.forEach(s=>{
-    total += Number(s.remainingReward) || 0;
+    const remaining =
+  (Number(s.reward) || 0) -
+  (Number(s.withdrawnReward) || 0);
+
+total += Math.max(0, remaining);
   });
 
   availableBalance.innerText =
@@ -238,7 +242,11 @@ function load(){
 
   let reward = 0;
   data.stakes.forEach(s=>{
-    reward += Number(s.remainingReward ?? s.reward) || 0;
+    const remaining =
+  (Number(s.reward) || 0) -
+  (Number(s.withdrawnReward) || 0);
+
+reward += Math.max(0, remaining);
   });
 
   aStake.innerText =
@@ -352,7 +360,9 @@ function confirmWithdraw(){
   data.stakes.forEach(s=>{
     if(remaining <= 0) return;
 
-    let r = Number(s.remainingReward) || 0;
+    let r =
+  (Number(s.reward) || 0) -
+  (Number(s.withdrawnReward) || 0);
 
     if(r > 0){
       let take = Math.min(r, remaining);
