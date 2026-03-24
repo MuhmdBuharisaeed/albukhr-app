@@ -223,18 +223,22 @@ function confirmStake(){
     return;
   }
 
-  successText.innerText =
-`${CONFIG.icon} Stake successful
+  /* RECORD TRANSACTION */
+  recordTx({
+    type:"stake",
+    project:PROJECT_NAME,
+    amount,
+    duration
+  });
 
-Amount: ${amount.toFixed(2)} Pi
-Duration: ${duration} Days
-Project: ${CONFIG.title}`;
-  
+  successText.innerText =
+    `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
+
   closeModal();
   successModal.style.display="flex";
 
   load();
-}
+  }
 
 /* ===============================
    LOAD
