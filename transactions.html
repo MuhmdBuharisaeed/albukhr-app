@@ -232,16 +232,17 @@ function loadTransactions(){
       timestamp:Number(s.timestamp)
   }));
 
-  const withdrawTx = (typeof getWithdrawHistory==="function")
-    ? getWithdrawHistory().map(w=>({
-        type:w.type==="capital"?"capital-withdraw":"reward-withdraw",
-        project:w.project,
-        amount:safeNumber(w.grossAmount||w.amount),
-        received:safeNumber(w.received||w.amount),
-        wallet:w.walletAddress||"Internal Wallet",
-        timestamp:Number(w.timestamp)
-      }))
-    : [];
+  const withdrawTx =
+(typeof getTransactions==="function")
+? getTransactions()
+.filter(tx => tx.type === "withdraw")
+.map(tx=>({
+type:"withdraw",
+project:tx.project,
+amount:safeNumber(tx.amount),
+timestamp:Number(tx.timestamp)
+}))
+: [];
 
   const merged = [...stakeTx,...withdrawTx]
       .sort((a,b)=>b.timestamp-a.timestamp);
