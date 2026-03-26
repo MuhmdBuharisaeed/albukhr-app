@@ -21,7 +21,7 @@ body{
   background:#f5f7f6;
   color:#111;
   overflow-x:hidden;
-  padding-bottom:70px; /* kare content daga bottom-nav */
+  padding-bottom:120px; /* kare content daga bottom-nav */
 }
 
 /* ================= WELCOME BAR ================= */
@@ -630,4 +630,11 @@ body{
 
 :root{
   --albukhr-gold:#d4af37;
+}
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:100px; /* <-- ADD THIS */
 }
