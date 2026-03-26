@@ -294,7 +294,7 @@ body{
   
   <div class="summary">  
   <div class="balance" id="available">0.00 Pi</div>  
-  <div class="sub">Available Reward Balance</div>
+  <div class="sub">Available Capital</div>
     
     <div class="row">  
     <div>Total Staked</div>  
@@ -515,7 +515,6 @@ let activeProject = null;
 
 /* GET MODAL ELEMENTS */
 const withdrawModal = document.getElementById("withdrawModal");
-const withdrawAmount = document.getElementById("withdrawAmount");
 const withdrawAddress = document.getElementById("withdrawAddress");
 const modalProject = document.getElementById("modalProject");
 
@@ -769,29 +768,6 @@ renderWallet();
 
 }
 
-/* =========================
-   CAPITAL WITHDRAW
-========================= */
-
-window.withdrawCapitalAction = function(project){
-
-  const res = requestCapitalWithdraw(project);
-
-  if(res?.error){
-    alert(res.error);
-    return;
-  }
-
-  alert(
-    "Capital withdrawn: " +
-    res.grossAmount.toFixed(2) +
-    " Pi"
-  );
-
-  renderWallet();
-
-}
-
 /* START WALLET */
 
 renderWallet();
@@ -799,56 +775,6 @@ renderWallet();
 });
 
 </script>
-  
-<script>
 
-const withdrawSuccessBox =
-document.getElementById("withdrawSuccessBox");
-
-/* Track last withdraw timestamp */
-let lastWithdrawTime = 0;
-
-/* Listen for wallet updates */
-window.addEventListener("walletUpdated", function(e){
-
-if(!e.detail) return;
-
-const data = e.detail;
-
-/* Capital withdraw only */
-if(data.type === "capital-withdraw"){
-
-const now = Date.now();
-
-/* prevent duplicate */
-if(now - lastWithdrawTime < 1000) return;
-
-lastWithdrawTime = now;
-
-showWithdrawSuccess();
-
-}
-
-});
-
-function showWithdrawSuccess(){
-
-withdrawSuccessBox.style.display = "block";
-
-withdrawSuccessBox.textContent =
-"Capital Withdraw Successful ✓";
-
-/* auto hide */
-
-setTimeout(()=>{
-
-withdrawSuccessBox.style.display = "none";
-
-},4000);
-
-}
-
-</script>
-  
 </body>
 </html>
