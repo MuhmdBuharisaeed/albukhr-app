@@ -452,14 +452,59 @@ Capital withdraw is processed instantly
   <script src="js/unified-transactions.js"></script>
   <script src="js/notifications.js"></script>
   
-<script>  
-const current = location.pathname.split("/").pop();  
-  
-document.querySelectorAll(".dock-item").forEach(link=>{  
-  if(link.getAttribute("href") === current){  
-    link.classList.add("active");  
-  }  
-});  
+<script>
+
+const withdrawSuccessBox =
+document.getElementById("withdrawSuccessBox");
+
+let lastWithdrawTime = 0;
+
+window.addEventListener("walletUpdated", function(e){
+
+if(!e.detail) return;
+
+const data = e.detail;
+
+/* Capital withdraw only */
+if(data.type === "capital-withdraw"){
+
+const now = Date.now();
+
+if(now - lastWithdrawTime < 1000) return;
+
+lastWithdrawTime = now;
+
+showWithdrawSuccess();
+
+}
+
+});
+
+function showWithdrawSuccess(){
+
+withdrawSuccessBox.style.display = "block";
+
+withdrawSuccessBox.textContent =
+"Capital Withdraw Successful ✓";
+
+setTimeout(()=>{
+
+withdrawSuccessBox.style.display = "none";
+
+},4000);
+
+}
+
+</script>
+
+<script>
+const current = location.pathname.split("/").pop();
+
+document.querySelectorAll(".dock-item").forEach(link=>{
+  if(link.getAttribute("href") === current){
+    link.classList.add("active");
+  }
+});
 </script>
   
 <script>
@@ -477,24 +522,27 @@ const modalProject = document.getElementById("modalProject");
 /* =========================
    OPEN WITHDRAW
 ========================= */
-
 window.openWithdraw = function(project){
 
-  activeProject = project;
+activeProject = project;
 
-  if(!withdrawModal){
-    console.error("Withdraw modal not found");
-    return;
-  }
+const breakdown =
+getProjectWalletBreakdown()
+.find(p=>p.project===project);
 
-  modalProject.innerText = "Withdraw from " + project;
+document.getElementById("capitalAvailable")
+.innerText =
+(breakdown?.withdrawableCapital || 0)
+.toFixed(2) + " Pi";
 
-  withdrawAmount.value = "";
-  withdrawAddress.value = "";
+modalProject.innerText =
+"Withdraw from " + project;
 
-  withdrawModal.style.display = "flex";
+withdrawAddress.value="";
+
+withdrawModal.style.display="flex";
+
 }
-
 /* =========================
    CLOSE MODAL
 ========================= */
@@ -653,7 +701,7 @@ ${(p.withdrawnCapital || 0).toFixed(2)} Pi
 
 <button class="btn"
 style="width:100%"
-onclick="withdrawCapitalAction('${p.project}')">
+onclick="openWithdraw('${p.project}')">
 
 Withdraw Capital
 
@@ -693,72 +741,34 @@ window.toggleBody = function(el){
    CONFIRM WITHDRAW
 ========================= */
 
-window.confirmWithdraw = function(){
+window.confirmCapitalWithdraw = function(){
 
-  const amt = withdrawAmount.value.trim();
-  const addr = withdrawAddress.value.trim();
+const address =
+withdrawAddress.value.trim();
 
-  if(!amt || Number(amt) <= 0){
-    alert("Enter valid withdraw amount");
-    return;
-  }
-
-  if(!addr){
-    alert("Enter Pi wallet address");
-    return;
-  }
-
-  const res = requestWithdraw({
-
-    project: activeProject,
-    amount: amt,
-    walletAddress: addr
-
-  });
-
-  if(res.error){
-    alert(res.error);
-    return;
-  }
-
-  withdrawAmount.value="";
-  withdrawAddress.value="";
-
-  closeModal();
-  renderWallet();
+if(!address){
+alert("Enter Pi wallet address");
+return;
 }
 
-function withdrawReward(project){
+const res =
+requestCapitalWithdraw(activeProject);
 
-  const amount =
-  document.getElementById("amount-"+project).value;
+if(res?.error){
+alert(res.error);
+return;
+}
 
-  const address =
-  document.getElementById("address-"+project).value;
+/* clear address */
+withdrawAddress.value = "";
 
-  if(!amount || Number(amount) <= 0){
-    alert("Enter valid amount");
-    return;
-  }
+closeModal();
 
-  if(!address){
-    alert("Enter Pi wallet address");
-    return;
-  }
+/* refresh wallet */
+renderWallet();
 
-  const res = requestWithdraw({
-    project: project,
-    amount: amount,
-    walletAddress: address
-  });
+}
 
-  if(res.error){
-    alert(res.error);
-    return;
-  }
-
-  renderWallet();
-}   
 /* =========================
    CAPITAL WITHDRAW
 ========================= */
@@ -790,45 +800,54 @@ renderWallet();
 
 </script>
   
-<script>  
-  
-const withdrawSuccessBox = document.getElementById("withdrawSuccessBox");  
-  
-/* Track last withdraw timestamp */  
-let lastWithdrawTime = 0;  
-  
-/* Listen for wallet updates */  
-window.addEventListener("walletUpdated", function(e){  
-  
-  if(!e.detail) return;  
-  
-  const data = e.detail;  
-  
-  /* Idan withdraw ne */  
-  if(data.type === "reward-withdraw" || data.type === "capital-withdraw"){  
-  
-    const now = Date.now();  
-  
-    /* Kauce wa duplicate show */  
-    if(now - lastWithdrawTime < 1000) return;  
-  
-    lastWithdrawTime = now;  
-  
-    showWithdrawSuccess();  
-  }  
-  
-});  
-  
-function showWithdrawSuccess(){  
-  
-  withdrawSuccessBox.style.display = "block";  
-  withdrawSuccessBox.textContent = "Withdraw Successful ✓";  
-  
-  /* Auto hide after 4 seconds */  
-  setTimeout(()=>{  
-    withdrawSuccessBox.style.display = "none";  
-  },4000);  
-}  
+<script>
+
+const withdrawSuccessBox =
+document.getElementById("withdrawSuccessBox");
+
+/* Track last withdraw timestamp */
+let lastWithdrawTime = 0;
+
+/* Listen for wallet updates */
+window.addEventListener("walletUpdated", function(e){
+
+if(!e.detail) return;
+
+const data = e.detail;
+
+/* Capital withdraw only */
+if(data.type === "capital-withdraw"){
+
+const now = Date.now();
+
+/* prevent duplicate */
+if(now - lastWithdrawTime < 1000) return;
+
+lastWithdrawTime = now;
+
+showWithdrawSuccess();
+
+}
+
+});
+
+function showWithdrawSuccess(){
+
+withdrawSuccessBox.style.display = "block";
+
+withdrawSuccessBox.textContent =
+"Capital Withdraw Successful ✓";
+
+/* auto hide */
+
+setTimeout(()=>{
+
+withdrawSuccessBox.style.display = "none";
+
+},4000);
+
+}
+
 </script>
   
 </body>
