@@ -400,28 +400,69 @@ WITHDRAW_KEY
 
 }
 
+function getProjectWalletBreakdown(){
+
+if(typeof getAllStakesMerged !== "function"){
+return [];
+}
+
+const stakes = getAllStakesMerged() || [];
+
+const map = {};
+
+stakes.forEach(s=>{
+
+if(!s?.project) return;
+
+if(!map[s.project]){
+map[s.project] = {
+project:s.project,
+stake:0,
+grossReward:0,
+withdrawnReward:0,
+withdrawnCapital:0
+};
+}
+
+if(!s.capitalWithdrawn){
+map[s.project].stake += Number(s.amount)||0;
+}
+
+const reward =
+Number(s.reward)||0;
+
+const withdrawn =
+Number(s.withdrawnReward)||0;
+
+map[s.project].grossReward += reward;
+map[s.project].withdrawnReward += withdrawn;
+
+});
+
 return Object.values(map).map(p=>({
 
-project: p.project,
+project:p.project,
 
-stake: p.stake,
+stake:p.stake,
 
-grossReward: p.grossReward,
+grossReward:p.grossReward,
 
-withdrawn: p.withdrawnReward + p.withdrawnCapital,
+withdrawnReward:p.withdrawnReward,
 
-withdrawnReward: p.withdrawnReward,
+withdrawnCapital:p.withdrawnCapital,
 
-withdrawnCapital: p.withdrawnCapital,
-
-netReward: Math.max(
+netReward:
+Math.max(
 p.grossReward - p.withdrawnReward,
 0
 ),
 
-withdrawableCapital: Math.max(
+withdrawableCapital:
+Math.max(
 p.stake - p.withdrawnCapital,
 0
 )
 
 }));
+
+   }
