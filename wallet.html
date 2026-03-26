@@ -264,7 +264,13 @@ body{
   border-radius:8px;
   border:1px solid #ddd;
   font-size:12px;
-   }   
+   }
+  .project-body{
+display:none;
+margin-top:12px;
+border-top:1px solid #eee;
+padding-top:10px;
+  }
   </style>
   
 <link rel="stylesheet" href="style.css">  
@@ -526,13 +532,19 @@ window.openWithdraw = function(project){
 activeProject = project;
 
 const breakdown =
-getProjectWalletBreakdown()
-.find(p=>p.project===project);
+(getProjectWalletBreakdown() || [])
+.find(p=>p.project===project) || {};
 
-document.getElementById("capitalAvailable")
-.innerText =
-(breakdown?.withdrawableCapital || 0)
-.toFixed(2) + " Pi";
+const capital =
+Number(breakdown.withdrawableCapital || 0);
+
+if(capital <= 0){
+alert("No capital available for withdraw");
+return;
+}
+
+document.getElementById("capitalAvailable").innerText =
+capital.toFixed(2) + " Pi";
 
 modalProject.innerText =
 "Withdraw from " + project;
@@ -541,16 +553,23 @@ withdrawAddress.value="";
 
 withdrawModal.style.display="flex";
 
-}
+   }
+
 /* =========================
    CLOSE MODAL
 ========================= */
 
 window.closeModal = function(){
-  if(withdrawModal){
-    withdrawModal.style.display = "none";
-  }
-}
+
+if(!withdrawModal) return;
+
+withdrawModal.style.display = "none";
+
+withdrawAddress.value = "";
+
+activeProject = null;
+
+   }
 
 /* =========================
    PROJECT ICON
@@ -592,33 +611,26 @@ return "🏢";
 
 function renderWallet(){
 
-const summary = getWalletSummary();
-
-/* TOTAL STAKE */
+const summary = getWalletSummary() || {};
 
 document.getElementById("totalStake").innerText =
-(summary.totalStake || 0).toFixed(2) + " Pi";
-
-/* TOTAL REWARD */
+Number(summary.totalStake || 0).toFixed(2) + " Pi";
 
 document.getElementById("totalReward").innerText =
-(summary.grossRewards || 0).toFixed(2) + " Pi";
-
-/* TOTAL WITHDRAWN */
+Number(summary.grossRewards || 0).toFixed(2) + " Pi";
 
 document.getElementById("withdrawn").innerText =
-(summary.withdrawn || 0).toFixed(2) + " Pi";
-
-/* AVAILABLE CAPITAL */
+Number(summary.withdrawn || 0).toFixed(2) + " Pi";
 
 document.getElementById("available").innerText =
-(summary.withdrawableCapital || 0).toFixed(2) + " Pi";
-
-/* RENDER PROJECTS */
+Number(summary.withdrawableCapital || 0).toFixed(2) + " Pi";
 
 renderProjects();
 
 }
+
+/* Auto refresh */
+window.addEventListener("walletUpdated", renderWallet);
 
 /* =========================
    RENDER PROJECTS
@@ -641,6 +653,12 @@ container.innerHTML=
 
 return;
 }
+
+breakdown.sort(
+(a,b)=>
+(b.withdrawableCapital||0)-
+(a.withdrawableCapital||0)
+);
 
 breakdown.forEach(p=>{
 
@@ -737,10 +755,15 @@ window.toggleBody = function(el){
 }
 
 /* =========================
-   CONFIRM WITHDRAW
+   CONFIRM CAPITAL WITHDRAW
 ========================= */
 
 window.confirmCapitalWithdraw = function(){
+
+if(!activeProject){
+alert("No project selected");
+return;
+}
 
 const address =
 withdrawAddress.value.trim();
@@ -758,13 +781,17 @@ alert(res.error);
 return;
 }
 
-/* clear address */
 withdrawAddress.value = "";
 
 closeModal();
 
-/* refresh wallet */
 renderWallet();
+
+window.dispatchEvent(
+new CustomEvent("walletUpdated",{
+detail:{type:"capital-withdraw"}
+})
+);
 
 }
 
