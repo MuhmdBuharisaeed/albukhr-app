@@ -515,12 +515,6 @@ document.addEventListener("DOMContentLoaded", function(){
 
 let activeProject = null;
 
-/* GET MODAL ELEMENTS */
-const withdrawModal = document.getElementById("withdrawModal");
-const withdrawAddress = document.getElementById("withdrawAddress");
-const modalProject = document.getElementById("modalProject");
-
-
 /* =========================
    MODAL ELEMENTS
 ========================= */
@@ -709,7 +703,8 @@ card.className="project-card";
 card.innerHTML = `
 
 <div class="project-header"
-onclick="toggleBody(this,event)"
+onclick="toggleBody(this,event)">
+
 <div class="project-title">
 
 <div class="project-icon">
