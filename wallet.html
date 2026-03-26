@@ -520,12 +520,10 @@ const withdrawModal = document.getElementById("withdrawModal");
 const withdrawAddress = document.getElementById("withdrawAddress");
 const modalProject = document.getElementById("modalProject");
 
-/* =========================
-   OPEN WITHDRAW
-========================= */
-window.openWithdraw = function(project){
 
-activeProject = project;
+/* =========================
+   MODAL ELEMENTS
+========================= */
 
 const withdrawModal =
 document.getElementById("withdrawModal");
@@ -539,12 +537,16 @@ document.getElementById("modalProject");
 const capitalAvailable =
 document.getElementById("capitalAvailable");
 
-/* Safety check */
 
-if(!withdrawModal || !modalProject || !withdrawAddress){
-console.error("Withdraw modal elements missing");
-return;
-}
+/* =========================
+   OPEN WITHDRAW
+========================= */
+
+window.openWithdraw = function(project){
+
+activeProject = project;
+
+/* Get project data */
 
 const breakdown =
 (getProjectWalletBreakdown() || [])
@@ -553,10 +555,14 @@ const breakdown =
 const capital =
 Number(breakdown.withdrawableCapital || 0);
 
+/* No capital */
+
 if(capital <= 0){
 alert("No capital available for withdraw");
 return;
 }
+
+/* Update modal */
 
 capitalAvailable.innerText =
 capital.toFixed(2) + " Pi";
@@ -566,9 +572,16 @@ modalProject.innerText =
 
 withdrawAddress.value = "";
 
+/* Open modal */
+
 withdrawModal.classList.add("active");
 
 }
+
+
+/* =========================
+   CLICK OUTSIDE CLOSE
+========================= */
 
 withdrawModal.addEventListener("click", function(e){
 
@@ -586,9 +599,7 @@ window.closeModal = function(){
 
 withdrawModal.classList.remove("active");
 
-setTimeout(()=>{
-withdrawModal.style.display="none";
-},100);
+withdrawAddress.value = "";
 
 activeProject = null;
 
