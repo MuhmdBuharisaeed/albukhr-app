@@ -685,8 +685,7 @@ card.className="project-card";
 card.innerHTML = `
 
 <div class="project-header"
-onclick="toggleBody(this)">
-
+onclick="toggleBody(this,event)"
 <div class="project-title">
 
 <div class="project-icon">
@@ -733,7 +732,7 @@ ${(p.withdrawnCapital || 0).toFixed(2)} Pi
 
 <button class="btn"
 style="width:100%"
-onclick="openWithdraw('${p.project}')">
+onclick="event.stopPropagation(); openWithdraw('${p.project}')">
 
 Withdraw Capital
 
@@ -755,19 +754,19 @@ container.appendChild(card);
    TOGGLE PROJECT BODY
 ========================= */
 
-window.toggleBody = function(el){
+window.toggleBody = function(el,event){
 
-  const card = el.closest(".project-card");
-  const body = card.querySelector(".project-body");
+if(event && event.target.closest("button")) return;
 
-  if(!body) return;
+const card = el.closest(".project-card");
+const body = card.querySelector(".project-body");
 
-  body.style.display =
-    body.style.display === "block"
-      ? "none"
-      : "block";
+body.style.display =
+body.style.display === "block"
+? "none"
+: "block";
 
-}
+   }
 
 /* =========================
    CONFIRM CAPITAL WITHDRAW
