@@ -399,3 +399,29 @@ WITHDRAW_KEY
 );
 
 }
+
+return Object.values(map).map(p=>({
+
+project: p.project,
+
+stake: p.stake,
+
+grossReward: p.grossReward,
+
+withdrawn: p.withdrawnReward + p.withdrawnCapital,
+
+withdrawnReward: p.withdrawnReward,
+
+withdrawnCapital: p.withdrawnCapital,
+
+netReward: Math.max(
+p.grossReward - p.withdrawnReward,
+0
+),
+
+withdrawableCapital: Math.max(
+p.stake - p.withdrawnCapital,
+0
+)
+
+}));
