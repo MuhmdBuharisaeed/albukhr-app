@@ -1,9 +1,8 @@
-/* ===== ALBUKHR DOCK NAV v3 ===== */
+/* ===== ALBUKHR BOTTOM NAV (iOS Style) ===== */
 
 :root{
---albukhr-gold:#d4af37;
---albukhr-gold-light:#f6d776;
---albukhr-gold-dark:#b8962e;
+--albukhr-green:#0f7a3d;
+--albukhr-gray:#888;
 }
 
 
@@ -12,26 +11,23 @@
 .dock-nav{
 
 position:fixed;
-bottom:10px;
-left:50%;
-transform:translateX(-50%);
+bottom:0;
+left:0;
+right:0;
 
-width:92%;
-max-width:480px;
+height:72px;
 
-background:linear-gradient(90deg,#0f7a3d,#1ec777);
+background:#ffffff;
 
-border-radius:26px;
-
-padding:10px 8px;
+border-top:1px solid #eaeaea;
 
 display:flex;
-justify-content:space-between;
+justify-content:space-around;
 align-items:center;
 
-box-shadow:0 10px 30px rgba(0,0,0,0.25);
-
 z-index:1000;
+
+padding-bottom:6px;
 
 }
 
@@ -48,12 +44,13 @@ align-items:center;
 justify-content:center;
 
 text-decoration:none;
-color:white;
 
-font-size:12px;
-font-weight:600;
+color:var(--albukhr-gray);
 
-transition:.25s ease;
+font-size:11px;
+font-weight:500;
+
+transition:.2s ease;
 
 position:relative;
 
@@ -64,56 +61,44 @@ position:relative;
 
 .dock-item span{
 
-font-size:13px;
-font-weight:600;
-
-margin-top:2px;
+font-size:12px;
+margin-top:3px;
 
 }
 
 
-/* ICON SIZE */
+/* ICON */
 
 .dock-icon{
 
-width:42px;
-height:42px;
+width:24px;
+height:24px;
 
-fill:white;
-
-margin-bottom:4px;
+fill:currentColor;
 
 }
 
 
-/* WALLET CENTER STYLE */
+/* REMOVE CENTER WALLET STYLE */
 
 .dock-item:nth-child(3){
-
-background:rgba(255,255,255,0.15);
-
-border-radius:16px;
-
-padding:6px 0;
-
+background:none;
+padding:0;
 }
-
-
-/* WALLET ICON BIGGER */
 
 .dock-item:nth-child(3) .dock-icon{
-
-width:46px;
-height:46px;
-
+width:24px;
+height:24px;
 }
 
 
-/* ACTIVE ITEM */
+/* ACTIVE */
 
 .dock-item.active{
 
-transform:translateY(-3px);
+color:var(--albukhr-green);
+
+transform:none;
 
 }
 
@@ -124,24 +109,20 @@ transform:translateY(-3px);
 
 content:"";
 
-width:6px;
-height:6px;
+width:5px;
+height:5px;
 
-background:#ffd84d;
+background:var(--albukhr-green);
 
 border-radius:50%;
 
-position:absolute;
-
-bottom:4px;
+margin-top:3px;
 
 }
 
 
-/* HOVER EFFECT */
+/* HOVER */
 
 .dock-item:hover{
-
-opacity:.9;
-
+opacity:.8;
   }
