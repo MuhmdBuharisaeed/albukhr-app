@@ -152,19 +152,6 @@ body{
   transform:scale(1.08);
 }
 
-
-/* ===============================
-   PROJECT BODY
-================================*/
-
-.project-body{
-  margin-top:12px;
-  display:block;
-  border-top:1px solid #eee;
-  padding-top:10px;
-}
-
-
 /* ===============================
    BUTTONS
 ================================*/
@@ -635,7 +622,6 @@ window.addEventListener("walletUpdated", renderWallet);
 /* =========================
    RENDER PROJECTS
 ========================= */
-
 function renderProjects(){
 
 const container =
@@ -643,8 +629,14 @@ document.getElementById("projectContainer");
 
 container.innerHTML="";
 
+if(typeof getProjectWalletBreakdown !== "function"){
+container.innerHTML =
+"<small>Wallet engine not ready</small>";
+return;
+}
+
 const breakdown =
-getProjectWalletBreakdown();
+getProjectWalletBreakdown() || [];
 
 if(!breakdown.length){
 
