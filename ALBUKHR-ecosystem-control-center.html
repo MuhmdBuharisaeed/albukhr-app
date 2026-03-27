@@ -124,6 +124,7 @@ ALBUKHR Ecosystem Control Center
 
 </div>
 
+<script src="admin-auth.js"></script>
 <script src="project-registry.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 <script src="staking.js"></script>
@@ -131,7 +132,26 @@ ALBUKHR Ecosystem Control Center
 <script src="albukhr-economic-intelligence-engine.js"></script>
 
 <script>
+/* ===============================
+   ADMIN AUTH GUARD
+================================ */
 
+document.addEventListener("DOMContentLoaded", function(){
+
+if(typeof requireRole === "function"){
+requireRole([
+"super_admin",
+"ecosystem_admin"
+]);
+}
+
+if(typeof getAdmin === "function" && !getAdmin()){
+window.location.href = "admin-login.html";
+return;
+}
+
+});
+  
 function renderControlCenter(){
 
 const projects =
