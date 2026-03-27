@@ -102,12 +102,34 @@ ALBUKHR Ecosystem Master Dashboard
 
 </div>
 
+<script src="admin-auth.js"></script>
 <script src="project-registry.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 <script src="staking.js"></script>
 <script src="capital-protection-engine.js"></script>
 
 <script>
+
+/* ===============================
+   ADMIN AUTH GUARD
+================================ */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+if(typeof requireRole === "function"){
+requireRole([
+"super_admin",
+"ecosystem_admin",
+"finance_admin"
+]);
+}
+
+if(typeof getAdmin === "function" && !getAdmin()){
+window.location.href = "admin-login.html";
+return;
+}
+
+});
 
 function renderDashboard(){
 
