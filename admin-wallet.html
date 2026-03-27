@@ -71,6 +71,31 @@ small{color:#666}
 </div>
 
 <div class="card">
+<h4>Admin Wallet Control</h4>
+
+<select id="adminProject">
+<option value="">Select Project</option>
+</select>
+
+<input 
+type="number" 
+id="adminAmount"
+placeholder="Amount (Pi)"
+style="width:100%;padding:10px;margin-top:8px;border-radius:10px;border:1px solid #ddd">
+
+<select id="adminType" style="width:100%;padding:10px;margin-top:8px;border-radius:10px">
+<option value="reward">Add Reward</option>
+<option value="capital">Add Capital</option>
+<option value="stake">Add Stake</option>
+</select>
+
+<button class="btn unlock" onclick="adminAddWallet()">
+Add to Wallet
+</button>
+
+</div>
+
+<div class="card">
   <h4>Recent Withdrawals</h4>
   <div id="adminTxList"></div>
 </div>
@@ -114,10 +139,11 @@ let lastAlertedTxId = null;
    INIT
 ================================ */
 function initAdminWallet(){
-  refreshAdminWallet();
-  window.addEventListener("walletUpdated", refreshAdminWallet);
-  setInterval(refreshAdminWallet, 5000);
-}
+refreshAdminWallet();
+loadProjectsAdmin();
+window.addEventListener("walletUpdated", refreshAdminWallet);
+setInterval(refreshAdminWallet, 5000);
+  }
 
 /* ===============================
    SUMMARY
@@ -283,6 +309,114 @@ function refreshAdminWallet(){
   renderSummary();
   renderTransactions();
 }
+
+/* ===============================
+   ADMIN ADD WALLET
+================================ */
+
+function loadProjectsAdmin(){
+
+if(typeof getProjectWalletBreakdown !== "function") return;
+
+const select =
+document.getElementById("adminProject");
+
+select.innerHTML =
+'<option value="">Select Project</option>';
+
+const projects =
+getProjectWalletBreakdown();
+
+projects.forEach(p=>{
+
+select.innerHTML +=
+`<option value="${p.project}">
+${p.project}
+</option>`;
+
+});
+
+}
+
+function adminAddWallet(){
+
+const project =
+document.getElementById("adminProject").value;
+
+const amount =
+Number(document.getElementById("adminAmount").value);
+
+const type =
+document.getElementById("adminType").value;
+
+if(!project){
+alert("Select project");
+return;
+}
+
+if(!amount || amount <= 0){
+alert("Invalid amount");
+return;
+}
+
+/* Load Stakes */
+
+const stakes =
+getAllStakesMerged();
+
+if(type === "reward"){
+
+stakes.forEach(s=>{
+if(s.project === project){
+s.reward = (Number(s.reward)||0) + amount;
+}
+});
+
+}
+
+if(type === "capital"){
+
+stakes.push({
+id:"ADM-"+Date.now(),
+project,
+amount,
+reward:0,
+timestamp:Date.now(),
+admin:true
+});
+
+}
+
+if(type === "stake"){
+
+stakes.push({
+id:"ADM-"+Date.now(),
+project,
+amount,
+reward:0,
+timestamp:Date.now(),
+admin:true
+});
+
+}
+
+_saveMergedStakes(stakes);
+
+recordTx({
+type:"admin-credit",
+project,
+amount
+});
+
+window.dispatchEvent(
+new CustomEvent("walletUpdated")
+);
+
+alert("Wallet updated successfully");
+
+refreshAdminWallet();
+
+  }
 
 </script>
 
