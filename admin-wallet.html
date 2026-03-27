@@ -174,7 +174,14 @@ available += Number(p.withdrawableCapital)||0;
 });
 
 history.forEach(tx=>{
-totalFees += Number(tx.fee)||0;
+
+const fee =
+Number(tx.fee || 0);
+
+if(!isNaN(fee)){
+totalFees += fee;
+}
+
 });
 
 const totalWithdrawn =
