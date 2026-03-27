@@ -327,6 +327,10 @@ isStakeMatured(s) &&
 
 s.capitalWithdrawn = true;
 
+s.withdrawnCapital =
+(Number(s.withdrawnCapital)||0)
++ (Number(s.amount)||0);
+
 totalCapital +=
 Number(s.amount)||0;
 
