@@ -280,7 +280,8 @@ saveWithdrawals(history);
 recordTx({
 type:"withdraw",
 project,
-amount
+amount,
+fee
 });
 
 window.dispatchEvent(
