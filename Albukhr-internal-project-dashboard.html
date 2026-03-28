@@ -236,19 +236,44 @@ Withdraw Liquidity
 
 <script>
 
+/* ===============================
+CORE PROJECTS
+=============================== */
+
+const CORE_PROJECTS = [
+
+"Barsh Agro",
+"Labbaika Bakery",
+"Raheem Pharma",
+"Urban Transport",
+"Khairat Recycling",
+"Azman Chemical",
+"Hauwal Maize"
+
+];
+
+/* ===============================
+AUTH CHECK
+=============================== */
+
 (function(){
 
-const email = localStorage.getItem("albukhr_current_email");
+const email =
+localStorage.getItem("albukhr_current_email");
 
 if(!email){
 
 alert("Login required");
-window.location.href="submit-albukhrecosystem-form.html";
+
+window.location.href =
+"submit-albukhrecosystem-form.html";
+
 return;
 
 }
 
-const allowed = localStorage.getItem(
+const allowed =
+localStorage.getItem(
 "albukhr_project_dashboard_unlocked_" + email
 );
 
@@ -256,22 +281,34 @@ if(!allowed){
 
 alert("Access denied");
 
-window.location.href="submit-albukhrecosystem-form.html";
+window.location.href =
+"submit-albukhrecosystem-form.html";
 
 }
 
 })();
 
-const project =
-localStorage.getItem("albukhr_current_project");
+/* ===============================
+CURRENT PROJECT
+=============================== */
 
-if(!isProjectOwner(project)){
+const currentProject =
+localStorage.getItem(
+"albukhr_current_project"
+);
 
-alert("Access denied");
+if(!currentProject){
 
-window.location.href = "marketplace.html";
+alert("Project not found");
+
+window.location.href =
+"marketplace.html";
 
 }
+
+</script>
+
+<script>
 
 function verifyOwner(){
 
@@ -319,6 +356,22 @@ window.location.href = "marketplace.html";
 
 function verifyOwner(){
 
+/* ===============================
+CORE PROJECTS
+=============================== */
+
+const CORE_PROJECTS = [
+
+"Barsh Agro",
+"Labbaika Bakery",
+"Raheem Pharma",
+"Urban Transport",
+"Khairat Recycling",
+"Azman Chemical",
+"Hauwal Maize"
+
+];
+
 const email =
 localStorage.getItem("albukhr_current_email");
 
@@ -341,22 +394,37 @@ if(typeof getMarketplaceProjects === "function"){
 
 const projects = getMarketplaceProjects();
 
-project = projects.find(p => p.name === currentProject);
+project = projects.find(
+p => p.name === currentProject
+);
 
 }
 
-/* if not found check internal projects */
+/* check internal projects */
 
 if(!project){
 
 const internal =
-JSON.parse(localStorage.getItem("albukhr_internal_projects")) || [];
+JSON.parse(
+localStorage.getItem(
+"albukhr_internal_projects"
+)
+) || [];
 
-project = internal.find(p => p.projectName === currentProject);
+project =
+internal.find(
+p => p.projectName === currentProject
+);
 
 }
 
-/* if still not found */
+/* Core project bypass */
+
+if(CORE_PROJECTS.includes(currentProject)){
+return;
+}
+
+/* not found */
 
 if(!project){
 
@@ -368,25 +436,35 @@ return;
 
 }
 
+/* ownership check */
+
 if(project.creator !== email){
 
-alert("Access denied. You are not the project owner.");
+alert(
+"Access denied. You are not the project owner."
+);
 
-window.location.href = "marketplace.html";
+window.location.href =
+"marketplace.html";
 
 }
 
 }
+
+/* run verification */
 
 verifyOwner();
+
+/* project check */
 
 if(!currentProject){
 
 alert("Project not found");
 
-window.location.href = "marketplace.html";
+window.location.href =
+"marketplace.html";
 
-}
+   }
 
 function updateDashboard(){
 
