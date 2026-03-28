@@ -374,7 +374,11 @@ roi.toFixed(2)+"%";
 
 const stakes =
 getAllStakesMerged()
-.filter(s=>s.project===currentProject);
+.filter(s =>
+(s.project || "")
+.toLowerCase()
+.includes(currentProject.toLowerCase())
+);
 
 document.getElementById("investors").innerText =
 stakes.length;
