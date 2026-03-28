@@ -115,7 +115,7 @@ Create Investment Project →
 
 <div class="box" id="projectDashboardBox" style="display:none">
 📊 Project Dashboard Access<br>
-<a href="#" onclick="openProjectDashboard()">
+<a href="Albukhr-internal-project-dashboard.html">
 Open Project Dashboard →
 </a>
 </div>
@@ -354,31 +354,6 @@ window.location.href="internal-registry-form.html";
 
 document.getElementById("email").addEventListener("blur",checkStatus);
 window.addEventListener("DOMContentLoaded",checkStatus);
-
-function openProjectDashboard(){
-
-const email =
-localStorage.getItem("albukhr_current_email");
-
-if(!email){
-alert("Login required");
-return;
-}
-
-/* unlock dashboard */
-
-localStorage.setItem(
-"albukhr_project_dashboard_unlocked_" + email,
-true
-);
-
-/* open dashboard */
-
-window.location.href =
-"Albukhr-internal-project-dashboard.html";
-
-}
-
 </script>
 
 </body>
