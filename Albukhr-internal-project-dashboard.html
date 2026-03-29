@@ -288,9 +288,42 @@ localStorage.getItem(
 "albukhr_project_dashboard_unlocked_" + email
 );
 
+/* Soft auto unlock */
+
 if(!allowed){
+
+/* allow if project exists */
+
+const internal =
+JSON.parse(
+localStorage.getItem("albukhr_internal_projects")
+) || [];
+
+const marketplace =
+typeof getMarketplaceProjects === "function"
+? getMarketplaceProjects()
+: [];
+
+const exists =
+internal.some(p=>p.projectName===currentProject) ||
+marketplace.some(p=>p.name===currentProject);
+
+/* auto unlock if valid project */
+
+if(exists){
+
+localStorage.setItem(
+"albukhr_project_dashboard_unlocked_" + email,
+true
+);
+
+}else{
+
 alert("Access denied");
 window.location.href="submit-albukhrecosystem-form.html";
+
+}
+
 }
 
 })();
