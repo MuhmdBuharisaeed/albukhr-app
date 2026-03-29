@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 
@@ -259,9 +259,26 @@ CURRENT PROJECT
 const currentProject =
 localStorage.getItem("albukhr_current_project");
 
+let isEmptyProject = false;
+
 if(!currentProject){
+
+const email =
+localStorage.getItem("albukhr_current_email");
+
+/* allow contributor empty dashboard */
+
+if(email){
+
+isEmptyProject = true;
+
+}else{
+
 alert("Project not found");
 window.location.href="marketplace.html";
+
+}
+
 }
 
 /* ===============================
@@ -385,10 +402,12 @@ UPDATE DASHBOARD
 function updateDashboard(){
 
 document.getElementById("projectName").innerText =
-currentProject;
+currentProject || "No Project Yet";
 
 const status =
-getProjectTreasuryStatus(currentProject) || {
+currentProject
+? getProjectTreasuryStatus(currentProject)
+: {liquidity:0,reserve:0} || {
 liquidity:0,
 reserve:0
 };
@@ -406,7 +425,14 @@ document.getElementById("roi").innerText =
 roi.toFixed(2)+"%";
 
 const stakes =
-getAllStakesMerged()
+currentProject
+? getAllStakesMerged()
+.filter(s =>
+(s.project || "")
+.toLowerCase()
+.includes(currentProject.toLowerCase())
+)
+: []
 .filter(s =>
 (s.project || "")
 .toLowerCase()
