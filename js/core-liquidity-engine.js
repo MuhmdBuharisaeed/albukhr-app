@@ -31,7 +31,7 @@ if(typeof addProjectLiquidity === "function"){
 
 addProjectLiquidity(
 project.name,
-project.target * 0.10   /* 10% bootstrap liquidity */
+100   /* uniform core liquidity */
 );
 
 }
