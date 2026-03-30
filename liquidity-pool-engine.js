@@ -4,6 +4,8 @@
 
 const POOL_KEY = "albukhr_liquidity_pools_v1";
 const MIN_POOL_LIQUIDITY = 100;
+const CORE_POOL_INIT = "albukhr_core_pool_initialized";
+
 /* STORAGE */
 
 function getPools(){
