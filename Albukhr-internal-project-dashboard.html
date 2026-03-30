@@ -360,11 +360,15 @@ localStorage.getItem("albukhr_current_email");
 
 let project = null;
 
+/* marketplace */
+
 if(typeof getMarketplaceProjects === "function"){
 project =
 getMarketplaceProjects()
 .find(p=>p.name===currentProject);
 }
+
+/* internal */
 
 if(!project){
 
@@ -380,6 +384,27 @@ p=>p.projectName===currentProject
 
 }
 
+/* allow internal project */
+
+if(project && !project.creator){
+
+return;
+
+}
+
+/* allow ALBUKHR */
+
+if(
+project &&
+(
+project.creator === "ALBUKHR" ||
+project.type === "internal" ||
+project.internal === true
+)
+){
+return;
+}
+
 if(!project){
 alert("Project not registered");
 window.location.href="marketplace.html";
@@ -391,9 +416,7 @@ alert("Access denied");
 window.location.href="marketplace.html";
 }
 
-}
-
-verifyOwner();
+ }
 
 /* ===============================
 UPDATE DASHBOARD
