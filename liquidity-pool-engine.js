@@ -3,7 +3,7 @@
 ========================================= */
 
 const POOL_KEY = "albukhr_liquidity_pools_v1";
-
+const MIN_POOL_LIQUIDITY = 100;
 /* STORAGE */
 
 function getPools(){
@@ -103,8 +103,11 @@ if(!pools[project]){
 return {error:"Pool not found"};
 }
 
-if(pools[project].liquidity < amount){
-return {error:"Insufficient liquidity"};
+if(
+pools[project].liquidity - amount 
+< MIN_POOL_LIQUIDITY
+){
+return {error:"Minimum pool liquidity protection"};
 }
 
 pools[project].liquidity -= amount;
@@ -122,3 +125,30 @@ return {
 };
 
 }
+
+/* =========================================
+   CORE LIQUIDITY BOOTSTRAP
+========================================= */
+
+function initCoreLiquidity(projects){
+
+projects.forEach(project=>{
+
+createLiquidityPool(project);
+
+addPoolLiquidity(
+project,
+100,
+"core-bootstrap"
+);
+
+});
+
+}
+
+/* AUTO INIT */
+
+if(typeof CORE_PROJECTS !== "undefined"){
+initCoreLiquidity(CORE_PROJECTS);
+}
+
