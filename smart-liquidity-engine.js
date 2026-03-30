@@ -5,6 +5,7 @@
 
 const TREASURY_KEY = "albukhr_project_treasury_v2";
 const RESERVE_PERCENT = 0.30;
+const MIN_PROJECT_LIQUIDITY = 100;
 
 /* =========================================
    SAFE STORAGE
@@ -255,6 +256,15 @@ return {error:"Project treasury missing"};
 
 if(!canUseLiquidity(project, amount)){
 return {error:"Reserve protection active"};
+}
+
+/* MINIMUM LIQUIDITY PROTECTION */
+
+if(
+treasury[project].liquidity - amount 
+< MIN_PROJECT_LIQUIDITY
+){
+return {error:"Minimum liquidity protection"};
 }
 
 /* ANTI RUG PROTECTION */
