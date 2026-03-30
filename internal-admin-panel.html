@@ -323,14 +323,50 @@ if(confirm("Approve this internal project?")){
 
 updateInternalStatus(id,"internal_approved");
 
+const list = getInternalProjects();
+
+const project = list.find(p => p.id === id);
+
 /* =====================================
 AUTO DEPLOY PROJECT
 ===================================== */
 
+if(project && typeof deployInternalProject === "function"){
+deployInternalProject(project);
+}
 
+/* fallback */
 
-const list = getInternalProjects();
-const project = list.find(p => p.id === id);
+const deployed =
+JSON.parse(
+localStorage.getItem("albukhr_deployed_projects")
+) || [];
+
+const exists =
+deployed.find(
+p=>p.projectName === project.projectName
+);
+
+if(!exists && project){
+
+deployed.push({
+
+projectName: project.projectName,
+creator: project.creatorEmail,
+roi: project.roi || 0,
+initialLiquidity: project.initialLiquidity || 0,
+type: "internal",
+createdAt: Date.now(),
+status: "active"
+
+});
+
+localStorage.setItem(
+"albukhr_deployed_projects",
+JSON.stringify(deployed)
+);
+
+}
 
 if(project){
 
