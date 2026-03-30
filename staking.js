@@ -27,12 +27,12 @@ function _save(key,data){
 ====================================== */
 const PROJECT_RULES = {
   Raheem:{minStake:10},
-  Hauwal:{minStake:20},
-  Barsh:{minStake:100},
-  Khairat:{minStake:50},
-  Urban:{minStake:150},
-  Labbaika:{minStake:30},
-  Azman:{minStake:50}
+  Hauwal:{minStake:10},
+  Barsh:{minStake:10},
+  Khairat:{minStake:10},
+  Urban:{minStake:10},
+  Labbaika:{minStake:10},
+  Azman:{minStake:10}
 };
 
 function getMinStake(project){
