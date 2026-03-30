@@ -11,7 +11,8 @@ const CORE_LIQUIDITY_KEY = "albukhr_core_liquidity_initialized";
 
 function initCoreProjectLiquidity(){
 
-if(localStorage.getItem(CORE_LIQUIDITY_KEY)) return;
+/* FORCE RESET */
+localStorage.removeItem(CORE_LIQUIDITY_KEY);
 
 if(typeof getMarketplaceProjects !== "function") return;
 
@@ -31,7 +32,7 @@ if(typeof addProjectLiquidity === "function"){
 
 addProjectLiquidity(
 project.name,
-100   /* uniform core liquidity */
+100
 );
 
 }
