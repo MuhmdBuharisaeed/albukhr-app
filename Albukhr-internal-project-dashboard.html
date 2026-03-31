@@ -221,6 +221,7 @@ Withdraw Liquidity
 <div class="title">Treasury Activity</div>
 
 <div id="history"></div>
+<div id="projectStakeBox"></div>
 
 </div>
 
@@ -543,6 +544,11 @@ div.innerHTML += `
 
 }
 
+renderProjectStakeUI(
+currentProject,
+localStorage.getItem("albukhr_current_email")
+);
+ 
 /* ===============================
 START
 =============================== */
