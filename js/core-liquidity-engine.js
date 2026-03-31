@@ -5,6 +5,7 @@
 
 const CORE_LIQUIDITY_KEY = "albukhr_core_liquidity_initialized";
 
+localStorage.removeItem("albukhr_core_liquidity_initialized");
 /* =========================================
    INIT CORE PROJECT TREASURIES
 ========================================= */
