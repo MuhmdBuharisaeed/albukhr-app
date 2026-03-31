@@ -544,7 +544,7 @@ card.className = "project-card";
 /* TREASURY */
 const treasury =
 typeof getProjectTreasuryStatus === "function"
-? getProjectTreasuryStatus(projectKey)
+? getProjectTreasuryStatus(project.name)
 : {liquidity:0};
 
 const liquidity =
@@ -625,7 +625,7 @@ ${riskData.risk}
 <div>Pool Liquidity</div>
 <div>${
 (typeof getPoolStatus==="function"
-? getPoolStatus(projectKey)?.liquidity || 0
+? getPoolStatus(project.name)?.liquidity || 0
 : 0).toFixed(2)
 } Pi</div>
 </div>
