@@ -425,7 +425,7 @@ UPDATE DASHBOARD
 function updateDashboard(){
 
 document.getElementById("projectName").innerText =
-currentProject || "No Project Yet";
+currentProject ? currentProject : "No Project Selected";
 
 const status =
 currentProject
@@ -543,17 +543,22 @@ div.innerHTML += `
 
 }
 
-renderProjectStakeUI(
-currentProject,
-localStorage.getItem("albukhr_current_email")
-);
-
 /* ===============================
 START
 =============================== */
 
 document.addEventListener("DOMContentLoaded",function(){
+
 updateDashboard();
+
+/* ADD THIS HERE */
+if(typeof renderProjectStakeUI === "function"){
+  renderProjectStakeUI(
+    currentProject,
+    localStorage.getItem("albukhr_current_email")
+  );
+}
+
 });
 
 </script>
