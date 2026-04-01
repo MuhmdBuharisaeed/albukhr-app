@@ -1,76 +1,69 @@
 /* =========================================
-ALBUKHR PROJECT DEPLOYMENT ENGINE v1
-Auto Deploy • Internal • Core Compatible
+ALBUKHR PROJECT DEPLOYMENT ENGINE v2 (FIXED)
 ========================================= */
-
-const DEPLOYED_KEY = "albukhr_deployed_projects";
-
-/* ===============================
-GET DEPLOYED
-=============================== */
-
-function getDeployedProjects(){
-return JSON.parse(
-localStorage.getItem(DEPLOYED_KEY)
-) || [];
-}
-
-function saveDeployedProjects(list){
-localStorage.setItem(
-DEPLOYED_KEY,
-JSON.stringify(list)
-);
-}
-
-/* ===============================
-DEPLOY PROJECT
-=============================== */
 
 function deployInternalProject(project){
 
 if(!project?.name) return;
 
-const deployed =
-getDeployedProjects();
+const deployed = getDeployedProjects();
 
-if(deployed.some(p=>p.name===project.name)){
+if(deployed.some(p=>p.name===project.name)) return;
+
+/* NORMALIZE */
+const projectKey =
+typeof normalizeProjectName === "function"
+? normalizeProjectName(project.name)
+: project.name;
+
+/* ===============================
+VERIFY STAKING
+=============================== */
+
+if(typeof verifyUserStaking === "function" && project.email){
+
+const stake = verifyUserStaking(project.email);
+
+if(!stake || stake.amount < 100 || stake.duration < 3){
 return;
 }
 
+}
+
 /* ===============================
-ADD TO REGISTRY
+REGISTER PROJECT
 =============================== */
 
-if(typeof registerProject === "function"){
+if(typeof registerMarketplaceProject === "function"){
 
-registerProject({
-
-name: project.name,
-category: project.category || "Internal",
+registerMarketplaceProject({
+name: projectKey,
 roi: Number(project.roi)||25,
-creator: project.owner || "Internal",
-status:"active",
-internal:true
-
+target: project.target || 1000,
+minimum: project.minimum || 10
 });
 
 }
 
 /* ===============================
-CREATE TREASURY
+TREASURY + LIQUIDITY
 =============================== */
 
 if(typeof createProjectTreasury === "function"){
+createProjectTreasury(projectKey);
+}
 
-createProjectTreasury(
-project.name,
-Number(project.initialLiquidity)||0
-);
+if(typeof addProjectLiquidity === "function"){
+
+const initial =
+Math.max(Number(project.initialLiquidity)||0, 100);
+
+addProjectLiquidity(projectKey, initial);
 
 }
 
 /* ===============================
-ENABLE DASHBOARD
+UNLOCK DASHBOARD
 =============================== */
 
 if(project.email){
@@ -87,10 +80,8 @@ SAVE DEPLOYED
 =============================== */
 
 deployed.push({
-
-name: project.name,
+name: projectKey,
 deployedAt: Date.now()
-
 });
 
 saveDeployedProjects(deployed);
@@ -105,49 +96,5 @@ new CustomEvent("projectDeployed")
 
 }
 
-/* ===============================
-AUTO DEPLOY APPROVED
-=============================== */
-
-function autoDeployApproved(){
-
-const internal =
-JSON.parse(
-localStorage.getItem("albukhr_internal_projects")
-) || [];
-
-internal.forEach(project=>{
-
-if(
-project.status==="approved" &&
-!project.deployed
-){
-
-deployInternalProject(project);
-
-project.deployed = true;
-
-}
-
-});
-
-localStorage.setItem(
-"albukhr_internal_projects",
-JSON.stringify(internal)
-);
-
-}
-
-/* ===============================
-AUTO RUN
-=============================== */
-
-document.addEventListener(
-"DOMContentLoaded",
-autoDeployApproved
-);
-
-window.addEventListener(
-"storage",
-autoDeployApproved
-);
+/* AUTO RUN LOOP */
+setInterval(autoDeployApproved, 3000);
