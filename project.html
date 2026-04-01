@@ -37,11 +37,18 @@
   <div class="short-info" id="projectDescription"></div>
 
   <div class="btns">
-    <button class="btn primary" onclick="openModal()">Stake</button>
-    <button class="btn secondary" onclick="openWithdrawModal()">
-      💸 Withdraw Rewards
-    </button>
-  </div>
+<button class="btn primary" onclick="openModal()">
+Stake
+</button>
+
+<button class="btn secondary" onclick="openWithdrawModal()">
+💸 Withdraw Rewards
+</button>
+</div>
+
+<button class="btn capital-btn" onclick="withdrawCapital()">
+🏦 Withdraw Capital
+</button>
 
   <div class="scroll-area">
     <h3 id="txTitle" style="margin-bottom:10px;font-size:15px">
@@ -310,6 +317,13 @@ function renderHistory(){
       icon = "🎁";
       label = "Reward";
     }
+    
+    if(tx.type === "capital"){
+      icon = "🏦";
+      label = "Capital";
+      sign = "-";
+      color = "withdraw-status";
+    }
 
     const div = document.createElement("div");
     div.className="project-tx";
@@ -422,7 +436,57 @@ receive.toFixed(2) + " Pi";
 });
 
 }
-  
+
+/* ===============================
+CAPITAL WITHDRAW
+=============================== */
+
+function withdrawCapital(){
+
+const data =
+getProjectTotals(PROJECT_NAME);
+
+const stakes =
+data.stakes.filter(
+s => !s.capitalWithdrawn
+);
+
+if(!stakes.length){
+
+alert("No capital available");
+return;
+
+}
+
+let total = 0;
+
+stakes.forEach(s=>{
+
+total += Number(s.amount)||0;
+
+s.capitalWithdrawn = true;
+
+});
+
+recordTx({
+
+type:"capital",
+project:PROJECT_NAME,
+amount:total,
+timestamp:Date.now()
+
+});
+
+alert(
+"Capital Withdrawn: "
++ total.toFixed(2)
++ " Pi"
+);
+
+load();
+
+}
+
 /* ===============================
    INIT
 =============================== */
