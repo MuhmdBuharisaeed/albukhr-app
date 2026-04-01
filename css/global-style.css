@@ -223,3 +223,15 @@ font-weight:600;
 box-shadow:0 6px 18px rgba(0,0,0,0.08);
 
 }
+
+.capital-wrapper{
+margin-top:12px;
+margin-bottom:12px;
+}
+
+.capital-btn{
+width:100%;
+padding:16px;
+border-radius:14px;
+font-weight:600;
+}
