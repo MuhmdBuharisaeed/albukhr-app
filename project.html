@@ -220,42 +220,6 @@ function closeWithdraw(){
   withdrawModal.style.display="none";
 }
 
-<!-- CAPITAL WITHDRAW MODAL -->
-<div class="modal" id="capitalModal">
-<div class="modal-box">
-
-<h3>Withdraw Capital</h3>
-
-<label>Amount</label>
-<input type="number" id="capitalWithdrawAmount">
-
-<small id="capitalAvailable"></small>
-
-<div style="font-size:12px;color:#666;margin-top:6px">
-Fee (0.5%):
-<strong id="capitalFee">0.00 Pi</strong>
-</div>
-
-<div style="font-size:12px;color:#666">
-You Receive:
-<strong id="capitalReceive">0.00 Pi</strong>
-</div>
-
-<div class="btns">
-<button class="btn primary"
-onclick="confirmCapitalWithdraw()">
-Confirm
-</button>
-
-<button class="btn secondary"
-onclick="closeCapitalModal()">
-Cancel
-</button>
-</div>
-
-</div>
-</div>
-
 /* ===============================
    STAKE
 =============================== */
@@ -527,116 +491,6 @@ load();
 
 }
 
-function openCapitalModal(){
-
-const data =
-getProjectTotals(PROJECT_NAME);
-
-const total = data.stake || 0;
-
-capitalAvailable.innerText =
-"Available: " +
-total.toFixed(2) + " Pi";
-
-capitalModal.style.display = "flex";
-
-}
-
-function closeCapitalModal(){
-
-capitalModal.style.display = "none";
-
-}
-
-function confirmCapitalWithdraw(){
-
-const amount =
-Number(capitalWithdrawAmount.value);
-
-if(!amount || amount <= 0){
-
-alert("Invalid amount");
-return;
-
-}
-
-const data =
-getProjectTotals(PROJECT_NAME);
-
-if(amount > data.stake){
-
-alert("Insufficient capital");
-return;
-
-}
-
-let remaining = amount;
-
-data.stakes.forEach(stake=>{
-
-if(remaining <= 0) return;
-
-const available =
-Number(stake.amount)||0;
-
-if(available > 0){
-
-const take =
-Math.min(available, remaining);
-
-stake.amount -= take;
-
-remaining -= take;
-
-}
-
-});
-
-/* record tx */
-
-recordTx({
-
-type:"capital",
-project:PROJECT_NAME,
-amount:amount,
-timestamp:Date.now()
-
-});
-
-closeCapitalModal();
-load();
-
-}
-
-const capitalWithdrawAmount =
-document.getElementById(
-"capitalWithdrawAmount"
-);
-
-if(capitalWithdrawAmount){
-
-capitalWithdrawAmount
-.addEventListener("input", function(){
-
-const amount =
-Number(this.value)||0;
-
-const fee =
-amount * 0.005;
-
-const receive =
-amount - fee;
-
-capitalFee.innerText =
-fee.toFixed(2) + " Pi";
-
-capitalReceive.innerText =
-receive.toFixed(2) + " Pi";
-
-});
-
-  }
-
 /* ===============================
    INIT
 =============================== */
@@ -645,4 +499,4 @@ load();
 </script>
 
 </body>
-        </html>
+</html>
