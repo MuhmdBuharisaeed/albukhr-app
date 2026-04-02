@@ -294,6 +294,18 @@ reward += Math.max(0, remaining);
 
   renderHistory();
 }
+/* ===============================
+SHORT WALLET
+=============================== */
+function shortWallet(address){
+
+if(!address) return "";
+
+return address.slice(0,6)
++ "..."
++ address.slice(-4);
+
+ }
 
 /* ===============================
    HISTORY (UNIFIED)
@@ -345,7 +357,7 @@ function renderHistory(){
       color = "withdraw-status";
     }
 
-  const div = document.createElement("div");
+    const div = document.createElement("div");
 div.className="project-tx";
 
 div.innerHTML = `
@@ -375,6 +387,10 @@ ${sign}${Number(tx.amount).toFixed(2)} Pi
 `;
 
 projectHistory.appendChild(div);
+
+  });
+
+  }
 
 /* ===============================
    WITHDRAW
@@ -610,4 +626,4 @@ load();
 </script>
 
 </body>
-</html>
+      </html>
