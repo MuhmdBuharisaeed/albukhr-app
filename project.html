@@ -345,29 +345,46 @@ function renderHistory(){
       color = "withdraw-status";
     }
 
-    const div = document.createElement("div");
-    div.className="project-tx";
+  const div = document.createElement("div");
+div.className="project-tx";
 
-    div.innerHTML = `
-      <div class="project-icon">${icon}</div>
-      <div class="project-body">
-        <div class="project-title">${label}</div>
-        <div class="project-date">
-          ${new Date(tx.timestamp).toLocaleString()}
-        </div>
-      </div>
-      <div class="project-right">
-        <div class="project-amount ${color}">
-          ${sign}${Number(tx.amount).toFixed(2)} Pi
-        </div>
-      </div>
-    `;
+div.innerHTML = `
+<div class="project-icon">${icon}</div>
 
-    projectHistory.appendChild(div);
+<div class="project-body">
 
-  });
+<div class="project-title">${label}</div>
 
-  }
+${tx.wallet ? `
+<div style="font-size:11px;color:#666">
+Wallet: ${shortWallet(tx.wallet)}
+</div>
+` : ""}
+
+<div class="project-date">
+${new Date(tx.timestamp).toLocaleString()}
+</div>
+
+</div>
+
+<div class="project-right">
+<div class="project-amount ${color}">
+${sign}${Number(tx.amount).toFixed(2)} Pi
+</div>
+</div>
+`;
+
+projectHistory.appendChild(div);
+
+function shortWallet(address){
+
+if(!address) return "";
+
+return address.slice(0,6)
++ "..."
++ address.slice(-4);
+
+}
 
 /* ===============================
    WITHDRAW
@@ -416,11 +433,12 @@ function confirmWithdraw(){
   });
 
   recordTx({
-    type:"withdraw",
-    project:PROJECT_NAME,
-    amount,
-    timestamp:Date.now()
-  });
+type:"withdraw",
+project:PROJECT_NAME,
+amount,
+wallet: wallet,
+timestamp:Date.now()
+});
 
   /* CLEAR WALLET */
   walletAddress.value = "";
