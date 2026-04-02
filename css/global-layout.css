@@ -57,7 +57,7 @@ body{
   position:relative;
   padding:14px;
 
-  margin-top:90px;  /* 🔥 THIS IS THE REAL FIX */
+  margin-top:100px;  /* 🔥 THIS IS THE REAL FIX */
 }
 .scroll-area h3{
   margin-top:15;
