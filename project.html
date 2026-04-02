@@ -491,21 +491,26 @@ function withdrawCapital(){
 const data =
 getProjectTotals(PROJECT_NAME);
 
-const stakes =
-data.stakes.filter(
-s => Number(s.amount) > 0
+const now = Date.now();
+
+/* unlocked stakes only */
+
+const unlocked =
+data.stakes.filter(s =>
+Number(s.amount) > 0 &&
+now >= (s.unlockTime || 0)
 );
 
-if(!stakes.length){
+if(!unlocked.length){
 
-alert("No capital available");
+alert("Capital locked until duration ends");
 return;
 
 }
 
 let total = 0;
 
-stakes.forEach(s=>{
+unlocked.forEach(s=>{
 
 const amount =
 Number(s.amount) || 0;
@@ -513,21 +518,24 @@ Number(s.amount) || 0;
 total += amount;
 
 /* reduce stake */
+
 s.amount = 0;
 
 });
 
-/* save updated stakes */
+/* save */
 
-saveProjectStakes(PROJECT_NAME, data.stakes);
+saveProjectStakes(
+PROJECT_NAME,
+data.stakes
+);
 
 recordTx({
-
 type:"capital",
 project:PROJECT_NAME,
 amount:total,
+wallet:"Internal",
 timestamp:Date.now()
-
 });
 
 alert(
@@ -539,53 +547,6 @@ alert(
 load();
 
   }
-
-function withdrawCapital(){
-
-const data =
-getProjectTotals(PROJECT_NAME);
-
-const now = Date.now();
-
-const unlocked =
-data.stakes.filter(s=>{
-
-return now >= s.unlockTime;
-
-});
-
-if(!unlocked.length){
-
-alert(
-"Capital locked until duration ends"
-);
-
-return;
-
-}
-
-let total = 0;
-
-unlocked.forEach(s=>{
-
-total += Number(s.amount)||0;
-
-s.amount = 0;
-
-});
-
-recordTx({
-
-type:"capital",
-project:PROJECT_NAME,
-amount:total,
-timestamp:Date.now()
-
-});
-
-load();
-
-}
 
   function saveProjectStakes(project, stakes){
 
