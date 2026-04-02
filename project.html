@@ -225,33 +225,49 @@ function closeWithdraw(){
 =============================== */
 function confirmStake(){
 
-  const amount = Number(amountInput.value);
-  const duration = Number(durationSelect.value);
-  const min = getMinStake(PROJECT_NAME);
+const amount = Number(amountInput.value);
+const duration = Number(durationSelect.value);
+const min = getMinStake(PROJECT_NAME);
 
-  if(!amount || amount < min){
-    alert("Minimum stake is " + min + " Pi");
-    return;
-  }
+if(!amount || amount < min){
+alert("Minimum stake is " + min + " Pi");
+return;
+}
 
-  const ok = addStake({
-    project: PROJECT_NAME,
-    amount,
-    duration
-  });
+/* ===============================
+CREATE LOCK TIME
+=============================== */
 
-  if(!ok){
-    alert("Stake failed.");
-    return;
-  }
-  
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
+const startTime = Date.now();
 
-  closeModal();
-  successModal.style.display="flex";
+const unlockTime =
+startTime + (duration * 86400000);
 
-  load();
+/* ===============================
+ADD STAKE
+=============================== */
+
+const ok = addStake({
+project: PROJECT_NAME,
+amount,
+duration,
+startTime,
+unlockTime
+});
+
+if(!ok){
+alert("Stake failed.");
+return;
+}
+
+successText.innerText =
+`You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
+
+closeModal();
+successModal.style.display="flex";
+
+load();
+
   }
 
 /* ===============================
@@ -498,6 +514,53 @@ alert(
 load();
 
   }
+
+function withdrawCapital(){
+
+const data =
+getProjectTotals(PROJECT_NAME);
+
+const now = Date.now();
+
+const unlocked =
+data.stakes.filter(s=>{
+
+return now >= s.unlockTime;
+
+});
+
+if(!unlocked.length){
+
+alert(
+"Capital locked until duration ends"
+);
+
+return;
+
+}
+
+let total = 0;
+
+unlocked.forEach(s=>{
+
+total += Number(s.amount)||0;
+
+s.amount = 0;
+
+});
+
+recordTx({
+
+type:"capital",
+project:PROJECT_NAME,
+amount:total,
+timestamp:Date.now()
+
+});
+
+load();
+
+}
 
   function saveProjectStakes(project, stakes){
 
