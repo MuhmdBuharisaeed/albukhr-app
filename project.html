@@ -452,7 +452,7 @@ getProjectTotals(PROJECT_NAME);
 
 const stakes =
 data.stakes.filter(
-s => !s.capitalWithdrawn
+s => Number(s.amount) > 0
 );
 
 if(!stakes.length){
@@ -466,11 +466,19 @@ let total = 0;
 
 stakes.forEach(s=>{
 
-total += Number(s.amount)||0;
+const amount =
+Number(s.amount) || 0;
 
-s.capitalWithdrawn = true;
+total += amount;
+
+/* reduce stake */
+s.amount = 0;
 
 });
+
+/* save updated stakes */
+
+saveProjectStakes(PROJECT_NAME, data.stakes);
 
 recordTx({
 
@@ -488,6 +496,38 @@ alert(
 );
 
 load();
+
+  }
+
+  function saveProjectStakes(project, stakes){
+
+const all =
+JSON.parse(
+localStorage.getItem("albukhr_stakes")
+) || [];
+
+const updated =
+all.map(s => {
+
+if(s.project === project){
+
+const found =
+stakes.find(
+x => x.id === s.id
+);
+
+return found || s;
+
+}
+
+return s;
+
+});
+
+localStorage.setItem(
+"albukhr_stakes",
+JSON.stringify(updated)
+);
 
 }
 
