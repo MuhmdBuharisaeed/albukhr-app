@@ -47,7 +47,7 @@ Stake
 </div>
 
 <div class="capital-wrapper">
-<button class="btn capital-btn" onclick="withdrawCapital()">
+<button class="btn capital-btn" onclick="openCapitalModal()">
 🏦 Withdraw Capital
 </button>
 </div>
@@ -131,6 +131,35 @@ You Receive:
   </div>
 </div>
 
+<!-- CAPITAL WITHDRAW MODAL -->
+<div class="modal" id="capitalModal">
+<div class="modal-box">
+
+<h3>Withdraw Capital</h3>
+
+<label>Amount</label>
+<input type="number" id="capitalWithdrawAmount">
+
+<small id="capitalAvailable"></small>
+
+<label>Wallet Address</label>
+<input type="text" id="capitalWallet">
+
+<div class="btns">
+<button class="btn primary"
+onclick="confirmCapitalWithdraw()">
+Confirm
+</button>
+
+<button class="btn secondary"
+onclick="closeCapitalModal()">
+Cancel
+</button>
+</div>
+
+</div>
+</div>
+  
 <!-- SCRIPTS -->
 <script src="js/project-config.js"></script>
 <script src="js/unified-transactions.js"></script>
@@ -577,6 +606,100 @@ localStorage.setItem(
 "albukhr_stakes",
 JSON.stringify(updated)
 );
+
+}
+
+function openCapitalModal(){
+
+const data =
+getProjectTotals(PROJECT_NAME);
+
+let total = 0;
+
+data.stakes.forEach(s=>{
+
+if(Date.now() >= (s.unlockTime||0)){
+total += Number(s.amount)||0;
+}
+
+});
+
+capitalAvailable.innerText =
+"Available: " + total.toFixed(2) + " Pi";
+
+capitalModal.style.display="flex";
+
+}
+
+function closeCapitalModal(){
+
+capitalModal.style.display="none";
+
+  }
+
+function confirmCapitalWithdraw(){
+
+const amount =
+Number(capitalWithdrawAmount.value);
+
+const wallet =
+capitalWallet.value;
+
+if(!amount || amount <= 0){
+alert("Invalid amount");
+return;
+}
+
+if(!wallet){
+alert("Enter wallet address");
+return;
+}
+
+const data =
+getProjectTotals(PROJECT_NAME);
+
+let remaining = amount;
+
+data.stakes.forEach(s=>{
+
+if(remaining <= 0) return;
+
+if(Date.now() >= (s.unlockTime||0)){
+
+let available =
+Number(s.amount)||0;
+
+let take =
+Math.min(available, remaining);
+
+s.amount -= take;
+
+remaining -= take;
+
+}
+
+});
+
+/* save */
+
+saveProjectStakes(
+PROJECT_NAME,
+data.stakes
+);
+
+recordTx({
+
+type:"capital",
+project:PROJECT_NAME,
+amount,
+wallet:wallet,
+timestamp:Date.now()
+
+});
+
+closeCapitalModal();
+
+load();
 
 }
 
