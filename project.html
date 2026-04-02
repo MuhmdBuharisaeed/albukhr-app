@@ -321,9 +321,53 @@ load();
    LOAD
 =============================== */
 function load(){
-function load(){
 
 const data = getProjectTotals(PROJECT_NAME);
+
+/* ===============================
+CALCULATE TOTAL STAKE
+=============================== */
+
+let totalStake = 0;
+
+data.stakes.forEach(s=>{
+
+totalStake += Number(s.amount) || 0;
+
+});
+
+/* ===============================
+CALCULATE REWARD
+=============================== */
+
+let reward = 0;
+
+data.stakes.forEach(s=>{
+
+const remaining =
+(Number(s.reward) || 0) -
+(Number(s.withdrawnReward) || 0);
+
+reward += Math.max(0, remaining);
+
+});
+
+/* ===============================
+UPDATE UI
+=============================== */
+
+aStake.innerText =
+totalStake.toFixed(2) + " Pi";
+
+aReward.innerText =
+reward.toFixed(2) + " Pi";
+
+renderHistory();
+
+/* LOCK STATUS */
+updateStakeStatus();
+
+}
 
 /* ===============================
 CALCULATE TOTAL STAKE
@@ -596,73 +640,7 @@ receive.toFixed(2) + " Pi";
 
 }
   
-/* ===============================
-CAPITAL WITHDRAW
-=============================== */
-
-function withdrawCapital(){
-
-const data =
-getProjectTotals(PROJECT_NAME);
-
-const now = Date.now();
-
-/* unlocked stakes only */
-
-const unlocked =
-data.stakes.filter(s =>
-Number(s.amount) > 0 &&
-now >= (s.unlockTime || 0)
-);
-
-if(!unlocked.length){
-
-alert("Capital locked until duration ends");
-return;
-
-}
-
-let total = 0;
-
-unlocked.forEach(s=>{
-
-const amount =
-Number(s.amount) || 0;
-
-total += amount;
-
-/* reduce stake */
-
-s.amount = 0;
-
-});
-
-/* save */
-
-saveProjectStakes(
-PROJECT_NAME,
-data.stakes
-);
-
-recordTx({
-type:"capital",
-project:PROJECT_NAME,
-amount:total,
-wallet:"Internal",
-timestamp:Date.now()
-});
-
-alert(
-"Capital Withdrawn: "
-+ total.toFixed(2)
-+ " Pi"
-);
-
-load();
-
-  }
-
-  function saveProjectStakes(project, stakes){
+function saveProjectStakes(project, stakes){
 
 const all =
 JSON.parse(
