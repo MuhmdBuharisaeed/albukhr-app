@@ -490,10 +490,14 @@ function confirmWithdraw(){
     }
   });
 
-  recordTx({
+  const fee = amount * 0.01;
+const receive = amount - fee;
+
+recordTx({
 type:"withdraw",
 project:PROJECT_NAME,
-amount,
+amount: receive,
+fee: fee,
 wallet: wallet,
 timestamp:Date.now()
 });
