@@ -324,27 +324,50 @@ function load(){
 
 const data = getProjectTotals(PROJECT_NAME);
 
-let reward = 0;
+/* ===============================
+CALCULATE TOTAL STAKE
+=============================== */
+
+let totalStake = 0;
+
 data.stakes.forEach(s=>{
+
+totalStake += Number(s.amount) || 0;
+
+});
+
+/* ===============================
+CALCULATE REWARD
+=============================== */
+
+let reward = 0;
+
+data.stakes.forEach(s=>{
+
 const remaining =
 (Number(s.reward) || 0) -
 (Number(s.withdrawnReward) || 0);
 
 reward += Math.max(0, remaining);
+
 });
 
+/* ===============================
+UPDATE UI
+=============================== */
+
 aStake.innerText =
-(data.stake || 0).toFixed(2) + " Pi";
+totalStake.toFixed(2) + " Pi";
 
 aReward.innerText =
 reward.toFixed(2) + " Pi";
 
 renderHistory();
 
-/* ADD THIS */
+/* LOCK STATUS */
 updateStakeStatus();
 
-}
+  }
 
 /* ===============================
 SHORT WALLET
