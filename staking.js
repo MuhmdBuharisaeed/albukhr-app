@@ -80,20 +80,28 @@ function addStake({project,amount,duration}){
 
   const stakes = _safeParse(INTERNAL_KEY);
 
-  stakes.push({
-    id:"ST-"+Date.now(),
-    project,
-    amount:safeAmount,
-    duration:safeDuration,
-    reward:Number(reward)||0,
+  const startTime = Date.now();
 
-    remainingReward:Number(reward)||0,
-    capitalWithdrawn:false,
+const unlockTime =
+startTime + (safeDuration * 86400000);
 
-    status:"Successful",
-    timestamp:Date.now(),
-    type:"internal"
-  });
+stakes.push({
+id:"ST-"+Date.now(),
+project,
+amount:safeAmount,
+duration:safeDuration,
+
+startTime:startTime,
+unlockTime:unlockTime,
+
+reward:Number(reward)||0,
+remainingReward:Number(reward)||0,
+capitalWithdrawn:false,
+
+status:"Successful",
+timestamp:Date.now(),
+type:"internal"
+});
 
   _save(INTERNAL_KEY,stakes);
 
