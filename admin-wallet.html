@@ -282,47 +282,73 @@ function unlockWalletAdmin(){
 ================================ */
 function renderTransactions(){
 
-  const txList = document.getElementById("adminTxList");
-  txList.innerHTML="";
+const txList =
+document.getElementById("adminTxList");
 
-  if(typeof getWithdrawHistory !== "function"){
-    txList.innerHTML="<small>Wallet engine not ready</small>";
-    return;
-  }
+txList.innerHTML="";
 
-  const history = getWithdrawHistory();
+const history =
+getTransactions()
+.filter(tx =>
+tx.type === "withdraw" ||
+tx.type === "capital"
+)
+.sort((a,b)=>b.timestamp - a.timestamp);
 
-  if(!history || !history.length){
-    txList.innerHTML="<small>No withdrawals yet</small>";
-    return;
-  }
+if(!history.length){
+txList.innerHTML =
+"<small>No withdrawals yet</small>";
+return;
+}
 
-  const threshold =
-    Number(document.getElementById("thresholdInput").value)
-    || DEFAULT_THRESHOLD;
+const threshold =
+Number(
+document.getElementById("thresholdInput").value
+) || DEFAULT_THRESHOLD;
 
-  history.forEach(tx=>{
+history.forEach(tx=>{
 
-    const isLarge =
-      Number(tx.grossAmount || 0) >= threshold;
+const gross =
+Number(tx.amount || 0);
 
-    if(isLarge && lastAlertedTxId !== tx.id){
-      playAlert();
-      lastAlertedTxId = tx.id;
-    }
+const fee =
+Number(tx.meta?.fee || 0);
 
-    txList.innerHTML += `
-      <div class="tx ${isLarge ? "tx-large" : ""}">
-        <strong>${tx.project || "Unknown Project"}</strong><br>
-        Type: ${tx.type}<br>
-        Amount: -${Number(tx.grossAmount || 0).toFixed(2)} Pi<br>
-        Fee: ${Number(tx.fee || 0).toFixed(2)} Pi<br>
-        Received: ${Number(tx.received || 0).toFixed(2)} Pi<br>
-        Wallet Address: ${tx.walletAddress || "internal"}<br>
-        <small>${new Date(tx.timestamp).toLocaleString()}</small>
-      </div>
-    `;
-  });
+const received =
+gross;
+
+const isLarge =
+gross >= threshold;
+
+if(isLarge && lastAlertedTxId !== tx.id){
+playAlert();
+lastAlertedTxId = tx.id;
+}
+
+txList.innerHTML += `
+<div class="tx ${isLarge ? "tx-large" : ""}">
+<strong>${tx.project}</strong><br>
+
+Type: ${tx.type}<br>
+
+Amount: -${gross.toFixed(2)} Pi<br>
+
+Fee: ${fee.toFixed(2)} Pi<br>
+
+Received: ${received.toFixed(2)} Pi<br>
+
+Wallet Address:
+${tx.meta?.wallet || "internal"}<br>
+
+<small>
+${new Date(tx.timestamp).toLocaleString()}
+</small>
+
+</div>
+`;
+
+});
+
 }
 
 /* ===============================
