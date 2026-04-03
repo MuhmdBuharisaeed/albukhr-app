@@ -595,73 +595,7 @@ receive.toFixed(2) + " Pi";
 
 }
   
-/* ===============================
-CAPITAL WITHDRAW
-=============================== */
-
-function withdrawCapital(){
-
-const data =
-getProjectTotals(PROJECT_NAME);
-
-const now = Date.now();
-
-/* unlocked stakes only */
-
-const unlocked =
-data.stakes.filter(s =>
-Number(s.amount) > 0 &&
-now >= (s.unlockTime || 0)
-);
-
-if(!unlocked.length){
-
-alert("Capital locked until duration ends");
-return;
-
-}
-
-let total = 0;
-
-unlocked.forEach(s=>{
-
-const amount =
-Number(s.amount) || 0;
-
-total += amount;
-
-/* reduce stake */
-
-s.amount = 0;
-
-});
-
-/* save */
-
-saveProjectStakes(
-PROJECT_NAME,
-data.stakes
-);
-
-recordTx({
-type:"capital",
-project:PROJECT_NAME,
-amount:total,
-wallet:"Internal",
-timestamp:Date.now()
-});
-
-alert(
-"Capital Withdrawn: "
-+ total.toFixed(2)
-+ " Pi"
-);
-
-load();
-
-  }
-
-  function saveProjectStakes(project, stakes){
+function saveProjectStakes(project, stakes){
 
 const all =
 JSON.parse(
@@ -767,6 +701,11 @@ remaining -= take;
 
 });
 
+if(remaining > 0){
+alert("Insufficient unlocked capital");
+return;
+}
+
 saveProjectStakes(
 PROJECT_NAME,
 data.stakes
@@ -785,9 +724,13 @@ timestamp:Date.now()
 
 closeCapitalModal();
 
+/* CLEAR INPUTS */
+capitalWithdrawAmount.value = "";
+capitalWallet.value = "";
+
 load();
 
-  }
+}
 
 function updateStakeStatus(){
 
