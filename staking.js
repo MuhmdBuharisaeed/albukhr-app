@@ -166,6 +166,17 @@ function getProjectTotals(project){
   return {stake,reward,stakes:filtered};
 }
 
+if(!hasMinimumLiquidity(PROJECT_NAME)){
+
+alert(
+"Project liquidity not ready.\n\n" +
+"Project must add minimum liquidity first."
+);
+
+return;
+
+}
+
 /* ======================================
    WITHDRAW REWARD (DASHBOARD)
 ====================================== */
