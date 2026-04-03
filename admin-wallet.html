@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function(){
     return;
   }
 
-  if(typeof getWithdrawHistory !== "function"){
+  if(typeof getTransactions !== "function")
     document.getElementById("adminTxList").innerHTML =
       "<small style='color:red'>Wallet engine not loaded</small>";
     return;
@@ -218,7 +218,8 @@ setInterval(refreshAdminWallet, 5000);
 ================================ */
 function renderSummary(){
 
-const treasury = getAdminTreasury();
+const t = getAdminTreasury();
+
 const summary = getWalletSummary() || {};
 const projects = getProjectWalletBreakdown() || [];
 const history = getWithdrawHistory() || [];
@@ -242,8 +243,7 @@ available += Number(p.withdrawableCapital)||0;
 
 history.forEach(tx=>{
 
-const fee =
-Number(tx.fee || 0);
+const fee = Number(tx.fee || 0);
 
 if(!isNaN(fee)){
 totalFees += fee;
@@ -251,17 +251,17 @@ totalFees += fee;
 
 });
 
+const totalWithdrawn =
+rewardWithdrawals + capitalWithdrawals;
+
 const health = getTreasuryHealth();
 
 document.getElementById("walletStatus")
 .innerText = health;
 
-const totalWithdrawn =
-rewardWithdrawals + capitalWithdrawals;
-
-const t = getAdminTreasury();
-
 document.getElementById("adminBalance").innerHTML = `
+
+<!-- TREASURY -->
 
 <div style="margin-bottom:14px;">
 <div style="font-size:13px;color:#666;">
@@ -277,50 +277,7 @@ ${t.treasury.toFixed(2)} Pi
 </div>
 </div>
 
-<div style="
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-font-size:12px;
-">
-
-<div>
-<div style="color:#666;">
-Total Stake
-</div>
-<b>${t.totalStake.toFixed(2)} Pi</b>
-</div>
-
-<div>
-<div style="color:#666;">
-Fees Collected
-</div>
-<b>${t.totalFees.toFixed(2)} Pi</b>
-</div>
-
-<div>
-<div style="color:#666;">
-Reward Withdraw
-</div>
-<b>${t.totalRewardWithdraw.toFixed(2)} Pi</b>
-</div>
-
-<div>
-<div style="color:#666;">
-Capital Withdraw
-</div>
-<b>${t.totalCapitalWithdraw.toFixed(2)} Pi</b>
-</div>
-
-<div>
-<div style="color:#666;">
-Admin Liquidity
-</div>
-<b>${t.adminLiquidity.toFixed(2)} Pi</b>
-</div>
-
-</div>
-`;
+<!-- AVAILABLE -->
 
 <div style="margin-bottom:14px;">
 <div style="font-size:13px;color:#666;">
@@ -328,13 +285,15 @@ Available Capital
 </div>
 
 <div style="
-font-size:28px;
-font-weight:800;
+font-size:22px;
+font-weight:700;
 color:#0f7a3d;
 ">
 ${available.toFixed(2)} Pi
 </div>
 </div>
+
+<!-- GRID -->
 
 <div style="
 display:grid;
@@ -344,56 +303,39 @@ font-size:12px;
 ">
 
 <div>
-<div style="color:#666;">
-Gross Rewards
-</div>
-<b>${grossRewards.toFixed(2)} Pi</b>
+<div style="color:#666;">Total Stake</div>
+<b>${t.totalStake.toFixed(2)} Pi</b>
 </div>
 
 <div>
-<div style="color:#666;">
-Total Stake
-</div>
-<b>${totalStake.toFixed(2)} Pi</b>
+<div style="color:#666;">Fees Collected</div>
+<b>${t.totalFees.toFixed(2)} Pi</b>
 </div>
 
 <div>
-<div style="color:#666;">
-Reward Withdrawals
-</div>
-<b>${rewardWithdrawals.toFixed(2)} Pi</b>
+<div style="color:#666;">Reward Withdraw</div>
+<b>${t.totalRewardWithdraw.toFixed(2)} Pi</b>
 </div>
 
 <div>
-<div style="color:#666;">
-Capital Withdrawals
-</div>
-<b>${capitalWithdrawals.toFixed(2)} Pi</b>
+<div style="color:#666;">Capital Withdraw</div>
+<b>${t.totalCapitalWithdraw.toFixed(2)} Pi</b>
 </div>
 
 <div>
-<div style="color:#666;">
-Fees Collected
-</div>
-<b>${totalFees.toFixed(2)} Pi</b>
+<div style="color:#666;">Admin Liquidity</div>
+<b>${t.adminLiquidity.toFixed(2)} Pi</b>
 </div>
 
 <div>
-<div style="color:#666;">
-Total Withdrawn
-</div>
+<div style="color:#666;">Total Withdrawn</div>
 <b>${totalWithdrawn.toFixed(2)} Pi</b>
 </div>
 
 </div>
 `;
 
-document.getElementById("walletStatus").innerText =
-localStorage.getItem("albukhr_wallet_locked") === "true"
-? "LOCKED"
-: "ACTIVE";
-
-}
+ }
 
 /* ===============================
    LOCK SYSTEM
