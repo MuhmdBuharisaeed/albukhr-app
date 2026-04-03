@@ -628,40 +628,26 @@ JSON.stringify(updated)
 
 }
 
+/* ===============================
+  OPEN CAPITAL MODAL
+=============================== */
 function openCapitalModal(){
 
-const data =
-getProjectTotals(PROJECT_NAME);
-
-let total = 0;
-
-const now = Date.now();
-
-data.stakes.forEach(s=>{
-
-const unlock =
-Number(s.unlockTime || 0);
-
-const amount =
-Number(s.amount) || 0;
-
-if(amount > 0 && now >= unlock){
-total += amount;
-}
-
-});
-
-capitalAvailable.innerText =
-"Available: " + total.toFixed(2) + " Pi";
+updateCapitalAvailable();
 
 capitalModal.style.display="flex";
 
-  }
+}
 
 /* ===============================
 UPDATE CAPITAL AVAILABLE
 =============================== */
-  function updateCapitalAvailable(){
+function updateCapitalAvailable(){
+
+const el =
+document.getElementById("capitalAvailable");
+
+if(!el) return;
 
 const data =
 getProjectTotals(PROJECT_NAME);
@@ -678,7 +664,7 @@ total += Number(s.amount)||0;
 
 });
 
-capitalAvailable.innerText =
+el.innerText =
 "Available: " + total.toFixed(2) + " Pi";
 
   }
