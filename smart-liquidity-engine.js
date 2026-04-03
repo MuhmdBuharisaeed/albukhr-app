@@ -305,3 +305,31 @@ liquidity:treasury[project].liquidity
 };
 
 }
+
+/* ===============================
+MINIMUM LIQUIDITY
+=============================== */
+
+const MIN_PROJECT_LIQUIDITY = 100; // 100 Pi minimum
+
+function hasMinimumLiquidity(project){
+
+const status =
+getProjectTreasuryStatus(project);
+
+return status.liquidity >= MIN_PROJECT_LIQUIDITY;
+
+}
+
+function getLiquidityStatus(project){
+
+const status =
+getProjectTreasuryStatus(project);
+
+if(status.liquidity >= MIN_PROJECT_LIQUIDITY){
+return "READY";
+}
+
+return "LOW";
+
+}
