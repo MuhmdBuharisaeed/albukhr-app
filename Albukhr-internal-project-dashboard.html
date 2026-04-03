@@ -433,16 +433,11 @@ function updateDashboard(){
 document.getElementById("projectName").innerText =
 currentProject ? currentProject : "No Project Selected";
 
-if(!hasMinimumLiquidity(PROJECT_NAME)){
+const statusLabel =
+getLiquidityStatus(currentProject);
 
-alert(
-"Project liquidity not ready.\n\n" +
-"Project must add minimum liquidity first."
-);
-
-return;
-
- }
+document.getElementById("liquidityStatus")
+.innerText = statusLabel;
  
 const status =
 currentProject
