@@ -635,10 +635,18 @@ getProjectTotals(PROJECT_NAME);
 
 let total = 0;
 
+const now = Date.now();
+
 data.stakes.forEach(s=>{
 
-if(Date.now() >= (s.unlockTime||0)){
-total += Number(s.amount)||0;
+const unlock =
+Number(s.unlockTime || 0);
+
+const amount =
+Number(s.amount) || 0;
+
+if(amount > 0 && now >= unlock){
+total += amount;
 }
 
 });
@@ -648,7 +656,7 @@ capitalAvailable.innerText =
 
 capitalModal.style.display="flex";
 
-}
+  }
 
 function closeCapitalModal(){
 
