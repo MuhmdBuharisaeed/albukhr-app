@@ -126,10 +126,10 @@ document.addEventListener("DOMContentLoaded", function(){
     return;
   }
 
-  if(typeof getTransactions !== "function")
-    document.getElementById("adminTxList").innerHTML =
-      "<small style='color:red'>Wallet engine not loaded</small>";
-    return;
+  if(typeof getTransactions !== "function"){
+document.getElementById("adminTxList").innerHTML =
+"<small style='color:red'>Wallet engine not loaded</small>";
+return;
   }
 
   initAdminWallet();
@@ -574,7 +574,9 @@ alert("Wallet updated successfully");
 refreshAdminWallet();
 
   }
-
+  
+setInterval(refreshAdminWallet, 3000);
+  
 </script>
 
 </body>
