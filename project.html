@@ -272,6 +272,25 @@ function closeWithdraw(){
 =============================== */
 function confirmStake(){
 
+/* ===============================
+LIQUIDITY CHECK
+=============================== */
+
+if(!hasMinimumLiquidity(PROJECT_NAME)){
+
+alert(
+"Project liquidity not ready.\n\n" +
+"Project must add minimum liquidity first."
+);
+
+return;
+
+}
+
+/* ===============================
+STAKE INPUT
+=============================== */
+
 const amount = Number(amountInput.value);
 const duration = Number(durationSelect.value);
 const min = getMinStake(PROJECT_NAME);
