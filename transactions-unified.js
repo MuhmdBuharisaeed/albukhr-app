@@ -8,50 +8,41 @@ function getAllTransactionsUnified(){
   let txs = [];
 
   /* -------- INTERNAL -------- */
-  if(typeof getInternalStakes === "function"){
-    getInternalStakes().forEach(s=>{
-      txs.push({
-        source: "internal",
-        projectId: s.project,
-        user: "internal",
-        amount: Number(s.amount) || 0,
-        status: s.status || "Successful",
-        timestamp: s.timestamp || Date.now(),
-        type: "stake"
-      });
-    });
-  }
+  txs.push({
+  source: "internal",
+  projectId: s.project,
+  user: s.user || "internal",
+  wallet: s.wallet || null,
+  amount: Number(s.amount) || 0,
+  status: s.status || "Successful",
+  timestamp: s.timestamp || Date.now(),
+  type: "stake"
+});
 
   /* -------- EXTERNAL -------- */
-  const external =
-    JSON.parse(localStorage.getItem("albukhr_external_stakes") || "[]");
-
-  external.forEach(s=>{
-    txs.push({
-      source: "external",
-      projectId: s.projectId,
-      user: s.userPiUID,
-      amount: Number(s.amount) || 0,
-      status: s.status || "Successful",
-      timestamp: s.timestamp || Date.now(),
-      type: "stake"
-    });
-  });
+  txs.push({
+  source: "external",
+  projectId: s.projectId,
+  user: s.userPiUID,
+  wallet: s.wallet || null,
+  amount: Number(s.amount) || 0,
+  status: s.status || "Successful",
+  timestamp: s.timestamp || Date.now(),
+  type: "stake"
+});
 
   /* -------- CORE -------- */
-  if(typeof getTransactions === "function"){
-    getTransactions().forEach(t=>{
-      txs.push({
-        source: "core",
-        projectId: t.project || t.projectId || "-",
-        user: t.user || "-",
-        amount: Number(t.amount) || 0,
-        status: t.status || "Successful",
-        timestamp: t.timestamp || Date.now(),
-        type: (t.type || "stake").toLowerCase()
-      });
-    });
-  }
+  txs.push({
+  source: "core",
+  projectId: t.project || t.projectId || "-",
+  user: t.user || "-",
+  wallet: t.meta?.wallet || null,
+  fee: Number(t.meta?.fee || 0),
+  amount: Number(t.amount) || 0,
+  status: t.status || "Successful",
+  timestamp: t.timestamp || Date.now(),
+  type: (t.type || "stake").toLowerCase()
+});
 
   /* SORT */
   return txs.sort((a,b)=>b.timestamp - a.timestamp);
@@ -90,3 +81,14 @@ function getUnifiedTotals(){
 function getUnifiedRecent(limit = 5){
   return getAllTransactionsUnified().slice(0, limit);
        }
+
+/* ======================================
+   BY PROJECT
+====================================== */
+
+function getUnifiedByProject(project){
+
+return getAllTransactionsUnified()
+.filter(t => t.projectId === project);
+
+}
