@@ -442,9 +442,9 @@ div.innerHTML = `
 
 <div class="project-title">${label}</div>
 
-${tx.wallet ? `
+${tx.meta?.wallet ? `
 <div style="font-size:11px;color:#666">
-Wallet: ${shortWallet(tx.wallet)}
+Wallet: ${shortWallet(tx.meta.wallet)}
 </div>
 ` : ""}
 
@@ -520,9 +520,10 @@ recordTx({
 type:"withdraw",
 project:PROJECT_NAME,
 amount: receive,
-fee: fee,
+meta:{
 wallet: wallet,
-timestamp:Date.now()
+fee: fee
+}
 });
 
   /* CLEAR WALLET */
@@ -712,14 +713,13 @@ data.stakes
 );
 
 recordTx({
-
 type:"capital",
 project:PROJECT_NAME,
 amount:receive,
-fee:fee,
+meta:{
 wallet:wallet,
-timestamp:Date.now()
-
+fee:fee
+}
 });
 
 closeCapitalModal();
