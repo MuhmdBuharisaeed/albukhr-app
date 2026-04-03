@@ -75,7 +75,7 @@ function addProjectLiquidity(project, amount){
   saveTreasury(treasury);
 
   if(typeof recordTransaction === "function"){
-    recordTransaction({
+    recordTx({
       type:"liquidity-add",
       project,
       amount
@@ -152,7 +152,7 @@ function fundRewardFromLiquidity(project, amount){
   saveTreasury(treasury);
 
   if(typeof recordTransaction === "function"){
-    recordTransaction({
+    recordTx({
       type:"reward-funding",
       project,
       amount
@@ -192,7 +192,7 @@ function distributeProjectRewards(project){
     if(!funding.error){
 
       if(typeof recordTransaction === "function"){
-        recordTransaction({
+        recordTx({
           type:"auto-reward",
           project,
           amount:reward,
@@ -292,7 +292,7 @@ saveTreasury(treasury);
 /* RECORD TRANSACTION */
 
 if(typeof recordTransaction === "function"){
-recordTransaction({
+recordTx({
 type:"internal-withdraw",
 project,
 amount
@@ -309,8 +309,6 @@ liquidity:treasury[project].liquidity
 /* ===============================
 MINIMUM LIQUIDITY
 =============================== */
-
-const MIN_PROJECT_LIQUIDITY = 100; // 100 Pi minimum
 
 function hasMinimumLiquidity(project){
 
