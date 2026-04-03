@@ -309,25 +309,29 @@ liquidity:treasury[project].liquidity
 /* ===============================
 MINIMUM LIQUIDITY
 =============================== */
-
 function hasMinimumLiquidity(project){
 
 const status =
 getProjectTreasuryStatus(project);
 
-return status.liquidity >= MIN_PROJECT_LIQUIDITY;
+let liquidity = Number(status.liquidity || 0);
 
+/* CORE PROJECT AUTO LIQUIDITY */
+
+const CORE_PROJECTS = [
+"Barsh",
+"Labbaika",
+"Raheem",
+"Urban",
+"Khairat",
+"Azman",
+"Hauwal"
+];
+
+if(CORE_PROJECTS.includes(project)){
+liquidity = Math.max(liquidity,100);
 }
 
-function getLiquidityStatus(project){
-
-const status =
-getProjectTreasuryStatus(project);
-
-if(status.liquidity >= MIN_PROJECT_LIQUIDITY){
-return "READY";
-}
-
-return "LOW";
+return liquidity >= MIN_PROJECT_LIQUIDITY;
 
 }
