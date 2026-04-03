@@ -181,8 +181,14 @@ font-size:12px;
 <div class="big" id="investors">0</div>
 </div>
 
+<!-- ADD THIS HERE -->
+
+<div class="card">
+<div class="title">Status</div>
+<div class="big" id="liquidityStatus">LOW</div>
 </div>
 
+</div>
 
 <!-- ADD LIQUIDITY -->
 
@@ -427,6 +433,17 @@ function updateDashboard(){
 document.getElementById("projectName").innerText =
 currentProject ? currentProject : "No Project Selected";
 
+if(!hasMinimumLiquidity(PROJECT_NAME)){
+
+alert(
+"Project liquidity not ready.\n\n" +
+"Project must add minimum liquidity first."
+);
+
+return;
+
+ }
+ 
 const status =
 currentProject
 ? getProjectTreasuryStatus(currentProject)
