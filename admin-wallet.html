@@ -138,6 +138,72 @@ const DEFAULT_THRESHOLD = 100;
 let lastAlertedTxId = null;
 
 /* ===============================
+ADMIN TREASURY ENGINE
+=============================== */
+
+function getAdminTreasury(){
+
+const txs = getTransactions() || [];
+
+let totalStake = 0;
+let totalFees = 0;
+let totalRewardWithdraw = 0;
+let totalCapitalWithdraw = 0;
+let adminLiquidity = 0;
+
+txs.forEach(tx=>{
+
+const amount = Number(tx.amount) || 0;
+const fee = Number(tx.meta?.fee || 0);
+
+/* STAKE */
+if(tx.type === "stake"){
+totalStake += amount;
+}
+
+/* ADMIN CREDIT */
+if(tx.type === "admin-credit"){
+adminLiquidity += amount;
+}
+
+/* REWARD WITHDRAW */
+if(tx.type === "withdraw"){
+totalRewardWithdraw += amount;
+totalFees += fee;
+}
+
+/* CAPITAL WITHDRAW */
+if(tx.type === "capital"){
+totalCapitalWithdraw += amount;
+totalFees += fee;
+}
+
+});
+
+/* CALCULATE TREASURY */
+
+const treasury =
+
+totalStake
++ adminLiquidity
++ totalFees
+- totalRewardWithdraw
+- totalCapitalWithdraw;
+
+return {
+
+treasury,
+totalStake,
+totalFees,
+totalRewardWithdraw,
+totalCapitalWithdraw,
+adminLiquidity
+
+};
+
+}
+
+/* ===============================
    INIT
 ================================ */
 function initAdminWallet(){
@@ -152,6 +218,7 @@ setInterval(refreshAdminWallet, 5000);
 ================================ */
 function renderSummary(){
 
+const treasury = getAdminTreasury();
 const summary = getWalletSummary() || {};
 const projects = getProjectWalletBreakdown() || [];
 const history = getWithdrawHistory() || [];
@@ -184,10 +251,76 @@ totalFees += fee;
 
 });
 
+const health = getTreasuryHealth();
+
+document.getElementById("walletStatus")
+.innerText = health;
+
 const totalWithdrawn =
 rewardWithdrawals + capitalWithdrawals;
 
+const t = getAdminTreasury();
+
 document.getElementById("adminBalance").innerHTML = `
+
+<div style="margin-bottom:14px;">
+<div style="font-size:13px;color:#666;">
+Treasury Balance
+</div>
+
+<div style="
+font-size:28px;
+font-weight:800;
+color:#2c3e50;
+">
+${t.treasury.toFixed(2)} Pi
+</div>
+</div>
+
+<div style="
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+font-size:12px;
+">
+
+<div>
+<div style="color:#666;">
+Total Stake
+</div>
+<b>${t.totalStake.toFixed(2)} Pi</b>
+</div>
+
+<div>
+<div style="color:#666;">
+Fees Collected
+</div>
+<b>${t.totalFees.toFixed(2)} Pi</b>
+</div>
+
+<div>
+<div style="color:#666;">
+Reward Withdraw
+</div>
+<b>${t.totalRewardWithdraw.toFixed(2)} Pi</b>
+</div>
+
+<div>
+<div style="color:#666;">
+Capital Withdraw
+</div>
+<b>${t.totalCapitalWithdraw.toFixed(2)} Pi</b>
+</div>
+
+<div>
+<div style="color:#666;">
+Admin Liquidity
+</div>
+<b>${t.adminLiquidity.toFixed(2)} Pi</b>
+</div>
+
+</div>
+`;
 
 <div style="margin-bottom:14px;">
 <div style="font-size:13px;color:#666;">
@@ -396,6 +529,25 @@ ${p.project}
 });
 
 }
+
+/* ===============================
+   GET TREASURY HEALTH
+================================ */
+function getTreasuryHealth(){
+
+const t = getAdminTreasury();
+
+if(t.treasury <= 0){
+return "CRITICAL";
+}
+
+if(t.treasury < 100){
+return "LOW";
+}
+
+return "HEALTHY";
+
+  }
 
 function adminAddWallet(){
 
