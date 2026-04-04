@@ -83,6 +83,15 @@
   color:#777;
   padding:20px;
 }
+
+.high-risk{
+background:#fff5f5;
+border-left:4px solid #e74c3c;
+}
+
+.medium-risk{
+background:#fff9e6;
+}
 </style>
 </head>
 
@@ -111,6 +120,19 @@
     <input id="projectFilter" placeholder="Project ID">
   </div>
 
+  <div id="txAlert"
+style="
+display:none;
+background:#c0392b;
+color:white;
+padding:10px;
+margin-bottom:10px;
+border-radius:8px;
+font-weight:700;
+">
+⚠️ High Risk Transaction Detected
+  </div>
+
   <!-- TABLE -->
   <table class="tx-table">
     <thead>
@@ -128,6 +150,8 @@
 
 </div>
 
+</script>
+
 <!-- =============================
      AUTH (LOAD FIRST)
 ============================= -->
@@ -138,7 +162,6 @@ requireRole([
   "finance_admin",
   "viewer_admin"
 ]);
-</script>
 
 <!-- CORE ENGINE -->
 <script src="transactions-unified.js"></script>
@@ -179,17 +202,50 @@ function renderTable(){
       d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
 
     body.innerHTML += `
-      <tr>
-        <td>${date}</td>
-        <td><span class="badge ${t.source}">${t.source}</span></td>
-        <td>${t.projectId || "-"}</td>
-        <td>${t.user || "-"}</td>
-        <td>${t.amount}</td>
-        <td class="${statusClass(t.status)}">${t.status}</td>
-      </tr>
-    `;
-  });
+<tr class="${getRiskClass(t)}">
+<td>${date}</td>
+
+<td>
+<span class="badge ${t.source}">
+${t.source}
+</span>
+</td>
+
+<td>${t.projectId || "-"}</td>
+
+<td>${t.user || "-"}</td>
+
+<td>
+${Number(t.amount || 0).toFixed(2)} Pi
+</td>
+
+<td class="${statusClass(t.status)}">
+${t.status}
+</td>
+
+</tr>
+`;
+});
+
+checkTxRisk(txs);
+  
+ }
+
+function getRiskClass(tx){
+
+const amount = Number(tx.amount || 0);
+
+if(amount >= 500){
+return "high-risk";
 }
+
+if(amount >= 200){
+return "medium-risk";
+}
+
+return "";
+
+ }
 
 function statusClass(s){
   if(s === "Successful") return "status-ok";
@@ -202,6 +258,8 @@ sourceFilter.addEventListener("change", renderTable);
 projectFilter.addEventListener("input", renderTable);
 
 renderTable();
+
+setInterval(renderTable, 4000);
 </script>
 
 </body>
