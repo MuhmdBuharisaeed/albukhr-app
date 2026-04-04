@@ -54,6 +54,21 @@ small{color:#666}
 
 </head>
 
+<!-- AUTO LIQUIDITY WARNING -->
+<div id="liquidityWarning"
+style="
+display:none;
+background:#f39c12;
+color:white;
+padding:12px;
+text-align:center;
+font-weight:700;
+">
+
+⚠️ Low Project Liquidity Detected
+
+</div>
+
 <body>
 
 <div class="header">
@@ -495,6 +510,59 @@ return "HEALTHY";
 
   }
 
+/* ===============================
+AUTO LIQUIDITY WARNING
+=============================== */
+
+function checkLiquidityWarning(){
+
+const projects = [
+"Barsh",
+"Labbaika",
+"Raheem",
+"Urban",
+"Khairat",
+"Azman",
+"Hauwal"
+];
+
+let lowProjects = [];
+
+projects.forEach(p=>{
+
+if(typeof getProjectTreasuryStatus !== "function")
+return;
+
+const status =
+getProjectTreasuryStatus(p);
+
+if(status.liquidity < 100){
+lowProjects.push(p);
+}
+
+});
+
+const el =
+document.getElementById("liquidityWarning");
+
+if(!el) return;
+
+if(lowProjects.length){
+
+el.style.display="block";
+
+el.innerText =
+"⚠️ Low Liquidity: " +
+lowProjects.join(", ");
+
+}else{
+
+el.style.display="none";
+
+}
+
+}
+  
 function adminAddWallet(){
 
 const project =
@@ -576,7 +644,10 @@ refreshAdminWallet();
   }
   
 setInterval(refreshAdminWallet, 3000);
-  
+
+setInterval(checkLiquidityWarning, 4000);
+checkLiquidityWarning();
+
 </script>
 
 </body>
