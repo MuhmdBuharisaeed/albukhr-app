@@ -52,6 +52,30 @@ padding:10px 0;
 font-size:13px;
 }
 
+/* ===============================
+CRITICAL ALERT
+=============================== */
+
+.critical-alert{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+background:#c0392b;
+color:white;
+text-align:center;
+padding:14px;
+font-weight:700;
+display:none;
+z-index:9999;
+animation:flash 1s infinite;
+}
+
+@keyframes flash{
+0%{opacity:1;}
+50%{opacity:.3;}
+100%{opacity:1;}
+  }
 </style>
 
 <script src="wallet-core.js"></script>
@@ -60,6 +84,15 @@ font-size:13px;
 <script src="admin-auth.js"></script>
 
 </head>
+
+<!-- CRITICAL ALERT -->
+<div id="criticalAlert" class="critical-alert">
+⚠️ CRITICAL SYSTEM RISK DETECTED
+</div>
+
+<audio id="alertSound">
+<source src="alert.mp3" type="audio/mpeg">
+</audio>
 
 <body>
 
@@ -285,10 +318,88 @@ renderSystemRisk();
 
 }
 
+/* ===============================
+CRITICAL RISK DETECTION
+=============================== */
+
+function checkCriticalRisk(){
+
+let critical = false;
+
+/* TREASURY */
+
+if(typeof getAdminTreasury === "function"){
+
+const t = getAdminTreasury();
+
+if(t.treasury < 50){
+critical = true;
+}
+
+}
+
+/* PROJECT LIQUIDITY */
+
+const projects = [
+"Barsh",
+"Labbaika",
+"Raheem",
+"Urban",
+"Khairat",
+"Azman",
+"Hauwal"
+];
+
+projects.forEach(p=>{
+
+const status =
+getProjectTreasuryStatus(p);
+
+if(status.liquidity < 30){
+critical = true;
+}
+
+});
+
+triggerCriticalAlert(critical);
+
+}
+
+/* ===============================
+TRIGGER ALERT
+=============================== */
+
+function triggerCriticalAlert(active){
+
+const alert =
+document.getElementById("criticalAlert");
+
+const sound =
+document.getElementById("alertSound");
+
+if(!alert) return;
+
+if(active){
+
+alert.style.display = "block";
+
+if(sound){
+sound.play().catch(()=>{});
+}
+
+}else{
+
+alert.style.display = "none";
+
+}
+
+}
+
 loadRisk();
+checkCriticalRisk();
 
 setInterval(loadRisk,5000);
-
+setInterval(checkCriticalRisk,5000);
 </script>
 
 </body>
