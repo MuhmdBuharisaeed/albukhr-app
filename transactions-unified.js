@@ -1,94 +1,107 @@
 /* ======================================
-   ALBUKHR – UNIFIED TRANSACTIONS LAYER
-   CLEAN • SAFE • NON-DESTRUCTIVE
+ALBUKHR – UNIFIED TRANSACTIONS LAYER
 ====================================== */
 
 function getAllTransactionsUnified(){
 
-  let txs = [];
+let txs = [];
 
-  /* -------- INTERNAL -------- */
-  txs.push({
-  source: "internal",
-  projectId: s.project,
-  user: s.user || "internal",
-  wallet: s.wallet || null,
-  amount: Number(s.amount) || 0,
-  status: s.status || "Successful",
-  timestamp: s.timestamp || Date.now(),
-  type: "stake"
+/* ===============================
+INTERNAL STAKES
+=============================== */
+
+try{
+
+const internal =
+JSON.parse(
+localStorage.getItem("albukhr_stakes")
+) || [];
+
+internal.forEach(s=>{
+
+txs.push({
+
+source:"internal",
+projectId: s.project,
+user: s.user || "internal",
+wallet: s.wallet || null,
+amount: Number(s.amount) || 0,
+status: s.status || "Successful",
+timestamp: s.timestamp || Date.now(),
+type:"stake"
+
 });
 
-  /* -------- EXTERNAL -------- */
-  txs.push({
-  source: "external",
-  projectId: s.projectId,
-  user: s.userPiUID,
-  wallet: s.wallet || null,
-  amount: Number(s.amount) || 0,
-  status: s.status || "Successful",
-  timestamp: s.timestamp || Date.now(),
-  type: "stake"
 });
 
-  /* -------- CORE -------- */
-  txs.push({
-  source: "core",
-  projectId: t.project || t.projectId || "-",
-  user: t.user || "-",
-  wallet: t.meta?.wallet || null,
-  fee: Number(t.meta?.fee || 0),
-  amount: Number(t.amount) || 0,
-  status: t.status || "Successful",
-  timestamp: t.timestamp || Date.now(),
-  type: (t.type || "stake").toLowerCase()
+}catch(e){}
+
+
+/* ===============================
+EXTERNAL PROJECTS
+=============================== */
+
+try{
+
+const external =
+JSON.parse(
+localStorage.getItem("albukhr_external_projects")
+) || [];
+
+external.forEach(s=>{
+
+txs.push({
+
+source:"external",
+projectId: s.projectId || s.project,
+user: s.userPiUID || "external",
+wallet: s.wallet || null,
+amount: Number(s.amount) || 0,
+status: s.status || "Successful",
+timestamp: s.timestamp || Date.now(),
+type:"stake"
+
 });
 
-  /* SORT */
-  return txs.sort((a,b)=>b.timestamp - a.timestamp);
-}
+});
 
-/* ======================================
-   TOTALS (SAFE + FLEXIBLE)
-====================================== */
+}catch(e){}
 
-function getUnifiedTotals(){
 
-  const txs = getAllTransactionsUnified();
+/* ===============================
+CORE TRANSACTIONS
+=============================== */
 
-  let totalStake = 0;
-  let totalReward = 0;
+try{
 
-  txs.forEach(t=>{
+const core =
+JSON.parse(
+localStorage.getItem("albukhr_transactions")
+) || [];
 
-    if(t.type === "stake"){
-      totalStake += t.amount;
-    }
+core.forEach(t=>{
 
-    if(t.type === "reward"){
-      totalReward += t.amount;
-    }
+txs.push({
 
-  });
+source:"core",
+projectId: t.project || t.projectId || "-",
+user: t.user || "-",
+wallet: t.meta?.wallet || null,
+fee: Number(t.meta?.fee || 0),
+amount: Number(t.amount) || 0,
+status: t.status || "Successful",
+timestamp: t.timestamp || Date.now(),
+type:(t.type || "stake").toLowerCase()
 
-  return { totalStake, totalReward };
-}
+});
 
-/* ======================================
-   RECENT
-====================================== */
+});
 
-function getUnifiedRecent(limit = 5){
-  return getAllTransactionsUnified().slice(0, limit);
-       }
+}catch(e){}
 
-/* ======================================
-   BY PROJECT
-====================================== */
 
-function getUnifiedByProject(project){
+/* SORT */
 
-return getAllTransactionsUnified()
-.filter(t => t.projectId === project);
+return txs.sort((a,b)=>b.timestamp - a.timestamp);
 
 }
