@@ -57,6 +57,7 @@ font-size:13px;
 <script src="wallet-core.js"></script>
 <script src="staking.js"></script>
 <script src="smart-liquidity-engine.js"></script>
+<script src="admin-auth.js"></script>
 
 </head>
 
@@ -113,6 +114,38 @@ LOW
 </div>
 
 <script>
+
+/* ===============================
+ADMIN AUTH GUARD
+=============================== */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+/* Allow Roles */
+
+requireRole([
+"super_admin",
+"finance_admin",
+"review_admin",
+"compliance_admin"
+]);
+
+/* Get Admin */
+
+const admin = getAdmin();
+
+if(!admin){
+
+alert("Admin login required");
+
+window.location.href =
+"admin-login.html";
+
+return;
+
+}
+
+});
 
 /* ===============================
 PROJECT RISK ENGINE
