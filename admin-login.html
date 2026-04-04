@@ -151,6 +151,16 @@ body{
 <script src="admin-auth.js"></script>
 
 <script>
+
+const session = getAdmin();
+
+if(session){
+
+window.location.href =
+"unified-admin-buttons.html";
+
+}
+
 /* Demo Keys – move to backend in production */
 const KEYS = {
   super_admin: "5194Bhr@",
@@ -161,25 +171,28 @@ const KEYS = {
 
 function login(){
 
-  const role = document.getElementById("role").value;
-  const key  = document.getElementById("key").value.trim();
+const role =
+document.getElementById("role").value;
 
-  if(KEYS[role] !== key){
-    alert("❌ Invalid admin credentials");
-    return;
-  }
+const key =
+document.getElementById("key").value.trim();
 
-  /* Start Session */
-  const success = adminLogin("admin", role, "ALBUKHR_CORE_2026");
+/* Use admin-auth directly */
 
-  if(!success){
-    alert("❌ Core authentication failed");
-    return;
-  }
+const success =
+adminLogin("admin", role, key);
 
-  /* ALL roles enter unified control center */
-  window.location.href = "unified-admin-buttons.html";
+if(!success){
+
+alert("❌ Invalid admin credentials");
+return;
+
 }
+
+window.location.href =
+"unified-admin-buttons.html";
+
+  }
 </script>
 
 </body>
