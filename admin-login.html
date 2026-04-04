@@ -152,14 +152,16 @@ body{
 
 <script>
 
+/* AUTO SESSION REDIRECT */
+
 const session = getAdmin();
 
 if(session){
-
 window.location.href =
 "unified-admin-buttons.html";
-
 }
+
+/* LOGIN */
 
 function login(){
 
@@ -169,22 +171,37 @@ document.getElementById("role").value;
 const key =
 document.getElementById("key").value.trim();
 
-/* Use admin-auth directly */
+/* USERNAME MAP */
+
+const USERNAMES = {
+
+super_admin:"admin",
+finance_admin:"finance",
+review_admin:"review",
+viewer_admin:"viewer"
+
+};
+
+const username =
+USERNAMES[role];
 
 const success =
-adminLogin("admin", role, key);
+adminLogin(
+username,
+role,
+key
+);
 
 if(!success){
-
-alert("❌ Invalid admin credentials");
+alert("❌ Invalid credentials");
 return;
-
 }
 
 window.location.href =
 "unified-admin-buttons.html";
 
-  }
+}
+
 </script>
 
 </body>
