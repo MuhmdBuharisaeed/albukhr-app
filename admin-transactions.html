@@ -150,8 +150,6 @@ font-weight:700;
 
 </div>
 
-</script>
-
 <!-- =============================
      AUTH (LOAD FIRST)
 ============================= -->
@@ -163,6 +161,8 @@ requireRole([
   "viewer_admin"
 ]);
 
+</script>
+
 <!-- CORE ENGINE -->
 <script src="transactions-unified.js"></script>
 
@@ -170,6 +170,22 @@ requireRole([
 const body = document.getElementById("txBody");
 const sourceFilter = document.getElementById("sourceFilter");
 const projectFilter = document.getElementById("projectFilter");
+
+function checkTxRisk(txs){
+
+const alert =
+document.getElementById("txAlert");
+
+const risky =
+txs.some(t => Number(t.amount) >= 500);
+
+if(risky){
+alert.style.display = "block";
+}else{
+alert.style.display = "none";
+}
+
+}
 
 function renderTable(){
   const source = sourceFilter.value;
