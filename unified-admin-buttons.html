@@ -72,6 +72,16 @@ body{
   background:#c0392b;
   color:#fff;
 }
+
+.badge{
+background:#e74c3c;
+color:white;
+font-size:10px;
+padding:2px 6px;
+border-radius:10px;
+margin-left:6px;
+font-weight:700;
+}
 </style>
 </head>
 
@@ -84,74 +94,92 @@ body{
 
 <div class="container">
 
-  <button class="admin-btn" onclick="go('Albukhr-core-projects-dashboard.html')">
-    🧩 Core Projects Dashboard
-  </button>
-  
-  <button class="admin-btn" onclick="go('ALBUKHR-ecosystem-dashboard.html')">
-    🏢 Albukhr ecosystem Dashboard
-  </button>
-  
-  <button class="admin-btn" onclick="go('admin-dapp-requests.html')">
-    📥 DApp Requests
-  </button>
+<button class="admin-btn" onclick="go('Albukhr-core-projects-dashboard.html')">
+🧩 Core Projects Dashboard
+<span id="coreBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('admin-contributors.html')">
-    👥 Contributors Management
-  </button>
+<button class="admin-btn" onclick="go('ALBUKHR-ecosystem-dashboard.html')">
+🏢 Albukhr ecosystem Dashboard
+<span id="ecosystemBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('admin-transactions.html')">
-    💳 Transactions Monitor
-  </button>
+<button class="admin-btn" onclick="go('admin-dapp-requests.html')">
+📥 DApp Requests
+<span id="dappBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('admin-risk.html')">
-    ⚠️ Risk Monitor
-  </button>
+<button class="admin-btn" onclick="go('admin-contributors.html')">
+👥 Contributors Management
+<span id="contributorsBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('internal-admin-panel.html')">
-    🏢 Internal Admin Panel
-  </button>
+<button class="admin-btn" onclick="go('admin-transactions.html')">
+💳 Transactions Monitor
+<span id="txBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('external-admin-panel.html')">
-    🌍 External Admin Panel
-  </button>
+<button class="admin-btn" onclick="go('admin-risk.html')">
+⚠️ Risk Monitor
+<span id="riskBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('external-admin-dashboard.html')">
-    📊 External Dashboard
-  </button>
+<button class="admin-btn" onclick="go('internal-admin-panel.html')">
+🏢 Internal Admin Panel
+<span id="internalBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('external-project-view.html')">
-    🔍 External Project Reviews
-  </button>
+<button class="admin-btn" onclick="go('external-admin-panel.html')">
+🌍 External Admin Panel
+<span id="externalAdminBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('escrow-admin.html')">
-    🔐 Escrow Admin
-  </button>
+<button class="admin-btn" onclick="go('external-admin-dashboard.html')">
+📊 External Dashboard
+<span id="externalDashBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('super-admin-dashboard.html')">
-    👑 Super Admin Dashboard
-  </button>
+<button class="admin-btn" onclick="go('external-project-view.html')">
+🔍 External Project Reviews
+<span id="externalReviewBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('admin-permissions.html')">
-    👁 Admin Permissions 
-  </button>
+<button class="admin-btn" onclick="go('escrow-admin.html')">
+🔐 Escrow Admin
+<span id="escrowBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('admin-wallet.html')">
-    💼 Admin Wallet
-  </button>
+<button class="admin-btn" onclick="go('super-admin-dashboard.html')">
+👑 Super Admin Dashboard
+<span id="superBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="admin-btn" onclick="go('ALBUKHR-ecosystem-control-center.html')">
-    🕹 Control Center
-  </button>
+<button class="admin-btn" onclick="go('admin-permissions.html')">
+👁 Admin Permissions 
+<span id="permissionsBadge" class="badge" style="display:none"></span>
+</button>
 
-  <button class="logout-btn" onclick="adminLogout()">
-    🚪 Logout
-  </button>
+<button class="admin-btn" onclick="go('admin-wallet.html')">
+💼 Admin Wallet
+<span id="walletBadge" class="badge" style="display:none"></span>
+</button>
 
-</div>
+<button class="admin-btn" onclick="go('ALBUKHR-ecosystem-control-center.html')">
+🕹 Control Center
+<span id="controlBadge" class="badge" style="display:none"></span>
+</button>
+
+<button class="logout-btn" onclick="adminLogout()">
+🚪 Logout
+</button>
+
+  </div>
 
 <!-- AUTH -->
 <script src="admin-auth.js"></script>
+<script src="smart-liquidity-engine.js"></script>
+<script src="staking.js"></script>
+<script src="wallet-core.js"></script>
 
 <script>
 
@@ -175,6 +203,150 @@ if(admin){
 function go(page){
   window.location.href = page;
 }
+
+/* ===============================
+UNIFIED ALERT ENGINE
+=============================== */
+
+function updateAdminAlerts(){
+
+updateRiskBadge();
+updateTxBadge();
+updateWalletBadge();
+updateExternalBadge();
+updateDappBadge();
+
+}
+
+/* ===============================
+TRANSACTION ALERT
+=============================== */
+
+function updateTxBadge(){
+
+const badge =
+document.getElementById("txBadge");
+
+if(!badge) return;
+
+const tx =
+getTransactions
+? getTransactions()
+: [];
+
+const pending =
+tx.filter(t=>t.flag==="risk");
+
+if(pending.length){
+
+badge.style.display="inline-block";
+badge.innerText = pending.length;
+
+}else{
+
+badge.style.display="none";
+
+}
+
+}
+
+/* ===============================
+WALLET ALERT
+=============================== */
+
+function updateWalletBadge(){
+
+const badge =
+document.getElementById("walletBadge");
+
+if(!badge) return;
+
+if(typeof getAdminTreasury !== "function")
+return;
+
+const t = getAdminTreasury();
+
+if(t.treasury < 100){
+
+badge.style.display="inline-block";
+badge.innerText = "!";
+
+}else{
+
+badge.style.display="none";
+
+}
+
+}
+
+/* ===============================
+EXTERNAL PROJECT ALERT
+=============================== */
+
+function updateExternalBadge(){
+
+const badge =
+document.getElementById("externalBadge");
+
+if(!badge) return;
+
+const external =
+JSON.parse(
+localStorage.getItem("albukhr_external_projects")
+)||[];
+
+const pending =
+external.filter(p=>p.status==="pending");
+
+if(pending.length){
+
+badge.style.display="inline-block";
+badge.innerText = pending.length;
+
+}else{
+
+badge.style.display="none";
+
+}
+
+}
+
+/* ===============================
+DAPP ALERT
+=============================== */
+
+function updateDappBadge(){
+
+const badge =
+document.getElementById("dappBadge");
+
+if(!badge) return;
+
+const dapps =
+JSON.parse(
+localStorage.getItem("albukhr_dapp_requests")
+)||[];
+
+const pending =
+dapps.filter(d=>!d.reviewed);
+
+if(pending.length){
+
+badge.style.display="inline-block";
+badge.innerText = pending.length;
+
+}else{
+
+badge.style.display="none";
+
+}
+
+}
+
+/* INIT */
+
+updateAdminAlerts();
+setInterval(updateAdminAlerts,4000);
 
 </script>
   
