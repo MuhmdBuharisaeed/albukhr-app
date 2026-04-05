@@ -1,39 +1,61 @@
 function submitExternalProject(data){
 
-  const gate = albukhrCanProceed("external_create");
+/* ===============================
+SECURITY GATE
+=============================== */
 
-  if(!gate.allowed){
-    alert(gate.message);
-    return;
-  }
+const gate =
+albukhrCanProceed("external_create");
 
-  saveExternalProject(data);
-
-  alert(
-    "✅ Project submitted successfully.\n" +
-    "Please join the ALBUKHR External Projects Telegram group."
-  );
+if(!gate.allowed){
+alert(gate.message);
+return;
 }
 
-function submitExternalProject(data){
+/* ===============================
+ESCROW LOCK
+=============================== */
 
-  const gate = albukhrCanProceed("external_create");
-  if(!gate.allowed){
-    alert(gate.message);
-    return;
-  }
+const escrowAmount =
+Number(data.escrowAmount || 0);
 
-  const escrowAmount = Number(data.escrowAmount || 0);
+if(escrowAmount > 0){
 
-  if(escrowAmount > 0){
-    const locked = lockToEscrow(data.projectId, escrowAmount);
-    if(!locked) return;
-  }
+const locked =
+lockToEscrow(
+data.projectId,
+escrowAmount
+);
 
-  saveExternalProject(data);
+if(!locked){
+alert("Escrow lock failed");
+return;
+}
 
-  alert(
-    "✅ Project submitted successfully.\n" +
-    "Funds are securely locked in escrow."
-  );
+}
+
+/* ===============================
+DEFAULT STATUS
+=============================== */
+
+data.status = "pending";
+data.telegramAccess = false;
+data.createdAt = Date.now();
+
+/* ===============================
+SAVE PROJECT
+=============================== */
+
+saveExternalProject(data);
+
+/* ===============================
+SUCCESS MESSAGE
+=============================== */
+
+alert(
+"✅ Project submitted successfully.\n\n" +
+"Waiting for admin approval.\n" +
+"Telegram access will unlock after approval."
+);
+
 }
