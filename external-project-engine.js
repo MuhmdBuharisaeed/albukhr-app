@@ -1,4 +1,59 @@
 /* ======================================
+EXTERNAL REGISTRY STORAGE
+====================================== */
+
+const EXTERNAL_REGISTRY_KEY =
+"albukhr_external_projects";
+
+/* GET REGISTRY */
+
+function getExternalProjects(){
+
+return JSON.parse(
+localStorage.getItem(EXTERNAL_REGISTRY_KEY)
+) || [];
+
+}
+
+/* SAVE REGISTRY */
+
+function saveExternalProjects(list){
+
+localStorage.setItem(
+EXTERNAL_REGISTRY_KEY,
+JSON.stringify(list)
+);
+
+}
+
+/* SAVE NEW PROJECT */
+
+function saveExternalProject(project){
+
+const list =
+getExternalProjects();
+
+/* DUPLICATE CHECK */
+
+const exists =
+list.find(p =>
+p.title === project.title &&
+p.owner === project.owner
+);
+
+if(exists){
+return false;
+}
+
+list.push(project);
+
+saveExternalProjects(list);
+
+return true;
+
+}
+
+/* ======================================
 CREATE LIVE PROJECT AFTER ADMIN APPROVAL
 ====================================== */
 
