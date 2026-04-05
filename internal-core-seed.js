@@ -1,102 +1,188 @@
 /* =========================================
-   ALBUKHR CORE INTERNAL PROJECTS SEED
+ALBUKHR CORE INTERNAL PROJECTS SEED
 ========================================= */
 
-const INTERNAL_PROJECT_KEY = "albukhr_internal_projects_master";
+const INTERNAL_PROJECT_KEY =
+"albukhr_internal_projects_master";
 
 /* GET ALL */
+
 function getAllInternalProjects(){
-  return JSON.parse(localStorage.getItem(INTERNAL_PROJECT_KEY)) || [];
+
+return JSON.parse(
+localStorage.getItem(INTERNAL_PROJECT_KEY)
+) || [];
+
 }
 
 /* SAVE ALL */
+
 function saveAllInternalProjects(list){
-  localStorage.setItem(INTERNAL_PROJECT_KEY, JSON.stringify(list));
+
+localStorage.setItem(
+INTERNAL_PROJECT_KEY,
+JSON.stringify(list)
+);
+
 }
 
-/* CHECK IF SEEDED */
+/* CHECK SEEDED */
+
 function internalProjectsSeeded(){
-  return getAllInternalProjects().length > 0;
+
+return getAllInternalProjects().length > 0;
+
 }
 
-/* SEED CORE PROJECTS */
+/* SEED */
+
 function seedInternalCoreProjects(){
 
-  if(internalProjectsSeeded()) return;
+if(internalProjectsSeeded()) return;
 
-  const projects = [
+const now = Date.now();
 
-    {
-      id: "INT-001",
-      name: "Azman Features Makers Lab",
-      category: "Manufacturing",
-      rewardRate: 0.08,
-      durationDays: 30,
-      status: "active",
-      createdAt: Date.now()
-    },
+const projects = [
 
-    {
-      id: "INT-002",
-      name: "Laibaika Bakery Center",
-      category: "Food Production",
-      rewardRate: 0.07,
-      durationDays: 30,
-      status: "active",
-      createdAt: Date.now()
-    },
+{
+id:"INT-001",
+name:"Azman Features Makers Lab",
+category:"Manufacturing",
 
-    {
-      id: "INT-003",
-      name: "Bash Agro",
-      category: "Agriculture",
-      rewardRate: 0.09,
-      durationDays: 45,
-      status: "active",
-      createdAt: Date.now()
-    },
+rewardRates:{
+30:0.08,
+60:0.12,
+90:0.18
+},
 
-    {
-      id: "INT-004",
-      name: "Urban Mobility",
-      category: "Transport",
-      rewardRate: 0.06,
-      durationDays: 30,
-      status: "active",
-      createdAt: Date.now()
-    },
+liquidity:100,
+reserve:30,
+investors:0,
 
-    {
-      id: "INT-005",
-      name: "Khairat Organic Fertilizer",
-      category: "Agro Industry",
-      rewardRate: 0.10,
-      durationDays: 60,
-      status: "active",
-      createdAt: Date.now()
-    },
+status:"active",
+createdAt:now
+},
 
-    {
-      id: "INT-006",
-      name: "Hauwal Sumonviter",
-      category: "Processing",
-      rewardRate: 0.08,
-      durationDays: 30,
-      status: "active",
-      createdAt: Date.now()
-    },
+{
+id:"INT-002",
+name:"Laibaika Bakery Center",
+category:"Food Production",
 
-    {
-      id: "INT-007",
-      name: "Raheem Pharmacy",
-      category: "Healthcare",
-      rewardRate: 0.07,
-      durationDays: 30,
-      status: "active",
-      createdAt: Date.now()
-    }
+rewardRates:{
+30:0.07,
+60:0.11,
+90:0.15
+},
 
-  ];
+liquidity:100,
+reserve:30,
+investors:0,
 
-  saveAllInternalProjects(projects);
+status:"active",
+createdAt:now
+},
+
+{
+id:"INT-003",
+name:"Bash Agro",
+category:"Agriculture",
+
+rewardRates:{
+30:0.09,
+60:0.14,
+90:0.20
+},
+
+liquidity:100,
+reserve:30,
+investors:0,
+
+status:"active",
+createdAt:now
+},
+
+{
+id:"INT-004",
+name:"Urban Mobility",
+category:"Transport",
+
+rewardRates:{
+30:0.06,
+60:0.10,
+90:0.14
+},
+
+liquidity:100,
+reserve:30,
+investors:0,
+
+status:"active",
+createdAt:now
+},
+
+{
+id:"INT-005",
+name:"Khairat Organic Fertilizer",
+category:"Agro Industry",
+
+rewardRates:{
+30:0.10,
+60:0.15,
+90:0.22
+},
+
+liquidity:100,
+reserve:30,
+investors:0,
+
+status:"active",
+createdAt:now
+},
+
+{
+id:"INT-006",
+name:"Hauwal Sumonviter",
+category:"Processing",
+
+rewardRates:{
+30:0.08,
+60:0.12,
+90:0.18
+},
+
+liquidity:100,
+reserve:30,
+investors:0,
+
+status:"active",
+createdAt:now
+},
+
+{
+id:"INT-007",
+name:"Raheem Pharmacy",
+category:"Healthcare",
+
+rewardRates:{
+30:0.07,
+60:0.11,
+90:0.16
+},
+
+liquidity:100,
+reserve:30,
+investors:0,
+
+status:"active",
+createdAt:now
 }
+
+];
+
+saveAllInternalProjects(projects);
+
+}
+
+/* AUTO SEED */
+
+seedInternalCoreProjects();
