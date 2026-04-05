@@ -1,44 +1,81 @@
 /* ======================================
-   ALBUKHR EXTERNAL PROJECT ENGINE
+CREATE LIVE PROJECT AFTER ADMIN APPROVAL
 ====================================== */
 
-const EXTERNAL_LIVE_KEY = "albukhr_external_live_projects";
-
-/* GET LIVE PROJECTS */
-function getExternalLiveProjects(){
-  return JSON.parse(localStorage.getItem(EXTERNAL_LIVE_KEY)) || [];
-}
-
-/* SAVE LIVE PROJECTS */
-function saveExternalLiveProjects(list){
-  localStorage.setItem(EXTERNAL_LIVE_KEY, JSON.stringify(list));
-}
-
-/* CREATE LIVE PROJECT AFTER ADMIN APPROVAL */
 function createExternalLiveProject(registryProject){
 
-  const list = getExternalLiveProjects();
+const list = getExternalLiveProjects();
 
-  const newProject = {
-    projectId: "EXTLIVE-" + Date.now(),
-    sourceRegistryId: registryProject.projectId,
-    name: registryProject.title,
-    category: registryProject.category,
-    description: registryProject.description,
-    owner: registryProject.owner,
+const newProject = {
 
-    durationDays: 45,            // admin can edit later
-    rewardRate: 0.12,            // 12% example
-    totalStaked: 0,
-    totalRewardPaid: 0,
+projectId: "EXTLIVE-" + Date.now(),
 
-    escrowLocked: true,
-    status: "active",
+sourceRegistryId:
+registryProject.projectId,
 
-    createdAt: Date.now(),
-    approvedAt: Date.now()
-  };
+name: registryProject.title,
 
-  list.push(newProject);
-  saveExternalLiveProjects(list);
+category:
+registryProject.category,
+
+description:
+registryProject.description,
+
+owner:
+registryProject.owner,
+
+/* INVESTMENT CONFIG */
+
+durationDays: 45,
+
+rewardRate: 0.12,
+
+totalStaked: 0,
+
+totalRewardPaid: 0,
+
+investors:0,
+
+/* LIQUIDITY */
+
+liquidity:0,
+
+/* SECURITY */
+
+escrowLocked:true,
+
+telegramAccess:true,
+
+riskLevel:"LOW",
+
+status:"active",
+
+/* TIMESTAMPS */
+
+createdAt: Date.now(),
+
+approvedAt: Date.now()
+
+};
+
+/* SAVE */
+
+list.push(newProject);
+
+saveExternalLiveProjects(list);
+
+/* RECORD TRANSACTION */
+
+if(typeof recordTx === "function"){
+
+recordTx({
+type:"external_project_live",
+project:newProject.projectId,
+amount:0
+});
+
 }
+
+return newProject;
+
+   }
