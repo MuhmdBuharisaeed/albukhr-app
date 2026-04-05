@@ -24,30 +24,33 @@ alert("Request not found.");
 return;
 }
 
-/* DOUBLE APPROVAL PROTECTION */
+/* AUTO APPROVAL */
 
-if(req.status !== "pending"){
-alert("Already processed.");
-return;
-}
-
-/* ADMIN WALLET CHECK */
-
-if(typeof getAdminTreasury === "function"){
-
-const treasury =
-getAdminTreasury();
-
-if(treasury.treasury < req.amount){
-alert("Insufficient admin liquidity");
-return;
-}
-
-}
-
-/* APPROVE */
+if(req.amount < AUTO_SETTLEMENT_LIMIT){
 
 req.status = "approved";
+req.autoApproved = true;
+
+}
+
+/* REQUIRE ADMIN */
+
+if(req.amount >= ADMIN_APPROVAL_LIMIT){
+
+req.status = "approved";
+
+}
+
+/* MEDIUM */
+
+if(
+req.amount >= AUTO_SETTLEMENT_LIMIT &&
+req.amount < ADMIN_APPROVAL_LIMIT
+){
+
+req.status = "approved";
+
+}
 
 req.approvedAt = Date.now();
 
@@ -58,14 +61,10 @@ getAdminRole
 
 req.settlementStatus = "pending";
 
-/* SAVE */
-
 localStorage.setItem(
 WITHDRAW_KEY,
 JSON.stringify(list)
 );
-
-/* RECORD TRANSACTION */
 
 if(typeof recordTx === "function"){
 
@@ -73,30 +72,12 @@ recordTx({
 type:"withdraw_approved",
 project:req.project,
 amount:req.amount,
-meta:{
-withdrawId:withdrawId
-}
+meta:{withdrawId:withdrawId}
 });
 
 }
 
-/* LARGE WITHDRAW WARNING */
-
-if(req.amount >= 500){
-
-alert(
-"⚠️ Large withdrawal approved.\n\n" +
-"Manual Pi settlement recommended."
-);
-
-}else{
-
-alert(
-"Withdrawal approved.\n" +
-"Ready for Pi settlement."
-);
-
-}
+alert("Withdrawal approved");
 
 }
 
@@ -112,60 +93,51 @@ list.find(w => w.id === withdrawId);
 
 if(!req) return;
 
-if(req.status !== "approved" &&
-req.status !== "pending"){
-return;
-}
+if(req.status !== "approved") return;
 
-/* AUTO SETTLEMENT */
+/* AUTO */
 
-if(req.amount < 200){
+if(req.amount < AUTO_SETTLEMENT_LIMIT){
 
 req.status = "settled";
 req.settledAt = Date.now();
 req.settledBy = "auto-engine";
 
+}
+
+/* MEDIUM */
+
+if(
+req.amount >= AUTO_SETTLEMENT_LIMIT &&
+req.amount < ADMIN_APPROVAL_LIMIT
+){
+
+req.status = "queued";
+
+}
+
+/* LARGE */
+
+if(req.amount >= ADMIN_APPROVAL_LIMIT){
+
+req.settlementStatus = "admin_required";
+
+}
+
 localStorage.setItem(
 WITHDRAW_KEY,
 JSON.stringify(list)
 );
 
-/* RECORD */
+if(typeof recordTx === "function"){
 
 recordTx({
-type:"pi_settlement_auto",
+type:"pi_settlement",
 project:req.project,
 amount:req.amount
 });
 
-return;
-
 }
-
-/* REQUIRE ADMIN */
-
-if(req.amount >= 500){
-
-req.settlementStatus = "admin_required";
-
-localStorage.setItem(
-WITHDRAW_KEY,
-JSON.stringify(list)
-);
-
-return;
-
-}
-
-/* MEDIUM RANGE */
-
-req.status = "queued";
-
-localStorage.setItem(
-WITHDRAW_KEY,
-JSON.stringify(list)
-
-);
 
 }
 
@@ -203,6 +175,21 @@ JSON.stringify(list)
 
 setInterval(()=>{
 
+const list =
+JSON.parse(
+localStorage.getItem(WITHDRAW_KEY)
+) || [];
+
+list.forEach(req=>{
+
+if(req.status === "approved"){
+
+settleWithdrawal(req.id);
+
+}
+
+});
+
 confirmSettlement();
 
-},5000);
+},4000);
