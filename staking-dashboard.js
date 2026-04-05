@@ -60,3 +60,28 @@ const merged =
 return merged.slice(0, limit);
 
 }
+
+function getDashboardStats(){
+
+const totals = getDashboardTotals();
+
+return {
+
+totalStake:
+totals.totalStake.toFixed(2),
+
+totalReward:
+totals.totalReward.toFixed(2)
+
+};
+
+  }
+
+const stats =
+getDashboardStats();
+
+stakeUI.innerText =
+stats.totalStake + " Pi";
+
+rewardUI.innerText =
+stats.totalReward + " Pi";
