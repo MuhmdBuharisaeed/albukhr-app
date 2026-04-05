@@ -1,33 +1,62 @@
 /* ==================================
-   ALBUKHR – STAKING DASHBOARD LAYER
-   INTERNAL + EXTERNAL (READ ONLY)
-   ================================== */
+ALBUKHR – STAKING DASHBOARD LAYER
+INTERNAL + EXTERNAL (READ ONLY)
+================================== */
 
 function getDashboardTotals(){
-  const internal = typeof getInternalTotals === "function"
-    ? getInternalTotals()
-    : { totalStake: 0, totalReward: 0 };
 
-  const external = typeof getExternalTotals === "function"
-    ? getExternalTotals()
-    : { totalStake: 0, totalReward: 0 };
+const internal =
+typeof getInternalTotals === "function"
+? getInternalTotals()
+: { stake:0, reward:0 };
 
-  return {
-    totalStake: internal.totalStake + external.totalStake,
-    totalReward: internal.totalReward + external.totalReward
-  };
+const external =
+typeof getExternalTotals === "function"
+? getExternalTotals()
+: { stake:0, reward:0 };
+
+const totalStake =
+Number(internal.stake || internal.totalStake || 0) +
+Number(external.stake || external.totalStake || 0);
+
+const totalReward =
+Number(internal.reward || internal.totalReward || 0) +
+Number(external.reward || external.totalReward || 0);
+
+return {
+
+totalStake:Number(totalStake),
+totalReward:Number(totalReward)
+
+};
+
 }
 
+
+/* ==================================
+RECENT
+================================== */
+
 function getDashboardRecent(limit = 5){
-  const internal = typeof getInternalRecent === "function"
-    ? getInternalRecent(limit)
-    : [];
 
-  const external = typeof getExternalRecent === "function"
-    ? getExternalRecent(limit)
-    : [];
+const internal =
+typeof getInternalRecent === "function"
+? getInternalRecent(limit)
+: [];
 
-  return [...internal, ...external]
-    .sort((a,b)=> b.timestamp - a.timestamp)
-    .slice(0, limit);
+const external =
+typeof getExternalRecent === "function"
+? getExternalRecent(limit)
+: [];
+
+const merged =
+[...internal,...external]
+.filter(t => t)
+.sort((a,b)=>
+(Number(b.timestamp||0)) -
+(Number(a.timestamp||0))
+);
+
+return merged.slice(0, limit);
+
 }
