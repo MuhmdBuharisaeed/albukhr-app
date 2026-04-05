@@ -90,16 +90,16 @@ textarea.input{min-height:90px}
   </div>
 
   <!-- TELEGRAM GROUP -->
-  <div class="card tg-box">
-    <strong>📢 Albukhr External Projects – Telegram</strong>
-    <p class="note">
-      Join our official Telegram group for all external project owners.
-      Updates, approvals, escrow notices & collaboration happen there.
-    </p>
-    <a href="https://t.me/+alGsXRgAe5w4ZjNk" target="_blank">
-      👉 Join Telegram Group
-    </a>
-  </div>
+<div id="telegramInvite" class="card tg-box" style="display:none;">
+  <strong>📢 Albukhr External Projects – Telegram</strong>
+  <p class="note">
+    Join our official Telegram group for all external project owners.
+    Updates, approvals, escrow notices & collaboration happen there.
+  </p>
+  <a href="https://t.me/+alGsXRgAe5w4ZjNk" target="_blank">
+    👉 Join Telegram Group
+  </a>
+</div>
 
   <!-- ESCROW NOTICE -->
   <div class="card">
@@ -123,6 +123,45 @@ textarea.input{min-height:90px}
 <script src="js/external/external-engine.js"></script>
 
 <script>
+
+/* =============================
+CHECK APPROVAL
+============================= */
+
+function checkTelegramApproval(){
+
+const projects =
+JSON.parse(
+localStorage.getItem("albukhr_external_projects")
+) || [];
+
+const username =
+document.getElementById("owner")
+? document.getElementById("owner").value.trim()
+: null;
+
+if(!username) return;
+
+const approved =
+projects.find(p =>
+p.owner === username &&
+p.status === "approved"
+);
+
+if(approved){
+
+document.getElementById("telegramInvite")
+.style.display = "block";
+
+}
+
+}
+
+setInterval(checkTelegramApproval,3000);
+
+  </script>
+
+<script>
 /* =============================
    SUBMIT PROJECT
 ============================= */
@@ -143,7 +182,7 @@ function submitExternalProject(){
     status: "pending",
     createdAt: Date.now(),
     escrowLocked: true,
-    telegramJoined: true
+    telegramJoined: false
   };
 
   if(!data.title || !data.category || !data.description || !data.owner){
