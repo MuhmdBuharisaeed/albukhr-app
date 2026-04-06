@@ -46,6 +46,17 @@ textarea.input{min-height:90px}
   color:#0f7a3d;
   text-decoration:none;
 }
+
+.approved-actions{
+display:flex;
+flex-direction:column;
+gap:12px;
+margin-top:14px;
+}
+
+.approved-actions .btn{
+box-shadow:0 4px 10px rgba(0,0,0,.08);
+  }
 </style>
 </head>
 
@@ -159,27 +170,30 @@ textarea.input{min-height:90px}
       Your external project is now live.
     </p>
 
-    <a 
-      id="telegramLink"
-      class="btn"
-      target="_blank"
-      href="https://t.me/+alGsXRgAe5w4ZjNk">
-      Join Telegram
-    </a>
+    <div class="approved-actions">
 
-    <br><br>
+<a 
+id="telegramLink"
+class="btn"
+target="_blank"
+href="https://t.me/+alGsXRgAe5w4ZjNk">
 
-    <a 
-      id="funderDashboard"
-      class="btn"
-      href="#">
-      Open Funder Dashboard
-    </a>
+Join Telegram
+
+</a>
+
+<a 
+id="funderDashboard"
+class="btn"
+href="#">
+
+Open Funder Dashboard
+
+</a>
 
   </div>
 
-</div>
-
+  </div>
 
 <!-- TELEGRAM INVITE -->
 <div id="telegramInvite" class="card tg-box" style="display:none;">
