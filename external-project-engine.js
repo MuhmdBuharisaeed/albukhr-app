@@ -1,39 +1,44 @@
 /* ======================================
-EXTERNAL REGISTRY STORAGE
+   ALBUKHR EXTERNAL PROJECT ENGINE v3
+   Clean • Secure • Wallet Compatible
 ====================================== */
 
-const EXTERNAL_REGISTRY_KEY =
-"albukhr_external_projects";
+const EXTERNAL_KEY = "albukhr_external_projects";
+const EXTERNAL_LIVE_KEY = "albukhr_external_live_projects";
 
-/* GET REGISTRY */
+
+/* ======================================
+   GET ALL PROJECTS
+====================================== */
 
 function getExternalProjects(){
-
 return JSON.parse(
-localStorage.getItem(EXTERNAL_REGISTRY_KEY)
+localStorage.getItem(EXTERNAL_KEY)
 ) || [];
-
 }
 
-/* SAVE REGISTRY */
+
+/* ======================================
+   SAVE PROJECTS
+====================================== */
 
 function saveExternalProjects(list){
-
 localStorage.setItem(
-EXTERNAL_REGISTRY_KEY,
+EXTERNAL_KEY,
 JSON.stringify(list)
 );
-
 }
 
-/* SAVE NEW PROJECT */
+
+/* ======================================
+   SAVE NEW PROJECT
+====================================== */
 
 function saveExternalProject(project){
 
-const list =
-getExternalProjects();
+const list = getExternalProjects();
 
-/* DUPLICATE CHECK */
+/* duplicate protection */
 
 const exists =
 list.find(p =>
@@ -45,6 +50,12 @@ if(exists){
 return false;
 }
 
+project.status = "pending";
+project.createdAt = Date.now();
+project.totalStake = 0;
+project.totalReward = 0;
+project.escrowLocked = true;
+
 list.push(project);
 
 saveExternalProjects(list);
@@ -53,84 +64,278 @@ return true;
 
 }
 
+
 /* ======================================
-CREATE LIVE PROJECT AFTER ADMIN APPROVAL
+   GET BY ID
 ====================================== */
 
-function createExternalLiveProject(registryProject){
+function getExternalProjectById(id){
+return getExternalProjects()
+.find(p => p.projectId === id);
+}
 
-const list = getExternalLiveProjects();
 
-const newProject = {
+/* ======================================
+   GET PENDING
+====================================== */
+
+function getPendingExternalProjects(){
+
+return getExternalProjects()
+.filter(p => p.status === "pending");
+
+}
+
+
+/* ======================================
+   UPDATE STATUS
+====================================== */
+
+function updateExternalStatus(projectId,status){
+
+let list = getExternalProjects();
+
+list = list.map(p => {
+
+if(p.projectId === projectId){
+
+p.status = status;
+
+if(status === "approved"){
+
+p.approvedAt = Date.now();
+p.escrowLocked = false;
+
+/* create live project */
+
+createExternalLiveProject(p);
+
+}
+
+if(status === "rejected"){
+
+p.rejectedAt = Date.now();
+p.escrowLocked = true;
+
+}
+
+}
+
+return p;
+
+});
+
+saveExternalProjects(list);
+
+}
+
+
+/* ======================================
+   LIVE PROJECT ENGINE
+====================================== */
+
+function getExternalLiveProjects(){
+
+return JSON.parse(
+localStorage.getItem(EXTERNAL_LIVE_KEY)
+) || [];
+
+}
+
+
+function saveExternalLiveProjects(list){
+
+localStorage.setItem(
+EXTERNAL_LIVE_KEY,
+JSON.stringify(list)
+);
+
+}
+
+
+function createExternalLiveProject(project){
+
+const list =
+getExternalLiveProjects();
+
+const exists =
+list.find(
+p => p.sourceRegistryId === project.projectId
+);
+
+if(exists) return;
+
+const live = {
 
 projectId: "EXTLIVE-" + Date.now(),
+sourceRegistryId: project.projectId,
 
-sourceRegistryId:
-registryProject.projectId,
+title: project.title,
+category: project.category,
+description: project.description,
+owner: project.owner,
 
-name: registryProject.title,
+rewardRate: 0.08,
+duration: 30,
 
-category:
-registryProject.category,
-
-description:
-registryProject.description,
-
-owner:
-registryProject.owner,
-
-/* INVESTMENT CONFIG */
-
-durationDays: 45,
-
-rewardRate: 0.12,
-
-totalStaked: 0,
-
-totalRewardPaid: 0,
-
-investors:0,
-
-/* LIQUIDITY */
-
-liquidity:0,
-
-/* SECURITY */
-
-escrowLocked:true,
-
-telegramAccess:true,
-
-riskLevel:"LOW",
+totalStake: 0,
+totalReward: 0,
 
 status:"active",
-
-/* TIMESTAMPS */
-
-createdAt: Date.now(),
-
-approvedAt: Date.now()
+createdAt: Date.now()
 
 };
 
-/* SAVE */
-
-list.push(newProject);
+list.push(live);
 
 saveExternalLiveProjects(list);
 
-/* RECORD TRANSACTION */
+}
+
+
+/* ======================================
+   STAKE
+====================================== */
+
+function addExternalStake(projectId,amount){
+
+const project =
+getExternalProjectById(projectId);
+
+if(!project){
+return {error:"Project not found"};
+}
+
+if(project.status !== "approved"){
+return {error:"Project not approved"};
+}
+
+if(project.escrowLocked){
+return {error:"Escrow locked"};
+}
+
+amount = Number(amount);
+
+if(!amount || amount <= 0){
+return {error:"Invalid amount"};
+}
+
+const stake = {
+
+id:"EXT-" + Date.now(),
+projectId,
+amount,
+reward:0,
+timestamp:Date.now(),
+status:"Successful"
+
+};
+
+/* save stake */
+
+const stakes =
+JSON.parse(
+localStorage.getItem("albukhr_external_stakes")
+)||[];
+
+stakes.push(stake);
+
+localStorage.setItem(
+"albukhr_external_stakes",
+JSON.stringify(stakes)
+);
+
+
+/* update project total */
+
+let projects =
+getExternalProjects();
+
+projects = projects.map(p => {
+
+if(p.projectId === projectId){
+p.totalStake =
+(Number(p.totalStake)||0) + amount;
+}
+
+return p;
+
+});
+
+saveExternalProjects(projects);
+
+
+/* record tx */
 
 if(typeof recordTx === "function"){
 
 recordTx({
-type:"external_project_live",
-project:newProject.projectId,
-amount:0
+type:"external_stake",
+project:projectId,
+amount
 });
 
 }
 
-return newProject;
+return stake;
 
-   }
+}
+
+
+/* ======================================
+   TOTALS
+====================================== */
+
+function getExternalTotals(){
+
+const stakes =
+JSON.parse(
+localStorage.getItem("albukhr_external_stakes")
+)||[];
+
+const totalStake =
+stakes.reduce(
+(sum,s)=>sum + (Number(s.amount)||0),
+0
+);
+
+const totalReward =
+stakes.reduce(
+(sum,s)=>sum + (Number(s.reward)||0),
+0
+);
+
+return {
+totalStake,
+totalReward
+};
+
+}
+
+
+/* ======================================
+   AUTO SYNC
+====================================== */
+
+function syncExternalProjects(){
+
+const approved =
+getExternalProjects()
+.filter(p=>p.status==="approved");
+
+approved.forEach(p=>{
+createExternalLiveProject(p);
+});
+
+}
+
+
+/* AUTO LOAD */
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+if(typeof syncExternalProjects === "function"){
+syncExternalProjects();
+}
+});
