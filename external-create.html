@@ -58,13 +58,21 @@ textarea.input{min-height:90px}
 <section class="section">
 
 <div id="createForm">
-  
+
   <!-- PROJECT INFO -->
   <div class="card">
-    <div class="label">Project Title</div>
-    <input class="input" id="title" placeholder="e.g. Solar Water Pump"/>
 
-    <div class="label" style="margin-top:12px">Category</div>
+    <div class="label">Project Title</div>
+    <input 
+      class="input" 
+      id="title" 
+      placeholder="e.g. Solar Water Pump"
+    />
+
+    <div class="label" style="margin-top:12px">
+      Category
+    </div>
+
     <select class="input" id="category">
       <option value="">Select category</option>
       <option>Agro / Farming</option>
@@ -75,44 +83,62 @@ textarea.input{min-height:90px}
       <option>Other</option>
     </select>
 
-    <div class="label" style="margin-top:12px">Project Description</div>
-    <textarea class="input" id="description"
-      placeholder="Explain what the project does, how funds will be used, and expected outcome"></textarea>
+    <div class="label" style="margin-top:12px">
+      Project Description
+    </div>
+
+    <textarea 
+      class="input" 
+      id="description"
+      placeholder="Explain what the project does, how funds will be used, and expected outcome"
+    ></textarea>
 
     <div class="label" style="margin-top:12px">
-Initial Liquidity (Pi)
-</div>
+      Initial Liquidity (Pi)
+    </div>
 
-<input 
-class="input" 
-id="initialLiquidity"
-placeholder="e.g. 500"
-/>
+    <input 
+      class="input" 
+      id="initialLiquidity"
+      placeholder="e.g. 500"
+    />
 
+    <div class="label" style="margin-top:12px">
+      External Project Code
+    </div>
 
-<div class="label" style="margin-top:12px">
-External Project Code
-</div>
+    <input 
+      class="input" 
+      id="extCode"
+      placeholder="Auto generated"
+      readonly
+    />
 
-<input 
-class="input" 
-id="extCode"
-placeholder="Auto generated"
-readonly
-/>
-</div>
+  </div>
 
   <!-- OWNER INFO -->
   <div class="card">
+
     <div class="label">Pi Username</div>
-    <input class="input" id="owner" placeholder="your Pi username"/>
+
+    <input 
+      class="input" 
+      id="owner" 
+      placeholder="your Pi username"
+    />
 
     <div class="label" style="margin-top:12px">
       Invite / Referral (optional)
     </div>
-    <input class="input" id="invite" placeholder="who invited you (optional)"/>
+
+    <input 
+      class="input" 
+      id="invite" 
+      placeholder="who invited you (optional)"
+    />
+
   </div>
-  
+
 </div>
   
 <div id="approvedPanel" style="display:none;">
