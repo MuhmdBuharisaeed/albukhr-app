@@ -151,6 +151,41 @@ box-shadow:0 4px 10px rgba(0,0,0,.08);
 
   </div>
 
+  <div class="card">
+
+<strong>📜 External Project Policy</strong>
+
+<p class="note">
+Please review and accept ALBUKHR External Project Policy before submitting.
+</p>
+
+<a 
+href="external-policy.html"
+target="_blank"
+style="color:#0f7a3d;font-weight:700;text-decoration:none">
+
+View External Policy
+
+</a>
+
+<br><br>
+
+<label style="display:flex;gap:8px;align-items:flex-start">
+
+<input 
+type="checkbox" 
+id="acceptPolicy"
+style="margin-top:4px"
+/>
+
+<span class="note">
+I accept ALBUKHR External Project Policy
+</span>
+
+</label>
+
+  </div>
+  
   <!-- SUBMIT BUTTON -->
   <button class="btn" onclick="submitExternalProject()">
     Submit for Review
@@ -280,6 +315,16 @@ setInterval(checkTelegramApproval,5000);
 ============================= */
 function submitExternalProject(){
 
+  const accepted =
+document.getElementById("acceptPolicy");
+
+if(!accepted.checked){
+alert(
+"Please accept External Policy before submitting."
+);
+return;
+  }
+  
   if(typeof saveExternalProject !== "function"){
     alert("System error: External engine not available");
     return;
