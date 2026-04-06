@@ -98,7 +98,60 @@ function saveExternalStakes(list){
 
 /* ADD STAKE */
 function addExternalStake(projectId, amount){
-   
+
+const project = getExternalProjectById(projectId);
+
+if(!project || project.status !== "approved")
+return { error:"Project not approved" };
+
+if(project.escrowLocked){
+return { error:"Project escrow locked" };
+}
+
+amount = parseFloat(amount);
+
+if(amount <= 0)
+return { error:"Invalid amount" };
+
+const stake = {
+id: "EXT-" + Date.now(),
+projectId,
+amount,
+reward: 0,
+status: "Successful",
+timestamp: Date.now()
+};
+
+/* SAVE STAKE */
+
+const list = getExternalStakes();
+list.push(stake);
+saveExternalStakes(list);
+
+/* UPDATE PROJECT TOTAL */
+
+let projects = getExternalProjects();
+
+projects = projects.map(p => {
+
+if(p.projectId === projectId){
+
+p.totalStake =
+(Number(p.totalStake)||0) + amount;
+
+}
+
+return p;
+
+});
+
+localStorage.setItem(
+EXTERNAL_KEY,
+JSON.stringify(projects)
+);
+
+/* RECORD TRANSACTION */
+
 if(typeof recordTx === "function"){
 
 recordTx({
@@ -109,37 +162,9 @@ status:"Successful"
 });
 
 }
-   
-  const project = getExternalProjectById(projectId);
-   
-if(project.escrowLocked){
-return {
-error:"Project escrow locked"
-};
-}
-   
-  if(!project || project.status !== "approved")
-    return { error:"Project not approved" };
 
-  amount = parseFloat(amount);
+return stake;
 
-  if(amount <= 0)
-    return { error:"Invalid amount" };
-
-  const stake = {
-    id: "EXT-" + Date.now(),
-    projectId,
-    amount,
-    reward: 0,
-    status: "Successful",
-    timestamp: Date.now()
-  };
-
-  const list = getExternalStakes();
-  list.push(stake);
-  saveExternalStakes(list);
-
-  return stake;
 }
 
 /* UPDATE PROJECT TOTAL */
