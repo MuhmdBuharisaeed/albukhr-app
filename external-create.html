@@ -263,25 +263,17 @@ I accept ALBUKHR External Project Policy
 <!-- APPROVED PANEL -->
 <div id="approvedPanel" style="display:none;">
 
-  <div class="card">
+<div class="card">
 
-    <strong>✅ Project Approved</strong>
+<strong>✅ Project Approved</strong>
 
-    <p class="note">
-      Your external project is now live.
-    </p>
+<p class="note">
+Your external project is now live.
+</p>
 
-    <div class="approved-actions">
+</div>
 
-<a 
-id="telegramLink"
-class="btn"
-target="_blank"
-href="https://t.me/+alGsXRgAe5w4ZjNk">
-
-Join Telegram
-
-</a>
+</div>
 
 <a 
 id="funderDashboard"
@@ -312,6 +304,27 @@ Open Funder Dashboard
 
 </div>
 
+<div id="funderInvite" 
+class="card tg-box" 
+style="display:none;">
+
+<strong>💼 Albukhr External Funder Dashboard</strong>
+
+<p class="note">
+Manage your external project liquidity, withdrawals 
+and treasury operations from your funder dashboard.
+</p>
+
+<a 
+id="funderDashboard"
+target="_blank"
+href="#">
+
+👉 Open Funder Dashboard
+
+</a>
+
+</div>
 
 <!-- ESCROW NOTICE -->
 <div class="card">
@@ -481,6 +494,12 @@ document.getElementById("createForm")
 .style.display = "none";
 
 document.getElementById("approvedPanel")
+.style.display = "block";
+
+document.getElementById("telegramInvite")
+.style.display = "block";
+
+document.getElementById("funderInvite")
 .style.display = "block";
 
 document.getElementById("funderDashboard")
