@@ -185,12 +185,25 @@ new URLSearchParams(window.location.search);
 const projectId =
 params.get("id");
 
+/* ============================= */
+
 function loadProject(){
 
 const project =
 getExternalProjectById(projectId);
 
 if(!project) return;
+
+/* UPDATE RESERVE */
+updateReserve(project);
+
+/* UPDATE RISK */
+const risk =
+calculateRisk(project);
+
+project.riskLevel = risk;
+
+/* DISPLAY */
 
 document.getElementById("projectName")
 .textContent = project.title;
@@ -211,13 +224,11 @@ document.getElementById("investors")
 .textContent =
 (project.investors || 0);
 
-const risk =
-calculateRisk(project);
-
-project.riskLevel = risk;
-
 document.getElementById("status")
 .textContent = risk;
+
+/* SAVE AUTO */
+saveProject(project);
 
 }
 
@@ -266,6 +277,22 @@ if(!amount) return;
 const project =
 getExternalProjectById(projectId);
 
+updateReserve(project);
+
+const available =
+project.liquidity - project.reserve;
+
+if(amount > available){
+
+alert(
+"⚠️ Withdrawal exceeds safe limit.\n" +
+"Protected Reserve: " + project.reserve + " Pi"
+);
+
+return;
+
+}
+
 project.liquidity =
 (Number(project.liquidity)||0)
 - amount;
@@ -279,7 +306,7 @@ amount
 
 loadProject();
 
-}
+  }
 
 /* ============================= */
 
@@ -320,6 +347,38 @@ return "MEDIUM";
 return "HIGH";
 
 }
+
+function calculateReserveLock(project){
+
+const liquidity =
+Number(project.liquidity || 0);
+
+if(liquidity < 200){
+return 0.80;
+}
+
+if(liquidity < 500){
+return 0.50;
+}
+
+return 0.30;
+
+}
+
+function updateReserve(project){
+
+const lock =
+calculateReserveLock(project);
+
+const liquidity =
+Number(project.liquidity || 0);
+
+project.reserve =
+Math.floor(liquidity * lock);
+
+return project;
+
+  }
 
 /* ============================= */
 
