@@ -77,7 +77,7 @@ border-bottom:1px solid #eee;
 <body>
 
 <header class="header">
-<span>💼 External Funder Dashboard</span>
+<span>👤 External Funder Dashboard</span>
 </header>
 
 <section class="section">
@@ -211,9 +211,13 @@ document.getElementById("investors")
 .textContent =
 (project.investors || 0);
 
+const risk =
+calculateRisk(project);
+
+project.riskLevel = risk;
+
 document.getElementById("status")
-.textContent =
-(project.riskLevel || "LOW");
+.textContent = risk;
 
 }
 
@@ -281,6 +285,9 @@ loadProject();
 
 function saveProject(project){
 
+project.riskLevel =
+calculateRisk(project);
+
 let list =
 getExternalProjects();
 
@@ -294,6 +301,23 @@ localStorage.setItem(
 "albukhr_external_projects",
 JSON.stringify(list)
 );
+
+}
+
+function calculateRisk(project){
+
+const liquidity =
+Number(project.liquidity || 0);
+
+if(liquidity >= 500){
+return "LOW";
+}
+
+if(liquidity >= 200){
+return "MEDIUM";
+}
+
+return "HIGH";
 
 }
 
