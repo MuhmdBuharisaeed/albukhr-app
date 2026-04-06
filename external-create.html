@@ -77,6 +77,29 @@ background:#fdecea;
 color:#c0392b;
 }
 
+.verify{
+padding:4px 10px;
+border-radius:20px;
+font-size:11px;
+font-weight:700;
+margin-left:6px;
+}
+
+.verify.unverified{
+background:#eee;
+color:#666;
+}
+
+.verify.verified{
+background:#eaf6ee;
+color:#0f7a3d;
+}
+
+.verify.premium{
+background:#fff4e5;
+color:#d97706;
+}
+
 .approved-actions .btn{
 box-shadow:0 4px 10px rgba(0,0,0,.08);
   }
@@ -146,6 +169,16 @@ Risk Level
 <option value="low">Low Risk</option>
 <option value="medium">Medium Risk</option>
 <option value="high">High Risk</option>
+</select>
+
+<div class="label" style="margin-top:12px">
+Verification Level
+</div>
+
+<select class="input" id="verificationLevel">
+<option value="unverified">Unverified</option>
+<option value="verified">Verified</option>
+<option value="premium">Premium</option>
 </select>
 
     <div class="label" style="margin-top:12px">
@@ -374,6 +407,8 @@ title: title.value.trim(),
 category: category.value,
 
 description: description.value.trim(),
+
+verificationLevel: verificationLevel.value || "unverified",
 
 owner: owner.value.trim(),
 
