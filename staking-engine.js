@@ -15,14 +15,30 @@ function stakeInternal(projectId, amount){
 }
 
 function stakeExternal(projectId, amount){
-    amount = parseFloat(amount);
-    if(!projectId || amount <= 0) return false;
 
-    // Record in Wallet Ledger
-    const tx = recordStake(projectId, amount, "external");
+if(typeof recordStake !== "function"){
+console.warn("Wallet engine not loaded");
+return false;
+}
 
-    console.log("External stake recorded:", tx);
-    return tx;
+amount = parseFloat(amount);
+
+if(!projectId || amount <= 0) return false;
+
+const tx =
+recordStake(
+projectId,
+amount,
+"external"
+);
+
+console.log(
+"External stake recorded:",
+tx
+);
+
+return tx;
+
 }
 
 // Get total staked for a project
@@ -34,10 +50,36 @@ function getProjectStake(projectId){
 
 // Auto-sync all approved external projects
 function syncExternalStakes(){
-    const externalProjects = getExternalProjects().filter(p=>p.status==="approved");
-    externalProjects.forEach(p=>{
-        if(!getByProject(p.projectId).length){
-            recordStake(p.projectId, p.staked || 0, "external");
-        }
-    });
-                }
+
+if(typeof getExternalProjects !== "function"){
+console.warn("External engine not loaded");
+return;
+}
+
+const externalProjects =
+getExternalProjects()
+.filter(p=>p.status==="approved");
+
+externalProjects.forEach(p=>{
+
+if(!getByProject(p.projectId).length){
+
+recordStake(
+p.projectId,
+p.staked || 0,
+"external"
+);
+
+}
+
+});
+
+}
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+if(typeof syncExternalStakes === "function"){
+syncExternalStakes();
+}
+});
