@@ -76,7 +76,28 @@ textarea.input{min-height:90px}
     <div class="label" style="margin-top:12px">Project Description</div>
     <textarea class="input" id="description"
       placeholder="Explain what the project does, how funds will be used, and expected outcome"></textarea>
-  </div>
+
+    <div class="label" style="margin-top:12px">
+Initial Liquidity (Pi)
+</div>
+
+<input 
+class="input" 
+id="initialLiquidity"
+placeholder="e.g. 500"
+/>
+
+
+<div class="label" style="margin-top:12px">
+External Project Code
+</div>
+
+<input 
+class="input" 
+id="extCode"
+placeholder="Auto generated"
+readonly
+</div>
 
   <!-- OWNER INFO -->
   <div class="card">
@@ -89,6 +110,40 @@ textarea.input{min-height:90px}
     <input class="input" id="invite" placeholder="who invited you (optional)"/>
   </div>
 
+<div id="approvedPanel" style="display:none;">
+
+<div class="card">
+
+<strong>✅ Project Approved</strong>
+
+<p class="note">
+Your external project is now live.
+</p>
+
+<a id="telegramLink"
+class="btn"
+target="_blank"
+href="https://t.me/+alGsXRgAe5w4ZjNk">
+
+Join Telegram
+
+</a>
+
+<br><br>
+
+<a 
+id="funderDashboard"
+class="btn"
+href="#">
+
+Open Funder Dashboard
+
+</a>
+
+</div>
+
+</div>
+    
   <!-- TELEGRAM GROUP -->
 <div id="telegramInvite" class="card tg-box" style="display:none;">
   <strong>📢 Albukhr External Projects – Telegram</strong>
@@ -176,17 +231,31 @@ function submitExternalProject(){
   }
 
   const data = {
-    projectId: "EXT-" + Date.now(),
-    title: title.value.trim(),
-    category: category.value,
-    description: description.value.trim(),
-    owner: owner.value.trim(),
-    invite: invite.value.trim(),
-    status: "pending",
-    createdAt: Date.now(),
-    escrowLocked: true,
-    telegramJoined: false
-  };
+
+projectId: "EXT-" + Date.now(),
+
+extCode: extCode.value,
+
+title: title.value.trim(),
+
+category: category.value,
+
+description: description.value.trim(),
+
+owner: owner.value.trim(),
+
+invite: invite.value.trim(),
+
+initialLiquidity:
+Number(initialLiquidity.value || 0),
+
+status: "pending",
+
+createdAt: Date.now(),
+
+escrowLocked: true
+
+};
 
   if(!data.title || !data.category || !data.description || !data.owner){
     alert("Please fill all required fields");
@@ -204,6 +273,56 @@ function submitExternalProject(){
 
   window.location.href = "projects.html";
 }
+
+function generateExtCode(){
+
+return "EXT-" + 
+Math.floor(
+100000 + Math.random()*900000
+);
+
+}
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+document.getElementById("extCode").value =
+generateExtCode();
+});
+
+function checkApproval(){
+
+const projects =
+getExternalProjects();
+
+const username =
+owner.value.trim();
+
+const approved =
+projects.find(p => 
+p.owner === username &&
+p.status === "approved"
+);
+
+if(approved){
+
+document.getElementById("createForm")
+.style.display = "none";
+
+document.getElementById("approvedPanel")
+.style.display = "block";
+
+document.getElementById("funderDashboard")
+.href =
+"external-funder-dashboard.html?id="
++ approved.projectId;
+
+}
+
+}
+
+setInterval(checkApproval,3000);
+
 </script>
 
 </body>
