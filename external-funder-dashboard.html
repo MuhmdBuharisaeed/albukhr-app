@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>External Funder Dashboard</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.section{
+max-width:900px;
+margin:auto;
+padding:16px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-top:12px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:14px;
+margin-bottom:12px;
+}
+
+.title{
+font-weight:700;
+font-size:13px;
+color:#777;
+}
+
+.value{
+font-size:22px;
+font-weight:800;
+color:#0f7a3d;
+margin-top:4px;
+}
+
+.input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd;
+margin-top:8px;
+}
+
+.btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:#0f7a3d;
+color:#fff;
+font-weight:700;
+margin-top:10px;
+cursor:pointer;
+}
+
+.activity{
+font-size:13px;
+color:#666;
+padding:8px 0;
+border-bottom:1px solid #eee;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+<span>💼 External Funder Dashboard</span>
+</header>
+
+<section class="section">
+
+<!-- Project -->
+<div class="card">
+<div class="title">Project</div>
+<div id="projectName" class="value">
+Loading...
+</div>
+</div>
+
+<!-- Stats -->
+<div class="grid">
+
+<div class="card">
+<div class="title">Liquidity</div>
+<div id="liquidity" class="value">0 Pi</div>
+</div>
+
+<div class="card">
+<div class="title">Reserve</div>
+<div id="reserve" class="value">0 Pi</div>
+</div>
+
+<div class="card">
+<div class="title">ROI</div>
+<div id="roi" class="value">0%</div>
+</div>
+
+<div class="card">
+<div class="title">Investors</div>
+<div id="investors" class="value">0</div>
+</div>
+
+</div>
+
+<div class="card">
+<div class="title">Status</div>
+<div id="status" class="value">LOW</div>
+</div>
+
+<!-- Add Liquidity -->
+<div class="card">
+
+<div class="title">Add Liquidity</div>
+
+<input 
+id="addAmount"
+class="input"
+placeholder="Amount"
+/>
+
+<button 
+class="btn"
+onclick="addLiquidity()">
+
+Add Liquidity
+
+</button>
+
+</div>
+
+<!-- Withdraw -->
+<div class="card">
+
+<div class="title">Withdraw Liquidity</div>
+
+<input 
+id="withdrawAmount"
+class="input"
+placeholder="Amount"
+/>
+
+<button 
+class="btn"
+onclick="withdrawLiquidity()">
+
+Withdraw Liquidity
+
+</button>
+
+</div>
+
+<!-- Activity -->
+<div class="card">
+
+<div class="title">Treasury Activity</div>
+
+<div id="activity"></div>
+
+</div>
+
+</section>
+
+<script src="external-project-engine.js"></script>
+
+<script>
+
+/* ============================= */
+
+const params =
+new URLSearchParams(window.location.search);
+
+const projectId =
+params.get("id");
+
+function loadProject(){
+
+const project =
+getExternalProjectById(projectId);
+
+if(!project) return;
+
+document.getElementById("projectName")
+.textContent = project.title;
+
+document.getElementById("liquidity")
+.textContent =
+(project.liquidity || 0) + " Pi";
+
+document.getElementById("reserve")
+.textContent =
+(project.reserve || 0) + " Pi";
+
+document.getElementById("roi")
+.textContent =
+(project.roi || 0) + "%";
+
+document.getElementById("investors")
+.textContent =
+(project.investors || 0);
+
+document.getElementById("status")
+.textContent =
+(project.riskLevel || "LOW");
+
+}
+
+/* ============================= */
+
+function addLiquidity(){
+
+const amount =
+Number(
+document.getElementById("addAmount")
+.value
+);
+
+if(!amount) return;
+
+const project =
+getExternalProjectById(projectId);
+
+project.liquidity =
+(Number(project.liquidity)||0)
++ amount;
+
+saveProject(project);
+
+recordActivity(
+"Added Liquidity",
+amount
+);
+
+loadProject();
+
+}
+
+/* ============================= */
+
+function withdrawLiquidity(){
+
+const amount =
+Number(
+document.getElementById("withdrawAmount")
+.value
+);
+
+if(!amount) return;
+
+const project =
+getExternalProjectById(projectId);
+
+project.liquidity =
+(Number(project.liquidity)||0)
+- amount;
+
+saveProject(project);
+
+recordActivity(
+"Withdraw Liquidity",
+amount
+);
+
+loadProject();
+
+}
+
+/* ============================= */
+
+function saveProject(project){
+
+let list =
+getExternalProjects();
+
+list =
+list.map(p =>
+p.projectId === project.projectId
+? project : p
+);
+
+localStorage.setItem(
+"albukhr_external_projects",
+JSON.stringify(list)
+);
+
+}
+
+/* ============================= */
+
+function recordActivity(type, amount){
+
+const box =
+document.getElementById("activity");
+
+const div =
+document.createElement("div");
+
+div.className = "activity";
+
+div.innerHTML =
+
+type + 
+" : " +
+amount +
+" Pi";
+
+box.prepend(div);
+
+}
+
+/* ============================= */
+
+loadProject();
+
+</script>
+
+</body>
+</html>
