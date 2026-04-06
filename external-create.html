@@ -120,8 +120,7 @@ textarea.input{min-height:90px}
 <script src="staking-external.js"></script>
 <script src="js/settings/settings-core.js"></script>
 <script src="js/core/albukhr-core.js"></script>
-<script src="js/external/external-engine.js"></script>
-
+<script src="external-project-engine.js"></script>
 <script>
 
 /* =============================
@@ -157,8 +156,12 @@ document.getElementById("telegramInvite")
 
 }
 
-setInterval(checkTelegramApproval,3000);
+window.addEventListener(
+"storage",
+checkTelegramApproval
+);
 
+setInterval(checkTelegramApproval,5000);
   </script>
 
 <script>
