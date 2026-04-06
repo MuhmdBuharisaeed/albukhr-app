@@ -60,8 +60,16 @@ function updateExternalStatus(projectId, status){
       p.history.push({ status, at: Date.now() });
 
       if(status === "approved"){
-        p.approvedAt = Date.now();
-        p.escrowLocked = false;  // unlock after approval
+
+p.approvedAt = Date.now();
+p.escrowLocked = false;
+
+/* CREATE LIVE PROJECT */
+
+if(typeof createExternalLiveProject === "function"){
+createExternalLiveProject(p);
+}
+
       }
 
       if(status === "rejected"){
@@ -90,9 +98,26 @@ function saveExternalStakes(list){
 
 /* ADD STAKE */
 function addExternalStake(projectId, amount){
+   
+if(typeof recordTx === "function"){
 
+recordTx({
+type:"external_stake",
+project:projectId,
+amount,
+status:"Successful"
+});
+
+}
+   
   const project = getExternalProjectById(projectId);
-
+   
+if(project.escrowLocked){
+return {
+error:"Project escrow locked"
+};
+}
+   
   if(!project || project.status !== "approved")
     return { error:"Project not approved" };
 
@@ -117,6 +142,26 @@ function addExternalStake(projectId, amount){
   return stake;
 }
 
+/* UPDATE PROJECT TOTAL */
+
+let projects = getExternalProjects();
+
+projects = projects.map(p => {
+
+if(p.projectId === projectId){
+p.totalStake =
+(Number(p.totalStake)||0) + amount;
+}
+
+return p;
+
+});
+
+localStorage.setItem(
+EXTERNAL_KEY,
+JSON.stringify(projects)
+);
+
 /* ===============================
    REWARD CALCULATION
 ================================ */
@@ -128,7 +173,13 @@ function calculateExternalRewards(){
 
   stakes.forEach(s=>{
     if(!s.reward){
-      s.reward = s.amount * 0.08;
+      const project =
+getExternalProjectById(s.projectId);
+
+const rate =
+project?.rewardRate || 0.08;
+
+s.reward = s.amount * rate;
     }
   });
 
