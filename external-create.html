@@ -54,6 +54,29 @@ gap:12px;
 margin-top:14px;
 }
 
+.risk{
+padding:4px 10px;
+border-radius:20px;
+font-size:11px;
+font-weight:700;
+display:inline-block;
+}
+
+.risk.low{
+background:#eaf6ee;
+color:#0f7a3d;
+}
+
+.risk.medium{
+background:#fff4e5;
+color:#d97706;
+}
+
+.risk.high{
+background:#fdecea;
+color:#c0392b;
+}
+
 .approved-actions .btn{
 box-shadow:0 4px 10px rgba(0,0,0,.08);
   }
@@ -114,6 +137,16 @@ box-shadow:0 4px 10px rgba(0,0,0,.08);
       id="initialLiquidity"
       placeholder="e.g. 500"
     />
+    
+    <div class="label" style="margin-top:12px">
+Risk Level
+</div>
+
+<select class="input" id="riskLevel">
+<option value="low">Low Risk</option>
+<option value="medium">Medium Risk</option>
+<option value="high">High Risk</option>
+</select>
 
     <div class="label" style="margin-top:12px">
       External Project Code
@@ -345,6 +378,8 @@ description: description.value.trim(),
 owner: owner.value.trim(),
 
 invite: invite.value.trim(),
+
+riskLevel: riskLevel.value,
 
 initialLiquidity:
 Number(initialLiquidity.value || 0),
