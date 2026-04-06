@@ -57,6 +57,7 @@ textarea.input{min-height:90px}
 
 <section class="section">
 
+<!-- CREATE FORM -->
 <div id="createForm">
 
   <!-- PROJECT INFO -->
@@ -139,66 +140,75 @@ textarea.input{min-height:90px}
 
   </div>
 
+  <!-- SUBMIT BUTTON -->
+  <button class="btn" onclick="submitExternalProject()">
+    Submit for Review
+  </button>
+
 </div>
-  
+
+
+<!-- APPROVED PANEL -->
 <div id="approvedPanel" style="display:none;">
 
-<div class="card">
+  <div class="card">
 
-<strong>✅ Project Approved</strong>
+    <strong>✅ Project Approved</strong>
 
-<p class="note">
-Your external project is now live.
-</p>
+    <p class="note">
+      Your external project is now live.
+    </p>
 
-<a id="telegramLink"
-class="btn"
-target="_blank"
-href="https://t.me/+alGsXRgAe5w4ZjNk">
+    <a 
+      id="telegramLink"
+      class="btn"
+      target="_blank"
+      href="https://t.me/+alGsXRgAe5w4ZjNk">
+      Join Telegram
+    </a>
 
-Join Telegram
+    <br><br>
 
-</a>
+    <a 
+      id="funderDashboard"
+      class="btn"
+      href="#">
+      Open Funder Dashboard
+    </a>
 
-<br><br>
-
-<a 
-id="funderDashboard"
-class="btn"
-href="#">
-
-Open Funder Dashboard
-
-</a>
-
-</div>
+  </div>
 
 </div>
-    
-  <!-- TELEGRAM GROUP -->
+
+
+<!-- TELEGRAM INVITE -->
 <div id="telegramInvite" class="card tg-box" style="display:none;">
+
   <strong>📢 Albukhr External Projects – Telegram</strong>
+
   <p class="note">
     Join our official Telegram group for all external project owners.
     Updates, approvals, escrow notices & collaboration happen there.
   </p>
+
   <a href="https://t.me/+alGsXRgAe5w4ZjNk" target="_blank">
     👉 Join Telegram Group
   </a>
+
 </div>
 
-  <!-- ESCROW NOTICE -->
-  <div class="card">
-    <strong>🔒 Albukhr Escrow Protection</strong>
-    <p class="note">
-      All submitted external projects enter escrow review.
-      Project must be approved by admin before appearing publicly.
-    </p>
-  </div>
 
-  <button class="btn" onclick="submitExternalProject()">
-    Submit for Review
-  </button>
+<!-- ESCROW NOTICE -->
+<div class="card">
+
+  <strong>🔒 Albukhr Escrow Protection</strong>
+
+  <p class="note">
+    All submitted external projects enter escrow review.
+    Project must be approved by admin before appearing publicly.
+  </p>
+
+</div>
 
 </section>
 
