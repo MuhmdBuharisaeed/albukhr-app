@@ -402,6 +402,7 @@ return project;
   }
   
 /* ============================= */
+
 function uploadProjectUpdate(){
 
 const image =
@@ -417,27 +418,37 @@ alert("Select image");
 return;
 }
 
+/* GET PROJECT */
+
+const project =
+getExternalProjectById(projectId);
+
+if(!project){
+alert("Project not found");
+return;
+}
+
 const reader = new FileReader();
 
 reader.onload = function(e){
 
 postProjectUpdate({
 
-project:project.title,
+project: project.title,
 
-projectId:project.projectId,
+projectId: project.projectId,
 
 type:"External Project",
 
-image:e.target.result,
+image: e.target.result,
 
 description,
 
-time:Date.now()
+time: Date.now()
 
 });
 
-/* IMPORTANT — Refresh Feed */
+/* Refresh Transparency Hub */
 
 window.dispatchEvent(
 new Event("projectFeedUpdated")
@@ -452,7 +463,7 @@ document.getElementById("projectImage").value="";
 
 reader.readAsDataURL(image);
 
-}
+  }
 
 /* ============================= */
 
