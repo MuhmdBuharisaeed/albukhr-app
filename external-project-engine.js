@@ -351,6 +351,37 @@ createExternalLiveProject(p);
 
 }
 
+function postProjectUpdate(data){
+
+let feed =
+JSON.parse(
+localStorage.getItem("albukhr_project_feed")
+)||[];
+
+feed.push({
+
+id:"FEED-"+Date.now(),
+
+project:data.project,
+
+projectId:data.projectId,
+
+type:data.type,
+
+image:data.image,
+
+description:data.description,
+
+time:data.time
+
+});
+
+localStorage.setItem(
+"albukhr_project_feed",
+JSON.stringify(feed)
+);
+
+}
 
 /* AUTO LOAD */
 
