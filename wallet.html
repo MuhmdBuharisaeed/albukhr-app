@@ -267,6 +267,54 @@ margin-top:12px;
 border-top:1px solid #eee;
 padding-top:10px;
   }
+
+.transparency-header{
+font-weight:700;
+margin-bottom:14px;
+color:#0f7a3d;
+}
+
+.feed-card{
+background:#fff;
+border-radius:14px;
+padding:12px;
+margin-bottom:16px;
+box-shadow:0 6px 18px rgba(0,0,0,.05);
+}
+
+.feed-header{
+display:flex;
+justify-content:space-between;
+margin-bottom:8px;
+font-size:13px;
+font-weight:600;
+}
+
+.feed-type{
+font-size:11px;
+padding:3px 8px;
+border-radius:20px;
+background:#e9f7ef;
+color:#0f7a3d;
+}
+
+.feed-img{
+width:100%;
+border-radius:12px;
+margin-top:8px;
+}
+
+.feed-desc{
+font-size:13px;
+margin-top:8px;
+color:#444;
+}
+
+.feed-time{
+font-size:11px;
+color:#888;
+margin-top:6px;
+}
   </style>
   
 <link rel="stylesheet" href="style.css">  
@@ -336,9 +384,15 @@ padding-top:10px;
   Withdraw Successful
 </div>
 
+<div class="scroll-area">
 
-<div class="scroll-area" id="projectContainer"></div>
+<div class="transparency-header">
+📸 Project Transparency Hub
+</div>
 
+<div id="projectFeed"></div>
+
+</div>
 
 <!-- =========================
      WITHDRAW MODAL
@@ -663,102 +717,63 @@ window.addEventListener("walletUpdated", renderWallet);
 /* =========================
    RENDER PROJECTS
 ========================= */
-function renderProjects(){
+
+function renderFeed(){
+
+const feed =
+JSON.parse(
+localStorage.getItem("albukhr_project_feed")
+) || [];
 
 const container =
-document.getElementById("projectContainer");
+document.getElementById("projectFeed");
 
 container.innerHTML="";
 
-if(typeof getProjectWalletBreakdown !== "function"){
-container.innerHTML =
-"<small>Wallet engine not ready</small>";
-return;
-}
-
-const breakdown =
-getProjectWalletBreakdown() || [];
-
-if(!breakdown.length){
+if(!feed.length){
 
 container.innerHTML=
-"<small>No activity yet</small>";
+"<small>No project updates yet</small>";
 
 return;
+
 }
 
-breakdown.sort(
-(a,b)=>
-(b.withdrawableCapital||0)-
-(a.withdrawableCapital||0)
-);
-
-breakdown.forEach(p=>{
+feed
+.sort((a,b)=>b.time-a.time)
+.forEach(item=>{
 
 const card =
 document.createElement("div");
 
-card.className="project-card";
+card.className="feed-card";
 
 card.innerHTML = `
 
-<div class="project-header"
-onclick="toggleBody(this,event)">
-
-<div class="project-title">
-
-<div class="project-icon">
-${getProjectIcon(p.project)}
-</div>
-
-${p.project}
-
-</div>
+<div class="feed-header">
 
 <div>
-${(p.withdrawableCapital || 0).toFixed(2)} Pi
+${item.project}
+</div>
+
+<div class="feed-type">
+${item.type}
 </div>
 
 </div>
 
-<div class="project-body">
+<img 
+src="${item.image}"
+class="feed-img"
+/>
 
-<div class="row">
-<div>Staked</div>
-<div>${(p.stake || 0).toFixed(2)} Pi</div>
+<div class="feed-desc">
+${item.description || ""}
 </div>
 
-<div class="row">
-<div>Gross Reward</div>
-<div>${(p.grossReward || 0).toFixed(2)} Pi</div>
-</div>
-
-<div class="row">
-<div>Capital Available</div>
-<div>
-${(p.withdrawableCapital || 0).toFixed(2)} Pi
-</div>
-</div>
-
-<div class="row">
-<div>Withdrawn Capital</div>
-<div>
-${(p.withdrawnCapital || 0).toFixed(2)} Pi
-</div>
-</div>
-
-<div class="withdraw-box">
-
-<button class="btn"
-style="width:100%"
-onclick="event.stopPropagation(); openWithdraw('${p.project}')">
-
-Withdraw Capital
-
-</button>
-
-</div>
-
+<div class="feed-time">
+${new Date(item.time)
+.toLocaleString()}
 </div>
 
 `;
@@ -767,6 +782,45 @@ container.appendChild(card);
 
 });
 
+}
+
+/* =========================
+   POST PROJECT UPDATE
+========================= */
+
+function postProjectUpdate(data){
+
+let feed =
+JSON.parse(
+localStorage.getItem("albukhr_project_feed")
+)||[];
+
+feed.push({
+
+id:"FEED-"+Date.now(),
+
+project:data.project,
+
+type:data.type || "Project",
+
+image:data.image,
+
+description:data.description,
+
+time:Date.now()
+
+});
+
+localStorage.setItem(
+"albukhr_project_feed",
+JSON.stringify(feed)
+);
+
+}
+
+if(typeof detectAIImage === "function"){
+const safe = detectAIImage(image);
+if(!safe) return;
 }
 
 /* =========================
@@ -818,7 +872,7 @@ withdrawAddress.value = "";
 
 closeModal();
 
-renderWallet();
+renderFeed();
 
 window.dispatchEvent(
 new CustomEvent("walletUpdated",{
@@ -830,7 +884,7 @@ detail:{type:"capital-withdraw"}
 
 /* START WALLET */
 
-renderWallet();
+renderFeed();
 
 });
 
