@@ -415,45 +415,121 @@ color:#444;
 </head>
   
 <body>  
-  <header class="header">
-  <div class="header-left">  
-    <img src="file_000000007c187246b1c01967ee086dc4.png" class="main-logo">  
-    <span class="brand">ALBUKHR</span>  
-    
-  </div>
-  <div class="header-right">  
-    
-    <div class="header-btn notification-btn" onclick="openNotifications()">
+
+<header class="header">
+
+<div class="header-left">  
+
+<img 
+src="file_000000007c187246b1c01967ee086dc4.png" 
+class="main-logo"
+/>
+
+<span class="brand">
+ALBUKHR
+</span>
+
+</div>
+
+
+<div class="header-right">  
+
+<div 
+class="header-btn notification-btn" 
+onclick="openNotifications()"
+>
 
 🔔
 
-<span id="notifBadge" class="notification-badge"></span>
+<span 
+id="notifBadge" 
+class="notification-badge"
+>
+</span>
 
 </div>  
 
 </div>
+
 </header>
-  
+
+
+
+<!-- =========================
+   WALLET NAV TABS
+========================= -->
+
 <div class="wallet-tabs">
 
-  <button class="nav-btn nav-wallet">
-    Wallet
-  </button>
+<button 
+class="nav-btn nav-wallet"
+>
 
-  <button class="nav-btn nav-trans"
-    onclick="window.location.href='transactions.html'">
-    Transactions
-  </button>
+📸 Transparency
+
+</button>
+
+
+<button 
+class="nav-btn nav-trans"
+onclick="window.location.href='transactions.html'"
+>
+
+📄 Transactions
+
+</button>
 
 </div>
+
+
+
+<!-- =========================
+   TRANSPARENCY HUB
+========================= -->
 
 <div class="scroll-area">
 
 <div class="transparency-header">
+
 📸 Project Transparency Hub
+
 </div>
 
-<div id="projectFeed" class="timeline-feed"></div>
+
+<!-- Timeline Feed -->
+
+<div 
+id="projectFeed" 
+class="timeline-feed"
+>
+
+<div class="empty-feed">
+
+No project updates yet
+
+</div>
+
+</div>
+
+
+</div>
+
+
+
+<!-- =========================
+   FEED FOOTER INFO
+========================= -->
+
+<div style="
+padding:12px 16px;
+font-size:12px;
+color:#777;
+text-align:center;
+">
+
+All project updates are published by
+Core, Internal & External project teams
+for transparency and trust.
 
 </div>
 
