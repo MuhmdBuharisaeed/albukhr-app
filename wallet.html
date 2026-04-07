@@ -874,6 +874,11 @@ closeModal();
 
 renderFeed();
 
+window.addEventListener(
+"projectFeedUpdated",
+renderFeed
+);
+
 window.dispatchEvent(
 new CustomEvent("walletUpdated",{
 detail:{type:"capital-withdraw"}
