@@ -351,7 +351,7 @@ JSON.stringify(list)
 );
 
 }
-
+/* ============================= */
 function calculateRisk(project){
 
 const liquidity =
@@ -368,7 +368,7 @@ return "MEDIUM";
 return "HIGH";
 
 }
-
+/* ============================= */
 function calculateReserveLock(project){
 
 const liquidity =
@@ -385,7 +385,7 @@ return 0.50;
 return 0.30;
 
 }
-
+/* ============================= */
 function updateReserve(project){
 
 const lock =
@@ -400,7 +400,8 @@ Math.floor(liquidity * lock);
 return project;
 
   }
-
+  
+/* ============================= */
 function uploadProjectUpdate(){
 
 const image =
@@ -435,6 +436,12 @@ description,
 time:Date.now()
 
 });
+
+/* IMPORTANT — Refresh Feed */
+
+window.dispatchEvent(
+new Event("projectFeedUpdated")
+);
 
 alert("Update uploaded");
 
