@@ -937,13 +937,13 @@ localStorage.setItem(
 JSON.stringify(feed)
 );
 
-}
+/* refresh wallet feed */
 
-if(typeof detectAIImage === "function"){
-const safe = detectAIImage(image);
-if(!safe) return;
-}
+window.dispatchEvent(
+new Event("projectFeedUpdated")
+);
 
+   }
 /* =========================
    TOGGLE PROJECT BODY
 ========================= */
@@ -997,6 +997,11 @@ JSON.stringify(dislikes)
 );
 
 renderFeed();
+
+window.addEventListener(
+"projectFeedUpdated",
+renderFeed
+);
 
 }
 
