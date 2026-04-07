@@ -365,6 +365,48 @@ font-size:11px;
 color:#888;
 margin-top:6px;
 }
+
+.timeline-actions{
+display:flex;
+gap:14px;
+margin-top:10px;
+}
+
+.timeline-actions button{
+border:none;
+background:#f4f7f6;
+padding:6px 12px;
+border-radius:10px;
+cursor:pointer;
+font-size:12px;
+}
+
+.comment-box{
+display:flex;
+gap:8px;
+margin-top:10px;
+}
+
+.comment-box input{
+flex:1;
+padding:8px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+.comment-box button{
+background:#0f7a3d;
+color:#fff;
+border:none;
+padding:8px 12px;
+border-radius:8px;
+}
+
+.comment-list{
+margin-top:8px;
+font-size:12px;
+color:#444;
+}
   </style>
   
 <link rel="stylesheet" href="style.css">  
@@ -707,22 +749,79 @@ document.createElement("div");
 
 card.className="timeline-card";
 
+const likes =
+JSON.parse(localStorage.getItem("albukhr_likes")) || {};
+
+const dislikes =
+JSON.parse(localStorage.getItem("albukhr_dislikes")) || {};
+
+const comments =
+JSON.parse(localStorage.getItem("albukhr_comments")) || {};
+
 card.innerHTML = `
 
-<div class="timeline-header"><div class="timeline-project">
+<div class="timeline-header">
+
+<div class="timeline-project">
 ${item.project}
-</div><div class="timeline-type">
+</div>
+
+<div class="timeline-type">
 ${item.type}
-</div></div><img 
+</div>
+
+</div>
+
+<img 
 src="${item.image}"
 class="timeline-image"
 />
 
 <div class="timeline-desc">
 ${item.description || ""}
-</div><div class="timeline-time">
+</div>
+
+<div class="timeline-actions">
+
+<button onclick="likePost('${item.id}')">
+👍 ${likes[item.id] || 0}
+</button>
+
+<button onclick="dislikePost('${item.id}')">
+👎 ${dislikes[item.id] || 0}
+</button>
+
+</div>
+
+<div class="comment-box">
+
+<input
+placeholder="Write comment..."
+id="comment-${item.id}"
+>
+
+<button
+onclick="addComment('${item.id}')">
+
+Post
+
+</button>
+
+</div>
+
+<div class="comment-list">
+
+${(comments[item.id] || [])
+.map(c=>`<div>💬 ${c.text}</div>`)
+.join("")}
+
+</div>
+
+<div class="timeline-time">
 ${new Date(item.time).toLocaleString()}
-</div>`;
+</div>
+
+`;
 
 container.appendChild(card);
 
@@ -786,6 +885,80 @@ body.style.display === "block"
 : "block";
 
    }
+
+function likePost(id){
+
+let likes =
+JSON.parse(
+localStorage.getItem("albukhr_likes")
+)||{};
+
+likes[id] =
+(likes[id]||0)+1;
+
+localStorage.setItem(
+"albukhr_likes",
+JSON.stringify(likes)
+);
+
+renderFeed();
+
+}
+
+function dislikePost(id){
+
+let dislikes =
+JSON.parse(
+localStorage.getItem("albukhr_dislikes")
+)||{};
+
+dislikes[id] =
+(dislikes[id]||0)+1;
+
+localStorage.setItem(
+"albukhr_dislikes",
+JSON.stringify(dislikes)
+);
+
+renderFeed();
+
+}
+
+function addComment(id){
+
+const input =
+document.getElementById(
+"comment-"+id
+);
+
+const text =
+input.value.trim();
+
+if(!text) return;
+
+let comments =
+JSON.parse(
+localStorage.getItem("albukhr_comments")
+)||{};
+
+if(!comments[id])
+comments[id]=[];
+
+comments[id].push({
+text,
+time:Date.now()
+});
+
+localStorage.setItem(
+"albukhr_comments",
+JSON.stringify(comments)
+);
+
+input.value="";
+
+renderFeed();
+
+}
 
 /* =========================
    CONFIRM CAPITAL WITHDRAW
