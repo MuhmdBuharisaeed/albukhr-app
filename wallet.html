@@ -315,6 +315,56 @@ font-size:11px;
 color:#888;
 margin-top:6px;
 }
+
+.timeline-feed{
+display:flex;
+flex-direction:column;
+gap:14px;
+}
+
+.timeline-card{
+background:#fff;
+border-radius:16px;
+padding:14px;
+box-shadow:0 6px 18px rgba(0,0,0,.05);
+}
+
+.timeline-header{
+display:flex;
+justify-content:space-between;
+margin-bottom:8px;
+}
+
+.timeline-project{
+font-weight:700;
+font-size:14px;
+}
+
+.timeline-type{
+font-size:11px;
+padding:4px 8px;
+border-radius:20px;
+background:#e8f5ee;
+color:#0f7a3d;
+}
+
+.timeline-image{
+width:100%;
+border-radius:12px;
+margin-top:8px;
+}
+
+.timeline-desc{
+font-size:13px;
+margin-top:8px;
+color:#444;
+}
+
+.timeline-time{
+font-size:11px;
+color:#888;
+margin-top:6px;
+}
   </style>
   
 <link rel="stylesheet" href="style.css">  
@@ -390,7 +440,7 @@ margin-top:6px;
 📸 Project Transparency Hub
 </div>
 
-<div id="projectFeed"></div>
+<div id="projectFeed" class="timeline-feed"></div>
 
 </div>
 
@@ -746,43 +796,30 @@ feed
 const card =
 document.createElement("div");
 
-card.className="feed-card";
+card.className="timeline-card";
 
 card.innerHTML = `
 
-<div class="feed-header">
-
-<div>
+<div class="timeline-header"><div class="timeline-project">
 ${item.project}
-</div>
-
-<div class="feed-type">
+</div><div class="timeline-type">
 ${item.type}
-</div>
-
-</div>
-
-<img 
+</div></div><img 
 src="${item.image}"
-class="feed-img"
+class="timeline-image"
 />
 
-<div class="feed-desc">
+<div class="timeline-desc">
 ${item.description || ""}
-</div>
-
-<div class="feed-time">
-${new Date(item.time)
-.toLocaleString()}
-</div>
-
-`;
+</div><div class="timeline-time">
+${new Date(item.time).toLocaleString()}
+</div>`;
 
 container.appendChild(card);
 
 });
 
-}
+   }
 
 /* =========================
    POST PROJECT UPDATE
