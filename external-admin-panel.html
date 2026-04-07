@@ -180,6 +180,22 @@ ${type.toUpperCase()}
 ${p.description || ""}
 </small>
 
+<br><br>
+
+<small>
+Approved By:
+${p.approvedBy || "-"}
+</small><br>
+
+<small>
+Time:
+${new Date(
+p.approvedAt || 
+p.rejectedAt || 
+p.createdAt
+).toLocaleString()}
+</small>
+
 ${type==="pending" ? `
 
 <div class="actions">
