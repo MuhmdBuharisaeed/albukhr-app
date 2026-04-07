@@ -235,16 +235,35 @@ function approveProject(id){
 if(!confirm("Approve this project?"))
 return;
 
-updateExternalStatus(
-id,
-"approved"
+let projects =
+getExternalProjects();
+
+projects = projects.map(p=>{
+
+if(p.projectId === id){
+
+p.status = "approved";
+
+p.approvedBy = "admin";
+
+p.approvedAt = Date.now();
+
+}
+
+return p;
+
+});
+
+localStorage.setItem(
+"albukhr_external_projects",
+JSON.stringify(projects)
 );
 
 alert("✅ Project approved");
 
 loadDashboard();
 
-}
+  }
 
 /* ============================= */
 
@@ -253,16 +272,35 @@ function rejectProject(id){
 if(!confirm("Reject this project?"))
 return;
 
-updateExternalStatus(
-id,
-"rejected"
+let projects =
+getExternalProjects();
+
+projects = projects.map(p=>{
+
+if(p.projectId === id){
+
+p.status = "rejected";
+
+p.rejectedBy = "admin";
+
+p.rejectedAt = Date.now();
+
+}
+
+return p;
+
+});
+
+localStorage.setItem(
+"albukhr_external_projects",
+JSON.stringify(projects)
 );
 
 alert("❌ Project rejected");
 
 loadDashboard();
 
-}
+  }
 
 /* ============================= */
 
