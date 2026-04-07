@@ -91,31 +91,51 @@ return getExternalProjects()
    UPDATE STATUS
 ====================================== */
 
-function updateExternalStatus(projectId,status){
+function updateExternalStatus(projectId, status){
 
-let list = getExternalProjects();
+let list =
+getExternalProjects();
 
-list = list.map(p => {
+const admin =
+localStorage.getItem("albukhr_admin")
+|| "admin";
+
+list = list.map(p=>{
 
 if(p.projectId === projectId){
 
 p.status = status;
 
+p.history =
+p.history || [];
+
+p.history.push({
+
+status,
+
+admin,
+
+timestamp: Date.now()
+
+});
+
 if(status === "approved"){
 
-p.approvedAt = Date.now();
-p.escrowLocked = false;
+p.approvedAt =
+Date.now();
 
-/* create live project */
-
-createExternalLiveProject(p);
+p.approvedBy =
+admin;
 
 }
 
 if(status === "rejected"){
 
-p.rejectedAt = Date.now();
-p.escrowLocked = true;
+p.rejectedAt =
+Date.now();
+
+p.rejectedBy =
+admin;
 
 }
 
@@ -125,10 +145,12 @@ return p;
 
 });
 
-saveExternalProjects(list);
+localStorage.setItem(
+"albukhr_external_projects",
+JSON.stringify(list)
+);
 
 }
-
 
 /* ======================================
    LIVE PROJECT ENGINE
