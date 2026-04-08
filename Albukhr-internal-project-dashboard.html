@@ -226,6 +226,55 @@ Withdraw Liquidity
 
 <div class="title">Treasury Activity</div>
 
+<!-- ===============================
+PROJECT UPDATES
+================================ -->
+
+<div class="card">
+
+<div class="project-title">
+📸 Project Updates
+</div>
+
+<input 
+type="file"
+id="projectUpdateImage"
+style="
+width:100%;
+margin-top:8px;
+padding:10px;
+border-radius:10px;
+border:1px solid #ddd;
+background:#fff;
+"
+/>
+
+<textarea
+id="projectUpdateText"
+placeholder="Describe project progress..."
+style="
+width:100%;
+margin-top:10px;
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd;
+min-height:90px;
+resize:none;
+font-family:system-ui;
+"
+></textarea>
+
+<button
+onclick="uploadProjectUpdate()"
+style="margin-top:10px;"
+>
+
+Upload Update
+
+</button>
+
+</div>
+ 
 <div id="history"></div>
 <div id="projectStakeBox"></div>
 </div>
@@ -555,6 +604,70 @@ div.innerHTML += `
 
 }
 
+function uploadProjectUpdate(){
+
+const project =
+localStorage.getItem(
+"albukhr_current_project"
+);
+
+const file =
+document.getElementById(
+"projectUpdateImage"
+).files[0];
+
+const text =
+document.getElementById(
+"projectUpdateText"
+).value;
+
+if(!file) return;
+
+const reader =
+new FileReader();
+
+reader.onload=function(){
+
+let feed =
+JSON.parse(
+localStorage.getItem(
+"albukhr_project_feed"
+)
+)||[];
+
+feed.push({
+
+id:"core_"+Date.now(),
+
+project:project,
+
+type:"Core Project",
+
+image:reader.result,
+
+description:text,
+
+time:Date.now()
+
+});
+
+localStorage.setItem(
+"albukhr_project_feed",
+JSON.stringify(feed)
+);
+
+window.dispatchEvent(
+new Event("projectFeedUpdated")
+);
+
+alert("Project update uploaded");
+
+};
+
+reader.readAsDataURL(file);
+
+}
+ 
 /* ===============================
 START
 =============================== */
