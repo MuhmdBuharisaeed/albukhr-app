@@ -895,33 +895,13 @@ btn.innerText = "Read more";
 function toggleComments(id){
 
 const box =
-document.getElementById(
-"comments-"+id
-);
-
-if(
-box.style.display === "none" ||
-box.style.display === ""
-){
-
-box.style.display = "flex";
-
-}else{
-
-box.style.display = "none";
-
-}
-
-}
-
-function toggleComments(id){
-
-const box =
 document.getElementById("comments-"+id);
 
 box.classList.toggle("comments-hidden");
 
-   }
+}
+
+}
 
 /* =========================
    EVENTS
