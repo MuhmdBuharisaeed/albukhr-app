@@ -328,6 +328,13 @@ padding:40px 0;
 display:none;
 }
 
+.comment-item{
+background:#f4f7f6;
+padding:8px;
+border-radius:8px;
+font-size:12px;
+line-height:1.4;
+}
 </style>
   
 <link rel="stylesheet" href="style.css">  
@@ -691,7 +698,6 @@ onclick="toggleComments('${item.id}')"
 </div>
 
 
-
 <div 
 class="comment-box"
 style="display:${openComments[item.id] ? 'flex' : 'none'}"
@@ -705,10 +711,23 @@ id="comment-${item.id}"
 
 <button
 onclick="addComment('${item.id}')">
-
 Post
-
 </button>
+
+</div>
+
+
+<div class="comment-list">
+
+${(comments[item.id] || [])
+.map(c=>`
+
+<div class="comment-item">
+💬 ${c.text}
+</div>
+
+`)
+.join("")}
 
 </div>
 
@@ -723,7 +742,7 @@ container.appendChild(card);
 
 });
 
-}
+   }
 
 
 /* =========================
