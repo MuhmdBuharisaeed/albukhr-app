@@ -570,6 +570,8 @@ document.querySelectorAll(".dock-item").forEach(link=>{
 
 document.addEventListener("DOMContentLoaded", function(){
 
+let openComments = {};
+
 /* =========================
    RENDER FEED
 ========================= */
@@ -691,7 +693,8 @@ onclick="toggleComments('${item.id}')"
 
 
 <div 
-class="comment-box comments-hidden"
+class="comment-box"
+style="display:${openComments[item.id] ? 'flex' : 'none'}"
 id="comments-${item.id}"
 >
 
@@ -892,12 +895,11 @@ btn.innerText = "Read more";
 
 }
 
-function toggleComments(id){
+window.toggleComments = function(id){
 
-const box =
-document.getElementById("comments-"+id);
+openComments[id] = !openComments[id];
 
-box.classList.toggle("comments-hidden");
+renderFeed();
 
 }
 
