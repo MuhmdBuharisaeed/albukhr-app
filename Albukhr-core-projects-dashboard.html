@@ -205,6 +205,10 @@ ${name}
 Open Dashboard
 </button>
 
+<button onclick="openProjectUpdates('${name}')">
+Project Updates
+</button>
+
 `;
 
 container.appendChild(card);
@@ -228,6 +232,22 @@ window.location.href =
 "Albukhr-internal-project-dashboard.html";
 
 }
+
+/* ===============================
+OPEN PROJECT UPDATES
+=============================== */
+
+function openProjectUpdates(name){
+
+localStorage.setItem(
+"albukhr_update_project",
+name
+);
+
+window.location.href =
+"core-project-updates.html";
+
+   }
 
 /* ===============================
 AUTO REFRESH
