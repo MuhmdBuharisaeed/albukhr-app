@@ -332,8 +332,6 @@ padding:40px 0;
 
 </head>
 
-<body>
-
 <div id="imageModal" class="image-modal" onclick="closeImage()">
 <img id="modalImg">
 </div>
@@ -587,7 +585,7 @@ container.innerHTML="";
 if(!feed.length){
 
 container.innerHTML=
-"<small>No project updates yet</small>";
+"<div class='empty-feed'>No project updates yet</div>";
 
 return;
 
@@ -703,11 +701,8 @@ Post
 </div>
 
 
-
 <div class="timeline-time">
-
 ${new Date(item.time).toLocaleString()}
-
 </div>
 
 `;
@@ -716,129 +711,14 @@ container.appendChild(card);
 
 });
 
-   }
-
-/* =========================
-   LIKE
-========================= */
-
-window.likePost = function(id){
-
-let likes =
-JSON.parse(
-localStorage.getItem("albukhr_likes")
-)||{};
-
-likes[id] =
-(likes[id]||0)+1;
-
-localStorage.setItem(
-"albukhr_likes",
-JSON.stringify(likes)
-);
-
-renderFeed();
-
 }
 
 
 /* =========================
-   DISLIKE
+   LIKE / DISLIKE
 ========================= */
 
-window.dislikePost = function(id){
-
-let dislikes =
-JSON.parse(
-localStorage.getItem("albukhr_dislikes")
-)||{};
-
-dislikes[id] =
-(dislikes[id]||0)+1;
-
-localStorage.setItem(
-"albukhr_dislikes",
-JSON.stringify(dislikes)
-);
-
-renderFeed();
-
-}
-
-
-/* =========================
-   COMMENT
-========================= */
-
-window.addComment = function(id){
-
-const input =
-document.getElementById(
-"comment-"+id
-);
-
-const text =
-input.value.trim();
-
-if(!text) return;
-
-let comments =
-JSON.parse(
-localStorage.getItem("albukhr_comments")
-)||{};
-
-if(!comments[id])
-comments[id]=[];
-
-comments[id].push({
-text,
-time:Date.now()
-});
-
-localStorage.setItem(
-"albukhr_comments",
-JSON.stringify(comments)
-);
-
-input.value="";
-
-renderFeed();
-
-}
-
-
-/* =========================
-   LISTEN EVENTS
-========================= */
-
-window.addEventListener(
-"projectFeedUpdated",
-renderFeed
-);
-
-window.addEventListener(
-"storage",
-renderFeed
-);
-
-function openImage(src){
-
-document.getElementById("imageModal")
-.style.display="flex";
-
-document.getElementById("modalImg")
-.src = src;
-
-}
-
-function closeImage(){
-
-document.getElementById("imageModal")
-.style.display="none";
-
- }
-
-function toggleLike(id){
+window.toggleLike = function(id){
 
 let likes =
 JSON.parse(localStorage.getItem("albukhr_likes"))||{};
@@ -874,7 +754,8 @@ renderFeed();
 
 }
 
-function toggleDislike(id){
+
+window.toggleDislike = function(id){
 
 let likes =
 JSON.parse(localStorage.getItem("albukhr_likes"))||{};
@@ -908,9 +789,75 @@ localStorage.setItem("albukhr_user_votes",JSON.stringify(votes));
 
 renderFeed();
 
-   }
+}
 
-function toggleReadMore(id){
+
+/* =========================
+   COMMENT
+========================= */
+
+window.addComment = function(id){
+
+const input =
+document.getElementById("comment-"+id);
+
+const text =
+input.value.trim();
+
+if(!text) return;
+
+let comments =
+JSON.parse(
+localStorage.getItem("albukhr_comments")
+)||{};
+
+if(!comments[id])
+comments[id]=[];
+
+comments[id].push({
+text,
+time:Date.now()
+});
+
+localStorage.setItem(
+"albukhr_comments",
+JSON.stringify(comments)
+);
+
+input.value="";
+
+renderFeed();
+
+}
+
+
+/* =========================
+   IMAGE MODAL
+========================= */
+
+window.openImage = function(src){
+
+document.getElementById("imageModal")
+.style.display="flex";
+
+document.getElementById("modalImg")
+.src = src;
+
+}
+
+window.closeImage = function(){
+
+document.getElementById("imageModal")
+.style.display="none";
+
+}
+
+
+/* =========================
+   READ MORE
+========================= */
+
+window.toggleReadMore = function(id){
 
 const desc =
 document.getElementById("desc-"+id);
@@ -936,7 +883,23 @@ btn.innerText = "Read more";
 
 }
 
-document.addEventListener("DOMContentLoaded", function(){
+
+/* =========================
+   EVENTS
+========================= */
+
+window.addEventListener(
+"projectFeedUpdated",
+renderFeed
+);
+
+window.addEventListener(
+"storage",
+renderFeed
+);
+
+
+/* START */
 
 renderFeed();
 
