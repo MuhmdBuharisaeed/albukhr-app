@@ -335,6 +335,22 @@ border-radius:8px;
 font-size:12px;
 line-height:1.4;
 }
+
+.comment-preview{
+background:#f4f7f6;
+padding:8px;
+border-radius:8px;
+font-size:12px;
+margin-bottom:6px;
+}
+
+.read-more-comments{
+color:#0f7a3d;
+font-size:12px;
+font-weight:600;
+margin-top:6px;
+cursor:pointer;
+}
 </style>
   
 <link rel="stylesheet" href="style.css">  
@@ -575,6 +591,29 @@ document.querySelectorAll(".dock-item").forEach(link=>{
   
 <script>
 
+function truncateComment(text){
+
+if(text.length > 60){
+return text.substring(0,60) + "...";
+}
+
+return text;
+
+}
+
+
+function openCommentsPage(id){
+
+localStorage.setItem(
+"albukhr_active_comment",
+id
+);
+
+window.location.href =
+"comments-section.html";
+
+}
+
 document.addEventListener("DOMContentLoaded", function(){
 
 let openComments = {};
@@ -720,14 +759,29 @@ Post
 <div class="comment-list">
 
 ${(comments[item.id] || [])
+.slice(0,3)
 .map(c=>`
 
-<div class="comment-item">
-💬 ${c.text}
+<div class="comment-preview">
+💬 ${truncateComment(c.text)}
 </div>
 
 `)
 .join("")}
+
+
+${(comments[item.id] || []).length > 3 ? `
+
+<div 
+class="read-more-comments"
+onclick="openCommentsPage('${item.id}')"
+>
+
+Read more comments
+
+</div>
+
+` : ""}
 
 </div>
 
