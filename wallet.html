@@ -838,28 +838,6 @@ document.getElementById("imageModal")
 
  }
 
-function toggleRead(id){
-
-const short =
-document.getElementById("short-"+id);
-
-const full =
-document.getElementById("full-"+id);
-
-if(full.style.display==="none"){
-
-full.style.display="inline";
-short.style.display="none";
-
-}else{
-
-full.style.display="none";
-short.style.display="inline";
-
-}
-
-}
-
 function toggleLike(id){
 
 let likes =
@@ -955,7 +933,9 @@ desc.classList.add("collapsed");
 btn.innerText = "Read more";
 
 }
-                                                      }
+
+}
+
 /* START */
 
 renderFeed();
