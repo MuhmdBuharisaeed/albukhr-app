@@ -614,11 +614,6 @@ document.createElement("div");
 
 card.className="timeline-card";
 
-const shortText =
-(item.description || "").length > 120
-? (item.description.substring(0,120)+"...")
-: item.description;
-
 card.innerHTML = `
 
 <div class="timeline-header">
@@ -633,6 +628,7 @@ ${item.type}
 
 </div>
 
+
 <div class="image-wrapper">
 
 <img 
@@ -643,12 +639,16 @@ onclick="openImage('${item.image}')"
 
 </div>
 
+
 <div 
 class="timeline-desc collapsed" 
 id="desc-${item.id}"
 >
 ${item.description || ""}
 </div>
+
+
+${(item.description || "").length > 120 ? `
 
 <div 
 class="read-more"
@@ -658,27 +658,9 @@ id="read-${item.id}"
 Read more
 </div>
 
-<span id="short-${item.id}">
-${shortText || ""}
-</span>
-
-<span 
-id="full-${item.id}"
-style="display:none"
->
-${item.description || ""}
-</span>
-
-${(item.description || "").length > 120 ? `
-<div class="read-more"
-onclick="toggleRead('${item.id}')">
-
-Read more
-
-</div>
 ` : ""}
 
-</div>
+
 
 <div class="timeline-actions">
 
@@ -702,6 +684,8 @@ onclick="toggleDislike('${item.id}')"
 
 </div>
 
+
+
 <div class="comment-box">
 
 <input
@@ -711,13 +695,19 @@ id="comment-${item.id}"
 
 <button
 onclick="addComment('${item.id}')">
+
 Post
+
 </button>
 
 </div>
 
+
+
 <div class="timeline-time">
+
 ${new Date(item.time).toLocaleString()}
+
 </div>
 
 `;
@@ -726,7 +716,7 @@ container.appendChild(card);
 
 });
 
-}
+   }
 
 /* =========================
    LIKE
