@@ -816,15 +816,6 @@ return;
 
 }
 
-feed
-.sort((a,b)=>b.time-a.time)
-.forEach(item=>{
-
-const card =
-document.createElement("div");
-
-card.className="timeline-card";
-
 const likes =
 JSON.parse(localStorage.getItem("albukhr_likes")) || {};
 
@@ -834,24 +825,35 @@ JSON.parse(localStorage.getItem("albukhr_dislikes")) || {};
 const comments =
 JSON.parse(localStorage.getItem("albukhr_comments")) || {};
 
+feed
+.sort((a,b)=>b.time-a.time)
+.forEach(item=>{
+
+const card =
+document.createElement("div");
+
+card.className="timeline-card";
+
 card.innerHTML = `
 
 <div class="timeline-header">
 
 <div class="timeline-project">
-${item.project}
+${item.project || "Project"}
 </div>
 
 <div class="timeline-type">
-${item.type}
+${item.type || "Update"}
 </div>
 
 </div>
 
+${item.image ? `
 <img 
 src="${item.image}"
 class="timeline-image"
 />
+` : ""}
 
 <div class="timeline-desc">
 ${item.description || ""}
@@ -878,9 +880,7 @@ id="comment-${item.id}"
 
 <button
 onclick="addComment('${item.id}')">
-
 Post
-
 </button>
 
 </div>
@@ -903,7 +903,7 @@ container.appendChild(card);
 
 });
 
-   }
+}
 
 /* =========================
    POST PROJECT UPDATE
@@ -1093,6 +1093,15 @@ renderFeed();
 
 });
 
+document.addEventListener(
+"DOMContentLoaded",
+renderFeed
+);
+
+window.addEventListener(
+"projectFeedUpdated",
+renderFeed
+);
 </script>
 
 </body>
