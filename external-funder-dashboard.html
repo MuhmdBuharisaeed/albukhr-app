@@ -405,65 +405,53 @@ return project;
 
 function uploadProjectUpdate(){
 
-const image =
-document.getElementById("projectImage")
-.files[0];
+const file =
+document.getElementById("projectImage").files[0];
 
 const description =
-document.getElementById("projectUpdate")
-.value;
+document.getElementById("projectUpdate").value;
 
-if(!image){
+if(!file){
 alert("Select image");
 return;
 }
 
-/* GET PROJECT */
-
 const project =
 getExternalProjectById(projectId);
-
-if(!project){
-alert("Project not found");
-return;
-}
 
 const reader = new FileReader();
 
 reader.onload = function(e){
 
-postProjectUpdate({
+let feed =
+JSON.parse(
+localStorage.getItem("albukhr_project_feed")
+) || [];
 
-project: project.title,
-
-projectId: project.projectId,
-
+feed.push({
+id:"feed-"+Date.now(),
+project:project.title,
 type:"External Project",
-
-image: e.target.result,
-
-description,
-
-time: Date.now()
-
+image:e.target.result,
+description:description,
+time:Date.now()
 });
 
-/* Refresh Transparency Hub */
-
-window.dispatchEvent(
-new Event("projectFeedUpdated")
+localStorage.setItem(
+"albukhr_project_feed",
+JSON.stringify(feed)
 );
 
-alert("Update uploaded");
+alert("Update Uploaded");
 
-document.getElementById("projectUpdate").value="";
-document.getElementById("projectImage").value="";
+/* force refresh */
+window.location.reload();
 
 };
 
-reader.readAsDataURL(image);
+reader.readAsDataURL(file);
 
-  }
+}
 
 /* ============================= */
 
