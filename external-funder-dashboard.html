@@ -419,6 +419,11 @@ return;
 const project =
 getExternalProjectById(projectId);
 
+if(!project){
+alert("Project not found");
+return;
+}
+
 const reader = new FileReader();
 
 reader.onload = function(e){
@@ -429,12 +434,19 @@ localStorage.getItem("albukhr_project_feed")
 ) || [];
 
 feed.push({
-id:"feed-"+Date.now(),
-project:project.title,
-type:"External Project",
-image:e.target.result,
-description:description,
-time:Date.now()
+
+id: "feed-" + Date.now(),
+
+project: project.title,
+
+type: "External Project",
+
+image: e.target.result,
+
+description: description,
+
+time: Date.now()
+
 });
 
 localStorage.setItem(
@@ -442,10 +454,13 @@ localStorage.setItem(
 JSON.stringify(feed)
 );
 
-alert("Update Uploaded");
+/* Refresh Wallet */
 
-/* force refresh */
-window.location.reload();
+window.dispatchEvent(
+new Event("projectFeedUpdated")
+);
+
+alert("Update Uploaded");
 
 };
 
