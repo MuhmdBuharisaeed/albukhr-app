@@ -690,13 +690,26 @@ body::before{
   </a>
 
 
-  <!-- WALLET -->
+  <!-- TRANSPARENCY HUB -->
   <a href="wallet.html" class="dock-item">
     <svg viewBox="0 0 24 24" class="dock-icon">
-      <path d="M3 7h15a2 2 0 012 2v8a2 2 0 01-2 2H3z"/>
-      <circle cx="17" cy="12" r="1.2"/>
+      
+      <!-- Document -->
+      <path d="M6 3h8l4 4v14H6z"/>
+      
+      <!-- Fold -->
+      <path d="M14 3v4h4"/>
+      
+      <!-- Lines -->
+      <path d="M8 11h8"/>
+      <path d="M8 14h8"/>
+      
+      <!-- Eye -->
+      <ellipse cx="12" cy="18" rx="4" ry="2"/>
+      <circle cx="12" cy="18" r="0.8"/>
+      
     </svg>
-    <span>Wallet</span>
+    <span>Transparency</span>
   </a>
 
 
@@ -709,7 +722,7 @@ body::before{
     <span>Services</span>
   </a>
 
-</div>
+         </div>
 
 <script>
 const current = location.pathname.split("/").pop() || "index.html";
