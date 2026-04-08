@@ -644,155 +644,8 @@ document.querySelectorAll(".dock-item").forEach(link=>{
 
 document.addEventListener("DOMContentLoaded", function(){
 
-let activeProject = null;
-
 /* =========================
-   MODAL ELEMENTS
-========================= */
-
-const withdrawModal =
-document.getElementById("withdrawModal");
-
-const withdrawAddress =
-document.getElementById("withdrawAddress");
-
-const modalProject =
-document.getElementById("modalProject");
-
-const capitalAvailable =
-document.getElementById("capitalAvailable");
-
-
-/* =========================
-   OPEN WITHDRAW
-========================= */
-
-window.openWithdraw = function(project){
-
-activeProject = project;
-
-/* Get project data */
-
-const breakdown =
-(getProjectWalletBreakdown() || [])
-.find(p=>p.project===project) || {};
-
-const capital =
-Number(breakdown.withdrawableCapital || 0);
-
-/* No capital */
-
-if(capital <= 0){
-alert("No capital available for withdraw");
-return;
-}
-
-/* Update modal */
-
-capitalAvailable.innerText =
-capital.toFixed(2) + " Pi";
-
-modalProject.innerText =
-"Withdraw from " + project;
-
-withdrawAddress.value = "";
-
-/* Open modal */
-
-withdrawModal.classList.add("active");
-
-}
-
-
-/* =========================
-   CLICK OUTSIDE CLOSE
-========================= */
-
-withdrawModal.addEventListener("click", function(e){
-
-if(e.target === withdrawModal){
-closeModal();
-}
-
-});
-
-/* =========================
-   CLOSE MODAL
-========================= */
-
-window.closeModal = function(){
-
-withdrawModal.classList.remove("active");
-
-withdrawAddress.value = "";
-
-activeProject = null;
-
-}
-
-/* =========================
-   PROJECT ICON
-========================= */
-
-function getProjectIcon(name){
-
-const key =
-typeof normalizeProjectName === "function"
-? normalizeProjectName(name)
-: name;
-
-if(
-typeof PROJECT_CONFIG !== "undefined" &&
-PROJECT_CONFIG[key]?.icon
-){
-return PROJECT_CONFIG[key].icon;
-}
-
-/* fallback icons */
-
-const n = name.toLowerCase();
-
-if(n.includes("raheem")) return "💊";
-if(n.includes("barsh")) return "🌾";
-if(n.includes("azman")) return "🧪";
-if(n.includes("khairat")) return "♻️";
-if(n.includes("urban")) return "🚍";
-if(n.includes("hauwal")) return "🌽";
-if(n.includes("labbaika")) return "🍞";
-
-return "🏢";
-
-   }
-
-/* =========================
-   WALLET SUMMARY
-========================= */
-
-function renderWallet(){
-
-const summary = getWalletSummary() || {};
-
-document.getElementById("totalStake").innerText =
-Number(summary.totalStake || 0).toFixed(2) + " Pi";
-
-document.getElementById("totalReward").innerText =
-Number(summary.grossRewards || 0).toFixed(2) + " Pi";
-
-document.getElementById("withdrawn").innerText =
-Number(summary.withdrawn || 0).toFixed(2) + " Pi";
-
-document.getElementById("available").innerText =
-Number(summary.withdrawableCapital || 0).toFixed(2) + " Pi";
-
-renderProjects();
-
-}
-
-/* Auto refresh */
-window.addEventListener("walletUpdated", renderWallet);
-
-/* =========================
-   RENDER PROJECTS
+   RENDER FEED
 ========================= */
 
 function renderFeed(){
@@ -816,15 +669,6 @@ return;
 
 }
 
-feed
-.sort((a,b)=>b.time-a.time)
-.forEach(item=>{
-
-const card =
-document.createElement("div");
-
-card.className="timeline-card";
-
 const likes =
 JSON.parse(localStorage.getItem("albukhr_likes")) || {};
 
@@ -834,24 +678,35 @@ JSON.parse(localStorage.getItem("albukhr_dislikes")) || {};
 const comments =
 JSON.parse(localStorage.getItem("albukhr_comments")) || {};
 
+feed
+.sort((a,b)=>b.time-a.time)
+.forEach(item=>{
+
+const card =
+document.createElement("div");
+
+card.className="timeline-card";
+
 card.innerHTML = `
 
 <div class="timeline-header">
 
 <div class="timeline-project">
-${item.project}
+${item.project || "Project"}
 </div>
 
 <div class="timeline-type">
-${item.type}
+${item.type || "Update"}
 </div>
 
 </div>
 
+${item.image ? `
 <img 
 src="${item.image}"
 class="timeline-image"
 />
+` : ""}
 
 <div class="timeline-desc">
 ${item.description || ""}
@@ -878,9 +733,7 @@ id="comment-${item.id}"
 
 <button
 onclick="addComment('${item.id}')">
-
 Post
-
 </button>
 
 </div>
@@ -903,66 +756,14 @@ container.appendChild(card);
 
 });
 
-   }
-
-/* =========================
-   POST PROJECT UPDATE
-========================= */
-
-function postProjectUpdate(data){
-
-let feed =
-JSON.parse(
-localStorage.getItem("albukhr_project_feed")
-)||[];
-
-feed.push({
-
-id:"FEED-"+Date.now(),
-
-project:data.project,
-
-type:data.type || "Project",
-
-image:data.image,
-
-description:data.description,
-
-time:Date.now()
-
-});
-
-localStorage.setItem(
-"albukhr_project_feed",
-JSON.stringify(feed)
-);
-
 }
 
-if(typeof detectAIImage === "function"){
-const safe = detectAIImage(image);
-if(!safe) return;
-}
 
 /* =========================
-   TOGGLE PROJECT BODY
+   LIKE
 ========================= */
 
-window.toggleBody = function(el,event){
-
-if(event && event.target.closest("button")) return;
-
-const card = el.closest(".project-card");
-const body = card.querySelector(".project-body");
-
-body.style.display =
-body.style.display === "block"
-? "none"
-: "block";
-
-   }
-
-function likePost(id){
+window.likePost = function(id){
 
 let likes =
 JSON.parse(
@@ -981,7 +782,12 @@ renderFeed();
 
 }
 
-function dislikePost(id){
+
+/* =========================
+   DISLIKE
+========================= */
+
+window.dislikePost = function(id){
 
 let dislikes =
 JSON.parse(
@@ -1000,7 +806,12 @@ renderFeed();
 
 }
 
-function addComment(id){
+
+/* =========================
+   COMMENT
+========================= */
+
+window.addComment = function(id){
 
 const input =
 document.getElementById(
@@ -1036,53 +847,23 @@ renderFeed();
 
 }
 
+
 /* =========================
-   CONFIRM CAPITAL WITHDRAW
+   LISTEN EVENTS
 ========================= */
-
-window.confirmCapitalWithdraw = function(){
-
-if(!activeProject){
-alert("No project selected");
-return;
-}
-
-const address =
-withdrawAddress.value.trim();
-
-if(!address){
-alert("Enter Pi wallet address");
-return;
-}
-
-const res =
-requestCapitalWithdraw(activeProject);
-
-if(res?.error){
-alert(res.error);
-return;
-}
-
-withdrawAddress.value = "";
-
-closeModal();
-
-renderFeed();
 
 window.addEventListener(
 "projectFeedUpdated",
 renderFeed
 );
 
-window.dispatchEvent(
-new CustomEvent("walletUpdated",{
-detail:{type:"capital-withdraw"}
-})
+window.addEventListener(
+"storage",
+renderFeed
 );
 
-}
 
-/* START WALLET */
+/* START */
 
 renderFeed();
 
