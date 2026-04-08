@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Comments</title>
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+padding-bottom:80px;
+}
+
+/* Header */
+
+.header{
+background:#0f7a3d;
+color:white;
+padding:14px;
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:700;
+}
+
+.back-btn{
+cursor:pointer;
+font-size:18px;
+}
+
+/* Container */
+
+.container{
+padding:16px;
+}
+
+/* Comment Box */
+
+.comment-input{
+display:flex;
+gap:8px;
+margin-bottom:16px;
+}
+
+.comment-input input{
+flex:1;
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd;
+}
+
+.comment-input button{
+background:#0f7a3d;
+color:white;
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+}
+
+/* Comment Card */
+
+.comment-card{
+background:white;
+padding:12px;
+border-radius:12px;
+margin-bottom:10px;
+box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.comment-text{
+font-size:14px;
+margin-bottom:6px;
+}
+
+.comment-meta{
+display:flex;
+justify-content:space-between;
+font-size:11px;
+color:#888;
+}
+
+/* Actions */
+
+.comment-actions{
+display:flex;
+gap:12px;
+margin-top:6px;
+}
+
+.comment-actions button{
+border:none;
+background:#f4f7f6;
+padding:6px 10px;
+border-radius:8px;
+cursor:pointer;
+font-size:12px;
+}
+
+/* Reply */
+
+.reply-box{
+margin-top:8px;
+display:flex;
+gap:6px;
+}
+
+.reply-box input{
+flex:1;
+padding:8px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+.reply-list{
+margin-top:8px;
+margin-left:16px;
+}
+
+.reply-item{
+background:#f4f7f6;
+padding:8px;
+border-radius:8px;
+margin-bottom:6px;
+font-size:12px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+<span class="back-btn" onclick="goBack()">←</span>
+Comments Discussion
+</div>
+
+<div class="container">
+
+<div class="comment-input">
+
+<input 
+id="newComment"
+placeholder="Write a comment..."
+>
+
+<button onclick="addComment()">
+Post
+</button>
+
+</div>
+
+<div id="commentList"></div>
+
+</div>
+
+<script>
+
+const postId =
+localStorage.getItem("albukhr_active_comment");
+
+/* =========================
+TIME AGO
+========================= */
+
+function timeAgo(time){
+
+const seconds =
+Math.floor((Date.now() - time)/1000);
+
+let interval =
+Math.floor(seconds/31536000);
+
+if(interval>=1)
+return interval+" year ago";
+
+interval =
+Math.floor(seconds/2592000);
+
+if(interval>=1)
+return interval+" month ago";
+
+interval =
+Math.floor(seconds/86400);
+
+if(interval>=1)
+return interval+" day ago";
+
+interval =
+Math.floor(seconds/3600);
+
+if(interval>=1)
+return interval+" hour ago";
+
+interval =
+Math.floor(seconds/60);
+
+if(interval>=1)
+return interval+" minute ago";
+
+return "Just now";
+
+}
+
+/* =========================
+LOAD COMMENTS
+========================= */
+
+function renderComments(){
+
+const comments =
+JSON.parse(
+localStorage.getItem("albukhr_comments")
+)||{};
+
+const likes =
+JSON.parse(
+localStorage.getItem("albukhr_comment_likes")
+)||{};
+
+const list =
+comments[postId] || [];
+
+const container =
+document.getElementById("commentList");
+
+container.innerHTML="";
+
+list
+.sort((a,b)=>b.time-a.time)
+.forEach((c,i)=>{
+
+const div =
+document.createElement("div");
+
+div.className="comment-card";
+
+div.innerHTML = `
+
+<div class="comment-text">
+${c.text}
+</div>
+
+<div class="comment-meta">
+
+<span>
+${timeAgo(c.time)}
+</span>
+
+</div>
+
+<div class="comment-actions">
+
+<button onclick="likeComment(${i})">
+
+👍 ${likes[i]||0}
+
+</button>
+
+<button onclick="toggleReply(${i})">
+
+Reply
+
+</button>
+
+</div>
+
+<div 
+class="reply-box"
+id="reply-${i}"
+style="display:none"
+>
+
+<input
+id="reply-input-${i}"
+placeholder="Write reply..."
+>
+
+<button
+onclick="addReply(${i})"
+>
+Send
+</button>
+
+</div>
+
+<div 
+class="reply-list"
+id="reply-list-${i}"
+>
+${(c.replies||[])
+.map(r=>`
+
+<div class="reply-item">
+
+💬 ${r.text}
+
+<br>
+
+<small>
+${timeAgo(r.time)}
+</small>
+
+</div>
+
+`).join("")}
+
+</div>
+
+`;
+
+container.appendChild(div);
+
+});
+
+}
+
+/* =========================
+ADD COMMENT
+========================= */
+
+function addComment(){
+
+const input =
+document.getElementById("newComment");
+
+const text =
+input.value.trim();
+
+if(!text) return;
+
+let comments =
+JSON.parse(
+localStorage.getItem("albukhr_comments")
+)||{};
+
+if(!comments[postId])
+comments[postId]=[];
+
+comments[postId].push({
+
+text,
+time:Date.now(),
+replies:[]
+
+});
+
+localStorage.setItem(
+"albukhr_comments",
+JSON.stringify(comments)
+);
+
+input.value="";
+
+renderComments();
+
+}
+
+/* =========================
+LIKE COMMENT
+========================= */
+
+function likeComment(i){
+
+let likes =
+JSON.parse(
+localStorage.getItem("albukhr_comment_likes")
+)||{};
+
+likes[i]=(likes[i]||0)+1;
+
+localStorage.setItem(
+"albukhr_comment_likes",
+JSON.stringify(likes)
+);
+
+renderComments();
+
+}
+
+/* =========================
+REPLY
+========================= */
+
+function toggleReply(i){
+
+const box =
+document.getElementById(
+"reply-"+i
+);
+
+box.style.display =
+box.style.display==="none"
+? "flex"
+: "none";
+
+}
+
+function addReply(i){
+
+const input =
+document.getElementById(
+"reply-input-"+i
+);
+
+const text =
+input.value.trim();
+
+if(!text) return;
+
+let comments =
+JSON.parse(
+localStorage.getItem("albukhr_comments")
+)||{};
+
+if(!comments[postId][i].replies)
+comments[postId][i].replies=[];
+
+comments[postId][i].replies.push({
+
+text,
+time:Date.now()
+
+});
+
+localStorage.setItem(
+"albukhr_comments",
+JSON.stringify(comments)
+);
+
+renderComments();
+
+}
+
+/* =========================
+BACK
+========================= */
+
+function goBack(){
+
+window.history.back();
+
+}
+
+/* START */
+
+renderComments();
+
+</script>
+
+</body>
+</html>
