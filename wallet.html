@@ -666,25 +666,31 @@ Read more
 class="${userVotes[item.id]==='like'?'active':''}"
 onclick="toggleLike('${item.id}')"
 >
-
 👍 ${likes[item.id] || 0}
-
 </button>
 
 <button 
 class="${userVotes[item.id]==='dislike'?'active':''}"
 onclick="toggleDislike('${item.id}')"
 >
-
 👎 ${dislikes[item.id] || 0}
+</button>
 
+<button
+onclick="toggleComments('${item.id}')"
+>
+💬 ${(comments[item.id] || []).length}
 </button>
 
 </div>
 
 
 
-<div class="comment-box">
+<div 
+class="comment-box"
+id="comments-${item.id}"
+style="display:none"
+>
 
 <input
 placeholder="Write comment..."
@@ -883,6 +889,24 @@ btn.innerText = "Read more";
 
 }
 
+function toggleComments(id){
+
+const box =
+document.getElementById(
+"comments-"+id
+);
+
+if(box.style.display==="none"){
+
+box.style.display="flex";
+
+}else{
+
+box.style.display="none";
+
+}
+
+}
 
 /* =========================
    EVENTS
