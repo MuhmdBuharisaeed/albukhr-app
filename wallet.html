@@ -407,13 +407,47 @@ margin-top:8px;
 font-size:12px;
 color:#444;
 }
+
+.image-wrapper{
+max-height:220px;
+overflow:hidden;
+border-radius:12px;
+}
+
+.timeline-image{
+width:100%;
+cursor:pointer;
+}
+
+.image-modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.8);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+}
+
+.image-modal img{
+max-width:95%;
+max-height:90%;
+border-radius:12px;
+   }
   </style>
   
 <link rel="stylesheet" href="style.css">  
 <link rel="stylesheet" href="css/global-header.css">  
 <link rel="stylesheet" href="global-buttons.css">
 </head>
-  
+
+<div id="imageModal" class="image-modal" onclick="closeImage()">
+<img id="modalImg">
+</div>
+
 <body>  
 
 <header class="header">
@@ -675,6 +709,9 @@ JSON.parse(localStorage.getItem("albukhr_likes")) || {};
 const dislikes =
 JSON.parse(localStorage.getItem("albukhr_dislikes")) || {};
 
+const userVotes =
+JSON.parse(localStorage.getItem("albukhr_user_votes")) || {};
+
 const comments =
 JSON.parse(localStorage.getItem("albukhr_comments")) || {};
 
@@ -687,39 +724,77 @@ document.createElement("div");
 
 card.className="timeline-card";
 
+const shortText =
+(item.description || "").length > 120
+? (item.description.substring(0,120)+"...")
+: item.description;
+
 card.innerHTML = `
 
 <div class="timeline-header">
 
 <div class="timeline-project">
-${item.project || "Project"}
+${item.project}
 </div>
 
 <div class="timeline-type">
-${item.type || "Update"}
+${item.type}
 </div>
 
 </div>
 
-${item.image ? `
+<div class="image-wrapper">
+
 <img 
 src="${item.image}"
 class="timeline-image"
+onclick="openImage('${item.image}')"
 />
-` : ""}
+
+</div>
 
 <div class="timeline-desc">
+
+<span id="short-${item.id}">
+${shortText || ""}
+</span>
+
+<span 
+id="full-${item.id}"
+style="display:none"
+>
 ${item.description || ""}
+</span>
+
+${(item.description || "").length > 120 ? `
+<div class="read-more"
+onclick="toggleRead('${item.id}')">
+
+Read more
+
+</div>
+` : ""}
+
 </div>
 
 <div class="timeline-actions">
 
-<button onclick="likePost('${item.id}')">
+<button 
+class="${userVotes[item.id]==='like'?'active':''}"
+onclick="toggleLike('${item.id}')"
+>
+
 👍 ${likes[item.id] || 0}
+
 </button>
 
-<button onclick="dislikePost('${item.id}')">
+<button 
+class="${userVotes[item.id]==='dislike'?'active':''}"
+onclick="toggleDislike('${item.id}')"
+>
+
 👎 ${dislikes[item.id] || 0}
+
 </button>
 
 </div>
@@ -738,14 +813,6 @@ Post
 
 </div>
 
-<div class="comment-list">
-
-${(comments[item.id] || [])
-.map(c=>`<div>💬 ${c.text}</div>`)
-.join("")}
-
-</div>
-
 <div class="timeline-time">
 ${new Date(item.time).toLocaleString()}
 </div>
@@ -757,7 +824,6 @@ container.appendChild(card);
 });
 
 }
-
 
 /* =========================
    LIKE
@@ -862,6 +928,116 @@ window.addEventListener(
 renderFeed
 );
 
+function openImage(src){
+
+document.getElementById("imageModal")
+.style.display="flex";
+
+document.getElementById("modalImg")
+.src = src;
+
+}
+
+function closeImage(){
+
+document.getElementById("imageModal")
+.style.display="none";
+
+ }
+
+function toggleRead(id){
+
+const short =
+document.getElementById("short-"+id);
+
+const full =
+document.getElementById("full-"+id);
+
+if(full.style.display==="none"){
+
+full.style.display="inline";
+short.style.display="none";
+
+}else{
+
+full.style.display="none";
+short.style.display="inline";
+
+}
+
+}
+
+function toggleLike(id){
+
+let likes =
+JSON.parse(localStorage.getItem("albukhr_likes"))||{};
+
+let dislikes =
+JSON.parse(localStorage.getItem("albukhr_dislikes"))||{};
+
+let votes =
+JSON.parse(localStorage.getItem("albukhr_user_votes"))||{};
+
+if(votes[id]==="like"){
+
+likes[id]--;
+delete votes[id];
+
+}else{
+
+likes[id]=(likes[id]||0)+1;
+
+if(votes[id]==="dislike"){
+dislikes[id]--;
+}
+
+votes[id]="like";
+
+}
+
+localStorage.setItem("albukhr_likes",JSON.stringify(likes));
+localStorage.setItem("albukhr_dislikes",JSON.stringify(dislikes));
+localStorage.setItem("albukhr_user_votes",JSON.stringify(votes));
+
+renderFeed();
+
+}
+
+function toggleDislike(id){
+
+let likes =
+JSON.parse(localStorage.getItem("albukhr_likes"))||{};
+
+let dislikes =
+JSON.parse(localStorage.getItem("albukhr_dislikes"))||{};
+
+let votes =
+JSON.parse(localStorage.getItem("albukhr_user_votes"))||{};
+
+if(votes[id]==="dislike"){
+
+dislikes[id]--;
+delete votes[id];
+
+}else{
+
+dislikes[id]=(dislikes[id]||0)+1;
+
+if(votes[id]==="like"){
+likes[id]--;
+}
+
+votes[id]="dislike";
+
+}
+
+localStorage.setItem("albukhr_likes",JSON.stringify(likes));
+localStorage.setItem("albukhr_dislikes",JSON.stringify(dislikes));
+localStorage.setItem("albukhr_user_votes",JSON.stringify(votes));
+
+renderFeed();
+
+   }
 
 /* START */
 
