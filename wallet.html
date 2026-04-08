@@ -195,6 +195,17 @@ margin-top:4px;
 cursor:pointer;
 }
 
+.timeline-desc.collapsed{
+display:-webkit-box;
+-webkit-line-clamp:3;
+-webkit-box-orient:vertical;
+overflow:hidden;
+}
+
+.timeline-desc.expanded{
+-webkit-line-clamp:unset;
+overflow:visible;
+}
 
 /* ===============================
 LIKE / DISLIKE
@@ -632,7 +643,20 @@ onclick="openImage('${item.image}')"
 
 </div>
 
-<div class="timeline-desc">
+<div 
+class="timeline-desc collapsed" 
+id="desc-${item.id}"
+>
+${item.description || ""}
+</div>
+
+<div 
+class="read-more"
+onclick="toggleReadMore('${item.id}')"
+id="read-${item.id}"
+>
+Read more
+</div>
 
 <span id="short-${item.id}">
 ${shortText || ""}
@@ -918,6 +942,30 @@ renderFeed();
 
    }
 
+function toggleReadMore(id){
+
+const desc =
+document.getElementById("desc-"+id);
+
+const btn =
+document.getElementById("read-"+id);
+
+if(desc.classList.contains("collapsed")){
+
+desc.classList.remove("collapsed");
+desc.classList.add("expanded");
+
+btn.innerText = "Show less";
+
+}else{
+
+desc.classList.remove("expanded");
+desc.classList.add("collapsed");
+
+btn.innerText = "Read more";
+
+}
+                                                      }
 /* START */
 
 renderFeed();
