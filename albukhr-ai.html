@@ -193,6 +193,22 @@ onclick="governanceHelp()">
 Governance
 </div>
 
+<div class="ai-chip" onclick="projectBuilder()">
+Build Project
+</div>
+
+<div class="ai-chip" onclick="riskAnalyzer()">
+Risk Check
+</div>
+
+<div class="ai-chip" onclick="roiPrediction()">
+ROI Estimate
+</div>
+
+<div class="ai-chip" onclick="marketplaceAI()">
+Best Projects
+</div>
+
 </div>
 
 <!-- INPUT -->
@@ -295,6 +311,51 @@ if(text.includes("idea")){
 
 generateProjectIdea();
 
+return;
+
+}
+
+/* BUILDER */
+
+if(text.includes("build")){
+
+projectBuilder();
+return;
+
+}
+
+/* RISK */
+
+if(text.includes("risk")){
+
+riskAnalyzer();
+return;
+
+}
+
+/* ROI */
+
+if(text.includes("roi")){
+
+roiPrediction();
+return;
+
+}
+
+/* CONTRIBUTOR */
+
+if(text.includes("contributor")){
+
+contributorHelp();
+return;
+
+}
+
+/* MARKET */
+
+if(text.includes("market")){
+
+marketplaceAI();
 return;
 
 }
@@ -453,6 +514,109 @@ addBot(
 );
 
   }
+
+/* =========================
+PROJECT BUILDER AI
+========================= */
+
+function projectBuilder(){
+
+addBot(
+
+"Let's build your project:\n\n"+
+"1. What is your project name?\n"+
+"2. What industry?\n"+
+"3. Required liquidity?\n"+
+"4. Target investors?\n\n"+
+"Tell me your idea."
+
+);
+
+saveMemory("mode","project_builder");
+
+}
+
+/* =========================
+RISK ANALYZER
+========================= */
+
+function riskAnalyzer(){
+
+addBot(
+
+"Project Risk Analysis:\n\n"+
+"Low Risk:\n"+
+"• Agriculture\n"+
+"• Food\n"+
+"• Essential services\n\n"+
+"Medium Risk:\n"+
+"• Transport\n"+
+"• Manufacturing\n\n"+
+"High Risk:\n"+
+"• Experimental tech\n"+
+"• Unverified business"
+
+);
+
+}
+
+/* =========================
+ROI PREDICTION
+========================= */
+
+function roiPrediction(){
+
+addBot(
+
+"Estimated ROI:\n\n"+
+"Essential Projects: 6% - 12%\n"+
+"Growth Projects: 10% - 18%\n"+
+"High Growth: 15% - 25%\n\n"+
+"ROI depends on liquidity & demand"
+
+);
+
+}
+
+/* =========================
+CONTRIBUTOR ASSISTANT
+========================= */
+
+function contributorHelp(){
+
+addBot(
+
+"How to become contributor:\n\n"+
+"1. Create project\n"+
+"2. Add liquidity\n"+
+"3. Upload updates\n"+
+"4. Engage investors\n\n"+
+"Would you like to create now?"
+
+);
+
+}
+
+/* =========================
+MARKETPLACE AI
+========================= */
+
+function marketplaceAI(){
+
+addBot(
+
+"Recommended Projects:\n\n"+
+"• Agro Farming\n"+
+"• Water Production\n"+
+"• Bakery\n"+
+"• Solar Energy\n\n"+
+"These projects perform best."
+
+);
+
+}
+
+
 
 /* DEFAULT */
 
