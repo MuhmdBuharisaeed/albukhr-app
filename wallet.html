@@ -762,8 +762,8 @@ ${timeAgo(item.time)}
 
 </div>
 
-<div class="timeline-type ${getTypeClass(item.type)}">
-${item.type}
+<div class="timeline-type ${getTypeClass(detectProjectType(item.project))}">
+${detectProjectType(item.project)}
 </div>
 
 </div>
@@ -1019,6 +1019,30 @@ window.closeImage = function(){
 
 document.getElementById("imageModal")
 .style.display="none";
+
+}
+
+function detectProjectType(project){
+
+const coreProjects = [
+"Barsh Agro",
+"Labbaika Bakery",
+"Raheem Pharma",
+"Urban Transport",
+"Khairat Recycling",
+"Azman Chemical",
+"Hauwal Maize"
+];
+
+if(coreProjects.includes(project)){
+return "Core Project";
+}
+
+if(project === "Maishayi"){
+return "Internal Project";
+}
+
+return "External Project";
 
 }
 
