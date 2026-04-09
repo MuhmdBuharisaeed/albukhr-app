@@ -70,11 +70,23 @@ function isLocked(){
 let inactivityTimer;
 
 function startAutoLock(){
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(()=>{
-    lockWallet();
-    alert("Wallet Locked");
-  }, 120000); // 2 mins
+
+const security = getSecurity();
+
+/* Only lock if 2FA enabled */
+
+if(!security.twofa) return;
+
+clearTimeout(inactivityTimer);
+
+inactivityTimer = setTimeout(()=>{
+
+lockWallet();
+
+alert("Wallet Locked");
+
+},120000);
+
 }
 
 document.addEventListener("click", startAutoLock);
@@ -93,3 +105,35 @@ function decryptData(data){
   if(!getSecurity().encrypt) return data;
   return JSON.parse(atob(data));
 }
+
+function startAutoLock(){
+
+const security = getSecurity();
+
+if(!security.twofa) return;
+
+clearTimeout(inactivityTimer);
+
+inactivityTimer = setTimeout(()=>{
+
+lockWallet();
+
+/* Optional silent lock */
+
+console.log("Wallet Auto Locked");
+
+},120000);
+
+}
+
+document.addEventListener("click",()=>{
+
+if(isLocked()){
+
+unlockWallet();
+
+}
+
+startAutoLock();
+
+});
