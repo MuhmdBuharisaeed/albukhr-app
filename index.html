@@ -597,6 +597,97 @@ body::before{
   0%{left:-40%;}
   100%{left:120%;}
    }
+
+/* ===============================
+ALBUKHR AI FLOATING
+================================ */
+
+.albukhr-ai-btn{
+
+position:fixed;
+right:18px;
+bottom:95px;
+
+width:56px;
+height:56px;
+
+border-radius:50%;
+
+background:#fff;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+box-shadow:0 8px 25px rgba(0,0,0,0.15);
+
+z-index:1200;
+
+cursor:pointer;
+
+animation:aiFloat 3s ease-in-out infinite;
+
+}
+
+.albukhr-ai-logo{
+
+width:42px;
+height:42px;
+
+}
+
+/* floating animation */
+
+@keyframes aiFloat{
+
+0%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(-6px);
+}
+
+100%{
+transform:translateY(0px);
+}
+
+}
+
+/* glow pulse */
+
+.albukhr-ai-btn::after{
+
+content:"";
+
+position:absolute;
+
+width:100%;
+height:100%;
+
+border-radius:50%;
+
+background:rgba(15,122,61,0.15);
+
+animation:aiPulse 2s infinite;
+
+z-index:-1;
+
+}
+
+@keyframes aiPulse{
+
+0%{
+transform:scale(1);
+opacity:.6;
+}
+
+100%{
+transform:scale(1.5);
+opacity:0;
+}
+
+}
 </style>
 
 <link rel="stylesheet" href="css/style.css">
@@ -664,6 +755,17 @@ body::before{
 
   <div id="assetsContainer"></div>
 </section>
+
+<!-- ===============================
+ALBUKHR AI FLOATING BUTTON
+================================ -->
+
+<div class="albukhr-ai-btn" onclick="openAlbukhrAI()">
+<img 
+src="file_000000007c187246b1c01967ee086dc4.png"
+class="albukhr-ai-logo"
+/>
+</div>
 
 <!-- ===== ALBUKHR DOCK NAV ===== -->
 
@@ -1099,6 +1201,17 @@ encryptData.addEventListener("change", e=>{
   setSecurity({...getSecurity(), encrypt:e.target.checked});
 });
 </script>
-   
+
+<script>
+
+function openAlbukhrAI(){
+
+window.location.href =
+"albukhr-ai.html";
+
+}
+
+</script>
+
 </body>
          </html>
