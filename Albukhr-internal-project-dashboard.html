@@ -604,6 +604,35 @@ div.innerHTML += `
 
 }
 
+function getProjectType(name){
+
+const CORE = [
+
+"Barsh Agro",
+"Labbaika Bakery",
+"Raheem Pharma",
+"Urban Transport",
+"Khairat Recycling",
+"Azman Chemical",
+"Hauwal Maize"
+
+];
+
+const project =
+(name || "").toLowerCase();
+
+if(CORE
+.map(p=>p.toLowerCase())
+.includes(project)){
+
+return "Internal Project"; // Core yanzu ya zama Internal
+
+}
+
+return "Internal Project"; // Duk sauran internal
+
+}
+
 function uploadProjectUpdate(){
 
 const project =
@@ -637,11 +666,11 @@ localStorage.getItem(
 
 feed.push({
 
-id:"core_"+Date.now(),
+id:"update_"+Date.now(),
 
 project:project,
 
-type:"Core Project",
+type:getProjectType(project),
 
 image:reader.result,
 
