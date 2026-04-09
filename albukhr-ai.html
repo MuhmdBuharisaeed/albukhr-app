@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Albukhr Intelligence</title>
+
+<style>
+
+body{
+margin:0;
+font-family:system-ui;
+background:#f4f7f6;
+display:flex;
+flex-direction:column;
+height:100vh;
+}
+
+/* HEADER */
+
+.ai-header{
+background:#0f7a3d;
+color:#fff;
+padding:14px;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.ai-logo{
+width:32px;
+height:32px;
+}
+
+.ai-title{
+font-weight:700;
+font-size:16px;
+}
+
+/* CHAT AREA */
+
+.ai-chat{
+flex:1;
+overflow:auto;
+padding:14px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+/* MESSAGES */
+
+.ai-msg{
+background:#fff;
+padding:10px;
+border-radius:12px;
+max-width:80%;
+font-size:13px;
+box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.ai-msg.bot{
+align-self:flex-start;
+}
+
+.ai-msg.user{
+align-self:flex-end;
+background:#0f7a3d;
+color:#fff;
+}
+
+/* INPUT */
+
+.ai-input-box{
+display:flex;
+padding:10px;
+background:#fff;
+border-top:1px solid #eee;
+}
+
+.ai-input{
+flex:1;
+padding:10px;
+border-radius:10px;
+border:1px solid #ddd;
+}
+
+.ai-send{
+background:#0f7a3d;
+color:#fff;
+border:none;
+padding:10px 14px;
+border-radius:10px;
+margin-left:8px;
+cursor:pointer;
+}
+
+/* SUGGESTIONS */
+
+.ai-suggestions{
+display:flex;
+gap:8px;
+overflow:auto;
+padding:10px;
+}
+
+.ai-chip{
+background:#e8f5ee;
+padding:6px 10px;
+border-radius:20px;
+font-size:12px;
+cursor:pointer;
+white-space:nowrap;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<div class="ai-header">
+
+<img 
+src="file_000000007c187246b1c01967ee086dc4.png"
+class="ai-logo"
+/>
+
+<div class="ai-title">
+Albukhr Intelligence
+</div>
+
+</div>
+
+<!-- CHAT -->
+
+<div id="chat" class="ai-chat">
+
+<div class="ai-msg bot">
+Hello 👋  
+I'm Albukhr Intelligence.
+
+I can help you:
+
+• Create projects  
+• Understand Albukhr  
+• Web3 strategy  
+• Pi Network integration  
+• Investment guidance
+
+Ask me anything.
+</div>
+
+</div>
+
+<!-- SUGGESTIONS -->
+
+<div class="ai-suggestions">
+
+<div class="ai-chip" onclick="askAI('How to create project')">
+Create Project
+</div>
+
+<div class="ai-chip" onclick="askAI('Explain Albukhr')">
+About Albukhr
+</div>
+
+<div class="ai-chip" onclick="askAI('Investment advice')">
+Investment Advice
+</div>
+
+<div class="ai-chip" onclick="askAI('Pi network role')">
+Pi Network
+</div>
+
+</div>
+
+<!-- INPUT -->
+
+<div class="ai-input-box">
+
+<input 
+id="userInput"
+class="ai-input"
+placeholder="Ask Albukhr Intelligence..."
+/>
+
+<button 
+class="ai-send"
+onclick="sendMsg()"
+>
+
+Send
+
+</button>
+
+</div>
+
+<script>
+
+/* SEND */
+
+function sendMsg(){
+
+const input =
+document.getElementById("userInput");
+
+const text =
+input.value.trim();
+
+if(!text) return;
+
+addUser(text);
+
+setTimeout(()=>{
+replyAI(text);
+},500);
+
+input.value="";
+
+}
+
+/* USER MSG */
+
+function addUser(text){
+
+const div =
+document.createElement("div");
+
+div.className="ai-msg user";
+
+div.innerText=text;
+
+chat.appendChild(div);
+
+scrollDown();
+
+}
+
+/* BOT MSG */
+
+function addBot(text){
+
+const div =
+document.createElement("div");
+
+div.className="ai-msg bot";
+
+div.innerText=text;
+
+chat.appendChild(div);
+
+scrollDown();
+
+}
+
+/* SCROLL */
+
+function scrollDown(){
+
+chat.scrollTop=
+chat.scrollHeight;
+
+}
+
+/* AI REPLY */
+
+function replyAI(text){
+
+text=text.toLowerCase();
+
+/* CREATE PROJECT */
+
+if(text.includes("create") || text.includes("project")){
+
+addBot(
+
+"To create project:\n\n"+
+"1. Go to marketplace\n"+
+"2. Submit project\n"+
+"3. Add liquidity\n"+
+"4. Launch investors\n\n"+
+"I can help you build idea."
+
+);
+
+return;
+
+}
+
+/* ALBUKHR */
+
+if(text.includes("albukhr")){
+
+addBot(
+
+"Albukhr is a Web3 ecosystem\n\n"+
+"Focused on:\n"+
+"• Real businesses\n"+
+"• Community investment\n"+
+"• Pi Network integration\n"+
+"• Sustainable industries"
+
+);
+
+return;
+
+}
+
+/* PI */
+
+if(text.includes("pi")){
+
+addBot(
+
+"Albukhr integrates Pi Network\n\n"+
+"• Real economy\n"+
+"• Liquidity model\n"+
+"• Web3 business layer"
+
+);
+
+return;
+
+}
+
+/* DEFAULT */
+
+addBot(
+
+"I understand.\n\n"+
+"Tell me more so I can assist."
+
+);
+
+}
+
+/* SUGGESTION */
+
+function askAI(text){
+
+document.getElementById("userInput").value=text;
+
+sendMsg();
+
+}
+
+</script>
+
+</body>
+
+</html>
