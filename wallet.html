@@ -571,7 +571,41 @@ for transparency and trust.
   <script src="capital-protection-engine.js"></script>
   <script src="js/unified-transactions.js"></script>
   <script src="js/notifications.js"></script>
-  
+
+<script>
+
+let lastScroll = 0;
+let threshold = 10;
+
+const dock =
+document.querySelector(".dock-nav");
+
+window.addEventListener("scroll",()=>{
+
+const current =
+window.pageYOffset;
+
+if(Math.abs(current-lastScroll)<=threshold)
+return;
+
+if(current > lastScroll){
+
+/* scroll down */
+dock.classList.add("hide");
+
+}else{
+
+/* scroll up */
+dock.classList.remove("hide");
+
+}
+
+lastScroll = current;
+
+});
+
+</script>
+
 <script>
 
 const withdrawSuccessBox =
