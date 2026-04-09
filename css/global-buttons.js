@@ -14,7 +14,7 @@
 position:fixed;
 bottom:10px;
 left:50%;
-transform:translateX(-50%);
+transform:translate(-50%,0);
 
 width:92%;
 max-width:480px;
@@ -32,6 +32,8 @@ align-items:center;
 box-shadow:0 10px 30px rgba(0,0,0,0.25);
 
 z-index:1000;
+
+transition:transform .35s ease;
 
 }
 
