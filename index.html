@@ -720,6 +720,63 @@ touch-action:none;
 .albukhr-ai-btn:active{
 cursor:grabbing;
 }
+
+.albukhr-ai-btn{
+
+position:fixed;
+
+right:18px;
+bottom:95px;
+
+width:58px;
+height:58px;
+
+border-radius:50%;
+
+background:#fff;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+box-shadow:0 8px 25px rgba(0,0,0,0.18);
+
+z-index:2000;
+
+cursor:grab;
+
+touch-action:none;
+
+transition:
+left .25s ease,
+top .25s ease,
+transform .25s ease;
+
+}
+
+.albukhr-ai-btn.minimized{
+
+transform:scale(.85);
+opacity:.8;
+
+}
+
+.albukhr-ai-logo{
+
+width:40px;
+height:40px;
+
+animation:aiFloat 3s ease-in-out infinite;
+
+}
+
+@keyframes aiFloat{
+
+0%{transform:translateY(0px);}
+50%{transform:translateY(-5px);}
+100%{transform:translateY(0px);}
+
+ }
 </style>
 
 <link rel="stylesheet" href="css/style.css">
@@ -1311,6 +1368,144 @@ function stopDrag(){
 isDragging = false;
 
 }
+
+</script>
+
+<script>
+
+const ai =
+document.getElementById("albukhrAI");
+
+let isDragging = false;
+let offsetX, offsetY;
+
+/* LOAD SAVED POSITION */
+
+const saved =
+JSON.parse(
+localStorage.getItem("albukhr_ai_position")
+);
+
+if(saved){
+
+ai.style.left = saved.left;
+ai.style.top = saved.top;
+
+ai.style.right = "auto";
+ai.style.bottom = "auto";
+
+}
+
+/* START DRAG */
+
+ai.addEventListener("touchstart",startDrag);
+ai.addEventListener("mousedown",startDrag);
+
+function startDrag(e){
+
+isDragging = true;
+
+const rect =
+ai.getBoundingClientRect();
+
+offsetX =
+(e.touches ? e.touches[0].clientX : e.clientX)
+- rect.left;
+
+offsetY =
+(e.touches ? e.touches[0].clientY : e.clientY)
+- rect.top;
+
+}
+
+/* DRAG */
+
+document.addEventListener("touchmove",drag);
+document.addEventListener("mousemove",drag);
+
+function drag(e){
+
+if(!isDragging) return;
+
+const x =
+(e.touches ? e.touches[0].clientX : e.clientX)
+- offsetX;
+
+const y =
+(e.touches ? e.touches[0].clientY : e.clientY)
+- offsetY;
+
+ai.style.left = x + "px";
+ai.style.top = y + "px";
+
+ai.style.right = "auto";
+ai.style.bottom = "auto";
+
+}
+
+/* STOP DRAG */
+
+document.addEventListener("touchend",stopDrag);
+document.addEventListener("mouseup",stopDrag);
+
+function stopDrag(){
+
+if(!isDragging) return;
+
+isDragging = false;
+
+/* SNAP TO EDGE */
+
+const rect =
+ai.getBoundingClientRect();
+
+const screenWidth =
+window.innerWidth;
+
+let snapX;
+
+if(rect.left < screenWidth/2){
+
+snapX = 10;
+
+}else{
+
+snapX = screenWidth - rect.width - 10;
+
+}
+
+ai.style.left = snapX + "px";
+
+/* SAVE POSITION */
+
+localStorage.setItem(
+"albukhr_ai_position",
+JSON.stringify({
+
+left: ai.style.left,
+top: ai.style.top
+
+})
+
+);
+
+/* AUTO MINIMIZE */
+
+setTimeout(()=>{
+
+ai.classList.add("minimized");
+
+},2000);
+
+}
+
+/* EXPAND ON TOUCH */
+
+ai.addEventListener("click",()=>{
+
+ai.classList.remove("minimized");
+
+});
 
 </script>
 
