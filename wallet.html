@@ -763,7 +763,9 @@ ${timeAgo(item.time)}
 </div>
 
 <div class="timeline-type ${getTypeClass(item.type)}">
-${item.type}
+${item.type === "External Project" 
+? "External Project" 
+: "Internal Project"}
 </div>
 
 </div>
@@ -1022,34 +1024,7 @@ document.getElementById("imageModal")
 
 }
 
-function detectProjectType(project){
-
-const coreProjects = [
-"Barsh Agro",
-"Labbaika Bakery",
-"Raheem Pharma",
-"Urban Transport",
-"Khairat Recycling",
-"Azman Chemical",
-"Hauwal Maize"
-];
-
-if(coreProjects.includes(project)){
-return "Core Project";
-}
-
-if(project === "Maishayi"){
-return "Internal Project";
-}
-
-return "External Project";
-
-}
-
 function getTypeClass(type){
-
-if(type === "Core Project")
-return "core-badge";
 
 if(type === "Internal Project")
 return "internal-badge";
@@ -1057,9 +1032,10 @@ return "internal-badge";
 if(type === "External Project")
 return "external-badge";
 
-return "";
+/* Default -> Internal */
+return "internal-badge";
 
-}
+   }
 
 /* =========================
    READ MORE
