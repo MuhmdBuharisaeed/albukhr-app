@@ -1318,7 +1318,46 @@ document.querySelector(".menu-icon").addEventListener("click", openDrawer);
 <script src="js/notifications.js"></script>
 <script src="project-treasury.js"></script>
 <script src="smart-liquidity-engine.js"></script>
-   
+
+<script>
+
+/* ===============================
+   ALBUKHR AI ACCESS CONTROL
+================================ */
+
+function openAlbukhrAI(){
+
+/* ADMIN BYPASS */
+
+const admin =
+localStorage.getItem("albukhr_ai_dev");
+
+if(admin === "true"){
+
+window.location.href =
+"albukhr-ai.html";
+
+return;
+
+}
+
+/* SHOW UNDER DEVELOPMENT */
+
+const note =
+document.getElementById("aiDevNote");
+
+note.classList.add("show");
+
+setTimeout(()=>{
+
+note.classList.remove("show");
+
+},2500);
+
+}
+
+</script>
+
 <script>
 const sec = getSecurity();
 
