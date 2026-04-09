@@ -178,6 +178,21 @@ Investment Advice
 Pi Network
 </div>
 
+<div class="ai-chip"
+onclick="generateProjectIdea()">
+Project Idea
+</div>
+
+<div class="ai-chip"
+onclick="investorAdvice()">
+Investment Tips
+</div>
+
+<div class="ai-chip"
+onclick="governanceHelp()">
+Governance
+</div>
+
 </div>
 
 <!-- INPUT -->
@@ -274,6 +289,36 @@ function replyAI(text){
 
 text=text.toLowerCase();
 
+/* IDEA */
+
+if(text.includes("idea")){
+
+generateProjectIdea();
+
+return;
+
+}
+
+/* INVEST */
+
+if(text.includes("invest")){
+
+investorAdvice();
+
+return;
+
+}
+
+/* GOVERNANCE */
+
+if(text.includes("governance")){
+
+governanceHelp();
+
+return;
+
+}
+
 /* CREATE PROJECT */
 
 if(text.includes("create") || text.includes("project")){
@@ -328,6 +373,86 @@ addBot(
 return;
 
 }
+
+/* =========================
+SMART MEMORY
+========================= */
+
+let memory =
+JSON.parse(
+localStorage.getItem("albukhr_ai_memory")
+) || {};
+
+function saveMemory(key,value){
+
+memory[key] = value;
+
+localStorage.setItem(
+"albukhr_ai_memory",
+JSON.stringify(memory)
+);
+
+  }
+
+function generateProjectIdea(){
+
+const ideas = [
+
+"Agro Farming Project",
+"Bakery Production",
+"Transport Business",
+"Pharmaceutical Supply",
+"Recycling Industry",
+"Food Processing",
+"Water Production",
+"Solar Energy Project"
+
+];
+
+const random =
+ideas[Math.floor(
+Math.random()*ideas.length
+)];
+
+addBot(
+
+"Here is a project idea:\n\n" +
+random +
+"\n\nWould you like help building it?"
+
+);
+
+  }
+
+function investorAdvice(){
+
+addBot(
+
+"Investment Strategy:\n\n"+
+"• Start with low risk projects\n"+
+"• Diversify investments\n"+
+"• Monitor liquidity\n"+
+"• Check project updates\n\n"+
+"Recommended: Agro & Essential services"
+
+);
+
+  }
+
+function governanceHelp(){
+
+addBot(
+
+"Albukhr Governance:\n\n"+
+"• Transparency required\n"+
+"• Liquidity protection\n"+
+"• Investor protection\n"+
+"• Community driven\n\n"+
+"All projects must follow Albukhr rules"
+
+);
+
+  }
 
 /* DEFAULT */
 
