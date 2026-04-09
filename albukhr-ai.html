@@ -209,6 +209,21 @@ ROI Estimate
 Best Projects
 </div>
 
+<div class="ai-chip"
+onclick="autoProject()">
+Auto Project
+</div>
+
+<div class="ai-chip"
+onclick="smartInvest()">
+Smart Invest
+</div>
+
+<div class="ai-chip"
+onclick="startVoice()">
+Voice AI
+</div>
+
 </div>
 
 <!-- INPUT -->
@@ -220,6 +235,15 @@ id="userInput"
 class="ai-input"
 placeholder="Ask Albukhr Intelligence..."
 />
+
+<button 
+class="ai-send"
+onclick="startVoice()"
+>
+
+🎤
+
+</button>
 
 <button 
 class="ai-send"
@@ -302,9 +326,13 @@ chat.scrollHeight;
 /* AI REPLY */
 
 function replyAI(text){
-
+  
 text=text.toLowerCase();
 
+/* SMART LEARNING */
+learnUser(text);
+conversationAI(text);
+  
 /* IDEA */
 
 if(text.includes("idea")){
@@ -615,6 +643,137 @@ addBot(
 );
 
 }
+
+/* =========================
+VOICE AI
+========================= */
+
+function startVoice(){
+
+const recognition =
+new (window.SpeechRecognition || 
+window.webkitSpeechRecognition)();
+
+recognition.lang="en-US";
+
+recognition.onresult = function(e){
+
+const text =
+e.results[0][0].transcript;
+
+document.getElementById(
+"userInput"
+).value = text;
+
+sendMsg();
+
+};
+
+recognition.start();
+
+  }
+
+/* =========================
+AUTO PROJECT GENERATOR
+========================= */
+
+function autoProject(){
+
+const industries = [
+"Agriculture",
+"Transport",
+"Pharmacy",
+"Food",
+"Energy"
+];
+
+const names = [
+"Green Agro",
+"Urban Transport",
+"Smart Bakery",
+"Solar Power",
+"Food Supply"
+];
+
+const industry =
+industries[Math.floor(
+Math.random()*industries.length
+)];
+
+const name =
+names[Math.floor(
+Math.random()*names.length
+)];
+
+addBot(
+
+"Generated Project:\n\n"+
+"Name: "+name+"\n"+
+"Industry: "+industry+"\n"+
+"Liquidity: 100-500 Pi\n"+
+"ROI: 8-18%\n\n"+
+"Would you like to create this?"
+
+);
+
+}
+
+/* =========================
+SMART INVESTMENT AI
+========================= */
+
+function smartInvest(){
+
+addBot(
+
+"Smart Investment Strategy:\n\n"+
+"• 40% Low Risk\n"+
+"• 30% Growth\n"+
+"• 20% High Return\n"+
+"• 10% Experimental\n\n"+
+"This balances risk & growth"
+
+);
+
+  }
+
+/* =========================
+LEARNING AI
+========================= */
+
+function learnUser(text){
+
+if(text.includes("agro"))
+saveMemory("interest","agriculture");
+
+if(text.includes("transport"))
+saveMemory("interest","transport");
+
+  }
+
+/* =========================
+REAL CONVERSATION
+========================= */
+
+function conversationAI(text){
+
+const interest =
+memory.interest;
+
+if(interest){
+
+addBot(
+
+"I see you like "+
+interest+
+" projects.\n\n"+
+"I recommend starting one."
+
+);
+
+}
+
+  }
 
 
 
