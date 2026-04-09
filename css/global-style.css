@@ -235,3 +235,12 @@ padding:16px;
 border-radius:14px;
 font-weight:600;
 }
+
+/* AUTO HIDE */
+
+.dock-nav.hide{
+
+transform:translate(-50%,120%);
+opacity:.98;
+
+}
