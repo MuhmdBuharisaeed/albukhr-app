@@ -357,6 +357,25 @@ font-size:11px;
 color:#888;
 margin-top:2px;
 }
+
+/* ===============================
+PROJECT TYPES
+================================ */
+
+.core-badge{
+background:#e8f5ee;
+color:#0f7a3d;
+}
+
+.internal-badge{
+background:#fff4e5;
+color:#ff9800;
+}
+
+.external-badge{
+background:#e3f2fd;
+color:#1976d2;
+}
 </style>
   
 <link rel="stylesheet" href="style.css">  
@@ -743,7 +762,7 @@ ${timeAgo(item.time)}
 
 </div>
 
-<div class="timeline-type">
+<div class="timeline-type ${getTypeClass(item.type)}">
 ${item.type}
 </div>
 
@@ -1003,6 +1022,20 @@ document.getElementById("imageModal")
 
 }
 
+function getTypeClass(type){
+
+if(type === "Core Project")
+return "core-badge";
+
+if(type === "Internal Project")
+return "internal-badge";
+
+if(type === "External Project")
+return "external-badge";
+
+return "";
+
+}
 
 /* =========================
    READ MORE
