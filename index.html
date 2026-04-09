@@ -777,6 +777,40 @@ animation:aiFloat 3s ease-in-out infinite;
 100%{transform:translateY(0px);}
 
  }
+
+.ai-dev-note{
+
+position:fixed;
+
+right:20px;
+bottom:160px;
+
+background:#0f7a3d;
+color:white;
+
+padding:8px 12px;
+
+border-radius:12px;
+
+font-size:11px;
+
+box-shadow:0 8px 20px rgba(0,0,0,0.15);
+
+opacity:0;
+transform:translateY(10px);
+
+transition:.3s ease;
+
+z-index:2000;
+
+}
+
+.ai-dev-note.show{
+
+opacity:1;
+transform:translateY(0);
+
+}
 </style>
 
 <link rel="stylesheet" href="css/style.css">
@@ -860,6 +894,13 @@ src="ALBUKHR_Logo_Optimized_1024x1024.png"
 class="albukhr-ai-logo"
 />
 
+</div>
+
+<div 
+id="aiDevNote"
+class="ai-dev-note"
+>
+Albukhr AI is under development
 </div>
 
 <!-- ===== ALBUKHR DOCK NAV ===== -->
