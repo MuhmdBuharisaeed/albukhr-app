@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sidra Project Builder — Albukhr</title>
+
+<link rel="stylesheet" href="css/global-header.css">
+
+<style>
+
+body{
+margin:0;
+background:#f4f7f6;
+font-family:system-ui;
+}
+
+.header{
+background:#0f7a3d;
+color:white;
+padding:16px;
+font-weight:700;
+}
+
+.container{
+padding:16px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.title{
+font-weight:700;
+margin-bottom:6px;
+}
+
+.row{
+font-size:13px;
+color:#666;
+margin-top:4px;
+}
+
+.stage{
+
+margin-top:10px;
+
+padding:6px 10px;
+
+border-radius:20px;
+
+display:inline-block;
+
+font-size:11px;
+
+background:#e6f5ec;
+
+color:#0f7a3d;
+
+}
+
+.actions{
+margin-top:12px;
+display:flex;
+gap:8px;
+}
+
+button{
+
+flex:1;
+
+padding:10px;
+
+border:none;
+
+border-radius:10px;
+
+cursor:pointer;
+
+font-weight:600;
+
+}
+
+.build{
+background:#0f7a3d;
+color:white;
+}
+
+.advance{
+background:#f2f7f4;
+}
+
+.empty{
+text-align:center;
+color:#777;
+padding:40px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+Sidra Project Builder
+</div>
+
+<div class="container" id="projects"></div>
+
+
+<script>
+
+const stages = [
+
+"Planning",
+"Architecture",
+"Dashboard Build",
+"App Development",
+"Testing",
+"Launch Ready"
+
+];
+
+function render(){
+
+const container =
+document.getElementById("projects");
+
+const list =
+JSON.parse(
+localStorage.getItem("albukhr_sidra_projects")
+)||[];
+
+container.innerHTML="";
+
+if(!list.length){
+
+container.innerHTML =
+"<div class='empty'>No Projects</div>";
+
+return;
+
+}
+
+list.forEach((item,index)=>{
+
+if(!item.stage) item.stage=0;
+
+const card =
+document.createElement("div");
+
+card.className="card";
+
+card.innerHTML = `
+
+<div class="title">
+${item.name}
+</div>
+
+<div class="row">
+Type: ${item.type}
+</div>
+
+<div class="row">
+${item.desc}
+</div>
+
+<div class="stage">
+${stages[item.stage]}
+</div>
+
+<div class="actions">
+
+<button
+class="build"
+onclick="advance(${index})"
+>
+Advance
+</button>
+
+<button
+class="advance"
+onclick="openProject(${index})"
+>
+Open
+</button>
+
+</div>
+
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+
+/* ADVANCE STAGE */
+
+function advance(i){
+
+let list =
+JSON.parse(
+localStorage.getItem("albukhr_sidra_projects")
+)||[];
+
+if(list[i].stage < stages.length-1){
+
+list[i].stage++;
+
+}
+
+localStorage.setItem(
+"albukhr_sidra_projects",
+JSON.stringify(list)
+);
+
+render();
+
+}
+
+
+/* OPEN PROJECT */
+
+function openProject(i){
+
+localStorage.setItem(
+"albukhr_sidra_active",
+i
+);
+
+window.location.href =
+"sidra-project-workspace.html";
+
+}
+
+
+render();
+
+</script>
+
+</body>
+</html>
