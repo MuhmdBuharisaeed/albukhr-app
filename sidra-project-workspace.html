@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sidra Workspace — Albukhr</title>
+
+<link rel="stylesheet" href="css/global-header.css">
+
+<style>
+
+body{
+margin:0;
+background:#f4f7f6;
+font-family:system-ui;
+padding-bottom:60px;
+}
+
+.header{
+background:#0f7a3d;
+color:#fff;
+padding:16px;
+font-weight:700;
+}
+
+.container{
+padding:16px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.title{
+font-weight:700;
+margin-bottom:8px;
+}
+
+textarea{
+
+width:100%;
+
+padding:10px;
+
+border-radius:10px;
+
+border:1px solid #ddd;
+
+margin-top:8px;
+
+min-height:80px;
+
+}
+
+button{
+
+margin-top:10px;
+
+padding:10px;
+
+border:none;
+
+border-radius:10px;
+
+background:#0f7a3d;
+
+color:#fff;
+
+font-weight:600;
+
+cursor:pointer;
+
+width:100%;
+
+}
+
+.task{
+
+background:#f4f7f6;
+
+padding:8px;
+
+border-radius:8px;
+
+margin-top:6px;
+
+font-size:13px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+Sidra Project Workspace
+</div>
+
+<div class="container">
+
+<!-- PROJECT INFO -->
+
+<div class="card">
+
+<div class="title">
+Project
+</div>
+
+<div id="projectName"></div>
+
+</div>
+
+
+<!-- NOTES -->
+
+<div class="card">
+
+<div class="title">
+Developer Notes
+</div>
+
+<textarea
+id="notes"
+placeholder="Write build notes..."
+></textarea>
+
+<button onclick="saveNotes()">
+Save Notes
+</button>
+
+</div>
+
+
+<!-- TASKS -->
+
+<div class="card">
+
+<div class="title">
+Project Tasks
+</div>
+
+<input 
+id="taskInput"
+placeholder="New task"
+style="width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;"
+>
+
+<button onclick="addTask()">
+Add Task
+</button>
+
+<div id="tasks"></div>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+const index =
+localStorage.getItem(
+"albukhr_sidra_active"
+);
+
+let projects =
+JSON.parse(
+localStorage.getItem(
+"albukhr_sidra_projects"
+)
+)||[];
+
+const project =
+projects[index];
+
+document.getElementById("projectName")
+.innerText = project.name;
+
+
+/* NOTES */
+
+document.getElementById("notes").value =
+project.notes || "";
+
+function saveNotes(){
+
+projects[index].notes =
+document.getElementById("notes").value;
+
+localStorage.setItem(
+"albukhr_sidra_projects",
+JSON.stringify(projects)
+);
+
+alert("Saved");
+
+}
+
+
+/* TASKS */
+
+function renderTasks(){
+
+const container =
+document.getElementById("tasks");
+
+container.innerHTML="";
+
+(project.tasks || [])
+.forEach((t,i)=>{
+
+container.innerHTML += `
+
+<div class="task">
+${t}
+</div>
+
+`;
+
+});
+
+}
+
+function addTask(){
+
+const input =
+document.getElementById("taskInput");
+
+const text =
+input.value;
+
+if(!text) return;
+
+if(!projects[index].tasks)
+projects[index].tasks=[];
+
+projects[index].tasks.push(text);
+
+localStorage.setItem(
+"albukhr_sidra_projects",
+JSON.stringify(projects)
+);
+
+input.value="";
+
+renderTasks();
+
+}
+
+renderTasks();
+
+</script>
+
+</body>
+</html>
