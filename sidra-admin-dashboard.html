@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sidra Admin — Albukhr</title>
+
+<link rel="stylesheet" href="css/global-header.css">
+
+<style>
+
+body{
+margin:0;
+background:#f4f7f6;
+font-family:system-ui;
+}
+
+.header{
+background:#0f7a3d;
+color:#fff;
+padding:16px;
+font-weight:700;
+}
+
+.container{
+padding:16px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
+}
+
+.title{
+font-weight:700;
+margin-bottom:8px;
+}
+
+.row{
+font-size:13px;
+margin-top:6px;
+color:#555;
+}
+
+.actions{
+margin-top:12px;
+display:flex;
+gap:8px;
+}
+
+button{
+
+flex:1;
+
+padding:10px;
+
+border:none;
+
+border-radius:10px;
+
+cursor:pointer;
+
+font-weight:600;
+
+}
+
+.approve{
+background:#0f7a3d;
+color:#fff;
+}
+
+.reject{
+background:#ddd;
+}
+
+.empty{
+text-align:center;
+color:#777;
+padding:40px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+Sidra Applications — Admin
+</div>
+
+<div class="container" id="applications"></div>
+
+
+<script>
+
+function render(){
+
+const container =
+document.getElementById("applications");
+
+const list =
+JSON.parse(
+localStorage.getItem("albukhr_sidra_applications")
+)||[];
+
+container.innerHTML="";
+
+if(!list.length){
+
+container.innerHTML =
+"<div class='empty'>No Applications</div>";
+
+return;
+
+}
+
+list.reverse().forEach((item,index)=>{
+
+const card =
+document.createElement("div");
+
+card.className="card";
+
+card.innerHTML = `
+
+<div class="title">
+${item.name}
+</div>
+
+<div class="row">
+Type: ${item.type}
+</div>
+
+<div class="row">
+${item.desc}
+</div>
+
+<div class="row">
+Goal: ${item.goal || "N/A"}
+</div>
+
+<div class="row">
+Email: ${item.email || "N/A"}
+</div>
+
+<div class="actions">
+
+<button 
+class="approve"
+onclick="approve(${index})"
+>
+
+Approve
+
+</button>
+
+<button
+class="reject"
+onclick="reject(${index})"
+>
+
+Reject
+
+</button>
+
+</div>
+
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+/* APPROVE */
+
+function approve(i){
+
+let apps =
+JSON.parse(
+localStorage.getItem("albukhr_sidra_applications")
+)||[];
+
+let approved =
+JSON.parse(
+localStorage.getItem("albukhr_sidra_projects")
+)||[];
+
+approved.push(apps[i]);
+
+apps.splice(i,1);
+
+localStorage.setItem(
+"albukhr_sidra_applications",
+JSON.stringify(apps)
+);
+
+localStorage.setItem(
+"albukhr_sidra_projects",
+JSON.stringify(approved)
+);
+
+alert("Approved");
+
+render();
+
+}
+
+
+/* REJECT */
+
+function reject(i){
+
+let apps =
+JSON.parse(
+localStorage.getItem("albukhr_sidra_applications")
+)||[];
+
+apps.splice(i,1);
+
+localStorage.setItem(
+"albukhr_sidra_applications",
+JSON.stringify(apps)
+);
+
+render();
+
+}
+
+
+render();
+
+</script>
+
+</body>
+</html>
