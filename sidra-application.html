@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sidra Application — Albukhr</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/global-header.css">
+
+<style>
+
+body{
+margin:0;
+background:#f4f7f6;
+font-family:system-ui;
+padding-bottom:80px;
+}
+
+.section{
+padding:16px;
+}
+
+.card{
+background:#fff;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+
+.title{
+font-weight:700;
+margin-bottom:10px;
+}
+
+input,textarea,select{
+
+width:100%;
+
+padding:12px;
+
+border-radius:10px;
+
+border:1px solid #ddd;
+
+margin-top:8px;
+
+font-family:system-ui;
+
+}
+
+textarea{
+min-height:90px;
+resize:none;
+}
+
+button{
+
+margin-top:16px;
+
+padding:14px;
+
+background:#0f7a3d;
+
+color:#fff;
+
+border:none;
+
+border-radius:12px;
+
+font-weight:700;
+
+cursor:pointer;
+
+width:100%;
+
+}
+
+.notice{
+
+font-size:12px;
+
+color:#777;
+
+margin-top:10px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<div class="header-left">
+
+<img src="file_000000007c187246b1c01967ee086dc4.png" class="main-logo">
+
+<span class="brand">
+ALBUKHR
+</span>
+
+</div>
+
+</header>
+
+<div class="section">
+
+<div class="card">
+
+<div class="title">
+Sidra Start Project Application
+</div>
+
+<div class="notice">
+Submit your project for Albukhr Sidra Start Builder
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">
+Project Name
+</div>
+
+<input 
+id="projectName"
+placeholder="Enter project name"
+/>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">
+Project Type
+</div>
+
+<select id="projectType">
+
+<option>Startup</option>
+<option>Investment Platform</option>
+<option>Community Project</option>
+<option>Business Platform</option>
+<option>Other</option>
+
+</select>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">
+Project Description
+</div>
+
+<textarea
+id="projectDesc"
+placeholder="Describe your project..."
+></textarea>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">
+Funding Goal (Optional)
+</div>
+
+<input
+id="fundingGoal"
+placeholder="Example: 5000 Pi"
+/>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">
+Contact Email
+</div>
+
+<input
+id="contactEmail"
+placeholder="Your email"
+/>
+
+</div>
+
+
+<button onclick="submitSidra()">
+
+Submit Application
+
+</button>
+
+
+</div>
+
+
+<script>
+
+function submitSidra(){
+
+const data = {
+
+name:
+document.getElementById("projectName").value,
+
+type:
+document.getElementById("projectType").value,
+
+desc:
+document.getElementById("projectDesc").value,
+
+goal:
+document.getElementById("fundingGoal").value,
+
+email:
+document.getElementById("contactEmail").value,
+
+time:Date.now()
+
+};
+
+if(!data.name || !data.desc){
+
+alert("Fill required fields");
+
+return;
+
+}
+
+let list =
+JSON.parse(
+localStorage.getItem("albukhr_sidra_applications")
+) || [];
+
+list.push(data);
+
+localStorage.setItem(
+"albukhr_sidra_applications",
+JSON.stringify(list)
+);
+
+alert("Application submitted");
+
+window.location.href="services.html";
+
+}
+
+</script>
+
+</body>
+</html>
