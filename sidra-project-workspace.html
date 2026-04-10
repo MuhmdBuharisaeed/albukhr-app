@@ -118,6 +118,111 @@ Project
 
 </div>
 
+<!-- PROJECT PROGRESS -->
+
+<div class="card">
+
+<div class="title">
+Project Progress
+</div>
+
+<div style="
+height:8px;
+background:#eee;
+border-radius:10px;
+overflow:hidden;
+margin-top:8px;
+">
+
+<div 
+id="progressBar"
+style="
+height:100%;
+width:0%;
+background:#0f7a3d;
+">
+</div>
+
+</div>
+
+<div 
+id="progressText"
+style="
+font-size:12px;
+margin-top:6px;
+color:#666;
+">
+0%
+</div>
+
+<button onclick="increaseProgress()">
+Update Progress
+</button>
+
+</div>
+
+<!-- TEAM -->
+
+<div class="card">
+
+<div class="title">
+Team Assignment
+</div>
+
+<input 
+id="teamInput"
+placeholder="Add team member"
+/>
+
+<button onclick="addTeam()">
+Add Member
+</button>
+
+<div id="teamList"></div>
+
+</div>
+
+<!-- MILESTONES -->
+
+<div class="card">
+
+<div class="title">
+Milestones
+</div>
+
+<input 
+id="milestoneInput"
+placeholder="Add milestone"
+/>
+
+<button onclick="addMilestone()">
+Add Milestone
+</button>
+
+<div id="milestoneList"></div>
+
+</div>
+
+<!-- FUNDING -->
+
+<div class="card">
+
+<div class="title">
+Funding Tracker
+</div>
+
+<input 
+id="fundInput"
+placeholder="Add funding"
+/>
+
+<button onclick="addFunding()">
+Add Funding
+</button>
+
+<div id="fundingTotal"></div>
+
+</div>
 
 <!-- NOTES -->
 
@@ -229,6 +334,181 @@ ${t}
 });
 
 }
+
+/* =========================
+PROGRESS
+========================= */
+
+function increaseProgress(){
+
+if(!projects[index].progress)
+projects[index].progress = 0;
+
+projects[index].progress += 10;
+
+if(projects[index].progress > 100)
+projects[index].progress = 100;
+
+saveProjects();
+renderProgress();
+
+}
+
+function renderProgress(){
+
+const progress =
+projects[index].progress || 0;
+
+document.getElementById("progressBar")
+.style.width = progress + "%";
+
+document.getElementById("progressText")
+.innerText = progress + "%";
+
+}
+
+
+/* =========================
+TEAM
+========================= */
+
+function addTeam(){
+
+const input =
+document.getElementById("teamInput");
+
+if(!projects[index].team)
+projects[index].team=[];
+
+projects[index].team.push(input.value);
+
+input.value="";
+
+saveProjects();
+renderTeam();
+
+}
+
+function renderTeam(){
+
+const div =
+document.getElementById("teamList");
+
+div.innerHTML="";
+
+(projects[index].team || [])
+.forEach(t=>{
+
+div.innerHTML += `
+<div class="task">
+👤 ${t}
+</div>
+`;
+
+});
+
+}
+
+
+/* =========================
+MILESTONE
+========================= */
+
+function addMilestone(){
+
+const input =
+document.getElementById("milestoneInput");
+
+if(!projects[index].milestones)
+projects[index].milestones=[];
+
+projects[index].milestones.push(input.value);
+
+input.value="";
+
+saveProjects();
+renderMilestones();
+
+}
+
+function renderMilestones(){
+
+const div =
+document.getElementById("milestoneList");
+
+div.innerHTML="";
+
+(projects[index].milestones || [])
+.forEach(m=>{
+
+div.innerHTML += `
+<div class="task">
+🎯 ${m}
+</div>
+`;
+
+});
+
+}
+
+
+/* =========================
+FUNDING
+========================= */
+
+function addFunding(){
+
+const input =
+document.getElementById("fundInput");
+
+const amount =
+Number(input.value);
+
+if(!projects[index].funding)
+projects[index].funding=0;
+
+projects[index].funding += amount;
+
+input.value="";
+
+saveProjects();
+renderFunding();
+
+}
+
+function renderFunding(){
+
+const fund =
+projects[index].funding || 0;
+
+document.getElementById("fundingTotal")
+.innerText = fund + " Pi";
+
+}
+
+
+/* =========================
+SAVE
+========================= */
+
+function saveProjects(){
+
+localStorage.setItem(
+"albukhr_sidra_projects",
+JSON.stringify(projects)
+);
+
+}
+
+
+/* =========================
+LOAD
+========================= */
+
+renderProgress();
+renderTeam();
+renderMilestones();
+renderFunding();
 
 function addTask(){
 
