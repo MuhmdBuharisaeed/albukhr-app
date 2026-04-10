@@ -214,17 +214,15 @@ color:#555;
 line-height:1.7;
 ">
 
-<b>English Policy</b><br><br>
-
 • Projects must be real and implementable<br>
 • No fraud or misleading projects allowed<br>
 • Albukhr may assist in dashboard or full app building<br>
 • Project creators must provide updates regularly<br>
 • Funding transparency is required<br>
-• Albukhr maintains governance oversight<br><br>
+• Albukhr maintains governance oversight
 
-<b></b><br><br>
 </div>
+
 </div>
 
 
@@ -238,11 +236,11 @@ id="policyAgree"
 style="margin-right:6px"
 >
 
-I agree to Albukhr Sidra Policy  
+I agree to Albukhr Sidra Policy
 
 </label>
 
-</div>
+  </div>
 
 <button onclick="submitSidra()">
 
@@ -263,10 +261,7 @@ document.getElementById("policyAgree").checked;
 
 if(!agree){
 
-alert(
-"You must agree to policy\n\n"+
-""
-);
+alert("You must agree to Albukhr Sidra Policy");
 
 return;
 
@@ -295,10 +290,7 @@ time:Date.now()
 
 if(!data.name || !data.desc){
 
-alert(
-"Fill required fields\n\n"+
-""
-);
+alert("Please fill required fields");
 
 return;
 
@@ -316,14 +308,11 @@ localStorage.setItem(
 JSON.stringify(list)
 );
 
-alert(
-"Application submitted successfully\n\n"+
-""
-);
+alert("Application submitted successfully");
 
 window.location.href="services.html";
 
-  }
+}
 
 </script>
 
