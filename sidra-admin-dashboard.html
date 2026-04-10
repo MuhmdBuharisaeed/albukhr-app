@@ -158,6 +158,10 @@ ${item.name}
 </div>
 
 <div class="row">
+Priority: ${item.priority || "Pending"}
+</div>
+
+<div class="row">
 Type: ${item.type}
 </div>
 
@@ -172,6 +176,36 @@ Goal: ${item.goal || "N/A"}
 <div class="row">
 Email: ${item.email || "N/A"}
 </div>
+
+<div class="row" style="margin-top:10px">
+Admin Note
+</div>
+
+<textarea
+id="note-${index}"
+placeholder="Write admin review..."
+style="
+width:100%;
+margin-top:6px;
+padding:8px;
+border-radius:8px;
+border:1px solid #ddd;
+font-size:12px;
+"
+></textarea>
+
+
+<div class="row">
+Project Score (1-10)
+</div>
+
+<input
+type="number"
+id="score-${index}"
+min="1"
+max="10"
+placeholder="Score"
+/>
 
 <div class="actions">
 
@@ -288,12 +322,34 @@ JSON.parse(
 localStorage.getItem("albukhr_sidra_projects")
 )||[];
 
-approved.push(apps[i]);
+const note =
+document.getElementById("note-"+i).value;
 
-saveHistory(
-"Approved",
-apps[i].name
-);
+const score =
+document.getElementById("score-"+i).value;
+
+const project = apps[i];
+
+project.adminNote = note || "";
+project.score = score || 5;
+
+/* PRIORITY */
+
+if(project.score >=8){
+project.priority="High";
+}
+else if(project.score >=5){
+project.priority="Medium";
+}
+else{
+project.priority="Low";
+}
+
+/* LOG HISTORY */
+
+logHistory("Approved",project);
+
+approved.push(project);
 
 apps.splice(i,1);
 
@@ -310,9 +366,9 @@ JSON.stringify(approved)
 alert("Approved");
 
 render();
+renderHistory();
 
   }
-
 
 /* REJECT */
 
@@ -323,10 +379,16 @@ JSON.parse(
 localStorage.getItem("albukhr_sidra_applications")
 )||[];
 
-saveHistory(
-"Rejected",
-apps[i].name
-);
+const note =
+document.getElementById("note-"+i).value;
+
+const project = apps[i];
+
+project.adminNote = note || "Rejected";
+
+/* LOG HISTORY */
+
+logHistory("Rejected",project);
 
 apps.splice(i,1);
 
@@ -336,13 +398,35 @@ JSON.stringify(apps)
 );
 
 render();
+renderHistory();
 
   }
 
+function rankProjects(){
+
+let projects =
+JSON.parse(
+localStorage.getItem("albukhr_sidra_projects")
+)||[];
+
+projects.sort((a,b)=>{
+
+return (b.score || 0) - (a.score || 0);
+
+});
+
+localStorage.setItem(
+"albukhr_sidra_projects",
+JSON.stringify(projects)
+);
+
+  }
 
 render();
 
 renderHistory();
+
+rankProjects();
 
 </script>
 
