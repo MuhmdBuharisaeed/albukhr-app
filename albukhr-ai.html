@@ -224,6 +224,22 @@ onclick="startVoice()">
 Voice AI
 </div>
 
+<div class="ai-chip" onclick="sidraBuilder()">
+Sidra Project
+</div>
+
+<div class="ai-chip" onclick="sidraStrategy()">
+Sidra Strategy
+</div>
+
+<div class="ai-chip" onclick="startupRoadmap()">
+Startup Roadmap
+</div>
+
+<div class="ai-chip" onclick="businessModelAI()">
+Business Model
+</div>
+
 </div>
 
 <!-- INPUT -->
@@ -328,6 +344,23 @@ chat.scrollHeight;
 function replyAI(text){
   
 text=text.toLowerCase();
+
+/* SIDRA IDEA */
+
+if(text.includes("sidra")){
+sidraStrategy();
+return;
+}
+
+if(text.includes("startup")){
+startupRoadmap();
+return;
+}
+
+if(text.includes("business")){
+businessModelAI();
+return;
+}
 
 /* SMART LEARNING */
 learnUser(text);
@@ -736,6 +769,90 @@ addBot(
 );
 
   }
+
+/* =========================
+SIDRA PROJECT BUILDER
+========================= */
+
+function sidraBuilder(){
+
+addBot(
+
+"Sidra Project Builder:\n\n"+
+"1. Project name?\n"+
+"2. Business type?\n"+
+"3. Community value?\n"+
+"4. Funding requirement?\n\n"+
+"I will help you build Sidra startup."
+
+);
+
+saveMemory("mode","sidra_builder");
+
+}
+
+/* =========================
+SIDRA STRATEGY
+========================= */
+
+function sidraStrategy(){
+
+addBot(
+
+"Sidra Strategy:\n\n"+
+"Sidra allows:\n"+
+"• Business projects\n"+
+"• Community platforms\n"+
+"• Investment groups\n\n"+
+"You don't need full app initially.\n"+
+"You can start with dashboard\n"+
+"then scale to full app."
+
+);
+
+}
+
+/* =========================
+STARTUP ROADMAP
+========================= */
+
+function startupRoadmap(){
+
+addBot(
+
+"Startup Roadmap:\n\n"+
+"Phase 1: Idea\n"+
+"Phase 2: Community\n"+
+"Phase 3: Funding\n"+
+"Phase 4: Dashboard\n"+
+"Phase 5: Full App\n\n"+
+"This is best Sidra strategy."
+
+);
+
+  }
+
+/* =========================
+BUSINESS MODEL AI
+========================= */
+
+function businessModelAI(){
+
+addBot(
+
+"Business Model:\n\n"+
+"Revenue Sources:\n"+
+"• Investment returns\n"+
+"• Service fees\n"+
+"• Marketplace\n"+
+"• Premium features\n\n"+
+"This builds sustainable project."
+
+);
+
+}
+
+
 
 /* =========================
 LEARNING AI
