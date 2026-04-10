@@ -347,7 +347,7 @@ project.priority="Low";
 
 /* LOG HISTORY */
 
-logHistory("Approved",project);
+saveHistory("Approved",project.name);
 
 approved.push(project);
 
@@ -362,6 +362,8 @@ localStorage.setItem(
 "albukhr_sidra_projects",
 JSON.stringify(approved)
 );
+
+rankProjects();
 
 alert("Approved");
 
@@ -388,7 +390,7 @@ project.adminNote = note || "Rejected";
 
 /* LOG HISTORY */
 
-logHistory("Rejected",project);
+saveHistory("Rejected",project.name);
 
 apps.splice(i,1);
 
