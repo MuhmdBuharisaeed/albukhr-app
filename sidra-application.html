@@ -260,14 +260,18 @@ const agree =
 document.getElementById("policyAgree").checked;
 
 if(!agree){
-
 alert("You must agree to Albukhr Sidra Policy");
-
 return;
-
 }
 
+/* GENERATE ID */
+
+const id =
+"SIDRA-" + Date.now();
+
 const data = {
+
+id:id,
 
 name:
 document.getElementById("projectName").value,
@@ -284,16 +288,19 @@ document.getElementById("fundingGoal").value,
 email:
 document.getElementById("contactEmail").value,
 
+status:"Pending",
+
+note:"",
+
+date:new Date().toLocaleString(),
+
 time:Date.now()
 
 };
 
 if(!data.name || !data.desc){
-
 alert("Please fill required fields");
-
 return;
-
 }
 
 let list =
@@ -312,7 +319,7 @@ alert("Application submitted successfully");
 
 window.location.href="services.html";
 
-}
+  }
 
 </script>
 
