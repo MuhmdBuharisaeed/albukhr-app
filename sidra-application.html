@@ -179,7 +179,7 @@ Funding Goal (Optional)
 
 <input
 id="fundingGoal"
-placeholder="Example: 5000 Pi"
+placeholder="Example: ₦500,000"
 />
 
 </div>
@@ -198,6 +198,61 @@ placeholder="Your email"
 
 </div>
 
+<!-- ===============================
+ALBUKHR SIDRA POLICY
+================================ -->
+
+<div class="card">
+
+<div class="title">
+Albukhr Sidra Policy
+</div>
+
+<div style="
+font-size:13px;
+color:#555;
+line-height:1.7;
+">
+
+<b>English Policy</b><br><br>
+
+• Projects must be real and implementable<br>
+• No fraud or misleading projects allowed<br>
+• Albukhr may assist in dashboard or full app building<br>
+• Project creators must provide updates regularly<br>
+• Funding transparency is required<br>
+• Albukhr maintains governance oversight<br><br>
+
+<b>Dokokin Hausa</b><br><br>
+
+• Dole project ya zama na gaske kuma mai yiwuwa<br>
+• Ba a yarda da yaudara ko karya ba<br>
+• Albukhr na iya taimakawa gina dashboard ko app<br>
+• Mai project zai rika bada sabbin bayanai<br>
+• Dole a tabbatar da gaskiya wajen funding<br>
+• Albukhr na da ikon kulawa da governance
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<label style="font-size:13px">
+
+<input 
+type="checkbox"
+id="policyAgree"
+style="margin-right:6px"
+>
+
+I agree to Albukhr Sidra Policy  
+(Na amince da ka'idojin Albukhr)
+
+</label>
+
+</div>
 
 <button onclick="submitSidra()">
 
@@ -212,6 +267,20 @@ Submit Application
 <script>
 
 function submitSidra(){
+
+const agree =
+document.getElementById("policyAgree").checked;
+
+if(!agree){
+
+alert(
+"You must agree to policy\n\n"+
+"Dole ka amince da ka'idoji"
+);
+
+return;
+
+}
 
 const data = {
 
@@ -236,7 +305,10 @@ time:Date.now()
 
 if(!data.name || !data.desc){
 
-alert("Fill required fields");
+alert(
+"Fill required fields\n\n"+
+"Cika dukkan muhimman bayanai"
+);
 
 return;
 
@@ -254,11 +326,14 @@ localStorage.setItem(
 JSON.stringify(list)
 );
 
-alert("Application submitted");
+alert(
+"Application submitted successfully\n\n"+
+"An tura application cikin nasara"
+);
 
 window.location.href="services.html";
 
-}
+  }
 
 </script>
 
