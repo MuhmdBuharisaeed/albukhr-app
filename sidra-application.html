@@ -336,6 +336,16 @@ Submit Application
 
 function submitPayment(){
 
+const plan =
+document.querySelector(
+"input[name='plan']:checked"
+);
+
+if(!plan){
+alert("Select pricing plan");
+return;
+}
+
 const file =
 document.getElementById(
 "paymentReceipt"
@@ -361,6 +371,7 @@ localStorage.getItem(
 )
 );
 
+req.plan = plan.value;
 req.payment="submitted";
 req.receipt=reader.result;
 
@@ -557,51 +568,6 @@ document
 
 })();
 
-<div id="paymentBox" style="display:none">
-
-<div class="card">
-
-<strong>Sidra Builder Fee</strong>
-
-<div class="notice">
-
-Sidra Builder Service Fee  
-₦150,000 — ₦500,000 depending on scope
-
-</div>
-
-<div class="label">
-Bank Account
-</div>
-
-<input 
-class="input"
-readonly
-value="BUHARI SAIDU — OPAY — 6113107463"
-/>
-
-<div class="label" style="margin-top:12px">
-Upload Payment Receipt
-</div>
-
-<input 
-type="file"
-class="input"
-id="paymentReceipt"
-/>
-
-<button class="btn"
-onclick="submitPayment()"
->
-
-Submit Payment
-
-</button>
-
-</div>
-
-</div>
-
 function submitPayment(){
 
 const plan =
@@ -654,37 +620,6 @@ file.files[0]
 );
 
   }
-
-/* REJECTED */
-
-if(request.status==="rejected"){
-
-statusBox.innerHTML=`
-
-<div class="card">
-
-<strong>Application Rejected</strong>
-
-<div class="notice">
-
-Your project was not approved.
-
-You may submit another idea.
-
-</div>
-
-</div>
-
-`;
-
-document
-.getElementById("sidraForm")
-.classList.remove("disabled");
-
-}
-
-})();
-
 
 </script>
 
