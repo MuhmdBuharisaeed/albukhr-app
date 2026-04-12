@@ -90,6 +90,59 @@ Admin review is required before project incubation.
 
 </p>
 
+<!-- PRICING -->
+
+<div class="card">
+
+<strong>Sidra Builder Plans</strong>
+
+<div class="notice">
+
+Starter — ₦150,000  
+• Basic project structure  
+• Dashboard setup  
+• Project guidance  
+
+<br><br>
+
+Standard — ₦300,000  
+• Full dashboard  
+• Investor structure  
+• Admin controls  
+• Governance setup  
+
+<br><br>
+
+Enterprise — ₦500,000  
+• Full platform build  
+• Custom features  
+• Funding structure  
+• Technical deployment
+
+</div>
+
+</div>
+
+<div class="card">
+
+<strong>Service Scope</strong>
+
+<div class="notice">
+
+Albukhr Sidra Builder Includes:
+
+• Startup architecture  
+• Project dashboard  
+• Investor system  
+• Governance setup  
+• Transparency tools  
+
+Note:  
+Final price depends on project complexity.
+
+</div>
+
+</div>
 
 <!-- STATUS -->
 
@@ -149,6 +202,54 @@ id="contactEmail"
 
 </div>
 
+<div 
+id="paymentBox"
+style="display:none"
+>
+
+<div class="card">
+
+<strong>Payment Required</strong>
+
+<div class="notice">
+
+Your project has been approved.  
+Complete payment to start incubation.
+
+</div>
+
+<div class="label">
+Bank Account
+</div>
+
+<input 
+class="input"
+readonly
+value="BUHARI SAIDU — OPAY — 6113107463"
+/>
+
+<div class="label" style="margin-top:12px">
+Upload Receipt
+</div>
+
+<input 
+type="file"
+class="input"
+id="paymentReceipt"
+/>
+
+<button 
+class="btn"
+onclick="submitPayment()"
+>
+
+Submit Payment
+
+</button>
+
+</div>
+
+</div>
 
 <!-- POLICY -->
 
@@ -188,6 +289,51 @@ Submit Application
 
 
 <script>
+
+function submitPayment(){
+
+const file =
+document.getElementById(
+"paymentReceipt"
+);
+
+if(!file.files.length){
+
+alert("Upload receipt");
+
+return;
+
+}
+
+const reader =
+new FileReader();
+
+reader.onload = function(){
+
+let req =
+JSON.parse(
+localStorage.getItem(
+"albukhr_sidra_my_request"
+)
+);
+
+req.payment="submitted";
+req.receipt=reader.result;
+
+localStorage.setItem(
+"albukhr_sidra_my_request",
+JSON.stringify(req)
+);
+
+alert("Payment Submitted");
+
+};
+
+reader.readAsDataURL(
+file.files[0]
+);
+
+}
 
 /* SUBMIT */
 
@@ -269,6 +415,13 @@ document
 .getElementById("sidraForm")
 .classList.add("disabled");
 
+if(request.status==="approved"){
+
+document
+.getElementById("paymentBox")
+.style.display="block";
+
+}
 
 /* PENDING */
 
