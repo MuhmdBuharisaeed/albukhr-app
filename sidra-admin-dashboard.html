@@ -351,6 +351,27 @@ saveHistory("Approved",project.name);
 
 approved.push(project);
 
+let my =
+JSON.parse(
+localStorage.getItem(
+"albukhr_sidra_my_request"
+)
+);
+
+if(my && my.id === project.id){
+
+my.status = "approved";
+my.adminNote = project.adminNote;
+my.priority = project.priority;
+my.score = project.score;
+
+localStorage.setItem(
+"albukhr_sidra_my_request",
+JSON.stringify(my)
+);
+
+}
+
 apps.splice(i,1);
 
 localStorage.setItem(
@@ -391,6 +412,25 @@ project.adminNote = note || "Rejected";
 /* LOG HISTORY */
 
 saveHistory("Rejected",project.name);
+
+let my =
+JSON.parse(
+localStorage.getItem(
+"albukhr_sidra_my_request"
+)
+);
+
+if(my && my.id === project.id){
+
+my.status = "rejected";
+my.adminNote = project.adminNote;
+
+localStorage.setItem(
+"albukhr_sidra_my_request",
+JSON.stringify(my)
+);
+
+}
 
 apps.splice(i,1);
 
