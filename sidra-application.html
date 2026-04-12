@@ -568,59 +568,6 @@ document
 
 })();
 
-function submitPayment(){
-
-const plan =
-document.querySelector(
-"input[name='plan']:checked"
-);
-
-if(!plan){
-alert("Select pricing plan");
-return;
-}
-
-const file =
-document.getElementById(
-"paymentReceipt"
-);
-
-if(!file.files.length){
-alert("Upload receipt");
-return;
-}
-
-const reader =
-new FileReader();
-
-reader.onload = function(){
-
-let req =
-JSON.parse(
-localStorage.getItem(
-"albukhr_sidra_my_request"
-)
-);
-
-req.plan = plan.value;
-req.payment="submitted";
-req.receipt=reader.result;
-
-localStorage.setItem(
-"albukhr_sidra_my_request",
-JSON.stringify(req)
-);
-
-alert("Payment Submitted");
-
-};
-
-reader.readAsDataURL(
-file.files[0]
-);
-
-  }
-
 </script>
 
 
