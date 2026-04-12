@@ -335,6 +335,93 @@ document
 
 }
 
+<div id="paymentBox" style="display:none">
+
+<div class="card">
+
+<strong>Sidra Builder Fee</strong>
+
+<div class="notice">
+
+Sidra Builder Service Fee  
+₦150,000 — ₦500,000 depending on scope
+
+</div>
+
+<div class="label">
+Bank Account
+</div>
+
+<input 
+class="input"
+readonly
+value="BUHARI SAIDU — OPAY — 6113107463"
+/>
+
+<div class="label" style="margin-top:12px">
+Upload Payment Receipt
+</div>
+
+<input 
+type="file"
+class="input"
+id="paymentReceipt"
+/>
+
+<button class="btn"
+onclick="submitPayment()"
+>
+
+Submit Payment
+
+</button>
+
+</div>
+
+</div>
+
+function submitPayment(){
+
+const file =
+document.getElementById("paymentReceipt");
+
+if(!file.files.length){
+
+alert("Upload receipt");
+
+return;
+
+}
+
+const reader =
+new FileReader();
+
+reader.onload = function(){
+
+let req =
+JSON.parse(
+localStorage.getItem(
+"albukhr_sidra_my_request"
+)
+);
+
+req.payment="submitted";
+req.receipt=reader.result;
+
+localStorage.setItem(
+"albukhr_sidra_my_request",
+JSON.stringify(req)
+);
+
+alert("Payment submitted");
+
+};
+
+reader.readAsDataURL(
+file.files[0]
+);
+
+  }
 
 /* REJECTED */
 
