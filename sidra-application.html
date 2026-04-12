@@ -148,6 +148,53 @@ Final price depends on project complexity.
 
 <div id="statusBox"></div>
 
+<!-- PRICING -->
+
+<div id="pricingBox" style="display:none">
+
+<div class="card">
+
+<strong>Choose Sidra Builder Plan</strong>
+
+<div class="notice">
+
+Starter — ₦150,000  
+Basic dashboard + project setup
+
+<br><br>
+
+Standard — ₦300,000  
+Investor system + governance
+
+<br><br>
+
+Enterprise — ₦500,000  
+Full startup platform build
+
+</div>
+
+<label>
+<input type="radio" name="plan" value="Starter">
+Starter
+</label>
+
+<br>
+
+<label>
+<input type="radio" name="plan" value="Standard">
+Standard
+</label>
+
+<br>
+
+<label>
+<input type="radio" name="plan" value="Enterprise">
+Enterprise
+</label>
+
+</div>
+
+</div>
 
 <!-- FORM -->
 
@@ -202,10 +249,7 @@ id="contactEmail"
 
 </div>
 
-<div 
-id="paymentBox"
-style="display:none"
->
+<div id="paymentBox" style="display:none">
 
 <div class="card">
 
@@ -213,8 +257,8 @@ style="display:none"
 
 <div class="notice">
 
-Your project has been approved.  
-Complete payment to start incubation.
+Your project has been approved  
+Complete payment to start incubation
 
 </div>
 
@@ -415,13 +459,6 @@ document
 .getElementById("sidraForm")
 .classList.add("disabled");
 
-if(request.status==="approved"){
-
-document
-.getElementById("paymentBox")
-.style.display="block";
-
-}
 
 /* PENDING */
 
@@ -435,9 +472,8 @@ statusBox.innerHTML=`
 
 <div class="notice">
 
-Your Sidra request is under review.
-
-Please wait for admin approval.
+Your Sidra request is under review  
+Please wait for admin approval
 
 </div>
 
@@ -460,9 +496,8 @@ statusBox.innerHTML=`
 
 <div class="notice">
 
-Your project has been approved.
-
-Proceed to next step
+Your project has been approved  
+Proceed with payment
 
 </div>
 
@@ -483,10 +518,44 @@ Continue on Telegram
 `;
 
 document
+.getElementById("pricingBox")
+.style.display="block";
+
+document
+.getElementById("paymentBox")
+.style.display="block";
+
+}
+
+
+/* REJECTED */
+
+if(request.status==="rejected"){
+
+statusBox.innerHTML=`
+
+<div class="card">
+
+<strong>Application Rejected</strong>
+
+<div class="notice">
+
+Your project was not approved  
+You may submit another idea
+
+</div>
+
+</div>
+
+`;
+
+document
 .getElementById("sidraForm")
 .classList.remove("disabled");
 
 }
+
+})();
 
 <div id="paymentBox" style="display:none">
 
@@ -535,15 +604,24 @@ Submit Payment
 
 function submitPayment(){
 
+const plan =
+document.querySelector(
+"input[name='plan']:checked"
+);
+
+if(!plan){
+alert("Select pricing plan");
+return;
+}
+
 const file =
-document.getElementById("paymentReceipt");
+document.getElementById(
+"paymentReceipt"
+);
 
 if(!file.files.length){
-
 alert("Upload receipt");
-
 return;
-
 }
 
 const reader =
@@ -558,6 +636,7 @@ localStorage.getItem(
 )
 );
 
+req.plan = plan.value;
 req.payment="submitted";
 req.receipt=reader.result;
 
@@ -566,7 +645,7 @@ localStorage.setItem(
 JSON.stringify(req)
 );
 
-alert("Payment submitted");
+alert("Payment Submitted");
 
 };
 
