@@ -73,7 +73,7 @@ pointer-events:none
 
 </head>
 
-<body data-page="services">
+<body>
 
 <header class="header">
 <h1 class="brand">ALBUKHR</h1>
@@ -84,69 +84,14 @@ pointer-events:none
 <h3>🚀 Sidra Start Builder</h3>
 
 <p class="muted">
-
 Submit your startup for Albukhr Sidra Builder  
-Admin review is required before project incubation.
-
+Admin review required before incubation
 </p>
-
-<!-- PRICING -->
-
-<div class="card">
-
-<strong>Sidra Builder Plans</strong>
-
-<div class="notice">
-
-Starter — ₦150,000  
-• Basic project structure  
-• Dashboard setup  
-• Project guidance  
-
-<br><br>
-
-Standard — ₦300,000  
-• Full dashboard  
-• Investor structure  
-• Admin controls  
-• Governance setup  
-
-<br><br>
-
-Enterprise — ₦500,000  
-• Full platform build  
-• Custom features  
-• Funding structure  
-• Technical deployment
-
-</div>
-
-</div>
-
-<div class="card">
-
-<strong>Service Scope</strong>
-
-<div class="notice">
-
-Albukhr Sidra Builder Includes:
-
-• Startup architecture  
-• Project dashboard  
-• Investor system  
-• Governance setup  
-• Transparency tools  
-
-Note:  
-Final price depends on project complexity.
-
-</div>
-
-</div>
 
 <!-- STATUS -->
 
 <div id="statusBox"></div>
+
 
 <!-- PRICING -->
 
@@ -159,42 +104,27 @@ Final price depends on project complexity.
 <div class="notice">
 
 Starter — ₦150,000  
-Basic dashboard + project setup
-
-<br><br>
-
 Standard — ₦300,000  
-Investor system + governance
-
-<br><br>
-
-Enterprise — ₦500,000  
-Full startup platform build
+Enterprise — ₦500,000
 
 </div>
 
 <label>
-<input type="radio" name="plan" value="Starter">
-Starter
-</label>
-
-<br>
+<input type="radio" name="plan" value="Starter"> Starter
+</label><br>
 
 <label>
-<input type="radio" name="plan" value="Standard">
-Standard
-</label>
-
-<br>
+<input type="radio" name="plan" value="Standard"> Standard
+</label><br>
 
 <label>
-<input type="radio" name="plan" value="Enterprise">
-Enterprise
+<input type="radio" name="plan" value="Enterprise"> Enterprise
 </label>
 
 </div>
 
 </div>
+
 
 <!-- FORM -->
 
@@ -205,118 +135,41 @@ Enterprise
 <div class="label">Project Name</div>
 <input class="input" id="projectName">
 
-<div class="label" style="margin-top:12px">Project Type</div>
+<div class="label">Project Type</div>
 
 <select class="select" id="projectType">
-
 <option>Startup</option>
 <option>Business Platform</option>
 <option>Community Project</option>
 <option>Investment Platform</option>
-
 </select>
 
+<div class="label">Project Description</div>
+<textarea class="input" id="projectDesc"></textarea>
 
-<div class="label" style="margin-top:12px">
-Project Description
-</div>
+<div class="label">Funding Goal</div>
+<input class="input" id="fundingGoal">
 
-<textarea
-class="input"
-id="projectDesc"
-></textarea>
-
-
-<div class="label" style="margin-top:12px">
-Funding Goal
-</div>
-
-<input
-class="input"
-id="fundingGoal"
-placeholder="Optional"
-/>
-
-
-<div class="label" style="margin-top:12px">
-Contact Email
-</div>
-
-<input
-class="input"
-id="contactEmail"
-/>
+<div class="label">Contact Email</div>
+<input class="input" id="contactEmail">
 
 </div>
 
-<div id="paymentBox" style="display:none">
-
-<div class="card">
-
-<strong>Payment Required</strong>
-
-<div class="notice">
-
-Your project has been approved  
-Complete payment to start incubation
-
-</div>
-
-<div class="label">
-Bank Account
-</div>
-
-<input 
-class="input"
-readonly
-value="BUHARI SAIDU — OPAY — 6113107463"
-/>
-
-<div class="label" style="margin-top:12px">
-Upload Receipt
-</div>
-
-<input 
-type="file"
-class="input"
-id="paymentReceipt"
-/>
-
-<button 
-class="btn"
-onclick="submitPayment()"
->
-
-Submit Payment
-
-</button>
-
-</div>
-
-</div>
-
-<!-- POLICY -->
 
 <div class="card">
 
 <strong>Albukhr Sidra Policy</strong>
 
 <div class="notice">
-
-• Projects must be real and implementable  
-• No fraud or misleading projects allowed  
-• Albukhr may assist dashboard or full app  
-• Updates required regularly  
-• Governance oversight enforced  
-
+• Real projects only  
+• No fraud  
+• Governance oversight  
+• Transparency required
 </div>
 
-<label style="margin-top:10px;display:block">
-
+<label>
 <input type="checkbox" id="agree">
-
 I agree to Albukhr Sidra Policy
-
 </label>
 
 </div>
@@ -329,10 +182,99 @@ Submit Application
 </div>
 
 
+<!-- PAYMENT (OUTSIDE FORM) -->
+
+<div id="paymentBox" style="display:none">
+
+<div class="card">
+
+<strong>Payment Required</strong>
+
+<div class="notice">
+Project approved — complete payment
+</div>
+
+<div class="label">Bank Account</div>
+
+<input 
+class="input"
+readonly
+value="BUHARI SAIDU — OPAY — 6113107463"
+/>
+
+<div class="label">Upload Receipt</div>
+
+<input 
+type="file"
+class="input"
+id="paymentReceipt"
+/>
+
+<button class="btn" onclick="submitPayment()">
+Submit Payment
+</button>
+
+</div>
+
+</div>
+
 </section>
 
 
 <script>
+
+/* SUBMIT */
+
+function submitSidra(){
+
+if(!agree.checked){
+alert("Agree to policy");
+return;
+}
+
+if(!projectName.value || !projectDesc.value){
+alert("Fill required fields");
+return;
+}
+
+const data = {
+
+id:"SIDRA-"+Date.now(),
+name:projectName.value,
+type:projectType.value,
+desc:projectDesc.value,
+goal:fundingGoal.value,
+email:contactEmail.value,
+status:"pending",
+createdAt:Date.now()
+
+};
+
+let list =
+JSON.parse(
+localStorage.getItem(
+"albukhr_sidra_applications"
+)
+)||[];
+
+list.push(data);
+
+localStorage.setItem(
+"albukhr_sidra_applications",
+JSON.stringify(list)
+);
+
+localStorage.setItem(
+"albukhr_sidra_my_request",
+JSON.stringify(data)
+);
+
+location.reload();
+
+}
+
+
+/* PAYMENT */
 
 function submitPayment(){
 
@@ -352,11 +294,8 @@ document.getElementById(
 );
 
 if(!file.files.length){
-
 alert("Upload receipt");
-
 return;
-
 }
 
 const reader =
@@ -385,67 +324,7 @@ alert("Payment Submitted");
 };
 
 reader.readAsDataURL(
-file.files[0]
-);
-
-}
-
-/* SUBMIT */
-
-function submitSidra(){
-
-if(!agree.checked){
-alert("Agree to policy");
-return;
-}
-
-if(!projectName.value || !projectDesc.value){
-alert("Fill required fields");
-return;
-}
-
-const data = {
-
-id:"SIDRA-"+Date.now(),
-
-name:projectName.value,
-
-type:projectType.value,
-
-desc:projectDesc.value,
-
-goal:fundingGoal.value,
-
-email:contactEmail.value,
-
-status:"pending",
-
-createdAt:Date.now()
-
-};
-
-let list =
-JSON.parse(
-localStorage.getItem(
-"albukhr_sidra_applications"
-)
-)||[];
-
-list.push(data);
-
-localStorage.setItem(
-"albukhr_sidra_applications",
-JSON.stringify(list)
-);
-
-/* LOCK */
-
-localStorage.setItem(
-"albukhr_sidra_my_request",
-JSON.stringify(data)
-);
-
-location.reload();
+file.files[0]);
 
 }
 
@@ -471,31 +350,21 @@ document
 .classList.add("disabled");
 
 
-/* PENDING */
-
 if(request.status==="pending"){
 
 statusBox.innerHTML=`
 
 <div class="card">
-
 <strong>Application Under Review</strong>
-
 <div class="notice">
-
-Your Sidra request is under review  
-Please wait for admin approval
-
+Waiting admin approval
 </div>
-
 </div>
 
 `;
 
 }
 
-
-/* APPROVED */
 
 if(request.status==="approved"){
 
@@ -505,21 +374,10 @@ statusBox.innerHTML=`
 
 <strong>Application Approved</strong>
 
-<div class="notice">
-
-Your project has been approved  
-Proceed with payment
-
-</div>
-
-<a 
-href="https://t.me/albukhrinvestmentlimited"
-target="_blank">
+<a href="https://t.me/albukhrinvestmentlimited" target="_blank">
 
 <button class="btn">
-
 Continue on Telegram
-
 </button>
 
 </a>
@@ -528,69 +386,23 @@ Continue on Telegram
 
 `;
 
-document
-.getElementById("pricingBox")
-.style.display="block";
-
-document
-.getElementById("paymentBox")
-.style.display="block";
+pricingBox.style.display="block";
+paymentBox.style.display="block";
 
 }
 
-
-/* REJECTED */
 
 if(request.status==="rejected"){
 
 statusBox.innerHTML=`
 
 <div class="card">
-
 <strong>Application Rejected</strong>
-
-<div class="notice">
-
-Your project was not approved  
-You may submit another idea
-
-</div>
-
 </div>
 
 `;
 
-document
-.getElementById("sidraForm")
-.classList.remove("disabled");
-
-}
-
-})();
-
-</script>
-
-
-<script>
-
-/* BLOCK IF PENDING */
-
-(function(){
-
-const req =
-JSON.parse(
-localStorage.getItem(
-"albukhr_sidra_my_request"
-)
-);
-
-if(!req) return;
-
-if(req.status==="pending"){
-
-document
-.getElementById("sidraForm")
-.classList.add("disabled");
+sidraForm.classList.remove("disabled");
 
 }
 
