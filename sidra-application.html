@@ -1,312 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Sidra Application — Albukhr</title>
+<title>Sidra Start Application | ALBUKHR</title>
 
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="css/global-header.css">
 
 <style>
 
-body{
-margin:0;
-background:#f4f7f6;
-font-family:system-ui;
-padding-bottom:80px;
-}
-
-.section{
-padding:16px;
-}
+.section{padding:16px}
 
 .card{
 background:#fff;
-padding:16px;
 border-radius:16px;
-margin-bottom:14px;
-box-shadow:0 6px 18px rgba(0,0,0,0.06);
+padding:16px;
+margin-bottom:14px
 }
 
-.title{
-font-weight:700;
-margin-bottom:10px;
+.label{
+font-size:13px;
+font-weight:600;
+margin-bottom:6px
 }
 
-input,textarea,select{
-
+.input{
 width:100%;
-
 padding:12px;
-
 border-radius:10px;
-
 border:1px solid #ddd;
-
-margin-top:8px;
-
-font-family:system-ui;
-
+font-size:14px
 }
 
-textarea{
-min-height:90px;
-resize:none;
+textarea.input{
+min-height:90px
 }
 
-button{
-
-margin-top:16px;
-
-padding:14px;
-
-background:#0f7a3d;
-
-color:#fff;
-
-border:none;
-
-border-radius:12px;
-
-font-weight:700;
-
-cursor:pointer;
-
+.select{
 width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ddd
+}
 
+.btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+background:#0f7a3d;
+color:#fff;
+font-size:15px;
+font-weight:700
 }
 
 .notice{
-
 font-size:12px;
-
-color:#777;
-
+background:#f6fbf8;
+border-left:4px solid #0f7a3d;
+padding:10px;
 margin-top:10px;
+line-height:1.6
+}
 
+.disabled{
+opacity:.5;
+pointer-events:none
 }
 
 </style>
 
 </head>
 
-<body>
+<body data-page="services">
 
 <header class="header">
-
-<div class="header-left">
-
-<img src="file_000000007c187246b1c01967ee086dc4.png" class="main-logo">
-
-<span class="brand">
-ALBUKHR
-</span>
-
-</div>
-
+<h1 class="brand">ALBUKHR</h1>
 </header>
 
-<div class="section">
+<section class="section">
+
+<h3>🚀 Sidra Start Builder</h3>
+
+<p class="muted">
+
+Submit your startup for Albukhr Sidra Builder  
+Admin review is required before project incubation.
+
+</p>
+
+
+<!-- STATUS -->
+
+<div id="statusBox"></div>
+
+
+<!-- FORM -->
+
+<div id="sidraForm">
 
 <div class="card">
 
-<div class="title">
-Sidra Start Project Application
-</div>
+<div class="label">Project Name</div>
+<input class="input" id="projectName">
 
-<div class="notice">
-Submit your project for Albukhr Sidra Start Builder
-</div>
+<div class="label" style="margin-top:12px">Project Type</div>
 
-</div>
-
-
-<div class="card">
-
-<div class="title">
-Project Name
-</div>
-
-<input 
-id="projectName"
-placeholder="Enter project name"
-/>
-
-</div>
-
-
-<div class="card">
-
-<div class="title">
-Project Type
-</div>
-
-<select id="projectType">
+<select class="select" id="projectType">
 
 <option>Startup</option>
-<option>Investment Platform</option>
-<option>Community Project</option>
 <option>Business Platform</option>
-<option>Other</option>
+<option>Community Project</option>
+<option>Investment Platform</option>
 
 </select>
 
-</div>
 
-
-<div class="card">
-
-<div class="title">
+<div class="label" style="margin-top:12px">
 Project Description
 </div>
 
 <textarea
+class="input"
 id="projectDesc"
-placeholder="Describe your project..."
 ></textarea>
 
-</div>
 
-
-<div class="card">
-
-<div class="title">
-Funding Goal (Optional)
+<div class="label" style="margin-top:12px">
+Funding Goal
 </div>
 
 <input
+class="input"
 id="fundingGoal"
-placeholder="Example: ₦500,000"
+placeholder="Optional"
 />
 
-</div>
 
-
-<div class="card">
-
-<div class="title">
+<div class="label" style="margin-top:12px">
 Contact Email
 </div>
 
 <input
+class="input"
 id="contactEmail"
-placeholder="Your email"
 />
 
 </div>
 
-<!-- ===============================
-ALBUKHR SIDRA POLICY
-================================ -->
+
+<!-- POLICY -->
 
 <div class="card">
 
-<div class="title">
-Albukhr Sidra Policy
-</div>
+<strong>Albukhr Sidra Policy</strong>
 
-<div style="
-font-size:13px;
-color:#555;
-line-height:1.7;
-">
+<div class="notice">
 
-• Projects must be real and implementable<br>
-• No fraud or misleading projects allowed<br>
-• Albukhr may assist in dashboard or full app building<br>
-• Project creators must provide updates regularly<br>
-• Funding transparency is required<br>
-• Albukhr maintains governance oversight
+• Projects must be real and implementable  
+• No fraud or misleading projects allowed  
+• Albukhr may assist dashboard or full app  
+• Updates required regularly  
+• Governance oversight enforced  
 
 </div>
 
-</div>
+<label style="margin-top:10px;display:block">
 
-
-<div class="card">
-
-<label style="font-size:13px">
-
-<input 
-type="checkbox"
-id="policyAgree"
-style="margin-right:6px"
->
+<input type="checkbox" id="agree">
 
 I agree to Albukhr Sidra Policy
 
 </label>
 
-  </div>
+</div>
 
-<button onclick="submitSidra()">
 
+<button class="btn" onclick="submitSidra()">
 Submit Application
-
 </button>
-
 
 </div>
 
 
+</section>
+
+
 <script>
+
+/* SUBMIT */
 
 function submitSidra(){
 
-const agree =
-document.getElementById("policyAgree").checked;
-
-if(!agree){
-alert("You must agree to Albukhr Sidra Policy");
+if(!agree.checked){
+alert("Agree to policy");
 return;
 }
 
-/* GENERATE ID */
-
-const id =
-"SIDRA-" + Date.now();
+if(!projectName.value || !projectDesc.value){
+alert("Fill required fields");
+return;
+}
 
 const data = {
 
-id:id,
+id:"SIDRA-"+Date.now(),
 
-name:
-document.getElementById("projectName").value,
+name:projectName.value,
 
-type:
-document.getElementById("projectType").value,
+type:projectType.value,
 
-desc:
-document.getElementById("projectDesc").value,
+desc:projectDesc.value,
 
-goal:
-document.getElementById("fundingGoal").value,
+goal:fundingGoal.value,
 
-email:
-document.getElementById("contactEmail").value,
+email:contactEmail.value,
 
-status:"Pending",
+status:"pending",
 
-note:"",
-
-date:new Date().toLocaleString(),
-
-time:Date.now()
+createdAt:Date.now()
 
 };
 
-if(!data.name || !data.desc){
-alert("Please fill required fields");
-return;
-}
-
 let list =
 JSON.parse(
-localStorage.getItem("albukhr_sidra_applications")
-) || [];
+localStorage.getItem(
+"albukhr_sidra_applications"
+)
+)||[];
 
 list.push(data);
 
@@ -315,11 +237,163 @@ localStorage.setItem(
 JSON.stringify(list)
 );
 
-alert("Application submitted successfully");
+/* LOCK */
 
-window.location.href="services.html";
+localStorage.setItem(
+"albukhr_sidra_my_request",
+JSON.stringify(data)
+);
 
-  }
+location.reload();
+
+}
+
+
+/* STATUS ENGINE */
+
+(function(){
+
+const request =
+JSON.parse(
+localStorage.getItem(
+"albukhr_sidra_my_request"
+)
+);
+
+if(!request) return;
+
+const statusBox =
+document.getElementById("statusBox");
+
+document
+.getElementById("sidraForm")
+.classList.add("disabled");
+
+
+/* PENDING */
+
+if(request.status==="pending"){
+
+statusBox.innerHTML=`
+
+<div class="card">
+
+<strong>Application Under Review</strong>
+
+<div class="notice">
+
+Your Sidra request is under review.
+
+Please wait for admin approval.
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* APPROVED */
+
+if(request.status==="approved"){
+
+statusBox.innerHTML=`
+
+<div class="card">
+
+<strong>Application Approved</strong>
+
+<div class="notice">
+
+Your project has been approved.
+
+Proceed to next step
+
+</div>
+
+<a 
+href="https://t.me/albukhrinvestmentlimited"
+target="_blank">
+
+<button class="btn">
+
+Continue on Telegram
+
+</button>
+
+</a>
+
+</div>
+
+`;
+
+document
+.getElementById("sidraForm")
+.classList.remove("disabled");
+
+}
+
+
+/* REJECTED */
+
+if(request.status==="rejected"){
+
+statusBox.innerHTML=`
+
+<div class="card">
+
+<strong>Application Rejected</strong>
+
+<div class="notice">
+
+Your project was not approved.
+
+You may submit another idea.
+
+</div>
+
+</div>
+
+`;
+
+document
+.getElementById("sidraForm")
+.classList.remove("disabled");
+
+}
+
+})();
+
+
+</script>
+
+
+<script>
+
+/* BLOCK IF PENDING */
+
+(function(){
+
+const req =
+JSON.parse(
+localStorage.getItem(
+"albukhr_sidra_my_request"
+)
+);
+
+if(!req) return;
+
+if(req.status==="pending"){
+
+document
+.getElementById("sidraForm")
+.classList.add("disabled");
+
+}
+
+})();
 
 </script>
 
