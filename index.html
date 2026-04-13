@@ -437,23 +437,30 @@ body::before{
 }
 
 .social-icon{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  background:#e6f6ec;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  margin:auto;
-  margin-bottom:4px;
-  transition:.25s ease;
+width:42px;
+height:42px;
+border-radius:50%;
+background:#e6f6ec;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:auto;
+margin-bottom:4px;
+transition:.25s ease;
+overflow:hidden;
+}
+
+.social-icon img{
+width:24px;
+height:24px;
+object-fit:contain;
 }
 
 .social-item:hover .social-icon{
-  transform:scale(1.1);
-  background:#d9f4e7;
-}
+transform:translateY(-2px) scale(1.05);
+background:#d9f4e7;
+box-shadow:0 6px 14px rgba(15,122,61,0.15);
+   }
 
 /* ===============================
    POLICIES – VERTICAL
@@ -1083,46 +1090,75 @@ Security is enforced to protect your assets and projects.
     </div>
 
 <!-- SOCIAL / MEDIA -->
-    <div class="drawer-title">🌐 Media & Channels</div>
+<div class="drawer-title">🌐 Media & Channels</div>
 
-    <div class="drawer-social">
+<div class="drawer-social">
 
-      <a class="social-item"
-         href="https://t.me/albukhrinvestmentlimited"
-         target="_blank">
-        <div class="social-icon">📢</div>
-        Telegram
-      </a>
+<a class="social-item"
+href="https://t.me/albukhrinvestmentlimited"
+target="_blank">
 
-      <a class="social-item"
-         href="https://whatsapp.com/channel/0029VbAyyWgI7BeNfCDjyZ1C"
-         target="_blank">
-        <div class="social-icon">🟢</div>
-        WhatsApp
-      </a>
+<div class="social-icon">
+<img src="images/images (2).jpeg" alt="Telegram">
+</div>
 
-      <a class="social-item"
-         href="https://www.facebook.com/groups/1491982365549301/permalink/1646336656780537/?mibextid=Nif5oz"
-         target="_blank">
-        <div class="social-icon">📖</div>
-        Facebook
-      </a>
+Telegram
 
-      <a class="social-item"
-         href="https://www.youtube.com/@Albukhrinvestmentlimited"
-         target="_blank">
-        <div class="social-icon">▶️</div>
-        YouTube
-      </a>
+</a>
 
-       <a class="social-item"
-         href="#"
-         target="_blank">
-        <div class="social-icon">❎</div>
-        X
-       </a>
 
-    </div>
+<a class="social-item"
+href="https://whatsapp.com/channel/0029VbAyyWgI7BeNfCDjyZ1C"
+target="_blank">
+
+<div class="social-icon">
+<img src="images/images.png" alt="WhatsApp">
+</div>
+
+WhatsApp
+
+</a>
+
+
+<a class="social-item"
+href="https://www.facebook.com/groups/1491982365549301/permalink/1646336656780537/?mibextid=Nif5oz"
+target="_blank">
+
+<div class="social-icon">
+<img src="images/images (1).jpeg" alt="Facebook">
+</div>
+
+Facebook
+
+</a>
+
+
+<a class="social-item"
+href="https://www.youtube.com/@Albukhrinvestmentlimited"
+target="_blank">
+
+<div class="social-icon">
+<img src="images/images.jpeg" alt="YouTube">
+</div>
+
+YouTube
+
+</a>
+
+
+<a class="social-item"
+href="#"
+target="_blank">
+
+<div class="social-icon">
+<img src="images/images (1).png" alt="X">
+</div>
+
+X
+
+</a>
+
+</div>
 
     <div class="drawer-note">
       Official public channels of ALBUKHR ecosystem
