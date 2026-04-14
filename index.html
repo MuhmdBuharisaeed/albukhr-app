@@ -1563,5 +1563,39 @@ Pi.init({
 });
 </script>
 
+<script>
+
+async function testPiPayment(){
+
+const payment = Pi.createPayment({
+  
+  amount: 0.01,
+  memo: "Albukhr Test Transaction",
+  metadata: { type: "test" }
+
+}, {
+
+  onReadyForServerApproval: function(paymentId){
+    console.log("Ready:", paymentId);
+  },
+
+  onReadyForServerCompletion: function(paymentId, txid){
+    console.log("Completed:", paymentId, txid);
+  },
+
+  onCancel: function(paymentId){
+    console.log("Cancelled", paymentId);
+  },
+
+  onError: function(error){
+    console.error(error);
+  }
+
+});
+
+}
+
+</script>
+
 </body>
 </html>
