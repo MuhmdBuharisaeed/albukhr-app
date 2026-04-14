@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
 <meta charset="UTF-8">
@@ -10,64 +9,95 @@
 
 <style>
 
-/* GLOBAL */
-
 body{
 margin:0;
-font-family:system-ui,-apple-system;
+font-family:system-ui,-apple-system,sans-serif;
 background:#f6fbf8;
 color:#333;
-line-height:1.7;
+line-height:1.6;
 }
 
-/* HERO */
+/* HEADER */
 
-.hero{
+.header{
 
-background:linear-gradient(135deg,#0f7a3d,#0c5e2e);
-color:white;
-padding:40px 20px;
+background:#0f7a3d;
+color:#fff;
+padding:20px;
 text-align:center;
 
 }
 
-.hero h1{
+.header h1{
+
 margin:0;
-font-size:28px;
+font-size:22px;
+
 }
 
-.hero p{
+.header p{
+
+margin:6px 0 0;
+font-size:13px;
 opacity:.9;
-margin-top:10px;
+
+}
+
+/* LANGUAGE SWITCH */
+
+.lang-switch{
+
+display:flex;
+justify-content:center;
+gap:8px;
+padding:10px;
+background:#fff;
+border-bottom:1px solid #eee;
+
+}
+
+.lang-btn{
+
+padding:6px 12px;
+border-radius:8px;
+cursor:pointer;
+background:#e6f6ec;
+font-size:12px;
+font-weight:600;
+
 }
 
 /* CONTAINER */
 
 .container{
+
 max-width:900px;
 margin:auto;
 padding:20px;
+
 }
 
 /* SECTION */
 
 .section{
 
-background:white;
-padding:25px;
+background:#fff;
+padding:20px;
 border-radius:14px;
-margin-bottom:18px;
+margin-bottom:16px;
 
-box-shadow:0 8px 20px rgba(0,0,0,0.05);
+box-shadow:0 6px 18px rgba(0,0,0,0.05);
 
 }
 
 .section h2{
+
 color:#0f7a3d;
 margin-top:0;
+
 }
 
-/* TABLE */
+/* TOC */
 
 .toc a{
 
@@ -80,21 +110,15 @@ font-weight:600;
 }
 
 .toc a:hover{
+
 opacity:.7;
+
 }
-
-/* LIST */
-
-ul{
-padding-left:18px;
-}
-
-/* FOOTER */
 
 .footer{
 
 text-align:center;
-padding:30px;
+padding:20px;
 font-size:12px;
 color:#777;
 
@@ -106,19 +130,31 @@ color:#777;
 
 <body>
 
-<!-- HERO -->
+<!-- HEADER -->
 
-<div class="hero">
+<div class="header">
 
 <h1>ALBUKHR Investment Limited</h1>
 
-<p>Community Driven Investment & Sustainable Industry Development</p>
+<p>Building sustainable industries & empowering communities</p>
+
+</div>
+
+<!-- LANGUAGE -->
+
+<div class="lang-switch">
+
+<div class="lang-btn">English</div>
+
+<div class="lang-btn">Hausa</div>
+
+<div class="lang-btn">Français</div>
 
 </div>
 
 <div class="container">
 
-<!-- TOC -->
+<!-- TABLE OF CONTENT -->
 
 <div class="section">
 
@@ -126,47 +162,27 @@ color:#777;
 
 <div class="toc">
 
-<a href="#summary">1. Executive Summary</a>
-<a href="#intro">2. Introduction</a>
-<a href="#vision">3. Vision</a>
-<a href="#mission">4. Mission</a>
-<a href="#values">5. Core Values</a>
-<a href="#problem">6. Problem Statement</a>
-<a href="#solution">7. ALBUKHR Solution</a>
-<a href="#industries">8. Core Industries</a>
-<a href="#investment">9. Investment Model</a>
-<a href="#governance">10. Governance</a>
-<a href="#security">11. Security</a>
-<a href="#impact">12. Community Impact</a>
-<a href="#revenue">13. Revenue Model</a>
-<a href="#roadmap">14. Roadmap</a>
-<a href="#future">15. Future Expansion</a>
-<a href="#conclusion">16. Conclusion</a>
+<a href="#intro">1. Introduction</a>
+
+<a href="#vision">2. Vision</a>
+
+<a href="#mission">3. Mission</a>
+
+<a href="#ecosystem">4. Ecosystem</a>
+
+<a href="#investment">5. Investment Model</a>
+
+<a href="#governance">6. Governance</a>
+
+<a href="#security">7. Security</a>
+
+<a href="#roadmap">8. Roadmap</a>
+
+<a href="#future">9. Future Expansion</a>
+
+<a href="#conclusion">10. Conclusion</a>
 
 </div>
-
-</div>
-
-<!-- EXECUTIVE SUMMARY -->
-
-<div class="section" id="summary">
-
-<h2>Executive Summary</h2>
-
-<p>
-
-ALBUKHR Investment Limited is a community-driven investment platform 
-designed to empower individuals and strengthen local economies 
-through sustainable industries.
-
-</p>
-
-<p>
-
-The platform connects investors, contributors, and communities 
-to fund real-world industries and create long-term economic value.
-
-</p>
 
 </div>
 
@@ -174,13 +190,20 @@ to fund real-world industries and create long-term economic value.
 
 <div class="section" id="intro">
 
-<h2>Introduction</h2>
+<h2>1. Introduction</h2>
 
 <p>
 
-Many communities lack access to investment opportunities and 
-industrial infrastructure. ALBUKHR bridges this gap by enabling 
-community investment into real industries.
+ALBUKHR Investment Limited is a community-driven investment platform 
+designed to empower individuals and communities through real-world industries, 
+digital innovation, and transparent governance.
+
+</p>
+
+<p>
+
+The platform allows users to invest into industries such as agriculture, 
+food production, transport, healthcare, and infrastructure development.
 
 </p>
 
@@ -190,12 +213,12 @@ community investment into real industries.
 
 <div class="section" id="vision">
 
-<h2>Vision</h2>
+<h2>2. Vision</h2>
 
 <p>
 
-To build a global community-driven investment ecosystem that 
-supports sustainable industries and economic empowerment.
+To build a global community-driven investment ecosystem that supports 
+real industries and empowers communities worldwide.
 
 </p>
 
@@ -205,49 +228,34 @@ supports sustainable industries and economic empowerment.
 
 <div class="section" id="mission">
 
-<h2>Mission</h2>
+<h2>3. Mission</h2>
 
 <p>
 
-To provide accessible investment opportunities and support 
-community-driven industries.
+To provide accessible investment opportunities, transparent governance, 
+and sustainable economic growth through real-world industries.
 
 </p>
 
 </div>
 
-<!-- VALUES -->
+<!-- ECOSYSTEM -->
 
-<div class="section" id="values">
+<div class="section" id="ecosystem">
 
-<h2>Core Values</h2>
-
-<ul>
-
-<li>Transparency</li>
-<li>Trust</li>
-<li>Sustainability</li>
-<li>Innovation</li>
-<li>Community Empowerment</li>
-
-</ul>
-
-</div>
-
-<!-- INDUSTRIES -->
-
-<div class="section" id="industries">
-
-<h2>Core Industries</h2>
+<h2>4. Ecosystem Architecture</h2>
 
 <ul>
 
-<li>Agriculture & Livestock</li>
-<li>Food Processing</li>
-<li>Clean Water</li>
-<li>Fertilizer Production</li>
-<li>Transport Services</li>
-<li>Healthcare & Pharmacy</li>
+<li>Investment Layer</li>
+
+<li>Treasury Layer</li>
+
+<li>Governance Layer</li>
+
+<li>Security Layer</li>
+
+<li>Transparency Layer</li>
 
 </ul>
 
@@ -257,12 +265,12 @@ community-driven industries.
 
 <div class="section" id="investment">
 
-<h2>Investment Model</h2>
+<h2>5. Investment Model</h2>
 
 <p>
 
-Users invest into projects and earn rewards based on 
-project performance.
+Users stake Pi into projects and earn rewards based on project performance 
+and lock duration.
 
 </p>
 
@@ -272,13 +280,17 @@ project performance.
 
 <div class="section" id="governance">
 
-<h2>Governance</h2>
+<h2>6. Governance</h2>
 
 <ul>
 
-<li>Project Review</li>
-<li>Risk Monitoring</li>
-<li>Admin Oversight</li>
+<li>Super Admin</li>
+
+<li>Finance Admin</li>
+
+<li>Review Admin</li>
+
+<li>Viewer Admin</li>
 
 </ul>
 
@@ -288,12 +300,12 @@ project performance.
 
 <div class="section" id="security">
 
-<h2>Security</h2>
+<h2>7. Security</h2>
 
 <p>
 
-ALBUKHR implements advanced security including 
-2FA, encryption, and governance monitoring.
+ALBUKHR uses 2FA, encryption, smart liquidity protection, and governance 
+controls to ensure investor safety.
 
 </p>
 
@@ -303,14 +315,17 @@ ALBUKHR implements advanced security including
 
 <div class="section" id="roadmap">
 
-<h2>Roadmap</h2>
+<h2>8. Roadmap</h2>
 
 <ul>
 
 <li>Phase 1 — Foundation</li>
+
 <li>Phase 2 — Infrastructure</li>
+
 <li>Phase 3 — Expansion</li>
-<li>Phase 4 — Global Growth</li>
+
+<li>Phase 4 — Global Ecosystem</li>
 
 </ul>
 
@@ -320,12 +335,12 @@ ALBUKHR implements advanced security including
 
 <div class="section" id="future">
 
-<h2>Future Expansion</h2>
+<h2>9. Future Expansion</h2>
 
 <p>
 
-ALBUKHR plans to expand into global industries 
-and partnerships.
+ALBUKHR plans to expand into renewable energy, manufacturing, agriculture, 
+and global partnerships.
 
 </p>
 
@@ -335,11 +350,11 @@ and partnerships.
 
 <div class="section" id="conclusion">
 
-<h2>Conclusion</h2>
+<h2>10. Conclusion</h2>
 
 <p>
 
-ALBUKHR is building a sustainable community-driven 
+ALBUKHR Investment Limited is building a sustainable community-driven 
 investment ecosystem for the future.
 
 </p>
@@ -350,7 +365,7 @@ investment ecosystem for the future.
 
 <div class="footer">
 
-ALBUKHR Investment Limited Whitepaper
+ALBUKHR Investment Limited — Whitepaper
 
 </div>
 
