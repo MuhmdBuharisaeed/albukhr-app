@@ -833,21 +833,22 @@ transform:translateY(0);
     <span class="brand">ALBUKHR</span>
   </div>
 
-  <div class="header-right">
+ <div class="header-right">
 
-    <div class="header-btn notification-btn" onclick="openNotifications()">
-
-  🔔
-
-  <span id="notifBadge" class="notification-badge"></span>
-
-    </div>
-
-    <div class="header-btn menu-icon">
-      ☰
-    </div>
-
+  <div class="header-btn" onclick="handleAuth()">
+    👤
   </div>
+
+  <div class="header-btn notification-btn" onclick="openNotifications()">
+    🔔
+    <span id="notifBadge" class="notification-badge"></span>
+  </div>
+
+  <div class="header-btn menu-icon">
+    ☰
+  </div>
+
+ </div>
 
   </header>
 
@@ -1170,6 +1171,7 @@ X
 
 <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
 
+<script src="js/auth.js"></script>
 <script src="js/project-config.js"></script>   
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
@@ -1561,6 +1563,7 @@ Pi.init({
 </script>
 
 <script>
+
 async function initPiUser(){
   try{
     const user = await Pi.authenticate(
@@ -1570,18 +1573,28 @@ async function initPiUser(){
       }
     );
 
-    localStorage.setItem(
-      "pi_user",
-      JSON.stringify(user)
-    );
+    localStorage.setItem("pi_user", JSON.stringify(user));
 
   }catch(err){
     console.error(err);
   }
 }
 
-initPiUser();
-</script>
+function isLoggedIn(){
+  return !!localStorage.getItem("pi_user");
+}
 
+function handleAuth(){
+
+  if(isLoggedIn()){
+    alert("Already logged in");
+    return;
+  }
+
+  initPiUser();
+
+}
+
+</script>
 </body>
    </html>
