@@ -271,27 +271,25 @@ function closeWithdraw(){
 }
 
 /* ===============================
-   STAKE
+     CONFORM STAKE
 =============================== */
-function confirmStake(){
+
+async function confirmStake(){
 
 /* ===============================
 LIQUIDITY CHECK
 =============================== */
 
 if(!hasMinimumLiquidity(PROJECT_NAME)){
-
-alert(
-"Project liquidity not ready.\n\n" +
-"Project must add minimum liquidity first."
-);
-
-return;
-
+  alert(
+    "Project liquidity not ready.\n\n" +
+    "Project must add minimum liquidity first."
+  );
+  return;
 }
 
 /* ===============================
-STAKE INPUT
+INPUT
 =============================== */
 
 const amount = Number(amountInput.value);
@@ -299,45 +297,56 @@ const duration = Number(durationSelect.value);
 const min = getMinStake(PROJECT_NAME);
 
 if(!amount || amount < min){
-alert("Minimum stake is " + min + " Pi");
-return;
+  alert("Minimum stake is " + min + " Pi");
+  return;
 }
 
 /* ===============================
-CREATE LOCK TIME
+UI LOCK (ANTI DOUBLE CLICK)
 =============================== */
 
-const startTime = Date.now();
-
-const unlockTime =
-startTime + (duration * 86400000);
+const btn = document.querySelector("#stakeModal .primary");
+btn.innerText = "Processing...";
+btn.disabled = true;
 
 /* ===============================
-ADD STAKE
+CALL PI STAKE
 =============================== */
 
-const ok = addStake({
-project: PROJECT_NAME,
-amount,
-duration,
-startTime,
-unlockTime
+const res = await addStake({
+  project: PROJECT_NAME,
+  amount,
+  duration
 });
 
-if(!ok){
-alert("Stake failed.");
-return;
+/* ===============================
+HANDLE RESULT
+=============================== */
+
+if(res.success){
+
+  successText.innerText =
+  `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
+
+  closeModal();
+  successModal.style.display="flex";
+
+  load();
+
+}else{
+
+  alert(res.error || "Transaction failed");
+
 }
 
-successText.innerText =
-`You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
+/* ===============================
+RESET BUTTON
+=============================== */
 
-closeModal();
-successModal.style.display="flex";
+btn.innerText = "Confirm";
+btn.disabled = false;
 
-load();
-
-  }
+}
 
 /* ===============================
    LOAD
@@ -620,35 +629,31 @@ receive.toFixed(2) + " Pi";
   
 function saveProjectStakes(project, stakes){
 
-const all =
-JSON.parse(
-localStorage.getItem("albukhr_stakes")
-) || [];
+  if(!Array.isArray(stakes)) return;
 
-const updated =
-all.map(s => {
+  const all =
+    JSON.parse(localStorage.getItem("albukhr_stakes")) || [];
 
-if(s.project === project){
+  const updated = all.map(s => {
 
-const found =
-stakes.find(
-x => x.id === s.id
-);
+    if(s.project === project){
 
-return found || s;
+      const found = stakes.find(x => x.id === s.id);
 
-}
+      return found || s;
 
-return s;
+    }
 
-});
+    return s;
 
-localStorage.setItem(
-"albukhr_stakes",
-JSON.stringify(updated)
-);
+  });
 
-}
+  localStorage.setItem(
+    "albukhr_stakes",
+    JSON.stringify(updated)
+  );
+
+  }
 
 /* ===============================
   OPEN CAPITAL MODAL
