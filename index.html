@@ -4,6 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ALBUKHR Projects</title>
+
+<!-- ✅ AUTH GUARD -->
+<script>
+function getCurrentUser(){
+  try{
+    return JSON.parse(localStorage.getItem("pi_user"));
+  }catch{
+    return null;
+  }
+}
+
+const user = getCurrentUser();
+
+if(!user){
+  window.location.href = "login.html";
+}
+</script>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
@@ -835,8 +853,8 @@ transform:translateY(0);
 
  <div class="header-right">
 
-  <div class="header-btn" onclick="handleAuth()">
-    👤
+  <div class="header-btn" id="userBtn" onclick="handleAuth()">
+  👤
   </div>
 
   <div class="header-btn notification-btn" onclick="openNotifications()">
@@ -1553,48 +1571,48 @@ ai.classList.remove("minimized");
 
 </script>
 
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
 <script>
-Pi.init({
-  version: "2.0",
-  sandbox: true
-});
-</script>
-
-<script>
-
-async function initPiUser(){
-  try{
-    const user = await Pi.authenticate(
-      ['username','payments'],
-      function(payment){
-        console.log(payment);
-      }
-    );
-
-    localStorage.setItem("pi_user", JSON.stringify(user));
-
-  }catch(err){
-    console.error(err);
-  }
-}
-
-function isLoggedIn(){
-  return !!localStorage.getItem("pi_user");
-}
 
 function handleAuth(){
 
-  if(isLoggedIn()){
-    alert("Already logged in");
+  const user = JSON.parse(localStorage.getItem("pi_user") || "null");
+
+  if(!user){
+    window.location.href = "login.html";
     return;
   }
 
-  initPiUser();
+  const confirmLogout = confirm(
+    "Logged in as @" + user.username + "\n\nLogout?"
+  );
+
+  if(confirmLogout){
+    localStorage.removeItem("pi_user");
+    window.location.href = "login.html";
+  }
 
 }
 
 </script>
+   
+<script>
+function updateUserUI(){
+
+  const user = JSON.parse(localStorage.getItem("pi_user") || "null");
+  const btn = document.getElementById("userBtn");
+
+  if(!btn) return;
+
+  if(user){
+    btn.innerText = "👤✓"; // logged in
+  }else{
+    btn.innerText = "👤"; // not logged in
+  }
+
+}
+
+window.addEventListener("DOMContentLoaded", updateUserUI);
+</script>
+   
 </body>
    </html>
