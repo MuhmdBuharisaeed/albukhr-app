@@ -158,9 +158,6 @@ async function addStake({project,amount,duration}){
     amount:safeAmount,
     duration:safeDuration,
 
-    startTime,
-    unlockTime,
-
     reward:Number(reward)||0,
     remainingReward:Number(reward)||0,
     capitalWithdrawn:false,
