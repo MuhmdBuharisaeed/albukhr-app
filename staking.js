@@ -103,11 +103,21 @@ async function payWithPi({amount, memo, metadata}){
 /* ======================================
    ADD STAKE (PI PAYMENT REQUIRED)
 ====================================== */
-
 async function addStake({project,amount,duration}){
 
   const safeAmount   = Number(amount);
   const safeDuration = Number(duration);
+
+  /* ===============================
+     USER CHECK FIRST
+  =============================== */
+
+  const currentUser =
+    JSON.parse(localStorage.getItem("pi_user") || "null");
+
+  if(!currentUser){
+    return {error:"User not logged in"};
+  }
 
   if(!project || isNaN(safeAmount) || safeAmount <= 0){
     return {error:"Invalid amount"};
@@ -126,10 +136,7 @@ async function addStake({project,amount,duration}){
     const payment = await payWithPi({
       amount: safeAmount,
       memo: `Stake in ${project}`,
-      metadata: {
-        project,
-        duration
-      }
+      metadata: { project, duration }
     });
 
     console.log("Payment success:", payment);
@@ -139,7 +146,7 @@ async function addStake({project,amount,duration}){
   }
 
   /* ===============================
-     STEP 2: SAVE STAKE AFTER PAYMENT
+     STEP 2: SAVE STAKE
   =============================== */
 
   const rate   = getRate(project,safeDuration);
@@ -148,60 +155,45 @@ async function addStake({project,amount,duration}){
   const stakes = _safeParse(INTERNAL_KEY);
 
   const startTime = Date.now();
-
   const unlockTime =
     startTime + (safeDuration * 86400000);
 
   const newStake = {
+
     id:"ST-"+Date.now(),
+
+    userId: currentUser.uid,   // 🔥 CORE FIX
+
     project,
     amount:safeAmount,
     duration:safeDuration,
 
+    startTime,
+    unlockTime,
+
     reward:Number(reward)||0,
     remainingReward:Number(reward)||0,
+    withdrawnReward:0,
+
     capitalWithdrawn:false,
 
     status:"Successful",
     timestamp:Date.now(),
     type:"internal",
 
-    /* NEW IMPORTANT */
     source:"pi",
     network:"testnet"
+
   };
 
-  const currentUser =
-JSON.parse(localStorage.getItem("pi_user") || "null");
+  stakes.push(newStake);
 
-if(!currentUser){
-  return {error:"User not logged in"};
-}
-
-stakes.push({
-id:"ST-"+Date.now(),
-
-userId: currentUser.uid,   // 🔥 VERY IMPORTANT
-
-project,
-amount:safeAmount,
-duration:safeDuration,
-
-startTime:startTime,
-unlockTime:unlockTime,
-
-reward:Number(reward)||0,
-remainingReward:Number(reward)||0,
-capitalWithdrawn:false,
-
-status:"Successful",
-timestamp:Date.now(),
-type:"internal"
-});
-  }
+  /* ✅ SAVE */
+  _save(INTERNAL_KEY, stakes);
 
   return {success:true, stake:newStake};
-}
+                       
+  }
 
 /* ======================================
    MERGED STAKES (WALLET SAFE)
