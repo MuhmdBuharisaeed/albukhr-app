@@ -43,22 +43,56 @@ dailyLimit:50
 /* =========================================
    STORAGE
 ========================================= */
-
 function getWithdrawals(){
-const data = safeParse(
+
+  const currentUser =
+    JSON.parse(localStorage.getItem("pi_user") || "null");
+
+  if(!currentUser) return [];
+
+  const data = safeParse(
+    localStorage.getItem(WITHDRAW_KEY),
+    []
+  );
+
+  /* ✅ ensure array */
+  if(!Array.isArray(data)) return [];
+
+  /* ✅ filter by userId safely */
+  return data.filter(w =>
+    w &&
+    w.userId === currentUser.uid
+  );
+     }
+
+  function saveWithdrawals(list){
+
+const currentUser =
+JSON.parse(localStorage.getItem("pi_user") || "null");
+
+if(!currentUser) return;
+
+const all = safeParse(
 localStorage.getItem(WITHDRAW_KEY),
 []
 );
 
-return Array.isArray(data) ? data : [];
-}
+/* remove old user data */
+const others = all.filter(
+w => w.userId !== currentUser.uid
+);
 
-function saveWithdrawals(list){
+/* attach userId */
+const updated = list.map(w=>({
+...w,
+userId: currentUser.uid
+}));
+
 localStorage.setItem(
 WITHDRAW_KEY,
-safeStringify(list)
+safeStringify([...others, ...updated])
 );
-}
+  }
 
 /* =========================================
    GLOBAL SUMMARY
@@ -158,8 +192,13 @@ error:"Daily limit exceeded"
 
 /* UPDATE STAKES */
 
-const stakes =
-getAllStakesMerged();
+const stakes = _safeParse("albukhr_stakes");
+
+const currentUser =
+JSON.parse(localStorage.getItem("pi_user") || "null");
+
+const stakes = _safeParse("albukhr_stakes")
+.filter(s => s.userId === currentUser.uid);
 
 let remaining = amount;
 
@@ -185,6 +224,8 @@ remaining -= take;
 
 }
 
+_save("albukhr_stakes", stakes);
+
 });
 
 const fee =
@@ -199,6 +240,8 @@ getWithdrawals();
 history.push({
 
 id:"RW-"+Date.now(),
+userId: JSON.parse(localStorage.getItem("pi_user") || "null")?.uid,
+
 type:"reward",
 project,
 grossAmount:amount,
@@ -209,7 +252,7 @@ walletAddress||"internal",
 timestamp:Date.now()
 
 });
-
+   
 saveWithdrawals(history);
 
 recordTx({
