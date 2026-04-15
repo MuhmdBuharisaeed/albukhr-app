@@ -50,7 +50,23 @@ body{
   font-weight:600;
   cursor:pointer;
 }
+
+.login-btn:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
 </style>
+
+<!-- 🚨 AUTO REDIRECT IF LOGGED IN -->
+<script>
+try{
+  const user = JSON.parse(localStorage.getItem("pi_user"));
+  if(user){
+    window.location.href = "index.html";
+  }
+}catch{}
+</script>
+
 </head>
 
 <body>
@@ -58,11 +74,12 @@ body{
 <div class="login-box">
 
   <div class="login-title">ALBUKHR</div>
+
   <div class="login-desc">
     Login with Pi Network to continue
   </div>
 
-  <button class="login-btn" onclick="loginWithPi()">
+  <button class="login-btn" id="loginBtn" onclick="loginWithPi()">
     Login with Pi
   </button>
 
@@ -71,12 +88,33 @@ body{
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <script>
-Pi.init({
-  version:"2.0",
-  sandbox:true
-});
+
+/* ===============================
+   INIT PI
+=============================== */
+
+if(window.Pi){
+
+  Pi.init({
+    version:"2.0",
+    sandbox:true   // 🔥 CHANGE TO false IN PRODUCTION
+  });
+
+}else{
+  alert("Pi Browser required");
+}
+
+/* ===============================
+   LOGIN FUNCTION
+=============================== */
 
 async function loginWithPi(){
+
+  const btn = document.getElementById("loginBtn");
+
+  /* LOCK BUTTON */
+  btn.disabled = true;
+  btn.innerText = "Connecting...";
 
   try{
 
@@ -87,16 +125,26 @@ async function loginWithPi(){
       }
     );
 
+    /* SAVE USER */
     localStorage.setItem("pi_user", JSON.stringify(user));
 
+    /* REDIRECT */
     window.location.href = "index.html";
 
   }catch(err){
-    alert("Login failed");
+
     console.error(err);
+
+    alert("Login failed. Try again.");
+
+    /* RESET BUTTON */
+    btn.disabled = false;
+    btn.innerText = "Login with Pi";
+
   }
 
 }
+
 </script>
 
 </body>
