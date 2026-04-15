@@ -277,21 +277,16 @@ function closeWithdraw(){
 
 async function confirmStake(){
 
-/* ===============================
-LIQUIDITY CHECK
-=============================== */
-
-if(!hasMinimumLiquidity(PROJECT_NAME)){
-  alert(
-    "Project liquidity not ready.\n\n" +
-    "Project must add minimum liquidity first."
-  );
+if(!localStorage.getItem("pi_user")){
+  alert("Please login first");
   return;
 }
 
-/* ===============================
-INPUT
-=============================== */
+if(typeof hasMinimumLiquidity === "function" && 
+   !hasMinimumLiquidity(PROJECT_NAME)){
+  alert("Project liquidity not ready");
+  return;
+}
 
 const amount = Number(amountInput.value);
 const duration = Number(durationSelect.value);
@@ -302,17 +297,9 @@ if(!amount || amount < min){
   return;
 }
 
-/* ===============================
-UI LOCK (ANTI DOUBLE CLICK)
-=============================== */
-
 const btn = document.querySelector("#stakeModal .primary");
 btn.innerText = "Processing...";
 btn.disabled = true;
-
-/* ===============================
-CALL PI STAKE
-=============================== */
 
 const res = await addStake({
   project: PROJECT_NAME,
@@ -320,11 +307,7 @@ const res = await addStake({
   duration
 });
 
-/* ===============================
-HANDLE RESULT
-=============================== */
-
-if(res.success){
+if(res === true || res?.success){
 
   successText.innerText =
   `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
@@ -335,10 +318,13 @@ if(res.success){
   load();
 
 }else{
-
-  alert(res.error || "Transaction failed");
-
+  alert(res?.error || "Transaction failed");
 }
+
+btn.innerText = "Confirm";
+btn.disabled = false;
+
+  }
 
 /* ===============================
 RESET BUTTON
