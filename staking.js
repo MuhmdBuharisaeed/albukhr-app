@@ -60,20 +60,87 @@ function getRate(project,duration){
 }
 
 /* ======================================
-   ADD INTERNAL STAKE (UPDATED)
+   PI PAYMENT HANDLER
 ====================================== */
-function addStake({project,amount,duration}){
+
+async function payWithPi({amount, memo, metadata}){
+
+  const PiNetwork = window.Pi;
+
+  return new Promise((resolve,reject)=>{
+
+    PiNetwork.createPayment({
+      amount: amount,
+      memo: memo,
+      metadata: metadata
+    },{
+
+      onReadyForServerApproval: function(paymentId){
+        console.log("Ready for approval:", paymentId);
+      },
+
+      onReadyForServerCompletion: function(paymentId, txid){
+        console.log("Payment complete:", txid);
+        resolve({paymentId, txid});
+      },
+
+      onCancel: function(paymentId){
+        console.warn("Payment cancelled");
+        reject("cancelled");
+      },
+
+      onError: function(error, payment){
+        console.error("Payment error:", error);
+        reject(error);
+      }
+
+    });
+
+  });
+
+}
+
+/* ======================================
+   ADD STAKE (PI PAYMENT REQUIRED)
+====================================== */
+
+async function addStake({project,amount,duration}){
 
   const safeAmount   = Number(amount);
   const safeDuration = Number(duration);
 
   if(!project || isNaN(safeAmount) || safeAmount <= 0){
-    return false;
+    return {error:"Invalid amount"};
   }
 
   if(safeAmount < getMinStake(project)){
-    return false;
+    return {error:"Minimum stake not reached"};
   }
+
+  /* ===============================
+     STEP 1: PI PAYMENT
+  =============================== */
+
+  try{
+
+    const payment = await payWithPi({
+      amount: safeAmount,
+      memo: `Stake in ${project}`,
+      metadata: {
+        project,
+        duration
+      }
+    });
+
+    console.log("Payment success:", payment);
+
+  }catch(err){
+    return {error:"Payment failed"};
+  }
+
+  /* ===============================
+     STEP 2: SAVE STAKE AFTER PAYMENT
+  =============================== */
 
   const rate   = getRate(project,safeDuration);
   const reward = safeAmount * rate;
@@ -82,42 +149,49 @@ function addStake({project,amount,duration}){
 
   const startTime = Date.now();
 
-const unlockTime =
-startTime + (safeDuration * 86400000);
+  const unlockTime =
+    startTime + (safeDuration * 86400000);
 
-stakes.push({
-id:"ST-"+Date.now(),
-project,
-amount:safeAmount,
-duration:safeDuration,
+  const newStake = {
+    id:"ST-"+Date.now(),
+    project,
+    amount:safeAmount,
+    duration:safeDuration,
 
-startTime:startTime,
-unlockTime:unlockTime,
+    startTime,
+    unlockTime,
 
-reward:Number(reward)||0,
-remainingReward:Number(reward)||0,
-capitalWithdrawn:false,
+    reward:Number(reward)||0,
+    remainingReward:Number(reward)||0,
+    capitalWithdrawn:false,
 
-status:"Successful",
-timestamp:Date.now(),
-type:"internal"
-});
+    status:"Successful",
+    timestamp:Date.now(),
+    type:"internal",
+
+    /* NEW IMPORTANT */
+    source:"pi",
+    network:"testnet"
+  };
+
+  stakes.push(newStake);
 
   _save(INTERNAL_KEY,stakes);
 
-  /* UNIFIED TRANSACTION RECORD */
   if(typeof recordTx === "function"){
     recordTx({
       type:"stake",
       project,
       amount:safeAmount,
       duration:safeDuration,
-      timestamp:Date.now()
+      timestamp:Date.now(),
+      network:"pi"
     });
   }
 
-  return true;
+  return {success:true, stake:newStake};
 }
+
 /* ======================================
    MERGED STAKES (WALLET SAFE)
 ====================================== */
