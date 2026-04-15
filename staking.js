@@ -216,7 +216,10 @@ function getAllStakesMerged(){
   const internal = _safeParse(INTERNAL_KEY)
     .filter(s =>
       s.status==="Successful" &&
-      s.userId === currentUser.uid   // 🔥 USER FILTER
+      (
+        s.userId === currentUser.uid ||
+        !s.userId   // 🔥 allow old data
+      )
     )
     .map(s=>({
       ...s,
@@ -229,7 +232,10 @@ function getAllStakesMerged(){
   const external = _safeParse(EXTERNAL_KEY)
     .filter(p =>
       p.status==="approved" &&
-      p.userId === currentUser.uid   // 🔥 USER FILTER
+      (
+        p.userId === currentUser.uid ||
+        !p.userId   // 🔥 allow old data
+      )
     )
     .map(p=>({
       ...p,
@@ -241,7 +247,7 @@ function getAllStakesMerged(){
 
   return [...internal,...external]
     .sort((a,b)=>b.timestamp - a.timestamp);
-       }
+}
 
 /* ======================================
    PROJECT TOTALS
