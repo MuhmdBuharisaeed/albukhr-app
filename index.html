@@ -1551,9 +1551,6 @@ ai.classList.remove("minimized");
 
 </script>
 
-</script>
-
-<!-- PI SDK -->
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <script>
@@ -1561,6 +1558,29 @@ Pi.init({
   version: "2.0",
   sandbox: true
 });
+</script>
+
+<script>
+async function initPiUser(){
+  try{
+    const user = await Pi.authenticate(
+      ['username','payments'],
+      function(payment){
+        console.log(payment);
+      }
+    );
+
+    localStorage.setItem(
+      "pi_user",
+      JSON.stringify(user)
+    );
+
+  }catch(err){
+    console.error(err);
+  }
+}
+
+initPiUser();
 </script>
 
 </body>
