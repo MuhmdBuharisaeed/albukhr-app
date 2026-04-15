@@ -1,10 +1,19 @@
 /* ======================================
-ALBUKHR – UNIFIED TRANSACTIONS LAYER
+ALBUKHR – UNIFIED TRANSACTIONS LAYER (USER SAFE)
 ====================================== */
 
 function getAllTransactionsUnified(){
 
 let txs = [];
+
+/* ===============================
+CURRENT USER
+=============================== */
+
+const currentUser =
+JSON.parse(localStorage.getItem("pi_user") || "null");
+
+if(!currentUser) return [];
 
 /* ===============================
 INTERNAL STAKES
@@ -17,13 +26,15 @@ JSON.parse(
 localStorage.getItem("albukhr_stakes")
 ) || [];
 
-internal.forEach(s=>{
+internal
+.filter(s => s.userId === currentUser.uid)   // 🔥 FIX
+.forEach(s=>{
 
 txs.push({
 
 source:"internal",
 projectId: s.project,
-user: s.user || "internal",
+userId: s.userId,
 wallet: s.wallet || null,
 amount: Number(s.amount) || 0,
 status: s.status || "Successful",
@@ -48,13 +59,15 @@ JSON.parse(
 localStorage.getItem("albukhr_external_projects")
 ) || [];
 
-external.forEach(s=>{
+external
+.filter(s => s.userId === currentUser.uid)   // 🔥 FIX
+.forEach(s=>{
 
 txs.push({
 
 source:"external",
 projectId: s.projectId || s.project,
-user: s.userPiUID || "external",
+userId: s.userId,
 wallet: s.wallet || null,
 amount: Number(s.amount) || 0,
 status: s.status || "Successful",
@@ -79,13 +92,15 @@ JSON.parse(
 localStorage.getItem("albukhr_transactions")
 ) || [];
 
-core.forEach(t=>{
+core
+.filter(t => t.userId === currentUser.uid)   // 🔥 FIX
+.forEach(t=>{
 
 txs.push({
 
 source:"core",
 projectId: t.project || t.projectId || "-",
-user: t.user || "-",
+userId: t.userId,
 wallet: t.meta?.wallet || null,
 fee: Number(t.meta?.fee || 0),
 amount: Number(t.amount) || 0,
@@ -100,7 +115,9 @@ type:(t.type || "stake").toLowerCase()
 }catch(e){}
 
 
-/* SORT */
+/* ===============================
+SORT
+=============================== */
 
 return txs.sort((a,b)=>b.timestamp - a.timestamp);
 
