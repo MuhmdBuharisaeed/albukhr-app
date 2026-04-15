@@ -171,19 +171,33 @@ async function addStake({project,amount,duration}){
     network:"testnet"
   };
 
-  stakes.push(newStake);
+  const currentUser =
+JSON.parse(localStorage.getItem("pi_user") || "null");
 
-  _save(INTERNAL_KEY,stakes);
+if(!currentUser){
+  return {error:"User not logged in"};
+}
 
-  if(typeof recordTx === "function"){
-    recordTx({
-      type:"stake",
-      project,
-      amount:safeAmount,
-      duration:safeDuration,
-      timestamp:Date.now(),
-      network:"pi"
-    });
+stakes.push({
+id:"ST-"+Date.now(),
+
+userId: currentUser.uid,   // 🔥 VERY IMPORTANT
+
+project,
+amount:safeAmount,
+duration:safeDuration,
+
+startTime:startTime,
+unlockTime:unlockTime,
+
+reward:Number(reward)||0,
+remainingReward:Number(reward)||0,
+capitalWithdrawn:false,
+
+status:"Successful",
+timestamp:Date.now(),
+type:"internal"
+});
   }
 
   return {success:true, stake:newStake};
@@ -194,8 +208,16 @@ async function addStake({project,amount,duration}){
 ====================================== */
 function getAllStakesMerged(){
 
+  const currentUser =
+  JSON.parse(localStorage.getItem("pi_user") || "null");
+
+  if(!currentUser) return [];
+
   const internal = _safeParse(INTERNAL_KEY)
-    .filter(s=>s.status==="Successful")
+    .filter(s =>
+      s.status==="Successful" &&
+      s.userId === currentUser.uid   // 🔥 USER FILTER
+    )
     .map(s=>({
       ...s,
       remainingReward:
@@ -205,7 +227,10 @@ function getAllStakesMerged(){
     }));
 
   const external = _safeParse(EXTERNAL_KEY)
-    .filter(p=>p.status==="approved")
+    .filter(p =>
+      p.status==="approved" &&
+      p.userId === currentUser.uid   // 🔥 USER FILTER
+    )
     .map(p=>({
       ...p,
       status:"Successful",
@@ -216,7 +241,7 @@ function getAllStakesMerged(){
 
   return [...internal,...external]
     .sort((a,b)=>b.timestamp - a.timestamp);
-}
+       }
 
 /* ======================================
    PROJECT TOTALS
