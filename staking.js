@@ -209,17 +209,14 @@ type:"internal"
 function getAllStakesMerged(){
 
   const currentUser =
-  JSON.parse(localStorage.getItem("pi_user") || "null");
+    JSON.parse(localStorage.getItem("pi_user") || "null");
 
   if(!currentUser) return [];
 
   const internal = _safeParse(INTERNAL_KEY)
     .filter(s =>
-      s.status==="Successful" &&
-      (
-        s.userId === currentUser.uid ||
-        !s.userId   // 🔥 allow old data
-      )
+      s.status === "Successful" &&
+      s.userId === currentUser.uid   // 🔥 FILTER USER
     )
     .map(s=>({
       ...s,
@@ -231,11 +228,8 @@ function getAllStakesMerged(){
 
   const external = _safeParse(EXTERNAL_KEY)
     .filter(p =>
-      p.status==="approved" &&
-      (
-        p.userId === currentUser.uid ||
-        !p.userId   // 🔥 allow old data
-      )
+      p.status === "approved" &&
+      p.userId === currentUser.uid   // 🔥 ALSO FILTER
     )
     .map(p=>({
       ...p,
@@ -248,7 +242,6 @@ function getAllStakesMerged(){
   return [...internal,...external]
     .sort((a,b)=>b.timestamp - a.timestamp);
 }
-
 /* ======================================
    PROJECT TOTALS
 ====================================== */
