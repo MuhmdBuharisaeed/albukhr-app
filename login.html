@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR Login</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:linear-gradient(135deg,#f4fff8,#ffffff);
+  font-family:sans-serif;
+}
+
+.login-box{
+  background:#fff;
+  padding:30px;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  text-align:center;
+  width:90%;
+  max-width:320px;
+}
+
+.login-title{
+  font-size:18px;
+  font-weight:700;
+  color:#0f7a3d;
+  margin-bottom:10px;
+}
+
+.login-desc{
+  font-size:13px;
+  color:#666;
+  margin-bottom:20px;
+}
+
+.login-btn{
+  background:#0f7a3d;
+  color:#fff;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  width:100%;
+  font-weight:600;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+  <div class="login-title">ALBUKHR</div>
+  <div class="login-desc">
+    Login with Pi Network to continue
+  </div>
+
+  <button class="login-btn" onclick="loginWithPi()">
+    Login with Pi
+  </button>
+
+</div>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<script>
+Pi.init({
+  version:"2.0",
+  sandbox:true
+});
+
+async function loginWithPi(){
+
+  try{
+
+    const user = await Pi.authenticate(
+      ['username','payments'],
+      function(payment){
+        console.log(payment);
+      }
+    );
+
+    localStorage.setItem("pi_user", JSON.stringify(user));
+
+    window.location.href = "index.html";
+
+  }catch(err){
+    alert("Login failed");
+    console.error(err);
+  }
+
+}
+</script>
+
+</body>
+</html>
