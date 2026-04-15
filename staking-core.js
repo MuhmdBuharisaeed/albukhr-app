@@ -9,14 +9,42 @@
 function stakeInternal(projectId, amount, duration = 30){
 
     amount = parseFloat(amount);
-    if(!projectId || amount <= 0) return false;
 
-    /* ✅ USE MAIN ENGINE */
-    return addStake({
+    if(!projectId || amount <= 0) return {
+        success:false,
+        error:"Invalid input"
+    };
+
+    /* GET PI USER */
+    const user = JSON.parse(
+        localStorage.getItem("pi_user") || "null"
+    );
+
+    if(!user){
+        return {
+            success:false,
+            error:"Pi user not authenticated"
+        };
+    }
+
+    /* CALL ENGINE */
+    const ok = addStake({
         project: projectId,
         amount,
-        duration
+        duration,
+        user: user.uid   // 🔥 IMPORTANT
     });
+
+    if(!ok){
+        return {
+            success:false,
+            error:"Stake failed"
+        };
+    }
+
+    return {
+        success:true
+    };
 }
 
 /* ===============================
