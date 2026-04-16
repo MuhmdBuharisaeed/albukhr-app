@@ -6,7 +6,7 @@
 /* ===============================
    INTERNAL STAKE
 =============================== */
-function stakeInternal(projectId, amount, duration = 30){
+async function stakeInternal(projectId, amount, duration = 30){
 
     amount = parseFloat(amount);
 
@@ -15,7 +15,6 @@ function stakeInternal(projectId, amount, duration = 30){
         error:"Invalid input"
     };
 
-    /* GET PI USER */
     const user = JSON.parse(
         localStorage.getItem("pi_user") || "null"
     );
@@ -27,23 +26,23 @@ function stakeInternal(projectId, amount, duration = 30){
         };
     }
 
-    /* CALL ENGINE */
-    const ok = addStake({
+    /* 🔥 FIX: AWAIT */
+    const res = await addStake({
         project: projectId,
         amount,
-        duration,
-        user: user.uid   // 🔥 IMPORTANT
+        duration
     });
 
-    if(!ok){
+    if(!res || !res.success){
         return {
             success:false,
-            error:"Stake failed"
+            error: res?.error || "Stake failed"
         };
     }
 
     return {
-        success:true
+        success:true,
+        data: res.stake
     };
 }
 
@@ -91,15 +90,26 @@ function syncExternalStakes(){
 
     externalProjects.forEach(p=>{
 
-        const exists = txs.some(t =>
-            t.project === p.projectId &&
-            t.type === "stake"
-        );
+        const currentUser =
+  JSON.parse(localStorage.getItem("pi_user") || "null");
+
+const exists = txs.some(t =>
+    t.project === p.projectId &&
+    t.type === "stake" &&
+    t.userId === currentUser?.uid
+);
 
         if(!exists && p.staked){
 
             if(typeof recordStake === "function"){
-                recordStake(p.projectId, p.staked);
+                if(typeof recordTx === "function"){
+  recordTx({
+    type:"stake",
+    project: p.projectId,
+    amount: p.staked,
+    meta:{source:"external"}
+  });
+                }
             }
 
         }
