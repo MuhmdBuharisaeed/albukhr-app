@@ -136,9 +136,11 @@ async function addStake({project,amount,duration}){
      STEP 1: PI PAYMENT
   =============================== */
 
+let payment;
+
 try{
 
-  const payment = await payWithPi({
+  payment = await payWithPi({
     amount: safeAmount,
     memo: `Stake in ${project}`,
     metadata: { project, duration }
