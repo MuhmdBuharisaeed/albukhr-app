@@ -166,31 +166,36 @@ try{
 
   const newStake = {
 
-    id:"ST-"+Date.now(),
+const newStake = {
 
-    userId: currentUser.uid,   // 🔥 CORE FIX
+  id:"ST-"+Date.now(),
 
-    project,
-    amount:safeAmount,
-    duration:safeDuration,
+  userId: currentUser.uid,
 
-    startTime,
-    unlockTime,
+  project,
+  amount:safeAmount,
+  duration:safeDuration,
 
-    reward:Number(reward)||0,
-    remainingReward:Number(reward)||0,
-    withdrawnReward:0,
+  startTime,
+  unlockTime,
 
-    capitalWithdrawn:false,
+  reward:Number(reward)||0,
+  remainingReward:Number(reward)||0,
+  withdrawnReward:0,
 
-    status:"Successful",
-    timestamp:Date.now(),
-    type:"internal",
+  capitalWithdrawn:false,
 
-    source:"pi",
-    network:"testnet"
+  status:"Successful",
+  timestamp:Date.now(),
+  type:"internal",
 
-  };
+  source:"pi",
+  network:"testnet",
+
+  /* 🔥 ADD THIS HERE */
+  txid: payment?.txid || null
+
+};
 
   stakes.push(newStake);
 
