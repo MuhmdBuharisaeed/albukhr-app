@@ -4,7 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">Project</title>
-
+  
+<!-- 🔐 AUTH GUARD (PUT HERE) -->
+  <script>
+(function(){
+  const user = JSON.parse(localStorage.getItem("pi_user") || "null");
+  if(!user){
+    window.location.href = "login.html";
+  }
+})();
+  </script>
+  
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="css/global-core.css">
 <link rel="stylesheet" href="css/global-layout.css">
@@ -189,6 +199,15 @@ Cancel
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<script>
+Pi.init({
+  version:"2.0",
+  sandbox:true
+});
+</script>
+
 <script>
 
 /* ===============================
@@ -301,30 +320,38 @@ const btn = document.querySelector("#stakeModal .primary");
 btn.innerText = "Processing...";
 btn.disabled = true;
 
-const res = await addStake({
-  project: PROJECT_NAME,
-  amount,
-  duration
-});
+try{
 
-if(res === true || res?.success){
+  const res = await addStake({
+    project: PROJECT_NAME,
+    amount,
+    duration
+  });
 
-  successText.innerText =
-  `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
+  if(res?.success){
 
-  closeModal();
-  successModal.style.display="flex";
+    successText.innerText =
+    `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
 
-  load();
+    closeModal();
+    successModal.style.display="flex";
 
-}else{
-  alert(res?.error || "Transaction failed");
+    load();
+
+  }else{
+    alert(res?.error || "Transaction failed");
+  }
+
+}catch(e){
+  alert("Something went wrong");
+  console.error(e);
 }
 
+/* ALWAYS RESET BUTTON */
 btn.innerText = "Confirm";
 btn.disabled = false;
 
-  }
+}
 
 /* ===============================
 RESET BUTTON
