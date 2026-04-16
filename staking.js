@@ -62,12 +62,17 @@ function getRate(project,duration){
 /* ======================================
    PI PAYMENT HANDLER
 ====================================== */
-
 async function payWithPi({amount, memo, metadata}){
 
   const PiNetwork = window.Pi;
 
   return new Promise((resolve,reject)=>{
+
+    /* 🔒 SAFETY CHECK */
+    if(!PiNetwork){
+      reject("Pi SDK not loaded");
+      return;
+    }
 
     PiNetwork.createPayment({
       amount: amount,
@@ -98,7 +103,7 @@ async function payWithPi({amount, memo, metadata}){
 
   });
 
-}
+ }
 
 /* ======================================
    ADD STAKE (PI PAYMENT REQUIRED)
@@ -131,19 +136,20 @@ async function addStake({project,amount,duration}){
      STEP 1: PI PAYMENT
   =============================== */
 
-  try{
+try{
 
-    const payment = await payWithPi({
-      amount: safeAmount,
-      memo: `Stake in ${project}`,
-      metadata: { project, duration }
-    });
+  const payment = await payWithPi({
+    amount: safeAmount,
+    memo: `Stake in ${project}`,
+    metadata: { project, duration }
+  });
 
-    console.log("Payment success:", payment);
+  console.log("Payment success:", payment);
 
-  }catch(err){
-    return {error:"Payment failed"};
-  }
+}catch(err){
+  __stakingLock = false;
+  return {error:"Payment failed"};
+}
 
   /* ===============================
      STEP 2: SAVE STAKE
@@ -191,9 +197,20 @@ async function addStake({project,amount,duration}){
   /* ✅ SAVE */
   _save(INTERNAL_KEY, stakes);
 
-  return {success:true, stake:newStake};
-                       
-  }
+/* 🔥 RECORD TRANSACTION */
+if(typeof recordTx === "function"){
+  recordTx({
+    type:"stake",
+    project,
+    amount:safeAmount,
+    meta:{
+      duration:safeDuration,
+      source:"pi"
+    }
+  });
+}
+
+return {success:true, stake:newStake};
 
 /* ======================================
    MERGED STAKES (WALLET SAFE)
