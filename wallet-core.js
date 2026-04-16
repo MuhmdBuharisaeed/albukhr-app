@@ -156,6 +156,13 @@ amount,
 walletAddress
 }){
 
+const currentUser =
+JSON.parse(localStorage.getItem("pi_user") || "null");
+
+if(!currentUser){
+  return {error:"User not logged in"};
+}
+
 amount = Number(amount);
 
 if(!amount || amount<=0){
@@ -192,13 +199,19 @@ error:"Daily limit exceeded"
 
 /* UPDATE STAKES */
 
-const stakes = _safeParse("albukhr_stakes");
-
 const currentUser =
 JSON.parse(localStorage.getItem("pi_user") || "null");
 
-const stakes = _safeParse("albukhr_stakes")
-.filter(s => s.userId === currentUser.uid);
+if(!currentUser || !currentUser.uid){
+  return {error:"User not logged in"};
+}
+
+let stakes = _safeParse("albukhr_stakes")
+.filter(s => 
+  s &&
+  s.userId &&
+  s.userId === currentUser.uid
+);
 
 let remaining = amount;
 
@@ -224,9 +237,10 @@ remaining -= take;
 
 }
 
-_save("albukhr_stakes", stakes);
-
 });
+
+/* ✅ SAVE AFTER LOOP */
+_save("albukhr_stakes", stakes);
 
 const fee =
 amount * (settings.feePercent/100);
@@ -236,23 +250,7 @@ amount - fee;
 
 const history =
 getWithdrawals();
-
-history.push({
-
-id:"RW-"+Date.now(),
-userId: JSON.parse(localStorage.getItem("pi_user") || "null")?.uid,
-
-type:"reward",
-project,
-grossAmount:amount,
-fee,
-received,
-walletAddress:
-walletAddress||"internal",
-timestamp:Date.now()
-
-});
-   
+ 
 saveWithdrawals(history);
 
 recordTx({
