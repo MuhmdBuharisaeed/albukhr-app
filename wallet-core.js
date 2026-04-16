@@ -199,13 +199,6 @@ error:"Daily limit exceeded"
 
 /* UPDATE STAKES */
 
-const currentUser =
-JSON.parse(localStorage.getItem("pi_user") || "null");
-
-if(!currentUser || !currentUser.uid){
-  return {error:"User not logged in"};
-}
-
 let stakes = _safeParse("albukhr_stakes")
 .filter(s => 
   s &&
@@ -250,7 +243,18 @@ amount - fee;
 
 const history =
 getWithdrawals();
- 
+
+history.push({
+  id:"RW-"+Date.now(),
+  type:"reward",
+  project,
+  grossAmount:amount,
+  fee,
+  received,
+  walletAddress: walletAddress || "internal",
+  timestamp:Date.now()
+});
+
 saveWithdrawals(history);
 
 recordTx({
@@ -281,6 +285,13 @@ received
 
 function requestCapitalWithdraw(project){
 
+const currentUser =
+JSON.parse(localStorage.getItem("pi_user") || "null");
+
+if(!currentUser){
+  return {error:"User not logged in"};
+}
+
 if(typeof getProjectTotals !== "function"){
 return {error:"Engine not ready"};
 }
@@ -294,7 +305,9 @@ return {error:"No stakes"};
 
 let totalCapital = 0;
 
-totals.stakes.forEach(s=>{
+totals.stakes
+.filter(s => s.userId === currentUser.uid)
+.forEach(s=>{
 
 if(
 typeof isStakeMatured==="function" &&
