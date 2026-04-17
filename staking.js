@@ -242,35 +242,56 @@ function getProjectTotals(project){
 /* ======================================
    WITHDRAW REWARD
 ====================================== */
-function withdrawStakeReward(stakeId, amount){
+async function withdrawStakeReward(stakeId, amount){
 
-  const stakes = _safeParse(INTERNAL_KEY);
+  const currentUser =
+    JSON.parse(localStorage.getItem("pi_user") || "null");
+
+  if(!currentUser || !currentUser.uid){
+    return {error:"User not logged in"};
+  }
+
+  if(!amount || amount <= 0){
+    return {error:"Invalid amount"};
+  }
+
+  /* FIND PROJECT FROM STAKE */
+  const stakes = getAllStakesMerged();
 
   const stake = stakes.find(s => s.id === stakeId);
 
-  if(!stake) return {error:"Stake not found"};
-
-  const totalReward = Number(stake.reward) || 0;
-  const withdrawn   = Number(stake.withdrawnReward) || 0;
-
-  const remaining = totalReward - withdrawn;
-
-  if(remaining <= 0){
-    return {error:"No reward available"};
+  if(!stake){
+    return {error:"Stake not found"};
   }
 
-  const take = Math.min(Number(amount)||0, remaining);
+  /* CALL BACKEND */
+  const res = await withdrawAPI({
+    userId: currentUser.uid,
+    project: stake.project,
+    amount: Number(amount)
+  });
 
-  stake.withdrawnReward =
-    (stake.withdrawnReward || 0) + take;
+  if(!res.success){
+    return {error: res.error || "Withdraw failed"};
+  }
 
-  _save(INTERNAL_KEY,stakes);
+  /* OPTIONAL: RECORD TX FRONTEND */
+  if(typeof recordTx === "function"){
+    recordTx({
+      type:"reward",
+      project: stake.project,
+      amount: Number(amount),
+      meta:{
+        source:"backend"
+      }
+    });
+  }
 
   return {
     success:true,
-    amount:take
+    amount: amount
   };
-}
+ }
 
 /* ======================================
    HELPERS
