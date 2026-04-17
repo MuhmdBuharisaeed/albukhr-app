@@ -206,7 +206,7 @@ Cancel
 <script>
 Pi.init({
   version:"2.0",
-  sandbox:true
+  sandbox:false
 });
 </script>
 
@@ -360,7 +360,15 @@ btn.disabled = false;
 =============================== */
 async function load(){
 
-  const data = await getProjectTotals(PROJECT_NAME);
+  let data;
+
+try{
+  data = await getProjectTotals(PROJECT_NAME);
+}catch(e){
+  console.error(e);
+  alert("Failed to load data");
+  return;
+}
 
 /* ===============================
 CALCULATE TOTAL STAKE
@@ -400,7 +408,7 @@ totalStake.toFixed(2) + " Pi";
 aReward.innerText =
 reward.toFixed(2) + " Pi";
 
-renderHistory();
+await renderHistory();
 
 /* LOCK STATUS */
 updateStakeStatus();
@@ -524,9 +532,9 @@ async function confirmWithdraw(){
   }
 
   const res = await withdrawStakeReward(
-    "bulk",
-    amount
-  );
+  PROJECT_NAME,
+  amount
+);
 
   if(!res.success){
     alert(res.error || "Withdraw failed");
@@ -687,7 +695,7 @@ capitalModal.style.display="none";
 
   }
 
-function confirmCapitalWithdraw(){
+async function confirmCapitalWithdraw(){
 
 const amount =
 Number(capitalWithdrawAmount.value);
@@ -770,8 +778,6 @@ capitalWallet.value = "";
 async function updateStakeStatus(){
 
   const data = await getProjectTotals(PROJECT_NAME);
-const data =
-getProjectTotals(PROJECT_NAME);
 
 let locked = 0;
 let unlocked = 0;
