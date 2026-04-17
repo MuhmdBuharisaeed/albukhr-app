@@ -113,6 +113,47 @@ async function addStake({project,amount,duration}){
   const safeAmount   = Number(amount);
   const safeDuration = Number(duration);
 
+  const currentUser =
+    JSON.parse(localStorage.getItem("pi_user") || "null");
+
+  if(!currentUser){
+    return {error:"User not logged in"};
+  }
+
+  /* STEP 1: PAYMENT */
+  let payment;
+
+  try{
+    payment = await payWithPi({
+      amount: safeAmount,
+      memo: `Stake in ${project}`,
+      metadata: { project, duration }
+    });
+  }catch(err){
+    return {error:"Payment failed"};
+  }
+
+  /* STEP 2: YOUR SYSTEM */
+  const stakes = _safeParse(INTERNAL_KEY);
+
+  const newStake = {
+    id:"ST-"+Date.now(),
+    userId: currentUser.uid,
+    project,
+    amount:safeAmount,
+    duration:safeDuration,
+    reward: safeAmount * getRate(project,safeDuration),
+    timestamp: Date.now(),
+
+    /* FROM PI */
+    txid: payment?.txid || null
+  };
+
+  stakes.push(newStake);
+  _save(INTERNAL_KEY, stakes);
+
+  return {success:true};
+     }
   /* ===============================
      USER CHECK FIRST
   =============================== */
