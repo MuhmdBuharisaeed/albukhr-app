@@ -3,6 +3,13 @@
 // API Driven • Secure • Scalable
 // =======================================
 
+/* ======================================
+   GLOBAL CACHE
+====================================== */
+
+let __stakesCache = [];
+let __stakesLoaded = false;
+
 const INTERNAL_KEY = "albukhr_stakes";
 
 /* ======================================
@@ -649,3 +656,57 @@ async function getInternalProjectTotals(p){
 async function addInternalStake(p){
   return await addStake(p);
 }
+
+/* ======================================
+   PRELOAD STAKES (AUTO)
+====================================== */
+
+async function preloadStakes(){
+
+  try{
+
+    const data = await getStakesAPI();
+
+    if(Array.isArray(data)){
+      __stakesCache = data;
+      __stakesLoaded = true;
+    }
+
+  }catch(err){
+
+    console.warn("⚠️ Using fallback");
+
+    __stakesCache = _safeParse(INTERNAL_KEY);
+    __stakesLoaded = true;
+
+  }
+
+    }
+/* AUTO START */
+preloadStakes();
+
+/* ======================================
+   GET ALL STAKES (SYNC SAFE)
+====================================== */
+
+function getAllStakesMerged(){
+
+  if(!__stakesLoaded){
+    console.warn("⚠️ Stakes not ready yet");
+    return [];
+  }
+
+  return (__stakesCache || [])
+    .filter(s => s.status === "Successful")
+    .sort((a,b)=>
+      (b.timestamp||0) - (a.timestamp||0)
+    );
+
+}
+
+async function getAllStakesMergedAsync(){
+  return await getStakesAPI();
+}
+
+setInterval(preloadStakes, 10000);
+if(!__stakesLoaded) showLoader();
