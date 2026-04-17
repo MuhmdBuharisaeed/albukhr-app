@@ -78,23 +78,39 @@ async function payWithPi({amount, memo, metadata}){
 
   const PiNetwork = window.Pi;
 
-  return new Promise((resolve,reject)=>{
+  if(!PiNetwork){
+    throw new Error("Pi SDK not loaded");
+  }
 
-    if(!PiNetwork){
-      reject("Pi SDK not loaded");
-      return;
-    }
+  return new Promise((resolve,reject)=>{
 
     PiNetwork.createPayment({
       amount,
       memo,
       metadata
     },{
-      onReadyForServerCompletion(paymentId, txid){
-        resolve({paymentId, txid});
+
+      /* ❌ REMOVE SERVER APPROVAL */
+
+      onReadyForServerCompletion: function(paymentId, txid){
+        console.log("✅ Payment success:", txid);
+
+        resolve({
+          paymentId,
+          txid
+        });
       },
-      onCancel(){ reject("cancelled"); },
-      onError(e){ reject(e); }
+
+      onCancel: function(){
+        console.warn("❌ User cancelled");
+        reject("cancelled");
+      },
+
+      onError: function(error){
+        console.error("❌ Pi error:", error);
+        reject(error);
+      }
+
     });
 
   });
