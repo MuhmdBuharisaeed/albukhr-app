@@ -1,37 +1,71 @@
 /* ======================================
-   ALBUKHR API LAYER
+   ALBUKHR API LAYER v2 (FINTECH READY)
 ====================================== */
 
-const API_BASE = "http://localhost:3000";
+const API_BASE = "https://api.albukhr.com"; // 🔥 CHANGE THIS
+
+/* ======================================
+   CORE FETCH WRAPPER (SECURE)
+====================================== */
+async function apiRequest(endpoint, data){
+
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 10000); // 10s timeout
+
+  try{
+
+    const res = await fetch(`${API_BASE}${endpoint}`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+
+        /* 🔐 BASIC AUTH (future upgrade) */
+        "x-app":"albukhr-v1"
+      },
+      body: JSON.stringify(data),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
+    if(!res.ok){
+      return {
+        success:false,
+        error:"Server error"
+      };
+    }
+
+    const json = await res.json();
+
+    return json;
+
+  }catch(err){
+
+    console.error("API ERROR:", err);
+
+    if(err.name === "AbortError"){
+      return {success:false,error:"Request timeout"};
+    }
+
+    return {
+      success:false,
+      error:"Network error"
+    };
+
+  }
+
+}
 
 /* ===============================
    STAKE API
 =============================== */
 async function addStakeAPI(data){
-
-  const res = await fetch(`${API_BASE}/stake`,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify(data)
-  });
-
-  return await res.json();
+  return await apiRequest("/stake", data);
 }
 
 /* ===============================
    WITHDRAW API
 =============================== */
 async function withdrawAPI(data){
-
-  const res = await fetch(`${API_BASE}/withdraw`,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify(data)
-  });
-
-  return await res.json();
-}
+  return await apiRequest("/withdraw", data);
+       }
