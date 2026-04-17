@@ -112,6 +112,11 @@ async function addStake({project,amount,duration}){
     return {error:"User not logged in"};
   }
 
+  /* 🔥 ADD THIS HERE (BEST POSITION) */
+  if(typeof window.Pi === "undefined"){
+    return {error:"Pi SDK not ready"};
+  }
+
   const safeAmount = Number(amount);
   const safeDuration = Number(duration);
 
@@ -122,7 +127,7 @@ async function addStake({project,amount,duration}){
   if(safeAmount < getMinStake(project)){
     return {error:"Minimum stake not reached"};
   }
-
+   
   /* PI PAYMENT */
   let payment;
 
