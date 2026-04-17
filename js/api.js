@@ -2,7 +2,7 @@
    ALBUKHR API LAYER v2 (FINTECH READY)
 ====================================== */
 
-const API_BASE = "https://api.albukhr.com"; // 🔥 CHANGE THIS
+const API_BASE = "http://localhost:3000";
 
 /* ======================================
    CORE FETCH WRAPPER (SECURE)
