@@ -132,8 +132,9 @@ async function addStake({project,amount,duration}){
       memo:`Stake in ${project}`,
       metadata:{project,duration}
     });
-  }catch{
-    return {error:"Payment failed"};
+  }catch(err){
+  console.error("❌ Payment error:", err);
+  return {error:"Payment failed"};
   }
 
   if(!payment?.txid){
