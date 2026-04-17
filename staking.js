@@ -113,14 +113,23 @@ async function addStake({project,amount,duration}){
   const safeAmount   = Number(amount);
   const safeDuration = Number(duration);
 
+  /* USER CHECK */
   const currentUser =
     JSON.parse(localStorage.getItem("pi_user") || "null");
 
-  if(!currentUser){
+  if(!currentUser || !currentUser.uid){
     return {error:"User not logged in"};
   }
 
-  /* STEP 1: PAYMENT */
+  if(!project || isNaN(safeAmount) || safeAmount <= 0){
+    return {error:"Invalid amount"};
+  }
+
+  if(safeAmount < getMinStake(project)){
+    return {error:"Minimum stake not reached"};
+  }
+
+  /* PAYMENT */
   let payment;
 
   try{
@@ -133,27 +142,63 @@ async function addStake({project,amount,duration}){
     return {error:"Payment failed"};
   }
 
-  /* STEP 2: YOUR SYSTEM */
+  /* SAVE */
   const stakes = _safeParse(INTERNAL_KEY);
 
+  const startTime = Date.now();
+  const unlockTime =
+    startTime + (safeDuration * 86400000);
+
+  const reward =
+    safeAmount * getRate(project,safeDuration);
+
   const newStake = {
+
     id:"ST-"+Date.now(),
+
     userId: currentUser.uid,
+
     project,
     amount:safeAmount,
     duration:safeDuration,
-    reward: safeAmount * getRate(project,safeDuration),
-    timestamp: Date.now(),
 
-    /* FROM PI */
+    startTime,
+    unlockTime,
+
+    reward:Number(reward)||0,
+    remainingReward:Number(reward)||0,
+    withdrawnReward:0,
+
+    capitalWithdrawn:false,
+
+    status:"Successful",
+    timestamp:Date.now(),
+    type:"internal",
+
+    source:"pi",
+    network:"testnet",
+
     txid: payment?.txid || null
   };
 
   stakes.push(newStake);
   _save(INTERNAL_KEY, stakes);
 
-  return {success:true};
-     }
+  /* RECORD TX */
+  if(typeof recordTx === "function"){
+    recordTx({
+      type:"stake",
+      project,
+      amount:safeAmount,
+      meta:{
+        duration:safeDuration,
+        source:"pi"
+      }
+    });
+  }
+
+  return {success:true, stake:newStake};
+       }
   /* ===============================
      USER CHECK FIRST
   =============================== */
