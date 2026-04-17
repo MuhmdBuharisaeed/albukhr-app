@@ -269,9 +269,9 @@ function closeSuccess(){ successModal.style.display="none"; }
 function openInfo(){ infoModal.style.display="flex"; }
 function closeInfo(){ infoModal.style.display="none"; }
 
-function openWithdrawModal(){
+async function openWithdrawModal(){
 
-  const data = getProjectTotals(PROJECT_NAME);
+  const data = await getProjectTotals(PROJECT_NAME);
 
   let total = 0;
   data.stakes.forEach(s=>{
@@ -356,20 +356,11 @@ btn.disabled = false;
 }
 
 /* ===============================
-RESET BUTTON
-=============================== */
-
-btn.innerText = "Confirm";
-btn.disabled = false;
-
-}
-
-/* ===============================
    LOAD
 =============================== */
-function load(){
+async function load(){
 
-const data = getProjectTotals(PROJECT_NAME);
+  const data = await getProjectTotals(PROJECT_NAME);
 
 /* ===============================
 CALCULATE TOTAL STAKE
@@ -517,7 +508,7 @@ projectHistory.appendChild(div);
 /* ===============================
    WITHDRAW
 =============================== */
-function confirmWithdraw(){
+async function confirmWithdraw(){
 
   const amount = Number(withdrawAmount.value);
   const wallet = walletAddress.value;
@@ -532,53 +523,34 @@ function confirmWithdraw(){
     return;
   }
 
-  const data = getProjectTotals(PROJECT_NAME);
+  const res = await withdrawStakeReward(
+    "bulk",
+    amount
+  );
 
-  let total = 0;
-  data.stakes.forEach(s=>{
-    total += Number(s.remainingReward) || 0;
-  });
-
-  if(amount > total){
-    alert("Insufficient balance");
+  if(!res.success){
+    alert(res.error || "Withdraw failed");
     return;
   }
 
-  let remaining = amount;
+  const fee = amount * 0.01;
+  const receive = amount - fee;
 
-  data.stakes.forEach(s=>{
-    if(remaining <= 0) return;
-
-    let r =
-  (Number(s.reward) || 0) -
-  (Number(s.withdrawnReward) || 0);
-
-    if(r > 0){
-      let take = Math.min(r, remaining);
-      withdrawStakeReward(s.id, take);
-      remaining -= take;
+  recordTx({
+    type:"withdraw",
+    project:PROJECT_NAME,
+    amount: receive,
+    meta:{
+      wallet: wallet,
+      fee: fee
     }
   });
 
-  const fee = amount * 0.01;
-const receive = amount - fee;
-
-recordTx({
-type:"withdraw",
-project:PROJECT_NAME,
-amount: receive,
-meta:{
-wallet: wallet,
-fee: fee
-}
-});
-
-  /* CLEAR WALLET */
   walletAddress.value = "";
 
   closeWithdraw();
-  load();
-  }
+  await load();
+    }
 
 /* ===============================
 REWARDS WITHDRAW FEE
@@ -685,16 +657,13 @@ capitalModal.style.display="flex";
 /* ===============================
 UPDATE CAPITAL AVAILABLE
 =============================== */
-function updateCapitalAvailable(){
-
+async function updateCapitalAvailable(){
 const el =
 document.getElementById("capitalAvailable");
 
 if(!el) return;
 
-const data =
-getProjectTotals(PROJECT_NAME);
-
+const data = await getProjectTotals(PROJECT_NAME);
 let total = 0;
 
 const now = Date.now();
@@ -790,12 +759,17 @@ closeCapitalModal();
 capitalWithdrawAmount.value = "";
 capitalWallet.value = "";
 
-load();
+(async ()=>{
+
+  await load();
+
+})();
 
 }
 
-function updateStakeStatus(){
+async function updateStakeStatus(){
 
+  const data = await getProjectTotals(PROJECT_NAME);
 const data =
 getProjectTotals(PROJECT_NAME);
 
@@ -848,7 +822,9 @@ document.getElementById("stakeStatus")
 load();
 
 /* AUTO UPDATE LOCK STATUS */
-  setInterval(updateStakeStatus, 1000);
+  setInterval(()=>{
+  updateStakeStatus();
+},1000);
 
 /* AUTO UPDATE CAPITAL */
 setInterval(updateCapitalAvailable, 1000);
