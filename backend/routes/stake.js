@@ -23,24 +23,34 @@ router.post("/", async (req,res)=>{
   }
 
   /* 🔐 VERIFY PI PAYMENT */
-  const check = await verifyPiPayment(txid);
+const check = await verifyPiPayment(txid);
 
-  if(!check.valid){
-    return res.json({
-      success:false,
-      error: check.error || "Payment verification failed"
-    });
-  }
+if(!check.valid){
+  return res.json({
+    success:false,
+    error: check.error || "Payment verification failed"
+  });
+}
 
-  const payment = check.payment;
+/* 🚫 BLOCK DOUBLE PAYMENT (VERY IMPORTANT) */
+const exists = db.stakes.find(s => s.txid === txid);
 
-  /* 🔍 EXTRA SECURITY CHECKS */
-  if(Number(payment.amount) !== Number(amount)){
-    return res.json({
-      success:false,
-      error:"Amount mismatch"
-    });
-  }
+if(exists){
+  return res.json({
+    success:false,
+    error:"Payment already used"
+  });
+}
+
+const payment = check.payment;
+
+/* 🔍 EXTRA SECURITY CHECKS */
+if(Number(payment.amount) !== Number(amount)){
+  return res.json({
+    success:false,
+    error:"Amount mismatch"
+  });
+   }
 
   /* OPTIONAL: CHECK MEMO */
   if(!payment.memo.includes(project)){
