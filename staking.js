@@ -90,6 +90,8 @@ async function payWithPi({amount, memo, metadata}){
 /* ======================================
    ADD STAKE (REAL FLOW)
 ====================================== */
+const API_BASE = "http://localhost:3000";
+
 async function addStake({project,amount,duration}){
 
   const user = getCurrentUser();
@@ -102,7 +104,7 @@ async function addStake({project,amount,duration}){
     return {error:"Invalid input"};
   }
 
-  /* 1. PAY */
+  /* 1. PI PAYMENT */
   let payment;
 
   try{
@@ -115,44 +117,46 @@ async function addStake({project,amount,duration}){
     return {error:"Payment failed"};
   }
 
+  /* 🔒 VALIDATE PAYMENT */
+  if(!payment?.txid){
+    return {error:"Invalid payment"};
+  }
+
   /* 2. SEND TO BACKEND */
   try{
 
-    const res = await fetch(
-      "http://localhost:3000/stake",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
+    const res = await fetch(`${API_BASE}/stake`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        userId: user.uid,
+        project,
+        amount,
+        duration,
+        txid: payment.txid
+      })
+    });
 
-          userId: user.uid,
-          project,
-          amount,
-          duration,
-
-          txid: payment.txid
-
-        })
-      }
-    );
+    if(!res.ok){
+      return {error:"Server error"};
+    }
 
     const data = await res.json();
 
     if(!data.success){
-      return {error:data.error};
+      return {error:data.error || "Stake failed"};
     }
 
-    /* OPTIONAL FALLBACK SAVE */
-    const local = _safeParse(INTERNAL_KEY);
-    local.push(data.stake);
-    _save(INTERNAL_KEY, local);
-
-    return {success:true};
+    return {
+      success:true,
+      stake:data.stake
+    };
 
   }catch(err){
-    return {error:"Server error"};
+    console.error(err);
+    return {error:"Network error"};
   }
 
 }
