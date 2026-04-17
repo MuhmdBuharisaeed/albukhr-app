@@ -1,98 +1,180 @@
-/* =====================================
-   ALBUKHR AUTH SYSTEM v1 (Pi + Local)
-===================================== */
+// =======================================
+// ALBUKHR AUTH SYSTEM (FINAL)
+// Pi SDK • Auto Login • Secure
+// =======================================
 
-const AUTH_KEY = "albukhr_auth";
+const AUTH_KEY = "pi_user";
 
-/* ===============================
-   GET CURRENT USER
-=============================== */
+/* ======================================
+   SAVE USER (SAFE)
+====================================== */
+function saveUser(user){
+
+  if(!user || !user.uid){
+    console.warn("⚠️ Invalid user");
+    return;
+  }
+
+  localStorage.setItem(
+    AUTH_KEY,
+    JSON.stringify({
+      uid: user.uid,
+      username: user.username || "user"
+    })
+  );
+
+}
+
+/* ======================================
+   GET USER
+====================================== */
 function getCurrentUser(){
 
   try{
-    return JSON.parse(localStorage.getItem(AUTH_KEY));
+    const raw = localStorage.getItem(AUTH_KEY);
+
+    if(!raw) return null;
+
+    const user = JSON.parse(raw);
+
+    if(!user || !user.uid){
+      localStorage.removeItem(AUTH_KEY);
+      return null;
+    }
+
+    return user;
+
   }catch{
+    localStorage.removeItem(AUTH_KEY);
     return null;
   }
 
 }
 
-/* ===============================
-   IS LOGGED IN
-=============================== */
-function isLoggedIn(){
-  return !!getCurrentUser();
-}
-
-/* ===============================
-   LOGIN WITH PI
-=============================== */
-async function loginWithPi(){
-
-  try{
-
-    const user = await Pi.authenticate(
-      ['username','payments'],
-      function(payment){
-        console.log("Payment:", payment);
-      }
-    );
-
-    const authData = {
-      uid: user.uid,
-      username: user.username,
-      accessToken: user.accessToken,
-      loginTime: Date.now()
-    };
-
-    localStorage.setItem(
-      AUTH_KEY,
-      JSON.stringify(authData)
-    );
-
-    console.log("Login success:", authData);
-
-    window.dispatchEvent(
-      new CustomEvent("authChanged")
-    );
-
-    return {success:true, user:authData};
-
-  }catch(err){
-
-    console.error("Login failed", err);
-
-    return {success:false, error:"Pi login failed"};
-  }
-
-}
-
-/* ===============================
+/* ======================================
    LOGOUT
-=============================== */
+====================================== */
 function logout(){
 
   localStorage.removeItem(AUTH_KEY);
 
-  window.dispatchEvent(
-    new CustomEvent("authChanged")
+  location.reload();
+
+}
+
+/* ======================================
+   PI LOGIN
+====================================== */
+function loginWithPi(){
+
+  const PiNetwork = window.Pi;
+
+  if(!PiNetwork){
+    alert("Pi SDK not ready");
+    return;
+  }
+
+  PiNetwork.authenticate(
+    ["username"],
+
+    function onSuccess(auth){
+
+      if(!auth?.user?.uid){
+        alert("Login failed");
+        return;
+      }
+
+      const user = {
+        uid: auth.user.uid,
+        username: auth.user.username
+      };
+
+      saveUser(user);
+
+      console.log("✅ Logged in:", user);
+
+      location.reload();
+
+    },
+
+    function onIncomplete(){
+      alert("Login incomplete");
+    },
+
+    function onError(error){
+      console.error(error);
+      alert("Login error");
+    }
+
   );
 
 }
 
-/* ===============================
-   REQUIRE AUTH (GUARD)
-=============================== */
+/* ======================================
+   AUTO LOGIN (IMPORTANT)
+====================================== */
+async function initAuth(){
+
+  const PiNetwork = window.Pi;
+
+  if(!PiNetwork){
+    console.warn("Pi SDK not loaded");
+    return;
+  }
+
+  try{
+
+    const scopes = ["username"];
+
+    const auth = await PiNetwork.authenticate(scopes, true);
+
+    if(auth?.user?.uid){
+
+      const existing = getCurrentUser();
+
+      /* UPDATE IF DIFFERENT */
+      if(!existing || existing.uid !== auth.user.uid){
+
+        saveUser({
+          uid: auth.user.uid,
+          username: auth.user.username
+        });
+
+        console.log("🔄 User synced");
+
+      }
+
+    }
+
+  }catch(err){
+
+    console.warn("Auto login skipped");
+
+  }
+
+}
+
+/* ======================================
+   REQUIRE LOGIN (OPTIONAL)
+====================================== */
 function requireAuth(){
 
-  if(!isLoggedIn()){
+  const user = getCurrentUser();
 
+  if(!user){
     alert("Please login first");
-
-    window.location.href = "index.html";
-
     return false;
   }
 
   return true;
+
 }
+
+/* ======================================
+   INIT
+====================================== */
+
+/* delay kadan don Pi SDK ya load */
+setTimeout(()=>{
+  initAuth();
+}, 1000);
