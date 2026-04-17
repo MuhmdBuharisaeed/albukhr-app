@@ -7,21 +7,56 @@ const INTERNAL_KEY = "albukhr_stakes";
 const EXTERNAL_KEY = "albukhr_external_projects";
 
 /* ======================================
-   SAFE STORAGE
+   SAFE LOCAL STORAGE (FALLBACK ONLY)
 ====================================== */
+
 function _safeParse(key){
+
   try{
-    const data = JSON.parse(localStorage.getItem(key));
-    return Array.isArray(data) ? data : [];
-  }catch{
+
+    const raw = localStorage.getItem(key);
+
+    if(!raw) return [];
+
+    const data = JSON.parse(raw);
+
+    /* tabbatar array ne */
+    if(!Array.isArray(data)) return [];
+
+    return data;
+
+  }catch(err){
+
+    console.warn("⚠️ Parse error:", key);
+
     return [];
+
   }
+
 }
 
 function _save(key,data){
-  localStorage.setItem(key, JSON.stringify(data));
-}
 
+  try{
+
+    /* ULTRA RULE: only allow array */
+    if(!Array.isArray(data)){
+      console.warn("⚠️ Invalid data format:", key);
+      return;
+    }
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(data)
+    );
+
+  }catch(err){
+
+    console.error("❌ Save failed:", key);
+
+  }
+
+}
 /* ======================================
    PROJECT RULES
 ====================================== */
