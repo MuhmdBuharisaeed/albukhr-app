@@ -178,19 +178,22 @@ Cancel
 </div>
 </div>
   
-<!-- SCRIPTS -->
+<!-- 1. PI SDK FIRST (VERY IMPORTANT) -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-<!-- 1. AUTH FIRST -->
+<!-- 2. INIT PI -->
+<script>
+Pi.init({
+  version:"2.0",
+  sandbox:true
+});
+</script>
+
+<!-- 3. AUTH -->
 <script src="js/auth.js"></script>
 
-<!-- 2. CORE CONFIG -->
+<!-- 4. CONFIG -->
 <script src="js/project-config.js"></script>
-
-<!-- 3. API (NEW) -->
-<script src="js/api.js"></script>
-
-<!-- 4. PI SDK (MUST COME EARLY) -->
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <!-- 5. TRANSACTIONS -->
 <script src="js/unified-transactions.js"></script>
@@ -199,16 +202,9 @@ Cancel
 <!-- 6. ENGINES -->
 <script src="smart-liquidity-engine.js"></script>
 
-<!-- 7. CORE BUSINESS LOGIC -->
+<!-- 7. CORE -->
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
-
-<script>
-Pi.init({
-  version:"2.0",
-  sandbox:true
-});
-</script>
 
 <script>
 
