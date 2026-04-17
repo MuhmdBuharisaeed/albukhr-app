@@ -1,6 +1,6 @@
 // =======================================
-// ALBUKHR STAKING ENGINE v3.2 (WALLET SAFE)
-// Fully Compatible with Wallet Core v7
+// ALBUKHR STAKING ENGINE v4 (FINAL CLEAN)
+// Stable • Wallet Safe • Pi Compatible
 // =======================================
 
 const INTERNAL_KEY = "albukhr_stakes";
@@ -68,45 +68,36 @@ async function payWithPi({amount, memo, metadata}){
 
   return new Promise((resolve,reject)=>{
 
-    /* 🔒 SAFETY CHECK */
     if(!PiNetwork){
       reject("Pi SDK not loaded");
       return;
     }
 
     PiNetwork.createPayment({
-      amount: amount,
-      memo: memo,
-      metadata: metadata
+      amount,
+      memo,
+      metadata
     },{
-
-      onReadyForServerApproval: function(paymentId){
-        console.log("Ready for approval:", paymentId);
+      onReadyForServerApproval(paymentId){
+        console.log("Approval:", paymentId);
       },
-
-      onReadyForServerCompletion: function(paymentId, txid){
-        console.log("Payment complete:", txid);
+      onReadyForServerCompletion(paymentId, txid){
         resolve({paymentId, txid});
       },
-
-      onCancel: function(paymentId){
-        console.warn("Payment cancelled");
+      onCancel(){
         reject("cancelled");
       },
-
-      onError: function(error, payment){
-        console.error("Payment error:", error);
+      onError(error){
         reject(error);
       }
-
     });
 
   });
 
- }
+}
 
 /* ======================================
-   ADD STAKE (PI PAYMENT REQUIRED)
+   ADD STAKE
 ====================================== */
 async function addStake({project,amount,duration}){
 
@@ -142,7 +133,7 @@ async function addStake({project,amount,duration}){
     return {error:"Payment failed"};
   }
 
-  /* SAVE */
+  /* SAVE STAKE */
   const stakes = _safeParse(INTERNAL_KEY);
 
   const startTime = Date.now();
@@ -155,7 +146,6 @@ async function addStake({project,amount,duration}){
   const newStake = {
 
     id:"ST-"+Date.now(),
-
     userId: currentUser.uid,
 
     project,
@@ -177,8 +167,8 @@ async function addStake({project,amount,duration}){
 
     source:"pi",
     network:"testnet",
-
     txid: payment?.txid || null
+
   };
 
   stakes.push(newStake);
@@ -198,115 +188,10 @@ async function addStake({project,amount,duration}){
   }
 
   return {success:true, stake:newStake};
-       }
-  /* ===============================
-     USER CHECK FIRST
-  =============================== */
-
-  const currentUser =
-    JSON.parse(localStorage.getItem("pi_user") || "null");
-
-  if(!currentUser){
-    return {error:"User not logged in"};
-  }
-
-  if(!project || isNaN(safeAmount) || safeAmount <= 0){
-    return {error:"Invalid amount"};
-  }
-
-  if(safeAmount < getMinStake(project)){
-    return {error:"Minimum stake not reached"};
-  }
-
-  /* ===============================
-     STEP 1: PI PAYMENT
-  =============================== */
-
-let payment;
-
-try{
-
-  payment = await payWithPi({
-    amount: safeAmount,
-    memo: `Stake in ${project}`,
-    metadata: { project, duration }
-  });
-
-  console.log("Payment success:", payment);
-
-}catch(err){
-  __stakingLock = false;
-  return {error:"Payment failed"};
 }
-
-  /* ===============================
-     STEP 2: SAVE STAKE
-  =============================== */
-
-  const rate   = getRate(project,safeDuration);
-  const reward = safeAmount * rate;
-
-  const stakes = _safeParse(INTERNAL_KEY);
-
-  const startTime = Date.now();
-  const unlockTime =
-    startTime + (safeDuration * 86400000);
-
-  const newStake = {
-
-const newStake = {
-
-  id:"ST-"+Date.now(),
-
-  userId: currentUser.uid,
-
-  project,
-  amount:safeAmount,
-  duration:safeDuration,
-
-  startTime,
-  unlockTime,
-
-  reward:Number(reward)||0,
-  remainingReward:Number(reward)||0,
-  withdrawnReward:0,
-
-  capitalWithdrawn:false,
-
-  status:"Successful",
-  timestamp:Date.now(),
-  type:"internal",
-
-  source:"pi",
-  network:"testnet",
-
-  /* 🔥 ADD THIS HERE */
-  txid: payment?.txid || null
-
-};
-
-  stakes.push(newStake);
-
-  /* ✅ SAVE */
-  _save(INTERNAL_KEY, stakes);
-
-/* 🔥 RECORD TRANSACTION */
-if(typeof recordTx === "function"){
-  recordTx({
-    type:"stake",
-    project,
-    amount:safeAmount,
-    meta:{
-      duration:safeDuration,
-      source:"pi"
-    }
-  });
-}
-
-return {success:true, stake:newStake};
 
 /* ======================================
-   MERGED STAKES (WALLET SAFE)
+   MERGED STAKES
 ====================================== */
 function getAllStakesMerged(){
 
@@ -318,32 +203,23 @@ function getAllStakesMerged(){
   const internal = _safeParse(INTERNAL_KEY)
     .filter(s =>
       s.status === "Successful" &&
-      s.userId === currentUser.uid   // 🔥 FILTER USER
-    )
-    .map(s=>({
-      ...s,
-      remainingReward:
-        s.remainingReward ?? s.reward ?? 0,
-      capitalWithdrawn:
-        s.capitalWithdrawn ?? false
-    }));
+      s.userId === currentUser.uid
+    );
 
   const external = _safeParse(EXTERNAL_KEY)
     .filter(p =>
       p.status === "approved" &&
-      p.userId === currentUser.uid   // 🔥 ALSO FILTER
+      p.userId === currentUser.uid
     )
     .map(p=>({
       ...p,
-      status:"Successful",
-      remainingReward:
-        p.remainingReward ?? p.reward ?? 0,
-      capitalWithdrawn:false
+      status:"Successful"
     }));
 
   return [...internal,...external]
     .sort((a,b)=>b.timestamp - a.timestamp);
 }
+
 /* ======================================
    PROJECT TOTALS
 ====================================== */
@@ -364,41 +240,40 @@ function getProjectTotals(project){
 }
 
 /* ======================================
-   WITHDRAW REWARD (DASHBOARD)
+   WITHDRAW REWARD
 ====================================== */
 function withdrawStakeReward(stakeId, amount){
 
-const stakes = _safeParse(INTERNAL_KEY);
+  const stakes = _safeParse(INTERNAL_KEY);
 
-const stake = stakes.find(s => s.id === stakeId);
+  const stake = stakes.find(s => s.id === stakeId);
 
-if(!stake) return {error:"Stake not found"};
+  if(!stake) return {error:"Stake not found"};
 
-const totalReward = Number(stake.reward) || 0;
-const withdrawn   = Number(stake.withdrawnReward) || 0;
+  const totalReward = Number(stake.reward) || 0;
+  const withdrawn   = Number(stake.withdrawnReward) || 0;
 
-const remaining = totalReward - withdrawn;
+  const remaining = totalReward - withdrawn;
 
-if(remaining <= 0){
-return {error:"No reward available"};
-}
+  if(remaining <= 0){
+    return {error:"No reward available"};
+  }
 
-const take = Math.min(Number(amount)||0, remaining);
+  const take = Math.min(Number(amount)||0, remaining);
 
-stake.withdrawnReward =
-  (stake.withdrawnReward || 0) + take;
+  stake.withdrawnReward =
+    (stake.withdrawnReward || 0) + take;
 
-_save(INTERNAL_KEY,stakes);
+  _save(INTERNAL_KEY,stakes);
 
-return {
-success:true,
-amount:take
-};
-
+  return {
+    success:true,
+    amount:take
+  };
 }
 
 /* ======================================
-   LEGACY WRAPPERS
+   HELPERS
 ====================================== */
 function getStakes(){ return getAllStakesMerged(); }
 function getInternalTotals(){ return getProjectTotals(); }
