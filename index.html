@@ -1197,32 +1197,54 @@ X
 <script>
 
 function loadHome(){
-  if(typeof getAllStakesMerged !== "function") return;
-  const stakes = getAllStakesMerged();
+
+  let stakes = [];
+
+  /* SAFE LOAD (NO CRASH) */
+  if(typeof getAllStakesMerged === "function"){
+    stakes = getAllStakesMerged();
+  }
+
   let userMap = {}, globalMap = {};
   let totalStake=0, totalReward=0;
-  
+
   stakes.forEach(s=>{
 
-  if(s.capitalWithdrawn) return;
+    if(s.capitalWithdrawn) return;
 
-  const amount = Number(s.amount)||0;
+    const amount = Number(s.amount)||0;
 
-  const total = Number(s.reward) || 0;
-  const withdrawn = Number(s.withdrawnReward) || 0;
+    const total = Number(s.reward) || 0;
+    const withdrawn = Number(s.withdrawnReward) || 0;
 
-  const reward = Math.max(0, total - withdrawn);
+    const reward = Math.max(0, total - withdrawn);
 
-  totalStake += amount;
-  totalReward += reward;
-   
+    totalStake += amount;
+    totalReward += reward;
+
     userMap[s.project] = (userMap[s.project]||0) + amount;
-    if(!globalMap[s.project]) globalMap[s.project]={total:0, investors:0};
+
+    if(!globalMap[s.project]){
+      globalMap[s.project]={total:0, investors:0};
+    }
+
     globalMap[s.project].total += amount;
+
   });
 
+  /* FIX: EVEN IF NO STAKES → SHOW PROJECTS */
+  if(typeof PROJECT_CONFIG === "object"){
+    Object.keys(PROJECT_CONFIG).forEach(project=>{
+      if(!globalMap[project]){
+        globalMap[project] = {total:0, investors:0};
+      }
+    });
+  }
+
   Object.keys(globalMap).forEach(project=>{
-    globalMap[project].investors = stakes.filter(s=> s.project===project && !s.capitalWithdrawn).length;
+    globalMap[project].investors = stakes.filter(s=> 
+      s.project===project && !s.capitalWithdrawn
+    ).length;
   });
 
   homeStake.innerText = totalStake.toFixed(2)+" Pi";
