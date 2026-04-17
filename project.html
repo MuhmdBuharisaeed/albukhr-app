@@ -408,7 +408,7 @@ totalStake.toFixed(2) + " Pi";
 aReward.innerText =
 reward.toFixed(2) + " Pi";
 
-await renderHistory();
+renderHistory();
 
 /* LOCK STATUS */
 updateStakeStatus();
@@ -717,7 +717,7 @@ const fee = amount * 0.01;
 const receive = amount - fee;
 
 const data =
-getProjectTotals(PROJECT_NAME);
+await getProjectTotals(PROJECT_NAME);
 
 let remaining = amount;
 
@@ -830,10 +830,10 @@ load();
 /* AUTO UPDATE LOCK STATUS */
   setInterval(()=>{
   updateStakeStatus();
-},1000);
+},5000);
 
 /* AUTO UPDATE CAPITAL */
-setInterval(updateCapitalAvailable, 1000);
+setInterval(updateCapitalAvailable, 5000);
 </script>
 
 </body>
