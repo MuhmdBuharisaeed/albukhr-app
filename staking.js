@@ -1,19 +1,16 @@
 // =======================================
-// ALBUKHR STAKING ENGINE v5 (ULTRA CLEAN)
-// API Driven • Stable • Production Ready
+// ALBUKHR STAKING ENGINE (LOCAL FINAL)
+// Pi SDK Ready • No API • Mobile Safe
 // =======================================
 
-const API_BASE = "https://api.albukhr.com";
 const INTERNAL_KEY = "albukhr_stakes";
 
 /* ======================================
-   SAFE STORAGE (FALLBACK)
+   STORAGE
 ====================================== */
 function _safeParse(key){
   try{
-    const raw = localStorage.getItem(key);
-    if(!raw) return [];
-    const data = JSON.parse(raw);
+    const data = JSON.parse(localStorage.getItem(key));
     return Array.isArray(data) ? data : [];
   }catch{
     return [];
@@ -31,41 +28,47 @@ function _save(key,data){
 ====================================== */
 function getCurrentUser(){
   try{
-    const user = JSON.parse(localStorage.getItem("pi_user"));
-    return user?.uid ? user : null;
+    return JSON.parse(localStorage.getItem("pi_user"));
   }catch{
     return null;
   }
 }
 
 /* ======================================
-   API: GET STAKES
+   PROJECT RULES
 ====================================== */
-async function getStakesAPI(){
+const PROJECT_RULES = {
+  Raheem:{minStake:10},
+  Hauwal:{minStake:10},
+  Barsh:{minStake:10},
+  Khairat:{minStake:10},
+  Urban:{minStake:10},
+  Labbaika:{minStake:10},
+  Azman:{minStake:10}
+};
 
-  const user = getCurrentUser();
-  if(!user?.uid) return [];
+function getMinStake(project){
+  return PROJECT_RULES?.[project]?.minStake || 0;
+}
 
-  try{
-    const res = await fetch(
-      `${API_BASE}/stakes?uid=${user.uid}`
-    );
+/* ======================================
+   REWARD RATES
+====================================== */
+function getRate(project,duration){
 
-    if(!res.ok) throw new Error();
+  const d = Number(duration);
 
-    const data = await res.json();
+  const table = {
+    Raheem:{30:0.01,60:0.025,90:0.05},
+    Hauwal:{30:0.02,60:0.04,90:0.08},
+    Khairat:{30:0.025,60:0.05,90:0.09},
+    Barsh:{30:0.03,60:0.06,90:0.10},
+    Labbaika:{30:0.02,60:0.045,90:0.075},
+    Urban:{30:0.12,60:0.12,90:0.12},
+    Azman:{30:0.04,60:0.07,90:0.12}
+  };
 
-    if(Array.isArray(data)){
-      _save(INTERNAL_KEY, data); // cache
-      return data;
-    }
-
-    throw new Error();
-
-  }catch{
-    return _safeParse(INTERNAL_KEY);
-  }
-
+  return table?.[project]?.[d] || 0;
 }
 
 /* ======================================
@@ -75,11 +78,12 @@ async function payWithPi({amount, memo, metadata}){
 
   const PiNetwork = window.Pi;
 
-  if(!PiNetwork){
-    throw new Error("Pi SDK not loaded");
-  }
-
   return new Promise((resolve,reject)=>{
+
+    if(!PiNetwork){
+      reject("Pi SDK not loaded");
+      return;
+    }
 
     PiNetwork.createPayment({
       amount,
@@ -100,195 +104,154 @@ async function payWithPi({amount, memo, metadata}){
 /* ======================================
    ADD STAKE
 ====================================== */
-let __stakingLock = false;
-
 async function addStake({project,amount,duration}){
-
-  if(__stakingLock){
-    return {error:"Processing..."};
-  }
-
-  __stakingLock = true;
 
   const user = getCurrentUser();
 
   if(!user?.uid){
-    __stakingLock = false;
     return {error:"User not logged in"};
   }
 
-  if(!project || !amount || amount <= 0){
-    __stakingLock = false;
+  const safeAmount = Number(amount);
+  const safeDuration = Number(duration);
+
+  if(!project || safeAmount <= 0){
     return {error:"Invalid input"};
   }
 
-  /* PAYMENT */
+  if(safeAmount < getMinStake(project)){
+    return {error:"Minimum stake not reached"};
+  }
+
+  /* PI PAYMENT */
   let payment;
 
   try{
     payment = await payWithPi({
-      amount,
+      amount: safeAmount,
       memo:`Stake in ${project}`,
       metadata:{project,duration}
     });
   }catch{
-    __stakingLock = false;
     return {error:"Payment failed"};
   }
 
   if(!payment?.txid){
-    __stakingLock = false;
     return {error:"Invalid payment"};
   }
 
-  /* SEND TO API */
-  try{
+  /* SAVE LOCAL */
+  const stakes = _safeParse(INTERNAL_KEY);
 
-    const res = await fetch(`${API_BASE}/stake`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body: JSON.stringify({
-        userId: user.uid,
-        project,
-        amount,
-        duration,
-        txid: payment.txid
-      })
-    });
+  const startTime = Date.now();
+  const unlockTime =
+    startTime + (safeDuration * 86400000);
 
-    const data = await res.json();
+  const reward =
+    safeAmount * getRate(project,safeDuration);
 
-    if(!data.success){
-      throw new Error(data.error);
-    }
+  const newStake = {
 
-    __stakingLock = false;
+    id:"ST-"+Date.now(),
+    userId:user.uid,
 
-    return {
-      success:true,
-      stake:data.stake
-    };
+    project,
+    amount:safeAmount,
+    duration:safeDuration,
 
-  }catch(err){
+    startTime,
+    unlockTime,
 
-    console.error(err);
+    reward,
+    withdrawnReward:0,
 
-    __stakingLock = false;
+    status:"Successful",
+    timestamp:Date.now(),
 
-    return {error:"Network / server error"};
-  }
+    txid: payment.txid
+  };
 
+  stakes.push(newStake);
+  _save(INTERNAL_KEY, stakes);
+
+  return {success:true, stake:newStake};
 }
 
 /* ======================================
    GET ALL STAKES
 ====================================== */
-async function getAllStakesMerged(){
+function getAllStakesMerged(){
 
-  const data = await getStakesAPI();
+  const user = getCurrentUser();
+  if(!user) return [];
 
-  return (data || [])
-    .filter(s => s.status === "Successful")
-    .sort((a,b)=>
-      (b.timestamp||0) - (a.timestamp||0)
-    );
-
+  return _safeParse(INTERNAL_KEY)
+    .filter(s =>
+      s.userId === user.uid &&
+      s.status === "Successful"
+    )
+    .sort((a,b)=>b.timestamp - a.timestamp);
 }
 
 /* ======================================
    PROJECT TOTALS
 ====================================== */
-async function getProjectTotals(project){
+function getProjectTotals(project){
 
-  const stakes = await getAllStakesMerged();
+  const stakes = getAllStakesMerged();
 
   const filtered =
     stakes.filter(s=>s.project===project);
 
-  let totalStake = 0;
-  let totalReward = 0;
+  let stake = 0;
+  let reward = 0;
 
   filtered.forEach(s=>{
 
-    const reward =
+    stake += Number(s.amount)||0;
+
+    const remaining =
       (Number(s.reward)||0) -
       (Number(s.withdrawnReward)||0);
 
-    totalStake += Number(s.amount)||0;
-    totalReward += Math.max(0, reward);
+    reward += Math.max(0, remaining);
 
   });
 
-  return {
-    stake: totalStake,
-    reward: totalReward,
-    stakes: filtered
-  };
-
+  return {stake,reward,stakes:filtered};
 }
 
 /* ======================================
-   WITHDRAW
+   WITHDRAW REWARD
 ====================================== */
-let __withdrawLock = false;
+function withdrawStakeReward(stakeId, amount){
 
-async function withdrawStakeReward(project, amount){
+  const stakes = _safeParse(INTERNAL_KEY);
 
-  if(__withdrawLock){
-    return {error:"Processing..."};
+  const stake = stakes.find(s => s.id === stakeId);
+
+  if(!stake) return {error:"Stake not found"};
+
+  const remaining =
+    (stake.reward || 0) -
+    (stake.withdrawnReward || 0);
+
+  if(remaining <= 0){
+    return {error:"No reward"};
   }
 
-  __withdrawLock = true;
+  const take = Math.min(Number(amount)||0, remaining);
 
-  const user = getCurrentUser();
+  stake.withdrawnReward =
+    (stake.withdrawnReward || 0) + take;
 
-  if(!user?.uid){
-    __withdrawLock = false;
-    return {error:"User not logged in"};
-  }
+  _save(INTERNAL_KEY, stakes);
 
-  try{
-
-    const res = await fetch(
-      `${API_BASE}/withdraw`,
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-          userId: user.uid,
-          project,
-          amount
-        })
-      }
-    );
-
-    const data = await res.json();
-
-    if(!data.success){
-      throw new Error(data.error);
-    }
-
-    __withdrawLock = false;
-
-    return {success:true};
-
-  }catch(err){
-
-    console.error(err);
-
-    __withdrawLock = false;
-
-    return {error:"Withdraw failed"};
-  }
-
+  return {success:true, amount:take};
 }
 
 /* ======================================
-   WRAPPERS
+   HELPERS
 ====================================== */
 function getStakes(){ return getAllStakesMerged(); }
 function getInternalTotals(){ return getProjectTotals(); }
