@@ -1,6 +1,9 @@
 const express = require("express");
+const cors = require("cors");
+
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 let stakes = [];
@@ -9,9 +12,8 @@ let transactions = [];
 /* =========================
    VERIFY PI PAYMENT
 ========================= */
-async function verifyPiPayment(paymentId){
-  // 🔥 Replace with real Pi API later
-  return true;
+async function verifyPiPayment(txid){
+  return { valid:true }; // TEMP
 }
 
 /* =========================
@@ -19,16 +21,22 @@ async function verifyPiPayment(paymentId){
 ========================= */
 app.post("/stake", async (req,res)=>{
 
-  const {userId, project, amount, duration, paymentId} = req.body;
+  const {userId, project, amount, duration, txid} = req.body;
 
-  if(!userId || !paymentId){
-    return res.json({error:"Invalid request"});
+  if(!userId || !txid){
+    return res.json({success:false,error:"Invalid request"});
   }
 
-  const verified = await verifyPiPayment(paymentId);
+  const check = await verifyPiPayment(txid);
 
-  if(!verified){
-    return res.json({error:"Payment not verified"});
+  if(!check.valid){
+    return res.json({success:false,error:"Payment not verified"});
+  }
+
+  /* DUPLICATE PROTECTION */
+  const exists = stakes.find(s => s.txid === txid);
+  if(exists){
+    return res.json({success:false,error:"Payment already used"});
   }
 
   const stake = {
@@ -39,18 +47,12 @@ app.post("/stake", async (req,res)=>{
     duration,
     reward: amount * 0.05,
     withdrawnReward:0,
-    timestamp:Date.now()
+    status:"Successful",
+    timestamp:Date.now(),
+    txid
   };
 
   stakes.push(stake);
-
-  transactions.push({
-    type:"stake",
-    userId,
-    project,
-    amount,
-    timestamp:Date.now()
-  });
 
   res.json({success:true, stake});
 
@@ -59,10 +61,16 @@ app.post("/stake", async (req,res)=>{
 /* =========================
    GET USER STAKES
 ========================= */
-app.get("/stakes/:userId",(req,res)=>{
+app.get("/stakes",(req,res)=>{
+
+  const { uid } = req.query;
+
+  if(!uid){
+    return res.json([]);
+  }
 
   const userStakes =
-    stakes.filter(s=>s.userId === req.params.userId);
+    stakes.filter(s => s.userId === uid);
 
   res.json(userStakes);
 
@@ -98,19 +106,11 @@ app.post("/withdraw",(req,res)=>{
   });
 
   if(remaining > 0){
-    return res.json({error:"Insufficient"});
+    return res.json({success:false,error:"Insufficient"});
   }
-
-  transactions.push({
-    type:"withdraw",
-    userId,
-    project,
-    amount,
-    timestamp:Date.now()
-  });
 
   res.json({success:true});
 
 });
 
-app.listen(3000,()=>console.log("Server running"));
+app.listen(3000,()=>console.log("✅ Server running"));
