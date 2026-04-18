@@ -74,51 +74,15 @@ function getRate(project,duration){
 /* ======================================
    PI PAYMENT
 ====================================== */
+
 async function payWithPi({amount, memo, metadata}){
 
-  const PiNetwork = window.Pi;
+  console.log("⚠️ TEST MODE PAYMENT");
 
-  if(!PiNetwork){
-    throw new Error("Pi SDK not loaded");
-  }
-
-  return new Promise((resolve,reject)=>{
-
-    PiNetwork.createPayment({
-      amount,
-      memo,
-      metadata
-    },{
-
-      /* ❌ REMOVE SERVER APPROVAL */
-
-      onReadyForServerCompletion: function(paymentId, txid){
-        console.log("✅ Payment success:", txid);
-
-        resolve({
-          paymentId,
-          txid
-        });
-      },
-
-      onCancel: function(){
-        console.warn("❌ User cancelled");
-        reject("cancelled");
-      },
-
-       onError: function(error){
-  alert("Pi Error: " + JSON.stringify(error));
-  console.error(error);
-       }
-
-      onError: function(error){
-        console.error("❌ Pi error:", error);
-        reject(error);
-      }
-
-    });
-
-  });
+  return {
+    paymentId: "TEST-"+Date.now(),
+    txid: "TEST-"+Date.now()
+  };
 
 }
 
