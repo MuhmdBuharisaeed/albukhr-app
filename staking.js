@@ -75,14 +75,57 @@ function getRate(project,duration){
    PI PAYMENT
 ====================================== */
 
-async function payWithPi({amount, memo, metadata}){
+function payWithPi({amount, memo, metadata}){
 
-  console.log("⚠️ TEST MODE PAYMENT");
+  return new Promise((resolve,reject)=>{
 
-  return {
-    paymentId: "TEST-"+Date.now(),
-    txid: "TEST-"+Date.now()
-  };
+    const PiNetwork = window.Pi;
+
+    if(!PiNetwork){
+      reject("Pi SDK not loaded");
+      return;
+    }
+
+    PiNetwork.createPayment({
+      amount,
+      memo,
+      metadata
+    },{
+
+      onReadyForServerCompletion: async function(paymentId, txid){
+
+        try{
+
+          await fetch("https://albukhr-api.onrender.com/complete-payment",{
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+              paymentId,
+              txid
+            })
+          });
+
+        }catch(e){
+          console.error("Complete failed", e);
+        }
+
+        resolve({paymentId, txid});
+      },
+
+      onCancel: function(){
+        reject("cancelled");
+      },
+
+      onError: function(error){
+        console.error(error);
+        reject(error);
+      }
+
+    });
+
+  });
 
 }
 
