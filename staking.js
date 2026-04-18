@@ -89,16 +89,26 @@ async function payWithPi({amount, memo, metadata}){
 /* ======================================
    ADD STAKE
 ====================================== */
+let __stakingLock = false;
+
 async function addStake({project,amount,duration}){
+
+  if(__stakingLock){
+    return {error:"Processing..."};
+  }
+
+  __stakingLock = true;
 
   const user = getCurrentUser();
 
   if(!user?.uid){
+    __stakingLock = false;
     return {error:"User not logged in"};
   }
 
-  /* 🔥 ADD THIS HERE (BEST POSITION) */
+  /* 🔐 PI CHECK */
   if(typeof window.Pi === "undefined"){
+    __stakingLock = false;
     return {error:"Pi SDK not ready"};
   }
 
@@ -106,58 +116,76 @@ async function addStake({project,amount,duration}){
   const safeDuration = Number(duration);
 
   if(!project || safeAmount <= 0){
+    __stakingLock = false;
     return {error:"Invalid input"};
   }
 
   if(safeAmount < getMinStake(project)){
+    __stakingLock = false;
     return {error:"Minimum stake not reached"};
   }
-   
-  /* PI PAYMENT */
+
+  /* ===============================
+     PI PAYMENT
+  =============================== */
   let payment;
 
   try{
+
     payment = await payWithPi({
       amount: safeAmount,
       memo:`Stake in ${project}`,
       metadata:{project,duration}
     });
+
   }catch(err){
-  console.error("❌ Payment error:", err);
-  return {error:"Payment failed"};
+
+    console.error("❌ Payment error:", err);
+
+    __stakingLock = false;
+    return {error:"Payment failed"};
+
   }
 
   if(!payment?.txid){
+    __stakingLock = false;
     return {error:"Invalid payment"};
   }
 
-  /* SAVE LOCAL */
+  /* ===============================
+     SAVE LOCAL (TESTNET MODE)
+  =============================== */
+
   const stakes = _safeParse(INTERNAL_KEY);
 
-  const startTime = Date.now();
+  const now = Date.now();
+
   const unlockTime =
-    startTime + (safeDuration * 86400000);
+    now + (safeDuration * 86400000);
+
+  const rate =
+    Number(getRate(project,safeDuration)) || 0;
 
   const reward =
-    safeAmount * getRate(project,safeDuration);
+    safeAmount * rate;
 
   const newStake = {
 
-    id:"ST-"+Date.now(),
+    id:"ST-"+now,
     userId:user.uid,
 
     project,
     amount:safeAmount,
     duration:safeDuration,
 
-    startTime,
+    startTime:now,
     unlockTime,
 
     reward,
     withdrawnReward:0,
 
     status:"Successful",
-    timestamp:Date.now(),
+    timestamp:now,
 
     txid: payment.txid
   };
@@ -165,7 +193,26 @@ async function addStake({project,amount,duration}){
   stakes.push(newStake);
   _save(INTERNAL_KEY, stakes);
 
-  return {success:true, stake:newStake};
+  /* ===============================
+     RECORD TRANSACTION (FIX HISTORY)
+  =============================== */
+
+  if(typeof recordTx === "function"){
+    recordTx({
+      type:"stake",
+      project,
+      amount:safeAmount,
+      timestamp:now
+    });
+  }
+
+  __stakingLock = false;
+
+  return {
+    success:true,
+    stake:newStake
+  };
+
 }
 
 /* ======================================
