@@ -106,6 +106,11 @@ async function payWithPi({amount, memo, metadata}){
         reject("cancelled");
       },
 
+       onError: function(error){
+  alert("Pi Error: " + JSON.stringify(error));
+  console.error(error);
+       }
+
       onError: function(error){
         console.error("❌ Pi error:", error);
         reject(error);
