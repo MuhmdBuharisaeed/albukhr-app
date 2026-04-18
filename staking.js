@@ -152,6 +152,27 @@ async function addStake({project,amount,duration}){
     return {error:"Invalid payment"};
   }
 
+   /* SEND TO BACKEND */
+try{
+
+  await fetch("https://albukhr-api.onrender.com/stake",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      userId:user.uid,
+      project,
+      amount:safeAmount,
+      duration:safeDuration,
+      txid: payment.txid
+    })
+  });
+
+}catch(e){
+  console.warn("Backend failed, using local");
+}
+
   /* ===============================
      SAVE LOCAL (TESTNET MODE)
   =============================== */
