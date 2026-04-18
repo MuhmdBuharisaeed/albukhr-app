@@ -152,24 +152,40 @@ async function addStake({project,amount,duration}){
   }
 
    /* SEND TO BACKEND */
+let backendStake = null;
+
 try{
 
-  await fetch("https://albukhr-api.onrender.com/stake",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-      userId:user.uid,
-      project,
-      amount:safeAmount,
-      duration:safeDuration,
-      txid: payment.txid
-    })
-  });
+  const res = await fetch(
+    "https://albukhr-api.onrender.com/stake",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        userId:user.uid,
+        project,
+        amount:safeAmount,
+        duration:safeDuration,
+        txid: payment.txid
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  /* ✅ CHECK SUCCESS */
+  if(data.success){
+    backendStake = data.stake;
+  }else{
+    console.warn("Backend rejected:", data.error);
+  }
 
 }catch(e){
+
   console.warn("Backend failed, using local");
+
 }
 
   /* ===============================
@@ -229,20 +245,42 @@ try{
   __stakingLock = false;
 
   return {
-    success:true,
-    stake:newStake
-  };
+  success:true,
+  stake: backendStake || newStake
+};
 
 }
 
 /* ======================================
    GET ALL STAKES
 ====================================== */
-function getAllStakesMerged(){
+async function getAllStakesMerged(){
 
   const user = getCurrentUser();
   if(!user) return [];
 
+  try{
+
+    const res = await fetch(
+      "https://albukhr-api.onrender.com/stakes",
+      {
+        headers:{
+          "x-user-id": user.uid
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    if(Array.isArray(data) && data.length){
+      return data.sort((a,b)=>b.timestamp - a.timestamp);
+    }
+
+  }catch(err){
+    console.warn("API failed, fallback to local");
+  }
+
+  /* fallback */
   return _safeParse(INTERNAL_KEY)
     .filter(s =>
       s.userId === user.uid &&
@@ -254,9 +292,9 @@ function getAllStakesMerged(){
 /* ======================================
    PROJECT TOTALS
 ====================================== */
-function getProjectTotals(project){
+async function getProjectTotals(project){
 
-  const stakes = getAllStakesMerged();
+  const stakes = await getAllStakesMerged();
 
   const filtered =
     stakes.filter(s=>s.project===project);
