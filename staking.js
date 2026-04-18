@@ -282,32 +282,64 @@ function getProjectTotals(project){
 /* ======================================
    WITHDRAW REWARD
 ====================================== */
-function withdrawStakeReward(stakeId, amount){
+async function withdrawStakeReward(stakeId, amount){
 
-  const stakes = _safeParse(INTERNAL_KEY);
+  const user = getCurrentUser();
 
-  const stake = stakes.find(s => s.id === stakeId);
-
-  if(!stake) return {error:"Stake not found"};
-
-  const remaining =
-    (stake.reward || 0) -
-    (stake.withdrawnReward || 0);
-
-  if(remaining <= 0){
-    return {error:"No reward"};
+  if(!user?.uid){
+    return {error:"User not logged in"};
   }
 
-  const take = Math.min(Number(amount)||0, remaining);
+  try{
 
-  stake.withdrawnReward =
-    (stake.withdrawnReward || 0) + take;
+    const res = await fetch(
+      "https://albukhr-api.onrender.com/withdraw",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+          userId:user.uid,
+          amount:Number(amount)
+        })
+      }
+    );
 
-  _save(INTERNAL_KEY, stakes);
+    const data = await res.json();
 
-  return {success:true, amount:take};
+    if(!data.success){
+      return {error:data.error || "Withdraw failed"};
+    }
+
+    return {success:true};
+
+  }catch(e){
+
+    console.warn("API failed, fallback to local");
+
+    /* LOCAL BACKUP */
+    const stakes = _safeParse(INTERNAL_KEY);
+
+    const stake = stakes.find(s => s.id === stakeId);
+
+    if(!stake) return {error:"Stake not found"};
+
+    const remaining =
+      (stake.reward||0) -
+      (stake.withdrawnReward||0);
+
+    const take = Math.min(Number(amount)||0, remaining);
+
+    stake.withdrawnReward += take;
+
+    _save(INTERNAL_KEY, stakes);
+
+    return {success:true, amount:take};
+
+  }
+
 }
-
 /* ======================================
    HELPERS
 ====================================== */
