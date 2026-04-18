@@ -129,6 +129,17 @@ function payWithPi({amount, memo, metadata}){
 
 }
 
+app.post("/complete-payment",(req,res)=>{
+
+  const {paymentId, txid} = req.body;
+
+  console.log("✅ Payment completed:", paymentId, txid);
+
+  /* nan zaka iya verify Pi a future */
+
+  res.json({success:true});
+
+});
 /* ======================================
    ADD STAKE
 ====================================== */
