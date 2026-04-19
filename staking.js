@@ -170,15 +170,11 @@ try{
 
   const data = await res.json();
 
-  if(!data.success){
-    return {
-      error: data.error || "Withdraw failed"
-    };
-  }
-
-  console.log("✅ Withdraw successful");
-
-  return {success:true};
+if(!data.success){
+  console.warn("Backend rejected:", data.error);
+}else{
+  console.log("✅ Stake saved to backend");
+}
 
 }catch(e){
 
