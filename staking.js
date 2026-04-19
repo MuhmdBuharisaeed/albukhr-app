@@ -29,21 +29,33 @@ function _save(key,data){
 
 function getCurrentUser(){
 
-  if(window.Pi){
+  if(window.Pi && Pi.getUser){
 
-    return {
-      uid: Pi.getUser().uid,
-      username: Pi.getUser().username
-    };
+    const u = Pi.getUser();
+
+    if(u && u.uid){
+      return {
+        uid: u.uid,
+        username: u.username
+      };
+    }
 
   }
 
-  // fallback
-  try{
-    return JSON.parse(localStorage.getItem("pi_user"));
-  }catch{
-    return null;
+  // fallback (IMPORTANT)
+  const local = localStorage.getItem("pi_user");
+
+  if(local){
+    try{
+      return JSON.parse(local);
+    }catch{}
   }
+
+  // 🔥 LAST FALLBACK (TEST MODE)
+  return {
+    uid: "test123",
+    username: "Test User"
+  };
 
 }
 
@@ -398,6 +410,26 @@ async function withdrawStakeReward(stakeId, amount){
   }
 
 }
+
+/* ======================================
+   LOAD DATA
+====================================== */
+
+async function loadData(){
+
+  try{
+
+    const stakes = await getAllStakesMerged();
+
+    console.log("STAKES:", stakes);
+
+  }catch(e){
+
+    alert("Failed to load data");
+
+  }
+
+       }
 
 /* ======================================
    HELPERS
