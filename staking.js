@@ -26,12 +26,25 @@ function _save(key,data){
 /* ======================================
    USER
 ====================================== */
+
 function getCurrentUser(){
+
+  if(window.Pi){
+
+    return {
+      uid: Pi.getUser().uid,
+      username: Pi.getUser().username
+    };
+
+  }
+
+  // fallback
   try{
     return JSON.parse(localStorage.getItem("pi_user"));
   }catch{
     return null;
   }
+
 }
 
 /* ======================================
@@ -98,7 +111,7 @@ async function addStake({project,amount,duration}){
 
   __stakingLock = true;
 
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
 
   if(!user?.uid){
     __stakingLock = false;
@@ -123,6 +136,10 @@ async function addStake({project,amount,duration}){
     __stakingLock = false;
     return {error:"Minimum stake not reached"};
   }
+
+   setTimeout(()=>{
+  location.reload();
+}, 1000);
 
   /* ===============================
      PI PAYMENT
@@ -252,17 +269,31 @@ if(!data.success){
 /* ======================================
    GET ALL STAKES
 ====================================== */
-function getAllStakesMerged(){
+async function getAllStakesMerged(){
 
-  const user = getCurrentUser();
+  const user = await getAllStakesMerged();
   if(!user) return [];
 
+  try{
+
+    const res = await fetch(
+      "https://albukhr-api.onrender.com/stakes?uid=" + user.uid
+    );
+
+    const data = await res.json();
+
+    if(Array.isArray(data)){
+      return data;
+    }
+
+  }catch(e){
+    console.warn("API failed, using local");
+  }
+
+  // fallback
   return _safeParse(INTERNAL_KEY)
-    .filter(s =>
-      s.userId === user.uid &&
-      s.status === "Successful"
-    )
-    .sort((a,b)=>b.timestamp - a.timestamp);
+    .filter(s => s.userId === user.uid);
+
 }
 
 /* ======================================
@@ -270,7 +301,7 @@ function getAllStakesMerged(){
 ====================================== */
 function getProjectTotals(project){
 
-  const stakes = getAllStakesMerged();
+  const stakes = await getAllStakesMerged();
 
   const filtered =
     stakes.filter(s=>s.project===project);
@@ -298,7 +329,7 @@ function getProjectTotals(project){
 ====================================== */
 async function withdrawStakeReward(stakeId, amount){
 
-  const user = getCurrentUser();
+  const user = await getAllStakesMerged();
 
   if(!user?.uid){
     return {error:"User not logged in"};
