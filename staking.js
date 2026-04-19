@@ -154,20 +154,19 @@ async function addStake({project,amount,duration}){
    /* SEND TO BACKEND */
 try{
 
-  const res = await fetch(
-    "https://albukhr-api.onrender.com/withdraw",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body: JSON.stringify({
-        userId:user.uid,
-        project: stake.project, // 🔥 VERY IMPORTANT
-        amount:Number(amount)
-      })
-    }
-  );
+  const res = await fetch("https://albukhr-api.onrender.com/stake",{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body: JSON.stringify({
+    userId:user.uid,
+    project: project,
+    amount:safeAmount,
+    duration:safeDuration,
+    txid: payment.txid
+  })
+});
 
   const data = await res.json();
 
