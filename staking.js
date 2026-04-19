@@ -137,10 +137,6 @@ async function addStake({project,amount,duration}){
     return {error:"Minimum stake not reached"};
   }
 
-   setTimeout(()=>{
-  location.reload();
-}, 1000);
-
   /* ===============================
      PI PAYMENT
   =============================== */
@@ -170,6 +166,9 @@ async function addStake({project,amount,duration}){
 
    /* SEND TO BACKEND */
 try{
+
+   ⏳ WAIT FOR RENDER WAKE UP
+   await new Promise(r => setTimeout(r, 1500));
 
   const res = await fetch("https://albukhr-api.onrender.com/stake",{
   method:"POST",
@@ -271,14 +270,25 @@ if(!data.success){
 ====================================== */
 async function getAllStakesMerged(){
 
-  const user = await getAllStakesMerged();
-  if(!user) return [];
+  const user = getCurrentUser();
+
+  if(!user?.uid){
+    console.warn("No UID");
+    return [];
+  }
 
   try{
+
+     ⏳ WAIT FOR RENDER WAKE UP
+     await new Promise(r => setTimeout(r, 1500));
 
     const res = await fetch(
       "https://albukhr-api.onrender.com/stakes?uid=" + user.uid
     );
+
+    if(!res.ok){
+      throw new Error("Network error");
+    }
 
     const data = await res.json();
 
@@ -287,10 +297,11 @@ async function getAllStakesMerged(){
     }
 
   }catch(e){
-    console.warn("API failed, using local");
+
+    console.warn("API failed, fallback local");
+
   }
 
-  // fallback
   return _safeParse(INTERNAL_KEY)
     .filter(s => s.userId === user.uid);
 
@@ -299,19 +310,18 @@ async function getAllStakesMerged(){
 /* ======================================
    PROJECT TOTALS
 ====================================== */
-function getProjectTotals(project){
+async function getProjectTotals(project){
 
   const stakes = await getAllStakesMerged();
 
-  const filtered =
-    stakes.filter(s=>s.project===project);
+  const filtered = stakes.filter(s => s.project === project);
 
   let stake = 0;
   let reward = 0;
 
-  filtered.forEach(s=>{
+  filtered.forEach(s => {
 
-    stake += Number(s.amount)||0;
+    stake += Number(s.amount) || 0;
 
     const remaining =
       (Number(s.reward)||0) -
@@ -321,7 +331,8 @@ function getProjectTotals(project){
 
   });
 
-  return {stake,reward,stakes:filtered};
+  return {stake, reward, stakes: filtered};
+
 }
 
 /* ======================================
@@ -329,13 +340,16 @@ function getProjectTotals(project){
 ====================================== */
 async function withdrawStakeReward(stakeId, amount){
 
-  const user = await getAllStakesMerged();
+  const user = getCurrentUser();
 
   if(!user?.uid){
     return {error:"User not logged in"};
   }
 
   try{
+
+     ⏳ WAIT FOR RENDER WAKE UP
+     await new Promise(r => setTimeout(r, 1500));
 
     const res = await fetch(
       "https://albukhr-api.onrender.com/withdraw",
@@ -361,9 +375,8 @@ async function withdrawStakeReward(stakeId, amount){
 
   }catch(e){
 
-    console.warn("API failed, fallback to local");
+    console.warn("Fallback local");
 
-    /* LOCAL BACKUP */
     const stakes = _safeParse(INTERNAL_KEY);
 
     const stake = stakes.find(s => s.id === stakeId);
@@ -385,6 +398,7 @@ async function withdrawStakeReward(stakeId, amount){
   }
 
 }
+
 /* ======================================
    HELPERS
 ====================================== */
