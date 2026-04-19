@@ -154,22 +154,41 @@ async function addStake({project,amount,duration}){
    /* SEND TO BACKEND */
 try{
 
-  await fetch("https://albukhr-api.onrender.com/stake",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-      userId:user.uid,
-      project,
-      amount:safeAmount,
-      duration:safeDuration,
-      txid: payment.txid
-    })
-  });
+  const res = await fetch(
+    "https://albukhr-api.onrender.com/withdraw",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        userId:user.uid,
+        project: stake.project, // 🔥 VERY IMPORTANT
+        amount:Number(amount)
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  if(!data.success){
+    return {
+      error: data.error || "Withdraw failed"
+    };
+  }
+
+  console.log("✅ Withdraw successful");
+
+  return {success:true};
 
 }catch(e){
-  console.warn("Backend failed, using local");
+
+  console.warn("❌ Backend withdraw failed", e);
+
+  return {
+    error:"Network error"
+  };
+
 }
 
   /* ===============================
