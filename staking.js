@@ -179,8 +179,8 @@ async function addStake({project,amount,duration}){
    /* SEND TO BACKEND */
 try{
 
-   ⏳ WAIT FOR RENDER WAKE UP
-   await new Promise(r => setTimeout(r, 1500));
+   // ⏳ WAIT FOR RENDER WAKE UP
+await new Promise(r => setTimeout(r, 1500));
 
   const res = await fetch("https://albukhr-api.onrender.com/stake",{
   method:"POST",
@@ -291,8 +291,8 @@ async function getAllStakesMerged(){
 
   try{
 
-     ⏳ WAIT FOR RENDER WAKE UP
-     await new Promise(r => setTimeout(r, 1500));
+     // ⏳ WAIT FOR RENDER WAKE UP
+await new Promise(r => setTimeout(r, 1500));
 
     const res = await fetch(
       "https://albukhr-api.onrender.com/stakes?uid=" + user.uid
@@ -360,9 +360,9 @@ async function withdrawStakeReward(stakeId, amount){
 
   try{
 
-     ⏳ WAIT FOR RENDER WAKE UP
-     await new Promise(r => setTimeout(r, 1500));
-
+     // ⏳ WAIT FOR RENDER WAKE UP
+await new Promise(r => setTimeout(r, 1500));
+     
     const res = await fetch(
       "https://albukhr-api.onrender.com/withdraw",
       {
@@ -419,7 +419,7 @@ async function loadData(){
 
   try{
 
-    const stakes = await getAllStakesMerged();
+   const user = getCurrentUser();
 
     console.log("STAKES:", stakes);
 
