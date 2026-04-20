@@ -328,14 +328,14 @@ async function withdrawStakeReward(stakeId, amount){
 
     // 1. Get current stake
     const res = await fetch(
-      `https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes?id=eq.${stakeId}`,
-      {
-        headers:{
-          "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
-          "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
-        }
-      }
-    );
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&userId=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    }
+  }
+);
 
     const data = await res.json();
     const stake = data[0];
@@ -394,17 +394,26 @@ async function loadData(){
 
   try{
 
-   const user = getCurrentUser();
-
     const stakes = await getAllStakesMerged();
-console.log("STAKES:", stakes);
+
+    console.log("📊 STAKES:", stakes);
+
+    // ❗ idan babu data, kada ka nuna error
+    if(!Array.isArray(stakes)){
+      console.warn("No data returned");
+      return;
+    }
+
+    // OPTIONAL: update UI nan gaba
+
   }catch(e){
 
-    alert("Failed to load data");
+    console.error("❌ Load error:", e);
 
+    // ❌ kar ka yi alert nan
   }
 
-       }
+}
 
 /* ======================================
    HELPERS
