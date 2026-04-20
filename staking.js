@@ -255,14 +255,20 @@ async function getAllStakesMerged(){
   try{
 
     const res = await fetch(
-      `https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes?userId=eq.${user.uid}`,
+      `${SUPABASE_URL}/rest/v1/stakes?select=*&userId=eq.${user.uid}`,
       {
         headers:{
-          "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
-          "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
         }
       }
     );
+
+    if(!res.ok){
+      const err = await res.text();
+      console.error("❌ Fetch error:", err);
+      return [];
+    }
 
     const data = await res.json();
 
@@ -272,8 +278,7 @@ async function getAllStakesMerged(){
 
   }catch(e){
 
-    console.error("❌ Supabase error:", e);
-
+    console.error("❌ Network error:", e);
     return [];
 
   }
