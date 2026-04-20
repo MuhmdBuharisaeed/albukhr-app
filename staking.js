@@ -206,14 +206,10 @@ try{
 }else{
   console.log("✅ Stake saved to Supabase");
   }
-  console.warn("Backend rejected:", data.error);
-}else{
-  console.log("✅ Stake saved to backend");
-}
-
+   
 }catch(e){
 
-  console.warn("❌ Backend withdraw failed", e);
+  console.error("❌ Supabase error", e);
 
   return {
     error:"Network error"
@@ -225,64 +221,24 @@ try{
      SAVE LOCAL (TESTNET MODE)
   =============================== */
 
-const stakes = _safeParse(INTERNAL_KEY);
-
-const now = Date.now();
-
-const unlockTime =
-  now + (safeDuration * 86400000);
-
-const rate =
-  Number(getRate(project,safeDuration)) || 0;
-
-const reward =
-  safeAmount * rate;
-
-const newStake = {
-
-  id:"ST-"+now,
-  userId:user.uid,
-
-  project,
-  amount:safeAmount,
-  duration:safeDuration,
-
-  startTime:now,
-  unlockTime,
-
-  reward,
-  withdrawnReward:0,
-
-  status:"Successful",
-  timestamp:now,
-
-  txid: payment.txid
-};
-
-stakes.push(newStake);
-_save(INTERNAL_KEY, stakes);
-
   /* ===============================
      RECORD TRANSACTION (FIX HISTORY)
   =============================== */
 
   if(typeof recordTx === "function"){
-    recordTx({
-      type:"stake",
-      project,
-      amount:safeAmount,
-      timestamp:now
-    });
-  }
-
-  __stakingLock = false;
-
-  return {
-    success:true,
-    stake:newStake
-  };
-
+  recordTx({
+    type:"stake",
+    project,
+    amount:safeAmount,
+    timestamp:Date.now()
+  });
 }
+
+__stakingLock = false;
+
+return {
+  success:true
+};
 
 /* ======================================
    GET ALL STAKES
