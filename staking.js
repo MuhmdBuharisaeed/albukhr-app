@@ -182,9 +182,6 @@ async function addStake({project,amount,duration}){
    /* SEND TO BACKEND */
 try{
 
-   // ⏳ WAIT FOR RENDER WAKE UP
-await new Promise(r => setTimeout(r, 1500));
-
   const res = await fetch("https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes",{
   method:"POST",
   headers:{
@@ -203,9 +200,12 @@ await new Promise(r => setTimeout(r, 1500));
   })
 });
 
-  const data = await res.json();
-
-if(!data.success){
+  if(!res.ok){
+  const err = await res.text();
+  console.error("❌ Insert failed:", err);
+}else{
+  console.log("✅ Stake saved to Supabase");
+  }
   console.warn("Backend rejected:", data.error);
 }else{
   console.log("✅ Stake saved to backend");
@@ -225,42 +225,42 @@ if(!data.success){
      SAVE LOCAL (TESTNET MODE)
   =============================== */
 
-  const stakes = _safeParse(INTERNAL_KEY);
+const stakes = _safeParse(INTERNAL_KEY);
 
-  const now = Date.now();
+const now = Date.now();
 
-  const unlockTime =
-    now + (safeDuration * 86400000);
+const unlockTime =
+  now + (safeDuration * 86400000);
 
-  const rate =
-    Number(getRate(project,safeDuration)) || 0;
+const rate =
+  Number(getRate(project,safeDuration)) || 0;
 
-  const reward =
-    safeAmount * rate;
+const reward =
+  safeAmount * rate;
 
-  const newStake = {
+const newStake = {
 
-    id:"ST-"+now,
-    userId:user.uid,
+  id:"ST-"+now,
+  userId:user.uid,
 
-    project,
-    amount:safeAmount,
-    duration:safeDuration,
+  project,
+  amount:safeAmount,
+  duration:safeDuration,
 
-    startTime:now,
-    unlockTime,
+  startTime:now,
+  unlockTime,
 
-    reward,
-    withdrawnReward:0,
+  reward,
+  withdrawnReward:0,
 
-    status:"Successful",
-    timestamp:now,
+  status:"Successful",
+  timestamp:now,
 
-    txid: payment.txid
-  };
+  txid: payment.txid
+};
 
-  stakes.push(newStake);
-  _save(INTERNAL_KEY, stakes);
+stakes.push(newStake);
+_save(INTERNAL_KEY, stakes);
 
   /* ===============================
      RECORD TRANSACTION (FIX HISTORY)
@@ -435,8 +435,8 @@ async function loadData(){
 
    const user = getCurrentUser();
 
-    console.log("STAKES:", stakes);
-
+    const stakes = await getAllStakesMerged();
+console.log("STAKES:", stakes);
   }catch(e){
 
     alert("Failed to load data");
