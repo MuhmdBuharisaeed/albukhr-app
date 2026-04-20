@@ -190,7 +190,7 @@ try{
     "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
   },
   body: JSON.stringify({
-    userId:user.uid,
+    userid:user.uid,
     project: project,
     amount:safeAmount,
     duration:safeDuration,
@@ -240,6 +240,8 @@ return {
   success:true
 };
 
+} // 🔥 THIS LINE IS MISSING (rufe addStake)
+
 /* ======================================
    GET ALL STAKES
 ====================================== */
@@ -255,7 +257,7 @@ async function getAllStakesMerged(){
   try{
 
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?select=*&userId=eq.${user.uid}`,
+      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
       {
         headers:{
           "apikey": SUPABASE_KEY,
@@ -328,7 +330,7 @@ async function withdrawStakeReward(stakeId, amount){
 
     // 1. Get current stake
     const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userId=eq.${user.uid}`,
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
   {
     headers:{
       "apikey": SUPABASE_KEY,
