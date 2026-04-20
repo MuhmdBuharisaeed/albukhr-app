@@ -3,6 +3,9 @@
 // Pi SDK Ready • No API • Mobile Safe
 // =======================================
 
+const SUPABASE_URL = "https://qexmnghilahsvethlxem.supabase.co";
+const SUPABASE_KEY = "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2";
+
 const INTERNAL_KEY = "albukhr_stakes";
 
 /* ======================================
@@ -182,17 +185,21 @@ try{
    // ⏳ WAIT FOR RENDER WAKE UP
 await new Promise(r => setTimeout(r, 1500));
 
-  const res = await fetch("https://albukhr-api.onrender.com/stake",{
+  const res = await fetch("https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes",{
   method:"POST",
   headers:{
-    "Content-Type":"application/json"
+    "Content-Type":"application/json",
+    "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
+    "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
   },
   body: JSON.stringify({
     userId:user.uid,
     project: project,
     amount:safeAmount,
     duration:safeDuration,
-    txid: payment.txid
+    txid: payment.txid,
+    reward: safeAmount * getRate(project, safeDuration),
+    withdrawnReward:0
   })
 });
 
@@ -291,31 +298,29 @@ async function getAllStakesMerged(){
 
   try{
 
-     // ⏳ WAIT FOR RENDER WAKE UP
-await new Promise(r => setTimeout(r, 1500));
-
     const res = await fetch(
-      "https://albukhr-api.onrender.com/stakes?uid=" + user.uid
+      `https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes?userId=eq.${user.uid}`,
+      {
+        headers:{
+          "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
+          "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+        }
+      }
     );
-
-    if(!res.ok){
-      throw new Error("Network error");
-    }
 
     const data = await res.json();
 
-    if(Array.isArray(data)){
-      return data;
-    }
+    console.log("📊 Supabase data:", data);
+
+    return Array.isArray(data) ? data : [];
 
   }catch(e){
 
-    console.warn("API failed, fallback local");
+    console.error("❌ Supabase error:", e);
+
+    return [];
 
   }
-
-  return _safeParse(INTERNAL_KEY)
-    .filter(s => s.userId === user.uid);
 
 }
 
@@ -360,52 +365,61 @@ async function withdrawStakeReward(stakeId, amount){
 
   try{
 
-     // ⏳ WAIT FOR RENDER WAKE UP
-await new Promise(r => setTimeout(r, 1500));
-     
+    // 1. Get current stake
     const res = await fetch(
-      "https://albukhr-api.onrender.com/withdraw",
+      `https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes?id=eq.${stakeId}`,
       {
-        method:"POST",
         headers:{
-          "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-          userId:user.uid,
-          amount:Number(amount)
-        })
+          "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
+          "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+        }
       }
     );
 
     const data = await res.json();
+    const stake = data[0];
 
-    if(!data.success){
-      return {error:data.error || "Withdraw failed"};
+    if(!stake){
+      return {error:"Stake not found"};
     }
 
-    return {success:true};
-
-  }catch(e){
-
-    console.warn("Fallback local");
-
-    const stakes = _safeParse(INTERNAL_KEY);
-
-    const stake = stakes.find(s => s.id === stakeId);
-
-    if(!stake) return {error:"Stake not found"};
-
+    // 2. Calculate remaining reward
     const remaining =
-      (stake.reward||0) -
-      (stake.withdrawnReward||0);
+      (stake.reward || 0) -
+      (stake.withdrawnReward || 0);
+
+    if(remaining <= 0){
+      return {error:"No reward"};
+    }
 
     const take = Math.min(Number(amount)||0, remaining);
 
-    stake.withdrawnReward += take;
+    // 3. Update DB
+    const updateRes = await fetch(
+      `https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes?id=eq.${stakeId}`,
+      {
+        method:"PATCH",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
+          "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+        },
+        body: JSON.stringify({
+          withdrawnReward: (stake.withdrawnReward || 0) + take
+        })
+      }
+    );
 
-    _save(INTERNAL_KEY, stakes);
+    if(!updateRes.ok){
+      return {error:"Update failed"};
+    }
 
     return {success:true, amount:take};
+
+  }catch(e){
+
+    console.error("❌ Withdraw error:", e);
+    return {error:"Network error"};
 
   }
 
