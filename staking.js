@@ -328,19 +328,21 @@ async function withdrawStakeReward(stakeId, amount){
 
   try{
 
-    // 1. Get current stake
+    // 1. Get user stakes
     const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
-  {
-    headers:{
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`
-    }
-  }
-);
+      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
+      {
+        headers:{
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
 
     const data = await res.json();
-    const stake = data[0];
+
+    // 🔥 FIX 1
+    const stake = data.find(s => s.txid === stakeId);
 
     if(!stake){
       return {error:"Stake not found"};
@@ -359,21 +361,23 @@ async function withdrawStakeReward(stakeId, amount){
 
     // 3. Update DB
     const updateRes = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?txid=eq.${stakeId}`,
-  {
-    method:"PATCH",
-    headers:{
-      "Content-Type":"application/json",
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`
-    },
-    body: JSON.stringify({
-      withdrawnReward: (stake.withdrawnReward || 0) + take
-    })
-  }
-);
+      `${SUPABASE_URL}/rest/v1/stakes?txid=eq.${stakeId}`,
+      {
+        method:"PATCH",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({
+          withdrawnReward: (stake.withdrawnReward || 0) + take
+        })
+      }
+    );
 
     if(!updateRes.ok){
+      const err = await updateRes.text();
+      console.error("❌ Update error:", err);
       return {error:"Update failed"};
     }
 
