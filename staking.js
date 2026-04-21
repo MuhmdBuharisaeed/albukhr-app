@@ -404,40 +404,53 @@ async function withdrawProjectReward(project, amount){
 /* ======================================
    WITHDRAW CAPITAL
 ====================================== */
-async function withdrawCapital({project, amount}){
+async function confirmCapitalWithdraw(){
 
-  const user = getCurrentUser();
+const amount = Number(capitalWithdrawAmount.value);
+const wallet = capitalWallet.value;
 
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes`,
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      },
-      body: JSON.stringify({
-        userid: user.uid,
-        project,
-        amount: -Math.abs(amount),
-        duration: 0,
-        txid: "CAP-"+Date.now(),
-        reward: 0,
-        withdrawnReward: 0,
-        type: "withdraw"
-      })
-    }
-  );
-
-  if(!res.ok){
-    console.error(await res.text());
-    return {error:"Failed"};
-  }
-
-  return {success:true};
+if(!amount || amount <= 0){
+  alert("Invalid amount");
+  return;
 }
 
+if(!wallet){
+  alert("Enter wallet address");
+  return;
+}
+
+const fee = amount * 0.01;
+const receive = amount - fee;
+
+/* 🔥 SEND TO SUPABASE */
+const res = await withdrawCapital({
+  project: PROJECT_NAME,
+  amount: amount
+});
+
+if(res?.error){
+  alert(res.error);
+  return;
+}
+
+/* 🔥 RECORD TX */
+recordTx({
+  type:"capital",
+  project:PROJECT_NAME,
+  amount:receive,
+  meta:{
+    wallet:wallet,
+    fee:fee
+  }
+});
+
+closeCapitalModal();
+
+capitalWithdrawAmount.value = "";
+capitalWallet.value = "";
+
+load();
+}
 
 /* ======================================
    LOAD DATA
