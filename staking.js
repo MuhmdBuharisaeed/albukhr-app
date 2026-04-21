@@ -31,35 +31,17 @@ function _save(key,data){
 ====================================== */
 
 function getCurrentUser(){
-
   if(window.Pi && Pi.getUser){
-
     const u = Pi.getUser();
-
-    if(u && u.uid){
-      return {
-        uid: u.uid,
-        username: u.username
-      };
+    if(u?.uid){
+      return { uid: u.uid, username: u.username };
     }
-
   }
 
-  // fallback (IMPORTANT)
-  const local = localStorage.getItem("pi_user");
-
-  if(local){
-    try{
-      return JSON.parse(local);
-    }catch{}
-  }
-
-  // 🔥 LAST FALLBACK (TEST MODE)
   return {
     uid: "test123",
     username: "Test User"
   };
-
 }
 
 /* ======================================
@@ -83,9 +65,6 @@ function getMinStake(project){
    REWARD RATES
 ====================================== */
 function getRate(project,duration){
-
-  const d = Number(duration);
-
   const table = {
     Raheem:{30:0.01,60:0.025,90:0.05},
     Hauwal:{30:0.02,60:0.04,90:0.08},
@@ -96,9 +75,8 @@ function getRate(project,duration){
     Azman:{30:0.04,60:0.07,90:0.12}
   };
 
-  return table?.[project]?.[d] || 0;
+  return table?.[project]?.[Number(duration)] || 0;
 }
-
 /* ======================================
    PI PAYMENT
 ====================================== */
@@ -316,80 +294,121 @@ async function getProjectTotals(project){
 }
 
 /* ======================================
-   WITHDRAW REWARD
+   GET USER STAKE
 ====================================== */
-async function withdrawStakeReward(stakeId, amount){
+async function getUserStakes(){
 
   const user = getCurrentUser();
 
-  if(!user?.uid){
-    return {error:"User not logged in"};
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  const data = await res.json();
+
+  return Array.isArray(data) ? data : [];
+}
+
+/* ======================================
+   WITHDRAW REWARD
+====================================== */
+async function withdrawStakeReward(txid, amount){
+
+  const user = getCurrentUser();
+
+  // 🔥 get correct stake
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?txid=eq.${txid}&userid=eq.${user.uid}`,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  const data = await res.json();
+  const stake = data[0];
+
+  if(!stake){
+    return {error:"Stake not found"};
   }
 
-  try{
+  const remaining =
+    (stake.reward || 0) -
+    (stake.withdrawnReward || 0);
 
-    // 1. Get user stakes
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
-      {
-        headers:{
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
-
-    const data = await res.json();
-
-    // 🔥 FIX 1
-    const stake = data.find(s => s.txid === stakeId);
-
-    if(!stake){
-      return {error:"Stake not found"};
-    }
-
-    // 2. Calculate remaining reward
-    const remaining =
-      (stake.reward || 0) -
-      (stake.withdrawnReward || 0);
-
-    if(remaining <= 0){
-      return {error:"No reward"};
-    }
-
-    const take = Math.min(Number(amount)||0, remaining);
-
-    // 3. Update DB
-    const updateRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?txid=eq.${stakeId}`,
-      {
-        method:"PATCH",
-        headers:{
-          "Content-Type":"application/json",
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify({
-          withdrawnReward: (stake.withdrawnReward || 0) + take
-        })
-      }
-    );
-
-    if(!updateRes.ok){
-      const err = await updateRes.text();
-      console.error("❌ Update error:", err);
-      return {error:"Update failed"};
-    }
-
-    return {success:true, amount:take};
-
-  }catch(e){
-
-    console.error("❌ Withdraw error:", e);
-    return {error:"Network error"};
-
+  if(remaining <= 0){
+    return {error:"No reward"};
   }
 
+  const take = Math.min(Number(amount)||0, remaining);
+
+  // 🔥 UPDATE using txid (IMPORTANT)
+  const updateRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?txid=eq.${txid}`,
+    {
+      method:"PATCH",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      },
+      body: JSON.stringify({
+        withdrawnReward: (stake.withdrawnReward || 0) + take
+      })
+    }
+  );
+
+  if(!updateRes.ok){
+    console.error(await updateRes.text());
+    return {error:"Update failed"};
+  }
+
+  return {success:true, amount:take};
+}
+
+/* ======================================
+   WITHDRAW CAPITAL
+====================================== */
+async function withdrawCapital({project, amount}){
+
+  const user = getCurrentUser();
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes`,
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      },
+      body: JSON.stringify({
+        userid: user.uid,
+        project,
+        amount: -Math.abs(amount),
+        duration: 0,
+        txid: "CAP-"+Date.now(),
+        reward: 0,
+        withdrawnReward: 0,
+        type: "withdraw"
+      })
+    }
+  );
+
+  if(!res.ok){
+    console.error(await res.text());
+    return {error:"Failed"};
+  }
+
+  return {success:true};
 }
 
 /* ======================================
