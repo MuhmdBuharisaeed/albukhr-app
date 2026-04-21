@@ -527,13 +527,27 @@ async function confirmWithdraw(){
     return;
   }
 
-  const res = await withdrawStakeReward(
-  PROJECT_NAME,
-  amount
-);
+  const data = await getProjectTotals(PROJECT_NAME);
 
-  if(!res.success){
-    alert(res.error || "Withdraw failed");
+  let remaining = amount;
+
+  for(const s of data.stakes){
+
+    if(remaining <= 0) break;
+
+    const res = await withdrawStakeReward(
+      s.txid,
+      remaining
+    );
+
+    if(res?.success){
+      remaining -= res.amount;
+    }
+
+  }
+
+  if(remaining > 0){
+    alert("Not enough reward");
     return;
   }
 
@@ -554,7 +568,7 @@ async function confirmWithdraw(){
 
   closeWithdraw();
   await load();
-    }
+}
 
 /* ===============================
 REWARDS WITHDRAW FEE
