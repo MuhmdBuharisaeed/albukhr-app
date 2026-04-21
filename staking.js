@@ -272,24 +272,39 @@ async function getProjectTotals(project){
 
   const stakes = await getAllStakesMerged();
 
-  const filtered = stakes.filter(s => s.project === project);
+  // 🔥 ALL PROJECT DATA
+  const projectData = stakes.filter(s => s.project === project);
 
+  // 🔥 CAPITAL (stake + withdraw)
   let stake = 0;
+
+  // 🔥 REWARD (ONLY REAL STAKES)
   let reward = 0;
 
-  filtered.forEach(s => {
+  projectData.forEach(s => {
 
-    stake += Number(s.amount) || 0;
+    const amount = Number(s.amount) || 0;
 
-    const remaining =
-      (Number(s.reward)||0) -
-      (Number(s.withdrawnReward)||0);
+    // ✅ Capital includes everything (withdraw negative)
+    stake += amount;
 
-    reward += Math.max(0, remaining);
+    // ❗ ONLY count reward from real stakes
+    if(s.type !== "withdraw"){
+
+      const remaining =
+        (Number(s.reward)||0) -
+        (Number(s.withdrawnReward)||0);
+
+      reward += Math.max(0, remaining);
+    }
 
   });
 
-  return {stake, reward, stakes: filtered};
+  return {
+    stake,
+    reward,
+    stakes: projectData
+  };
 
 }
 
@@ -318,7 +333,7 @@ async function getUserStakes(){
 /* ======================================
    WITHDRAW REWARD
 ====================================== */
-async withdrawStakeReward(stake.txid, amount){
+async function withdrawStakeReward(txid, amount){
 
   const user = getCurrentUser();
 
@@ -377,7 +392,7 @@ async withdrawStakeReward(stake.txid, amount){
 /* ======================================
    WITHDRAW CAPITAL
 ====================================== */
-async function withdrawnreward({project, amount}){
+async function withdrawCapital({project, amount}){
 
   const user = getCurrentUser();
 
