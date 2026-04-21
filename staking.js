@@ -388,6 +388,63 @@ async function withdrawStakeReward(txid, amount){
 
   return {success:true, amount:take};
 }
+/* ======================================
+   WITHDRAW PROJECT REWARD
+====================================== */
+async function withdrawProjectReward(project, amount){
+
+  const user = getCurrentUser();
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}`,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  const stakes = await res.json();
+
+  if(!stakes.length){
+    return {error:"No stakes"};
+  }
+
+  let remainingToTake = Number(amount);
+
+  for(const stake of stakes){
+
+    const remaining =
+      (stake.reward || 0) -
+      (stake.withdrawnReward || 0);
+
+    if(remaining <= 0) continue;
+
+    const take = Math.min(remainingToTake, remaining);
+
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
+      {
+        method:"PATCH",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({
+          withdrawnReward: (stake.withdrawnReward || 0) + take
+        })
+      }
+    );
+
+    remainingToTake -= take;
+
+    if(remainingToTake <= 0) break;
+  }
+
+  return {success:true};
+}
 
 /* ======================================
    WITHDRAW CAPITAL
