@@ -318,7 +318,7 @@ async function getUserStakes(){
 /* ======================================
    WITHDRAW REWARD
 ====================================== */
-async function withdrawStakeReward(txid, amount){
+async withdrawStakeReward(stake.txid, amount){
 
   const user = getCurrentUser();
 
@@ -377,7 +377,7 @@ async function withdrawStakeReward(txid, amount){
 /* ======================================
    WITHDRAW CAPITAL
 ====================================== */
-async function withdrawCapital({project, amount}){
+async function withdrawnreward({project, amount}){
 
   const user = getCurrentUser();
 
@@ -410,6 +410,7 @@ async function withdrawCapital({project, amount}){
 
   return {success:true};
 }
+
 
 /* ======================================
    LOAD DATA
