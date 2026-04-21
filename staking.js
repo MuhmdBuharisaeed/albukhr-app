@@ -331,69 +331,17 @@ async function getUserStakes(){
 }
 
 /* ======================================
-   WITHDRAW REWARD
-====================================== */
-async function withdrawStakeReward(txid, amount){
-
-  const user = getCurrentUser();
-
-  // 🔥 get correct stake
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?txid=eq.${txid}&userid=eq.${user.uid}`,
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
-    }
-  );
-
-  const data = await res.json();
-  const stake = data[0];
-
-  if(!stake){
-    return {error:"Stake not found"};
-  }
-
-  const remaining =
-    (stake.reward || 0) -
-    (stake.withdrawnReward || 0);
-
-  if(remaining <= 0){
-    return {error:"No reward"};
-  }
-
-  const take = Math.min(Number(amount)||0, remaining);
-
-  // 🔥 UPDATE using txid (IMPORTANT)
-  const updateRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?txid=eq.${txid}`,
-    {
-      method:"PATCH",
-      headers:{
-        "Content-Type":"application/json",
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      },
-      body: JSON.stringify({
-        withdrawnReward: (stake.withdrawnReward || 0) + take
-      })
-    }
-  );
-
-  if(!updateRes.ok){
-    console.error(await updateRes.text());
-    return {error:"Update failed"};
-  }
-
-  return {success:true, amount:take};
-}
-/* ======================================
    WITHDRAW PROJECT REWARD
 ====================================== */
 async function withdrawProjectReward(project, amount){
 
   const user = getCurrentUser();
+
+  let remainingToTake = Number(amount);
+
+  if(remainingToTake <= 0){
+    return {error:"Invalid amount"};
+  }
 
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}`,
@@ -411,8 +359,6 @@ async function withdrawProjectReward(project, amount){
     return {error:"No stakes"};
   }
 
-  let remainingToTake = Number(amount);
-
   for(const stake of stakes){
 
     const remaining =
@@ -423,7 +369,7 @@ async function withdrawProjectReward(project, amount){
 
     const take = Math.min(remainingToTake, remaining);
 
-    await fetch(
+    const updateRes = await fetch(
       `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
       {
         method:"PATCH",
@@ -438,9 +384,18 @@ async function withdrawProjectReward(project, amount){
       }
     );
 
+    if(!updateRes.ok){
+      console.error(await updateRes.text());
+      return {error:"Update failed"};
+    }
+
     remainingToTake -= take;
 
     if(remainingToTake <= 0) break;
+  }
+
+  if(remainingToTake > 0){
+    return {error:"Insufficient reward"};
   }
 
   return {success:true};
