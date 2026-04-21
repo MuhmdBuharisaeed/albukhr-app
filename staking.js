@@ -359,19 +359,19 @@ async function withdrawStakeReward(stakeId, amount){
 
     // 3. Update DB
     const updateRes = await fetch(
-      `https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes?id=eq.${stakeId}`,
-      {
-        method:"PATCH",
-        headers:{
-          "Content-Type":"application/json",
-          "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
-          "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
-        },
-        body: JSON.stringify({
-          withdrawnReward: (stake.withdrawnReward || 0) + take
-        })
-      }
-    );
+  `${SUPABASE_URL}/rest/v1/stakes?txid=eq.${stakeId}`,
+  {
+    method:"PATCH",
+    headers:{
+      "Content-Type":"application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    },
+    body: JSON.stringify({
+      withdrawnReward: (stake.withdrawnReward || 0) + take
+    })
+  }
+);
 
     if(!updateRes.ok){
       return {error:"Update failed"};
