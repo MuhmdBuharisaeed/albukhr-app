@@ -685,7 +685,7 @@ const now = Date.now();
 
 data.stakes.forEach(s=>{
 
-if(now >= (s.unlockTime||0)){
+if(now >= (s.unlocktime || 0)){
 total += Number(s.amount)||0;
 }
 
@@ -695,92 +695,92 @@ el.innerText =
 "Available: " + total.toFixed(2) + " Pi";
 
   }
-
+  
+/* ===============================
+FUNCTION CAPITAL MODAL
+=============================== */
 function closeCapitalModal(){
 
 capitalModal.style.display="none";
 
   }
+  
+/* ===============================
+COMFIRM CAPITAL WITHDRAW
+=============================== */
 
 async function confirmCapitalWithdraw(){
 
-const amount =
-Number(capitalWithdrawAmount.value);
+  const amount = Number(capitalWithdrawAmount.value);
 
-const wallet =
-capitalWallet.value;
+  // 🔥 VALIDATION
+  if(!Number.isFinite(amount)){
+    alert("Invalid number");
+    return;
+  }
 
-if(!amount || amount <= 0){
-alert("Invalid amount");
-return;
+  if(amount <= 0){
+    alert("Invalid amount");
+    return;
+  }
+
+  const wallet = capitalWallet.value;
+
+  if(!wallet){
+    alert("Enter wallet address");
+    return;
+  }
+
+  // 🔥 LOCK BUTTON
+  const btn = document.querySelector("#capitalModal .primary");
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+
+  // 🔥 CALL BACKEND (IMPORTANT)
+  const res = await withdrawCapital({
+    project: PROJECT_NAME,
+    amount: amount
+  });
+
+  if(res?.error){
+
+    alert(res.error);
+
+    btn.disabled = false;
+    btn.innerText = "Confirm";
+
+    return;
+  }
+
+  const fee = amount * 0.01;
+  const receive = amount - fee;
+
+  // 🔥 RECORD TRANSACTION
+  recordTx({
+    type:"capital",
+    project:PROJECT_NAME,
+    amount:receive,
+    meta:{
+      wallet:wallet,
+      fee:fee
+    }
+  });
+
+  // 🔥 RESET INPUTS
+  capitalWithdrawAmount.value = "";
+  capitalWallet.value = "";
+
+  closeCapitalModal();
+  await load();
+
+  // 🔥 UNLOCK BUTTON
+  btn.disabled = false;
+  btn.innerText = "Confirm";
 }
-
-if(!wallet){
-alert("Enter wallet address");
-return;
-}
-
-const fee = amount * 0.01;
-const receive = amount - fee;
-
-const data =
-await getProjectTotals(PROJECT_NAME);
-
-let remaining = amount;
-
-data.stakes.forEach(s=>{
-
-if(remaining <= 0) return;
-
-if(Date.now() >= (s.unlockTime||0)){
-
-let available =
-Number(s.amount)||0;
-
-let take =
-Math.min(available, remaining);
-
-s.amount -= take;
-
-remaining -= take;
-
-}
-
-});
-
-if(remaining > 0){
-alert("Insufficient unlocked capital");
-return;
-}
-
-saveProjectStakes(
-PROJECT_NAME,
-data.stakes
-);
-
-recordTx({
-type:"capital",
-project:PROJECT_NAME,
-amount:receive,
-meta:{
-wallet:wallet,
-fee:fee
-}
-});
-
-closeCapitalModal();
-
-/* CLEAR INPUTS */
-capitalWithdrawAmount.value = "";
-capitalWallet.value = "";
-
-(async ()=>{
-
-load();
-
-})();
-
-}
+  
+/* ===============================
+UPDATE STAKE STATUS
+=============================== */
 
 async function updateStakeStatus(){
 
@@ -796,7 +796,7 @@ data.stakes.forEach(s=>{
 const amount =
 Number(s.amount)||0;
 
-if(now >= (s.unlockTime||0)){
+if(now >= (s.unlocktime || 0)){
 unlocked += amount;
 }else{
 locked += amount;
