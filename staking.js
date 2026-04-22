@@ -202,10 +202,6 @@ try{
 }
 
   /* ===============================
-     SAVE LOCAL (TESTNET MODE)
-  =============================== */
-
-  /* ===============================
      RECORD TRANSACTION (FIX HISTORY)
   =============================== */
 
@@ -432,12 +428,18 @@ async function withdrawProjectReward(project, amount){
 /* ======================================
    WITHDRAW CAPITAL
 ====================================== */
-async function withdrawCapital(project, amount){
+async function withdrawCapital({project, amount}){
 
   const user = getCurrentUser();
 
+  let remaining = Number(amount);
+
+  if(remaining <= 0){
+    return {error:"Invalid amount"};
+  }
+
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}`,
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
     {
       headers:{
         "apikey": SUPABASE_KEY,
@@ -446,9 +448,10 @@ async function withdrawCapital(project, amount){
     }
   );
 
-  const stakes = await res.json();
+  let stakes = await res.json();
 
-  let remaining = amount;
+  // 🔥 ONLY REAL STAKES
+  stakes = stakes.filter(s => s.type === "stake");
 
   for(const s of stakes){
 
@@ -462,20 +465,33 @@ async function withdrawCapital(project, amount){
 
     const take = Math.min(available, remaining);
 
-    await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?id=eq.${s.id}`,
+    // 🔥 DO NOT MODIFY ORIGINAL STAKE
+    const insertRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/stakes`,
       {
-        method:"PATCH",
+        method:"POST",
         headers:{
           "Content-Type":"application/json",
           "apikey": SUPABASE_KEY,
           "Authorization": `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({
-          amount: available - take
+          userid: user.uid,
+          project,
+          amount: -take,
+          duration: 0,
+          txid: "CAP-"+Date.now(),
+          reward: 0,
+          withdrawnReward: 0,
+          type:"withdraw"
         })
       }
     );
+
+    if(!insertRes.ok){
+      console.error(await insertRes.text());
+      return {error:"Withdraw failed"};
+    }
 
     remaining -= take;
   }
@@ -484,7 +500,7 @@ async function withdrawCapital(project, amount){
     return {error:"Insufficient unlocked capital"};
   }
 
-  return {success:true};
+  return {success:true, amount};
 }
 
 /* ======================================
