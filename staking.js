@@ -225,10 +225,27 @@ return {
 ====================================== */
 async function getAllStakesMerged(){
 
-  const user = getCurrentUser();
+  let user = getCurrentUser();
 
+  // 🔥 FIX: wait for user
   if(!user?.uid){
-    console.warn("No UID");
+
+    console.warn("⏳ Waiting for user...");
+
+    // try localStorage directly
+    const local = localStorage.getItem("pi_user");
+
+    if(local){
+      try{
+        user = JSON.parse(local);
+      }catch{}
+    }
+
+  }
+
+  // ❗ STILL NO USER → RETURN EMPTY BUT DON'T BREAK
+  if(!user?.uid){
+    console.warn("⚠️ No user yet, returning empty");
     return [];
   }
 
@@ -251,8 +268,6 @@ async function getAllStakesMerged(){
     }
 
     const data = await res.json();
-
-    console.log("📊 Supabase data:", data);
 
     return Array.isArray(data) ? data : [];
 
