@@ -515,45 +515,40 @@ projectHistory.appendChild(div);
 async function confirmWithdraw(){
 
   const amount = Number(withdrawAmount.value);
-  const wallet = walletAddress.value;
 
-  if(!amount || amount <= 0){
+  // 🔥 VALIDATION
+  if(!Number.isFinite(amount)){
+    alert("Invalid number");
+    return;
+  }
+
+  if(amount <= 0){
     alert("Invalid amount");
     return;
   }
+
+  const wallet = walletAddress.value;
 
   if(!wallet){
     alert("Enter wallet address");
     return;
   }
 
-  const data = await getProjectTotals(PROJECT_NAME);
+  // 🔥 CALL NEW ENGINE (IMPORTANT)
+  const res = await withdrawProjectReward(
+    PROJECT_NAME,
+    amount
+  );
 
-  let remaining = amount;
-
-  for(const s of data.stakes){
-
-    if(remaining <= 0) break;
-
-    const res = await withdrawStakeReward(
-      s.txid,
-      remaining
-    );
-
-    if(res?.success){
-      remaining -= res.amount;
-    }
-
-  }
-
-  if(remaining > 0){
-    alert("Not enough reward");
+  if(!res?.success){
+    alert(res?.error || "Withdraw failed");
     return;
   }
 
   const fee = amount * 0.01;
   const receive = amount - fee;
 
+  // 🔥 RECORD TX
   recordTx({
     type:"withdraw",
     project:PROJECT_NAME,
@@ -564,11 +559,13 @@ async function confirmWithdraw(){
     }
   });
 
+  // 🔥 RESET UI
+  withdrawAmount.value = "";
   walletAddress.value = "";
 
   closeWithdraw();
   await load();
-}
+    }
 
 /* ===============================
 REWARDS WITHDRAW FEE
