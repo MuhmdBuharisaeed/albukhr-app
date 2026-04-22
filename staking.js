@@ -118,7 +118,11 @@ async function addStake({project,amount,duration}){
   }
 
   const safeAmount = Number(amount);
-  const safeDuration = Number(duration);
+const safeDuration = Number(duration);
+
+/* 🔥 ADD THIS HERE */
+const unlockTime =
+Date.now() + (safeDuration * 24 * 60 * 60 * 1000);
 
   if(!project || safeAmount <= 0){
     __stakingLock = false;
@@ -168,14 +172,16 @@ try{
     "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
   },
   body: JSON.stringify({
-    userid:user.uid,
-    project: project,
-    amount:safeAmount,
-    duration:safeDuration,
-    txid: payment.txid,
-    reward: safeAmount * getRate(project, safeDuration),
-    withdrawnReward:0
-  })
+  userid:user.uid,
+  project: project,
+  amount:safeAmount,
+  duration:safeDuration,
+  txid: payment.txid,
+  reward: safeAmount * getRate(project, safeDuration),
+  withdrawnReward:0,
+  type:"stake",
+  unlocktime: unlockTime   // 🔥 NAN
+})
 });
 
   if(!res.ok){
@@ -288,28 +294,27 @@ async function getProjectTotals(project){
 
   const stakes = await getAllStakesMerged();
 
-  // 🔥 ALL PROJECT DATA
-  const projectData = stakes.filter(s => s.project === project);
-
-  // 🔥 CAPITAL (stake + withdraw)
   let stake = 0;
-
-  // 🔥 REWARD (ONLY REAL STAKES)
   let reward = 0;
+
+  const projectData = stakes.filter(s => s.project === project);
 
   projectData.forEach(s => {
 
     const amount = Number(s.amount) || 0;
 
-    // ✅ Capital includes everything (withdraw negative)
-    stake += amount;
+    // ✅ CAPITAL (includes withdraw negative)
+    if(s.type === "stake" || s.type === "withdraw"){
+      stake += amount;
+    }
 
-    // ❗ ONLY count reward from real stakes
-    if(s.type !== "withdraw"){
+    // ✅ REWARD ONLY FROM REAL STAKES
+    if(s.type === "stake"){
 
-      const remaining =
-        (Number(s.reward)||0) -
-        (Number(s.withdrawnReward)||0);
+      const total = Number(s.reward) || 0;
+      const withdrawn = Number(s.withdrawnReward) || 0;
+
+      const remaining = total - withdrawn;
 
       reward += Math.max(0, remaining);
     }
@@ -360,7 +365,7 @@ async function withdrawProjectReward(project, amount){
   }
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}`,
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
     {
       headers:{
         "apikey": SUPABASE_KEY,
@@ -369,21 +374,27 @@ async function withdrawProjectReward(project, amount){
     }
   );
 
-  const stakes = await res.json();
+  let stakes = await res.json();
 
-  if(!stakes.length){
+  if(!Array.isArray(stakes) || !stakes.length){
     return {error:"No stakes"};
   }
 
+  // 🔥 ONLY REAL STAKES
+  stakes = stakes.filter(s => s.type === "stake");
+
   for(const stake of stakes){
 
-    const remaining =
-      (stake.reward || 0) -
-      (stake.withdrawnReward || 0);
+    const totalReward = Number(stake.reward) || 0;
+    const withdrawn = Number(stake.withdrawnReward) || 0;
+
+    const remaining = totalReward - withdrawn;
 
     if(remaining <= 0) continue;
 
     const take = Math.min(remainingToTake, remaining);
+
+    const newWithdrawn = withdrawn + take;
 
     const updateRes = await fetch(
       `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
@@ -395,13 +406,14 @@ async function withdrawProjectReward(project, amount){
           "Authorization": `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({
-          withdrawnReward: (stake.withdrawnReward || 0) + take
+          withdrawnReward: newWithdrawn
         })
       }
     );
 
     if(!updateRes.ok){
-      console.error(await updateRes.text());
+      const err = await updateRes.text();
+      console.error("❌ Update error:", err);
       return {error:"Update failed"};
     }
 
@@ -414,11 +426,69 @@ async function withdrawProjectReward(project, amount){
     return {error:"Insufficient reward"};
   }
 
-  return {success:true};
+  return {success:true, amount: amount};
 }
 
 /* ======================================
    WITHDRAW CAPITAL
+====================================== */
+async function withdrawCapital(project, amount){
+
+  const user = getCurrentUser();
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}`,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  const stakes = await res.json();
+
+  let remaining = amount;
+
+  for(const s of stakes){
+
+    if(remaining <= 0) break;
+
+    if(Date.now() < (s.unlocktime || 0)) continue;
+
+    const available = Number(s.amount) || 0;
+
+    if(available <= 0) continue;
+
+    const take = Math.min(available, remaining);
+
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/stakes?id=eq.${s.id}`,
+      {
+        method:"PATCH",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({
+          amount: available - take
+        })
+      }
+    );
+
+    remaining -= take;
+  }
+
+  if(remaining > 0){
+    return {error:"Insufficient unlocked capital"};
+  }
+
+  return {success:true};
+}
+
+/* ======================================
+  COMFIRM WITHDRAW CAPITAL
 ====================================== */
 async function confirmCapitalWithdraw(){
 
