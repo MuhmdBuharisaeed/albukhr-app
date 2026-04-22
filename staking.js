@@ -408,22 +408,37 @@ async function withdrawProjectReward(project, amount){
     );
 
     if(!updateRes.ok){
-      const err = await updateRes.text();
-      console.error("❌ Update error:", err);
-      return {error:"Update failed"};
-    }
 
-    remainingToTake -= take;
+  let errText = "Unknown error";
 
-    if(remainingToTake <= 0) break;
-  }
+  try{
+    errText = await updateRes.text();
+  }catch{}
 
-  if(remainingToTake > 0){
-    return {error:"Insufficient reward"};
-  }
+  console.error("❌ Update error:", errText);
 
-  return {success:true, amount: amount};
+  return {error:"Update failed"};
 }
+
+// 🔥 PROTECT CALCULATION
+if(!Number.isFinite(take)){
+  return {error:"Invalid calculation"};
+}
+
+remainingToTake -= take;
+
+if(remainingToTake <= 0) break;
+
+}
+
+if(remainingToTake > 0){
+  return {error:"Insufficient reward"};
+}
+
+return {
+  success:true,
+  amount: amount
+};
 
 /* ======================================
    WITHDRAW CAPITAL
@@ -488,20 +503,36 @@ async function withdrawCapital({project, amount}){
       }
     );
 
-    if(!insertRes.ok){
-      console.error(await insertRes.text());
-      return {error:"Withdraw failed"};
-    }
+   if(!insertRes.ok){
 
-    remaining -= take;
-  }
+  let errText = "Unknown error";
 
-  if(remaining > 0){
-    return {error:"Insufficient unlocked capital"};
-  }
+  try{
+    errText = await insertRes.text();
+  }catch{}
 
-  return {success:true, amount};
+  console.error("❌ Withdraw insert error:", errText);
+
+  return {error:"Withdraw failed"};
 }
+
+// 🔥 PROTECT SYSTEM
+if(!Number.isFinite(take)){
+  return {error:"Invalid calculation"};
+}
+
+remaining -= take;
+
+}
+
+if(remaining > 0){
+  return {error:"Insufficient unlocked capital"};
+}
+
+return {
+  success:true,
+  amount
+}; 
 
 /* ======================================
   COMFIRM WITHDRAW CAPITAL
