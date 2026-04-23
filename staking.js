@@ -268,30 +268,33 @@ async function getProjectTotals(project){
 
   const stakes = await getAllStakesMerged();
 
-  // 🔥 ALL PROJECT DATA
-  const projectData = stakes.filter(s => s.project === project);
+  const projectData = stakes.filter(s =>
+    s.project === project &&
+    (s.type === "stake" || s.type === "capital")
+  );
 
-  // 🔥 CAPITAL (stake + withdraw)
   let stake = 0;
-
-  // 🔥 REWARD (ONLY REAL STAKES)
   let reward = 0;
 
   projectData.forEach(s => {
 
-    const amount = Number(s.amount) || 0;
+    const amount = Number(s.amount);
 
-    // ✅ Capital includes everything (withdraw negative)
+    if(!Number.isFinite(amount)) return;
+
+    // CAPITAL
     stake += amount;
 
-    // ❗ ONLY count reward from real stakes
-    if(s.type === "stake")
+    // ONLY REAL STAKES
+    if(s.type === "stake"){
 
-      const remaining =
-        (Number(s.reward)||0) -
-        (Number(s.withdrawnReward)||0);
+      const total = Number(s.reward) || 0;
+      const withdrawn = Number(s.withdrawnReward) || 0;
 
-      reward += Math.max(0, remaining);
+      const remaining = Math.max(0, total - withdrawn);
+
+      reward += remaining;
+
     }
 
   });
