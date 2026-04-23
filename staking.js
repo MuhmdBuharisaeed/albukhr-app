@@ -350,135 +350,95 @@ async function getUserStakes(){
 /* ======================================
    WITHDRAW PROJECT REWARD
 ====================================== */
-let __withdrawLock = false;
-
 async function withdrawProjectReward(project, amount){
-
-  // 🔒 PREVENT DOUBLE CLICK / DOUBLE WITHDRAW
-  if(__withdrawLock){
-    return {error:"Processing..."};
-  }
-
-  __withdrawLock = true;
 
   const user = getCurrentUser();
 
   let remainingToTake = Number(amount);
 
-  // 🔥 VALIDATION
-  if(!Number.isFinite(remainingToTake) || remainingToTake <= 0){
-    __withdrawLock = false;
+  if(remainingToTake <= 0){
     return {error:"Invalid amount"};
   }
 
-  try{
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
 
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
+  let stakes = await res.json();
+
+  if(!Array.isArray(stakes) || !stakes.length){
+    return {error:"No stakes"};
+  }
+
+  // 🔥 ONLY REAL STAKES
+  stakes = stakes.filter(s => s.type === "stake");
+
+  for(const stake of stakes){
+
+    const totalReward = Number(stake.reward) || 0;
+    const withdrawn = Number(stake.withdrawnReward) || 0;
+
+    const remaining = totalReward - withdrawn;
+
+    if(remaining <= 0) continue;
+
+    const take = Math.min(remainingToTake, remaining);
+
+    const newWithdrawn = withdrawn + take;
+
+    const updateRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
       {
+        method:"PATCH",
         headers:{
+          "Content-Type":"application/json",
           "apikey": SUPABASE_KEY,
           "Authorization": `Bearer ${SUPABASE_KEY}`
-        }
+        },
+        body: JSON.stringify({
+          withdrawnReward: newWithdrawn
+        })
       }
     );
 
-    if(!res.ok){
-      const err = await res.text();
-      console.error("❌ Fetch error:", err);
-      __withdrawLock = false;
-      return {error:"Fetch failed"};
-    }
+    if(!updateRes.ok){
 
-    let stakes = await res.json();
+  let errText = "Unknown error";
 
-    if(!Array.isArray(stakes) || !stakes.length){
-      __withdrawLock = false;
-      return {error:"No stakes"};
-    }
+  try{
+    errText = await updateRes.text();
+  }catch{}
 
-    // 🔥 ONLY REAL STAKES
-    stakes = stakes.filter(s => s.type === "stake");
+  console.error("❌ Update error:", errText);
 
-    for(const stake of stakes){
-
-      if(remainingToTake <= 0) break;
-
-      const totalReward = Number(stake.reward) || 0;
-      const withdrawn = Number(stake.withdrawnReward) || 0;
-
-      const remaining = totalReward - withdrawn;
-
-      // 🔥 SAFETY CHECK
-      if(!Number.isFinite(remaining)){
-        continue;
-      }
-
-      if(remaining <= 0) continue;
-
-      const take = Math.min(remainingToTake, remaining);
-
-      // 🔥 PROTECT CALCULATION
-      if(!Number.isFinite(take)){
-        __withdrawLock = false;
-        return {error:"Invalid calculation"};
-      }
-
-      const newWithdrawn = withdrawn + take;
-
-      const updateRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
-        {
-          method:"PATCH",
-          headers:{
-            "Content-Type":"application/json",
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`
-          },
-          body: JSON.stringify({
-            withdrawnReward: newWithdrawn
-          })
-        }
-      );
-
-      if(!updateRes.ok){
-
-        let errText = "Unknown error";
-
-        try{
-          errText = await updateRes.text();
-        }catch{}
-
-        console.error("❌ Update error:", errText);
-
-        __withdrawLock = false;
-        return {error:"Update failed"};
-      }
-
-      remainingToTake -= take;
-    }
-
-    if(remainingToTake > 0){
-      __withdrawLock = false;
-      return {error:"Insufficient reward"};
-    }
-
-    __withdrawLock = false;
-
-    return {
-      success:true,
-      amount: amount
-    };
-
-  }catch(e){
-
-    console.error("❌ Network error:", e);
-
-    __withdrawLock = false;
-
-    return {error:"Network error"};
-  }
+  return {error:"Update failed"};
 }
+
+// 🔥 PROTECT CALCULATION
+if(!Number.isFinite(take)){
+  return {error:"Invalid calculation"};
+}
+
+remainingToTake -= take;
+
+if(remainingToTake <= 0) break;
+
+}
+
+if(remainingToTake > 0){
+  return {error:"Insufficient reward"};
+}
+
+return {
+  success:true,
+  amount: amount
+};
 
 /* ======================================
    WITHDRAW CAPITAL
@@ -535,7 +495,7 @@ async function withdrawCapital({project, amount}){
           project,
           amount: -take,
           duration: 0,
-          txid: "CAP-"+Date.now()+"-"+Math.random().toString(36).slice(2),
+          txid: "CAP-"+Date.now(),
           reward: 0,
           withdrawnReward: 0,
           type:"withdraw"
