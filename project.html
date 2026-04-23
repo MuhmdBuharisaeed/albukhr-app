@@ -685,9 +685,21 @@ const now = Date.now();
 
 data.stakes.forEach(s=>{
 
-if(now >= (s.unlocktime || 0)){
-total += Number(s.amount)||0;
-}
+  // 🔥 ONLY REAL STAKES
+  if(s.type !== "stake") return;
+
+  const amount = Number(s.amount) || 0;
+
+  // 🔥 PROTECT SYSTEM
+  if(!Number.isFinite(amount) || amount <= 0){
+    return;
+  }
+
+  const unlock = Number(s.unlocktime) || 0;
+
+  if(now >= unlock){
+    total += amount;
+  }
 
 });
 
@@ -793,14 +805,23 @@ const now = Date.now();
 
 data.stakes.forEach(s=>{
 
-const amount =
-Number(s.amount)||0;
+  // 🔥 ONLY REAL STAKES
+  if(s.type !== "stake") return;
 
-if(now >= (s.unlocktime || 0)){
-unlocked += amount;
-}else{
-locked += amount;
-}
+  const amount = Number(s.amount) || 0;
+
+  // 🔥 PROTECTION
+  if(!Number.isFinite(amount) || amount <= 0){
+    return;
+  }
+
+  const unlock = Number(s.unlocktime) || 0;
+
+  if(now >= unlock){
+    unlocked += amount;
+  }else{
+    locked += amount;
+  }
 
 });
 
