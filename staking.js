@@ -196,10 +196,6 @@ try{
 }
 
   /* ===============================
-     SAVE LOCAL (TESTNET MODE)
-  =============================== */
-
-  /* ===============================
      RECORD TRANSACTION (FIX HISTORY)
   =============================== */
 
@@ -289,7 +285,7 @@ async function getProjectTotals(project){
     stake += amount;
 
     // ❗ ONLY count reward from real stakes
-    if(s.type !== "withdraw"){
+    if(s.type === "stake")
 
       const remaining =
         (Number(s.reward)||0) -
@@ -402,57 +398,6 @@ async function withdrawProjectReward(project, amount){
 }
 
 /* ======================================
-   WITHDRAW CAPITAL
-====================================== */
-async function confirmCapitalWithdraw(){
-
-const amount = Number(capitalWithdrawAmount.value);
-const wallet = capitalWallet.value;
-
-if(!amount || amount <= 0){
-  alert("Invalid amount");
-  return;
-}
-
-if(!wallet){
-  alert("Enter wallet address");
-  return;
-}
-
-const fee = amount * 0.01;
-const receive = amount - fee;
-
-/* 🔥 SEND TO SUPABASE */
-const res = await withdrawCapital({
-  project: PROJECT_NAME,
-  amount: amount
-});
-
-if(res?.error){
-  alert(res.error);
-  return;
-}
-
-/* 🔥 RECORD TX */
-recordTx({
-  type:"capital",
-  project:PROJECT_NAME,
-  amount:receive,
-  meta:{
-    wallet:wallet,
-    fee:fee
-  }
-});
-
-closeCapitalModal();
-
-capitalWithdrawAmount.value = "";
-capitalWallet.value = "";
-
-load();
-}
-
-/* ======================================
    LOAD DATA
 ====================================== */
 
@@ -479,6 +424,86 @@ async function loadData(){
     // ❌ kar ka yi alert nan
   }
 
+}
+
+/* ======================================
+   WITHDRAW CAPITAL (ENGINE)
+====================================== */
+async function withdrawCapital({project, amount}){
+
+  const user = getCurrentUser();
+
+  let remaining = Number(amount);
+
+  if(!Number.isFinite(remaining) || remaining <= 0){
+    return {error:"Invalid amount"};
+  }
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  let stakes = await res.json();
+
+  if(!Array.isArray(stakes)){
+    return {error:"Invalid data"};
+  }
+
+  // 🔥 ONLY REAL STAKES
+  stakes = stakes.filter(s => s.type !== "withdraw");
+
+  for(const s of stakes){
+
+    if(remaining <= 0) break;
+
+    const available = Number(s.amount) || 0;
+
+    if(available <= 0) continue;
+
+    const take = Math.min(available, remaining);
+
+    // 🔥 INSERT NEGATIVE (CAPITAL WITHDRAW)
+    const insertRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/stakes`,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({
+          userid: user.uid,
+          project: project,
+          amount: -take,
+          duration: 0,
+          txid: "CAP-"+Date.now(),
+          reward: 0,
+          withdrawnReward: 0,
+          type:"capital"
+        })
+      }
+    );
+
+    if(!insertRes.ok){
+      console.error(await insertRes.text());
+      return {error:"Withdraw failed"};
+    }
+
+    remaining -= take;
+  }
+
+  if(remaining > 0){
+    return {error:"Insufficient capital"};
+  }
+
+  return {success:true, amount};
 }
 
 /* ======================================
