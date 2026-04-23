@@ -482,15 +482,15 @@ async function withdrawCapital({project, amount}){
           "Authorization": `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({
-          userid: user.uid,
-          project: project,
-          amount: -take,
-          duration: 0,
-          txid: "CAP-"+Date.now(),
-          reward: 0,
-          withdrawnReward: 0,
-          type:"capital"
-        })
+  userid: user.uid,
+  project: project,
+  amount: -take,
+  duration: 0,
+  txid: "CAP-"+Date.now(),
+  reward: 0,
+  withdrawnReward: 0,
+  type:"withdraw"   // ✅ FIX
+})
       }
     );
 
