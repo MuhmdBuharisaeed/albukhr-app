@@ -473,7 +473,7 @@ async function withdrawCapital({project, amount}){
   }
 
   // 🔥 ONLY REAL STAKES
-  stakes = stakes.filter(s => s.type !== "withdraw");
+  stakes = stakes.filter(s => s.type === "stake");
 
   for(const s of stakes){
 
