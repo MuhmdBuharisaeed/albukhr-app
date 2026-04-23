@@ -402,11 +402,11 @@ link.classList.add("active");
 
 <script>
 
-function renderInvestorDashboard(){
+async function renderInvestorDashboard(){
 
 if(typeof getAllStakesMerged !== "function") return;
 
-const stakes = getAllStakesMerged();
+const stakes = await getAllStakesMerged(); // ✅ FIX
 
 let totalInvest = 0;
 let totalEarn = 0;
@@ -415,11 +415,16 @@ const map = {};
 
 stakes.forEach(s=>{
 
-totalInvest += Number(s.amount)||0;
+const amount = Number(s.amount)||0;
 
-const reward = Number(s.remainingReward ?? s.reward)||0;
+totalInvest += amount;
 
-totalEarn += reward;
+// ✅ FIX reward calculation
+const reward =
+(Number(s.reward)||0) -
+(Number(s.withdrawnReward)||0);
+
+totalEarn += Math.max(0, reward);
 
 if(!map[s.project]){
 
@@ -430,9 +435,8 @@ earn:0
 
 }
 
-map[s.project].invest += Number(s.amount)||0;
-
-map[s.project].earn += reward;
+map[s.project].invest += amount;
+map[s.project].earn += Math.max(0, reward);
 
 });
 
@@ -455,11 +459,8 @@ card.className="invest-card";
 card.innerHTML = `
 
 <div class="invest-header">
-
 <div>${project}</div>
-
 <div>${map[project].earn.toFixed(2)} Pi</div>
-
 </div>
 
 <div class="row">
@@ -478,7 +479,7 @@ container.appendChild(card);
 
 });
 
-}
+ }
 
 renderInvestorDashboard();
 
