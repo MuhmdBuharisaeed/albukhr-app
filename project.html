@@ -512,6 +512,8 @@ projectHistory.appendChild(div);
 /* ===============================
    WITHDRAW
 =============================== */
+  let __withdrawLock = false;
+  
 async function confirmWithdraw(){
 
   // 🔒 PREVENT DOUBLE CLICK
@@ -640,7 +642,10 @@ receive.toFixed(2) + " Pi";
 });
 
 }
-  
+
+/* ===============================
+SAVE PROJECT STAKE 
+=============================== */
 function saveProjectStakes(project, stakes){
 
   if(!Array.isArray(stakes)) return;
