@@ -168,14 +168,15 @@ try{
     "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
   },
   body: JSON.stringify({
-    userid:user.uid,
-    project: project,
-    amount:safeAmount,
-    duration:safeDuration,
-    txid: payment.txid,
-    reward: safeAmount * getRate(project, safeDuration),
-    withdrawnReward:0
-  })
+  userid:user.uid,
+  project: project,
+  amount:safeAmount,
+  duration:safeDuration,
+  txid: payment.txid,
+  reward: safeAmount * getRate(project, safeDuration),
+  withdrawnReward:0,
+  type:"stake"   // 🔥 VERY IMPORTANT
+})
 });
 
   if(!res.ok){
@@ -338,7 +339,7 @@ async function withdrawProjectReward(project, amount){
 
   let remainingToTake = Number(amount);
 
-  if(remainingToTake <= 0){
+  if(!Number.isFinite(remainingToTake) || remainingToTake <= 0){
     return {error:"Invalid amount"};
   }
 
@@ -352,21 +353,33 @@ async function withdrawProjectReward(project, amount){
     }
   );
 
-  const stakes = await res.json();
+  if(!res.ok){
+    const err = await res.text();
+    console.error(err);
+    return {error:"Network error"};
+  }
 
-  if(!stakes.length){
+  let stakes = await res.json();
+
+  if(!Array.isArray(stakes) || !stakes.length){
     return {error:"No stakes"};
   }
 
+  // 🔥 FIX: ONLY STAKES
+  stakes = stakes.filter(s => s.type === "stake");
+
   for(const stake of stakes){
 
-    const remaining =
-      (stake.reward || 0) -
-      (stake.withdrawnReward || 0);
+    const total = Number(stake.reward) || 0;
+    const withdrawn = Number(stake.withdrawnReward) || 0;
 
-    if(remaining <= 0) continue;
+    const remaining = total - withdrawn;
+
+    if(!Number.isFinite(remaining) || remaining <= 0) continue;
 
     const take = Math.min(remainingToTake, remaining);
+
+    if(!Number.isFinite(take)) continue;
 
     const updateRes = await fetch(
       `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
@@ -378,13 +391,14 @@ async function withdrawProjectReward(project, amount){
           "Authorization": `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({
-          withdrawnReward: (stake.withdrawnReward || 0) + take
+          withdrawnReward: withdrawn + take
         })
       }
     );
 
     if(!updateRes.ok){
-      console.error(await updateRes.text());
+      const err = await updateRes.text();
+      console.error(err);
       return {error:"Update failed"};
     }
 
@@ -397,8 +411,8 @@ async function withdrawProjectReward(project, amount){
     return {error:"Insufficient reward"};
   }
 
-  return {success:true};
-}
+  return {success:true, amount};
+  }
 
 /* ======================================
    LOAD DATA
