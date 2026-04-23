@@ -270,7 +270,7 @@ async function getProjectTotals(project){
 
   const projectData = stakes.filter(s =>
     s.project === project &&
-    (s.type === "stake" || s.type === "capital")
+    (s.type === "stake" || s.type === "withdraw")
   );
 
   let stake = 0;
@@ -282,10 +282,10 @@ async function getProjectTotals(project){
 
     if(!Number.isFinite(amount)) return;
 
-    // CAPITAL
+    // ✅ CAPITAL (stake + negative withdraw)
     stake += amount;
 
-    // ONLY REAL STAKES
+    // ✅ ONLY REAL STAKES FOR REWARD
     if(s.type === "stake"){
 
       const total = Number(s.reward) || 0;
