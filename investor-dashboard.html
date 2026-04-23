@@ -404,9 +404,7 @@ link.classList.add("active");
 
 async function renderInvestorDashboard(){
 
-if(typeof getAllStakesMerged !== "function") return;
-
-const stakes = await getAllStakesMerged(); // ✅ FIX
+const stakes = await getAllStakesMerged();
 
 let totalInvest = 0;
 let totalEarn = 0;
@@ -415,28 +413,35 @@ const map = {};
 
 stakes.forEach(s=>{
 
-const amount = Number(s.amount)||0;
+const amount = Number(s.amount) || 0;
 
 totalInvest += amount;
 
-// ✅ FIX reward calculation
-const reward =
+if(s.type === "stake"){
+
+const remaining =
 (Number(s.reward)||0) -
 (Number(s.withdrawnReward)||0);
 
-totalEarn += Math.max(0, reward);
-
-if(!map[s.project]){
-
-map[s.project]={
-invest:0,
-earn:0
-};
+totalEarn += Math.max(0, remaining);
 
 }
 
+if(!map[s.project]){
+map[s.project] = {invest:0, earn:0};
+}
+
 map[s.project].invest += amount;
-map[s.project].earn += Math.max(0, reward);
+
+if(s.type === "stake"){
+
+const remaining =
+(Number(s.reward)||0) -
+(Number(s.withdrawnReward)||0);
+
+map[s.project].earn += Math.max(0, remaining);
+
+}
 
 });
 
@@ -447,8 +452,7 @@ document.getElementById("totalEarn").innerText =
 totalEarn.toFixed(2)+" Pi";
 
 const container = document.getElementById("investments");
-
-container.innerHTML="";
+container.innerHTML = "";
 
 Object.keys(map).forEach(project=>{
 
@@ -457,7 +461,6 @@ const card = document.createElement("div");
 card.className="invest-card";
 
 card.innerHTML = `
-
 <div class="invest-header">
 <div>${project}</div>
 <div>${map[project].earn.toFixed(2)} Pi</div>
@@ -472,14 +475,13 @@ card.innerHTML = `
 <div>Earnings</div>
 <div>${map[project].earn.toFixed(2)} Pi</div>
 </div>
-
 `;
 
 container.appendChild(card);
 
 });
 
- }
+}
 
 renderInvestorDashboard();
 
