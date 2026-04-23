@@ -118,11 +118,7 @@ async function addStake({project,amount,duration}){
   }
 
   const safeAmount = Number(amount);
-const safeDuration = Number(duration);
-
-/* 🔥 ADD THIS HERE */
-const unlockTime =
-Date.now() + (safeDuration * 24 * 60 * 60 * 1000);
+  const safeDuration = Number(duration);
 
   if(!project || safeAmount <= 0){
     __stakingLock = false;
@@ -172,16 +168,14 @@ try{
     "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
   },
   body: JSON.stringify({
-  userid:user.uid,
-  project: project,
-  amount:safeAmount,
-  duration:safeDuration,
-  txid: payment.txid,
-  reward: safeAmount * getRate(project, safeDuration),
-  withdrawnReward:0,
-  type:"stake",
-  unlocktime: unlockTime   // 🔥 NAN
-})
+    userid:user.uid,
+    project: project,
+    amount:safeAmount,
+    duration:safeDuration,
+    txid: payment.txid,
+    reward: safeAmount * getRate(project, safeDuration),
+    withdrawnReward:0
+  })
 });
 
   if(!res.ok){
@@ -200,6 +194,10 @@ try{
   };
 
 }
+
+  /* ===============================
+     SAVE LOCAL (TESTNET MODE)
+  =============================== */
 
   /* ===============================
      RECORD TRANSACTION (FIX HISTORY)
@@ -225,32 +223,13 @@ return {
 /* ======================================
    GET ALL STAKES
 ====================================== */
-
 async function getAllStakesMerged(){
 
-  let user = getCurrentUser();
+  const user = getCurrentUser();
 
-  // 🔥 fallback user for index
   if(!user?.uid){
-
-    const local = localStorage.getItem("pi_user");
-
-    if(local){
-      try{
-        user = JSON.parse(local);
-      }catch{}
-    }
-
-  }
-
-  // 🔥 FINAL FALLBACK (IMPORTANT)
-  if(!user?.uid){
-
-    // 👇 THIS FIXES INDEX
-    user = {
-      uid: "test123"
-    };
-
+    console.warn("No UID");
+    return [];
   }
 
   try{
@@ -266,11 +245,14 @@ async function getAllStakesMerged(){
     );
 
     if(!res.ok){
-      console.error(await res.text());
+      const err = await res.text();
+      console.error("❌ Fetch error:", err);
       return [];
     }
 
     const data = await res.json();
+
+    console.log("📊 Supabase data:", data);
 
     return Array.isArray(data) ? data : [];
 
@@ -290,27 +272,28 @@ async function getProjectTotals(project){
 
   const stakes = await getAllStakesMerged();
 
-  let stake = 0;
-  let reward = 0;
-
+  // 🔥 ALL PROJECT DATA
   const projectData = stakes.filter(s => s.project === project);
+
+  // 🔥 CAPITAL (stake + withdraw)
+  let stake = 0;
+
+  // 🔥 REWARD (ONLY REAL STAKES)
+  let reward = 0;
 
   projectData.forEach(s => {
 
     const amount = Number(s.amount) || 0;
 
-    // ✅ CAPITAL (includes withdraw negative)
-    if(s.type === "stake" || s.type === "withdraw"){
-      stake += amount;
-    }
+    // ✅ Capital includes everything (withdraw negative)
+    stake += amount;
 
-    // ✅ REWARD ONLY FROM REAL STAKES
-    if(s.type === "stake"){
+    // ❗ ONLY count reward from real stakes
+    if(s.type !== "withdraw"){
 
-      const total = Number(s.reward) || 0;
-      const withdrawn = Number(s.withdrawnReward) || 0;
-
-      const remaining = total - withdrawn;
+      const remaining =
+        (Number(s.reward)||0) -
+        (Number(s.withdrawnReward)||0);
 
       reward += Math.max(0, remaining);
     }
@@ -361,7 +344,7 @@ async function withdrawProjectReward(project, amount){
   }
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}`,
     {
       headers:{
         "apikey": SUPABASE_KEY,
@@ -370,27 +353,21 @@ async function withdrawProjectReward(project, amount){
     }
   );
 
-  let stakes = await res.json();
+  const stakes = await res.json();
 
-  if(!Array.isArray(stakes) || !stakes.length){
+  if(!stakes.length){
     return {error:"No stakes"};
   }
 
-  // 🔥 ONLY REAL STAKES
-  stakes = stakes.filter(s => s.type === "stake");
-
   for(const stake of stakes){
 
-    const totalReward = Number(stake.reward) || 0;
-    const withdrawn = Number(stake.withdrawnReward) || 0;
-
-    const remaining = totalReward - withdrawn;
+    const remaining =
+      (stake.reward || 0) -
+      (stake.withdrawnReward || 0);
 
     if(remaining <= 0) continue;
 
     const take = Math.min(remainingToTake, remaining);
-
-    const newWithdrawn = withdrawn + take;
 
     const updateRes = await fetch(
       `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
@@ -402,140 +379,30 @@ async function withdrawProjectReward(project, amount){
           "Authorization": `Bearer ${SUPABASE_KEY}`
         },
         body: JSON.stringify({
-          withdrawnReward: newWithdrawn
+          withdrawnReward: (stake.withdrawnReward || 0) + take
         })
       }
     );
 
     if(!updateRes.ok){
+      console.error(await updateRes.text());
+      return {error:"Update failed"};
+    }
 
-  let errText = "Unknown error";
+    remainingToTake -= take;
 
-  try{
-    errText = await updateRes.text();
-  }catch{}
+    if(remainingToTake <= 0) break;
+  }
 
-  console.error("❌ Update error:", errText);
+  if(remainingToTake > 0){
+    return {error:"Insufficient reward"};
+  }
 
-  return {error:"Update failed"};
+  return {success:true};
 }
-
-// 🔥 PROTECT CALCULATION
-if(!Number.isFinite(take)){
-  return {error:"Invalid calculation"};
-}
-
-remainingToTake -= take;
-
-if(remainingToTake <= 0) break;
-
-}
-
-if(remainingToTake > 0){
-  return {error:"Insufficient reward"};
-}
-
-return {
-  success:true,
-  amount: amount
-};
 
 /* ======================================
    WITHDRAW CAPITAL
-====================================== */
-async function withdrawCapital({project, amount}){
-
-  const user = getCurrentUser();
-
-  let remaining = Number(amount);
-
-  if(remaining <= 0){
-    return {error:"Invalid amount"};
-  }
-
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
-    }
-  );
-
-  let stakes = await res.json();
-
-  // 🔥 ONLY REAL STAKES
-  stakes = stakes.filter(s => s.type === "stake");
-
-  for(const s of stakes){
-
-    if(remaining <= 0) break;
-
-    if(Date.now() < (s.unlocktime || 0)) continue;
-
-    const available = Number(s.amount) || 0;
-
-    if(available <= 0) continue;
-
-    const take = Math.min(available, remaining);
-
-    // 🔥 DO NOT MODIFY ORIGINAL STAKE
-    const insertRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes`,
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify({
-          userid: user.uid,
-          project,
-          amount: -take,
-          duration: 0,
-          txid: "CAP-"+Date.now(),
-          reward: 0,
-          withdrawnReward: 0,
-          type:"withdraw"
-        })
-      }
-    );
-
-   if(!insertRes.ok){
-
-  let errText = "Unknown error";
-
-  try{
-    errText = await insertRes.text();
-  }catch{}
-
-  console.error("❌ Withdraw insert error:", errText);
-
-  return {error:"Withdraw failed"};
-}
-
-// 🔥 PROTECT SYSTEM
-if(!Number.isFinite(take)){
-  return {error:"Invalid calculation"};
-}
-
-remaining -= take;
-
-}
-
-if(remaining > 0){
-  return {error:"Insufficient unlocked capital"};
-}
-
-return {
-  success:true,
-  amount
-}; 
-
-/* ======================================
-  COMFIRM WITHDRAW CAPITAL
 ====================================== */
 async function confirmCapitalWithdraw(){
 
