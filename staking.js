@@ -196,6 +196,10 @@ try{
 }
 
   /* ===============================
+     SAVE LOCAL (TESTNET MODE)
+  =============================== */
+
+  /* ===============================
      RECORD TRANSACTION (FIX HISTORY)
   =============================== */
 
@@ -394,17 +398,13 @@ async function withdrawProjectReward(project, amount){
     return {error:"Insufficient reward"};
   }
 
-return {
-  success:true,
-  amount: amount
-};
-
-} // ✅ yanzu an rufe function ɗin daidai
+  return {success:true};
+}
 
 /* ======================================
    WITHDRAW CAPITAL
 ====================================== */
-async function withdrawCapital({project, amount}){
+async function confirmCapitalWithdraw(){
 
 const amount = Number(capitalWithdrawAmount.value);
 const wallet = capitalWallet.value;
