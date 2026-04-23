@@ -514,16 +514,22 @@ projectHistory.appendChild(div);
 =============================== */
 async function confirmWithdraw(){
 
+  // 🔒 PREVENT DOUBLE CLICK
+  if(__withdrawLock) return;
+  __withdrawLock = true;
+
   const amount = Number(withdrawAmount.value);
 
   // 🔥 VALIDATION
   if(!Number.isFinite(amount)){
     alert("Invalid number");
+    __withdrawLock = false;
     return;
   }
 
   if(amount <= 0){
     alert("Invalid amount");
+    __withdrawLock = false;
     return;
   }
 
@@ -531,10 +537,11 @@ async function confirmWithdraw(){
 
   if(!wallet){
     alert("Enter wallet address");
+    __withdrawLock = false;
     return;
   }
 
-  // 🔥 CALL NEW ENGINE (IMPORTANT)
+  // 🔥 CALL ENGINE
   const res = await withdrawProjectReward(
     PROJECT_NAME,
     amount
@@ -542,6 +549,7 @@ async function confirmWithdraw(){
 
   if(!res?.success){
     alert(res?.error || "Withdraw failed");
+    __withdrawLock = false;
     return;
   }
 
@@ -565,7 +573,10 @@ async function confirmWithdraw(){
 
   closeWithdraw();
   await load();
-    }
+
+  // 🔓 UNLOCK
+  __withdrawLock = false;
+}
 
 /* ===============================
 REWARDS WITHDRAW FEE
@@ -696,92 +707,82 @@ el.innerText =
 
   }
 
+/* ===============================
+CLOSE CAPITAL MODAL
+=============================== */
 function closeCapitalModal(){
 
 capitalModal.style.display="none";
 
   }
 
+/* ===============================
+COMFORM CAPITAL WITHDRAW
+=============================== */
+let __capitalLock = false;
+
 async function confirmCapitalWithdraw(){
 
-const amount =
-Number(capitalWithdrawAmount.value);
+  // 🔒 PREVENT DOUBLE CLICK
+  if(__capitalLock) return;
+  __capitalLock = true;
 
-const wallet =
-capitalWallet.value;
+  const amount = Number(capitalWithdrawAmount.value);
+  const wallet = capitalWallet.value;
 
-if(!amount || amount <= 0){
-alert("Invalid amount");
-return;
+  // 🔥 VALIDATION
+  if(!Number.isFinite(amount) || amount <= 0){
+    alert("Invalid amount");
+    __capitalLock = false;
+    return;
+  }
+
+  if(!wallet){
+    alert("Enter wallet address");
+    __capitalLock = false;
+    return;
+  }
+
+  // 🔥 CALL SUPABASE ENGINE
+  const res = await withdrawCapital({
+    project: PROJECT_NAME,
+    amount: amount
+  });
+
+  if(res?.error){
+    alert(res.error);
+    __capitalLock = false;
+    return;
+  }
+
+  const fee = amount * 0.01;
+  const receive = amount - fee;
+
+  // 🔥 RECORD TX
+  recordTx({
+    type:"capital",
+    project:PROJECT_NAME,
+    amount:receive,
+    meta:{
+      wallet:wallet,
+      fee:fee
+    }
+  });
+
+  // 🔥 RESET UI
+  capitalWithdrawAmount.value = "";
+  capitalWallet.value = "";
+
+  closeCapitalModal();
+  await load();
+
+  // 🔓 UNLOCK
+  __capitalLock = false;
 }
 
-if(!wallet){
-alert("Enter wallet address");
-return;
-}
-
-const fee = amount * 0.01;
-const receive = amount - fee;
-
-const data =
-await getProjectTotals(PROJECT_NAME);
-
-let remaining = amount;
-
-data.stakes.forEach(s=>{
-
-if(remaining <= 0) return;
-
-if(Date.now() >= (s.unlockTime||0)){
-
-let available =
-Number(s.amount)||0;
-
-let take =
-Math.min(available, remaining);
-
-s.amount -= take;
-
-remaining -= take;
-
-}
-
-});
-
-if(remaining > 0){
-alert("Insufficient unlocked capital");
-return;
-}
-
-saveProjectStakes(
-PROJECT_NAME,
-data.stakes
-);
-
-recordTx({
-type:"capital",
-project:PROJECT_NAME,
-amount:receive,
-meta:{
-wallet:wallet,
-fee:fee
-}
-});
-
-closeCapitalModal();
-
-/* CLEAR INPUTS */
-capitalWithdrawAmount.value = "";
-capitalWallet.value = "";
-
-(async ()=>{
-
-load();
-
-})();
-
-}
-
+/* ===============================
+UPDATE STAKE STATUS 
+=============================== */
 async function updateStakeStatus(){
 
   const data = await getProjectTotals(PROJECT_NAME);
