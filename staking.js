@@ -491,8 +491,8 @@ async function withdrawCapital({project, amount}){
   withdrawnReward: 0,
   type:"withdraw"   // ✅ FIX
 })
-      }
-    );
+ }
+ );
 
     if(!insertRes.ok){
       console.error(await insertRes.text());
