@@ -438,10 +438,11 @@ return (amount * roi / 100).toFixed(2);
 
 async function renderMarketplace(){
 
-const container =
-document.getElementById("projectList");
-
+const container = document.getElementById("projectList");
 container.innerHTML = "";
+
+// ✅ FETCH ONCE ONLY
+const stakes = await getAllStakesMerged();
 
 const allProjects =
 Object.keys(PROJECT_CONFIG).map(p => ({
@@ -538,8 +539,6 @@ card.className = "project-card";
 card.onclick = () =>
 location.href = `project.html?project=${projectKey}`;
 
-card.className = "project-card";
-
 /* TREASURY */
 const treasury =
 typeof getProjectTreasuryStatus === "function"
@@ -554,8 +553,6 @@ const funded =
 Math.min((liquidity / (project.target || 1000))*100,100);
 
 /* INVESTORS */
-const stakes = await getAllStakesMerged();
-
 const investors =
 stakes.filter(s => s.project === projectKey).length;
 
@@ -693,15 +690,10 @@ renderMarketInsights();
 renderDiscovery();
 
 /* AUTO REFRESH */
-
 setInterval(()=>{
-
 renderMarketplace();
-renderMarketInsights();
-renderDiscovery();
-
-},5000);
-
+},10000);
+  
 </script>
 
 </body>
