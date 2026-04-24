@@ -239,6 +239,10 @@ initPi();
 const params = new URLSearchParams(window.location.search);
 const PROJECT_NAME = params.get("project") || "Azman";
 const CONFIG = getProjectConfig(PROJECT_NAME);
+
+// ✅ ADD THIS LINE
+const txTitle = document.getElementById("txTitle");
+
 txTitle.innerText =
 `${CONFIG.title} Transactions`;
 
@@ -319,8 +323,8 @@ function closeWithdraw(){
 
 async function confirmStake(){
 
-if(!localStorage.getItem("pi_user")){
-  alert("Please login first");
+if(typeof Pi === "undefined"){
+  alert("Open inside Pi Browser");
   return;
 }
 
@@ -370,11 +374,10 @@ try{
   console.error(e);
 }
 
-/* ALWAYS RESET BUTTON */
 btn.innerText = "Confirm";
 btn.disabled = false;
 
-}
+  }
 
 /* ===============================
    LOAD
