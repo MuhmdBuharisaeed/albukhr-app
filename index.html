@@ -6,20 +6,43 @@
 <title>ALBUKHR Projects</title>
 
 <!-- ✅ AUTH GUARD -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
 <script>
-function getCurrentUser(){
-  try{
-    return JSON.parse(localStorage.getItem("pi_user"));
-  }catch{
-    return null;
+Pi.init({
+  version:"2.0",
+  sandbox:false
+});
+
+let CURRENT_USER = null;
+
+async function initPi(){
+
+  if(typeof Pi === "undefined"){
+    console.error("Pi SDK not loaded");
+    return;
   }
+
+  try{
+
+    const scopes = ['username','payments'];
+
+    const user = await Pi.authenticate(scopes, function(payment){});
+
+    console.log("✅ Logged in:", user);
+
+    CURRENT_USER = user;
+
+    // ✅ load dashboard AFTER login
+    loadHome();
+
+  }catch(e){
+    console.error("Auth failed", e);
+  }
+
 }
 
-const user = getCurrentUser();
-
-if(!user){
-  window.location.href = "login.html";
-}
+initPi();
 </script>
 
 <link rel="stylesheet" href="style.css">
@@ -1589,10 +1612,10 @@ ai.classList.remove("minimized");
 
 function handleAuth(){
 
-  const user = JSON.parse(localStorage.getItem("pi_user") || "null");
+  const user = CURRENT_USER;
 
   if(!user){
-    window.location.href = "login.html";
+    alert("Not logged in");
     return;
   }
 
@@ -1601,8 +1624,7 @@ function handleAuth(){
   );
 
   if(confirmLogout){
-    localStorage.removeItem("pi_user");
-    window.location.href = "login.html";
+    location.reload(); // Pi logout = reload
   }
 
 }
@@ -1612,15 +1634,15 @@ function handleAuth(){
 <script>
 function updateUserUI(){
 
-  const user = JSON.parse(localStorage.getItem("pi_user") || "null");
+  const user = CURRENT_USER;
   const btn = document.getElementById("userBtn");
 
   if(!btn) return;
 
   if(user){
-    btn.innerText = "👤✓"; // logged in
+    btn.innerText = "👤✓";
   }else{
-    btn.innerText = "👤"; // not logged in
+    btn.innerText = "👤";
   }
 
 }
