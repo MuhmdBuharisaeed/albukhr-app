@@ -82,54 +82,46 @@ function getRate(project,duration){
 ====================================== */
 async function payWithPi({amount, memo, metadata}){
 
-  try{
+  if(typeof Pi === "undefined"){
+    throw new Error("❌ Open inside Pi Browser");
+  }
 
-    if(typeof Pi === "undefined"){
-      throw new Error("Pi SDK missing");
-    }
+  return new Promise((resolve, reject) => {
 
-    const payment = await Pi.createPayment({
-      amount: amount,
-      memo: memo,
-      metadata: metadata
+    Pi.createPayment({
+      amount,
+      memo,
+      metadata
     },{
 
       onReadyForServerApproval: function(paymentId){
-        console.log("✅ Ready for approval:", paymentId);
+        console.log("✅ Ready:", paymentId);
       },
 
       onReadyForServerCompletion: function(paymentId, txid){
-        console.log("🎉 Completed:", paymentId, txid);
+        console.log("🎉 Completed:", txid);
+
+        resolve({
+          paymentId,
+          txid
+        });
       },
 
       onCancel: function(paymentId){
         console.warn("❌ Cancelled:", paymentId);
+        reject(new Error("User cancelled"));
       },
 
       onError: function(error){
         console.error("❌ Pi Error:", error);
+        reject(error);
       }
 
     });
 
-    return {
-      paymentId: payment?.identifier || ("DEMO-"+Date.now()),
-      txid: payment?.transaction?.txid || ("DEMO-"+Date.now())
-    };
-
-  }catch(err){
-
-    console.warn("⚠️ DEMO fallback:", err);
-
-    return {
-      paymentId: "DEMO-"+Date.now(),
-      txid: "DEMO-"+Date.now()
-    };
-
-  }
+  });
 
 }
-
 /* ======================================
    ADD STAKE
 ====================================== */
