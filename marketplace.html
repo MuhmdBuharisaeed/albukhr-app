@@ -442,7 +442,16 @@ const container = document.getElementById("projectList");
 container.innerHTML = "";
 
 // ✅ FETCH ONCE ONLY
-const stakes = await getAllStakesMerged();
+let stakes = [];
+
+try{
+  if(typeof getAllStakesMerged === "function"){
+    stakes = await getAllStakesMerged();
+  }
+}catch(e){
+  console.error("Stake load failed", e);
+  stakes = [];
+}
 
 const allProjects =
 Object.keys(PROJECT_CONFIG).map(p => ({
