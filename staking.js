@@ -148,7 +148,12 @@ async function addStake({project,amount,duration}){
 
   __stakingLock = true;
 
-  const user = await getCurrentUser();
+  const user = await ensurePiAuth();
+
+if(!user?.uid){
+  __stakingLock = false;
+  return {error:"Login required"};
+}
 
   if(!user?.uid){
     __stakingLock = false;
@@ -242,6 +247,8 @@ console.log("✅ Stake saved to Supabase");
 
   console.error("❌ Supabase error", e);
 
+  __stakingLock = false; // 🔥 ADD THIS
+
   return {
     error:"Network error"
   };
@@ -274,12 +281,12 @@ return {
 ====================================== */
 async function getAllStakesMerged(){
 
-  const user = getCurrentUser();
+  const user = await ensurePiAuth();
 
-  if(!user?.uid){
-    console.warn("No UID");
-    return [];
-  }
+if(!user?.uid){
+  console.warn("No UID");
+  return [];
+}
 
   try{
 
@@ -505,7 +512,11 @@ async function loadData(){
 ====================================== */
 async function withdrawCapital({project, amount}){
 
-  const user = getCurrentUser();
+  const user = await ensurePiAuth();
+
+if(!user?.uid){
+  return {error:"Login required"};
+}
 
   let remaining = Number(amount);
 
