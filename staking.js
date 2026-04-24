@@ -31,17 +31,24 @@ function _save(key,data){
 ====================================== */
 
 function getCurrentUser(){
+
   if(window.Pi && Pi.getUser){
-    const u = Pi.getUser();
-    if(u?.uid){
-      return { uid: u.uid, username: u.username };
+    try{
+      const u = Pi.getUser();
+
+      if(u?.uid){
+        return {
+          uid: u.uid,
+          username: u.username
+        };
+      }
+
+    }catch(e){
+      console.warn("Pi user not ready yet");
     }
   }
 
-  return {
-    uid: "test123",
-    username: "Test User"
-  };
+  return null; // ❗ kar ka saka test123 a production
 }
 
 /* ======================================
@@ -100,6 +107,12 @@ async function payWithPi({amount, memo, metadata}){
 
       onReadyForServerCompletion: function(paymentId, txid){
         console.log("🎉 Completed:", txid);
+
+         // 🔥 VALIDATION
+         if(!paymentId || !txid){
+  reject(new Error("Invalid Pi transaction"));
+  return;
+         }
 
         resolve({
           paymentId,
@@ -209,16 +222,21 @@ try{
   txid: payment.txid,
   reward: safeAmount * getRate(project, safeDuration),
   withdrawnReward:0,
-  type:"stake"   // 🔥 VERY IMPORTANT
+  unlockTime: Date.now() + (safeDuration * 86400000),
+  type:"stake"
 })
 });
 
   if(!res.ok){
   const err = await res.text();
   console.error("❌ Insert failed:", err);
-}else{
-  console.log("✅ Stake saved to Supabase");
-  }
+
+  __stakingLock = false; // 🔥 VERY IMPORTANT
+
+  return {error:"Database error"};
+}
+
+console.log("✅ Stake saved to Supabase");
    
 }catch(e){
 
