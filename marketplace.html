@@ -436,7 +436,7 @@ return (amount * roi / 100).toFixed(2);
 
 }
 
-function renderMarketplace(){
+async function renderMarketplace(){
 
 const container =
 document.getElementById("projectList");
@@ -444,9 +444,11 @@ document.getElementById("projectList");
 container.innerHTML = "";
 
 const allProjects =
-typeof getProjects === "function"
-? getProjects()
-: [];
+Object.keys(PROJECT_CONFIG).map(p => ({
+name: p,
+roi: PROJECT_CONFIG[p]?.roi || 0,
+description: PROJECT_CONFIG[p]?.desc || ""
+}));
 
 /* SEARCH */
 
@@ -531,13 +533,10 @@ const projectKey = normalizeProjectName(project.name);
 
 const card = document.createElement("div");
 
-card.onclick = () =>
-location.href = `project.html?project=${projectKey}`;
-
 card.className = "project-card";
 
 card.onclick = () =>
-  location.href = `project.html?project=${projectKey}`;
+location.href = `project.html?project=${projectKey}`;
 
 card.className = "project-card";
 
@@ -555,11 +554,10 @@ const funded =
 Math.min((liquidity / (project.target || 1000))*100,100);
 
 /* INVESTORS */
+const stakes = await getAllStakesMerged();
+
 const investors =
-typeof getAllStakesMerged === "function"
-? getAllStakesMerged()
-    .filter(s => s.project === projectKey).length
-: 0;
+stakes.filter(s => s.project === projectKey).length;
 
 /* RISK */
 const riskData =
