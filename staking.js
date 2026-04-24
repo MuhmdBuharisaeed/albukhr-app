@@ -387,7 +387,12 @@ async function getUserStakes(){
 ====================================== */
 async function withdrawProjectReward(project, amount){
 
-  const user = getCurrentUser();
+  const user = await ensurePiAuth();
+
+if(!user?.uid){
+  __stakingLock = false;
+  return {error:"Login required"};
+}
 
   let remainingToTake = Number(amount);
 
