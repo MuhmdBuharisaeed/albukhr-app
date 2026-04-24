@@ -181,16 +181,41 @@ Cancel
 <!-- 1. PI SDK FIRST (VERY IMPORTANT) -->
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-<!-- 2. INIT PI -->
+<!-- 2. INIT PI (TESTNET MODE) -->
 <script>
 Pi.init({
   version:"2.0",
-  sandbox:true
+  sandbox:false // 🔥 IMPORTANT: TESTNET, NOT SANDBOX
 });
 </script>
 
-<!-- 3. AUTH -->
-<script src="js/auth.js"></script>
+<!-- 3. AUTH (MUST COME BEFORE ANY ENGINE) -->
+<script>
+async function initPi(){
+
+  if(typeof Pi === "undefined"){
+    console.error("❌ Pi SDK not available");
+    return;
+  }
+
+  try{
+
+    const scopes = ['username','payments'];
+
+    const user = await Pi.authenticate(scopes, function(payment){
+      console.log("💰 Payment callback:", payment);
+    });
+
+    console.log("✅ Pi Authenticated:", user);
+
+  }catch(e){
+    console.error("❌ Auth failed:", e);
+  }
+
+}
+
+initPi();
+</script>
 
 <!-- 4. CONFIG -->
 <script src="js/project-config.js"></script>
@@ -847,33 +872,6 @@ load();
 
 /* AUTO UPDATE CAPITAL */
 setInterval(updateCapitalAvailable, 5000);
-</script>
-
-<script>
-async function initPi(){
-
-  if(typeof Pi === "undefined"){
-    console.error("❌ Not in Pi Browser");
-    return;
-  }
-
-  try{
-
-    const scopes = ['username','payments'];
-
-    const user = await Pi.authenticate(scopes, function(payment){
-      console.log("Payment callback", payment);
-    });
-
-    console.log("✅ Authenticated:", user);
-
-  }catch(e){
-    console.error("❌ Auth failed:", e);
-  }
-
-}
-
-initPi();
 </script>
 
 </body>
