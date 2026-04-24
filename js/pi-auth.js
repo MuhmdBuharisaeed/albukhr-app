@@ -1,36 +1,31 @@
 // =======================================
-// PI AUTH ENGINE (PRODUCTION)
+// PI AUTH ENGINE (PRODUCTION READY)
 // =======================================
 
-let __piUser = null;
-let __piReady = false;
+let __PI_USER = null;
 
 /* ===============================
    INIT PI
 =============================== */
-function initPiSDK(){
+function initPi(){
 
   if(typeof Pi === "undefined"){
-    console.error("❌ Pi SDK not loaded");
+    console.error("❌ Pi SDK missing");
     return;
   }
 
   Pi.init({
     version: "2.0",
-    sandbox: false // 🔥 TESTNET / MAINNET READY
+    sandbox: false // ✅ TESTNET
   });
 
-  console.log("✅ Pi SDK initialized");
+  console.log("✅ Pi initialized");
 }
 
 /* ===============================
-   AUTHENTICATE USER
+   AUTHENTICATE
 =============================== */
 async function authenticatePi(){
-
-  if(typeof Pi === "undefined"){
-    throw new Error("Pi SDK missing");
-  }
 
   try{
 
@@ -44,34 +39,33 @@ async function authenticatePi(){
       throw new Error("Invalid Pi user");
     }
 
-    __piUser = user;
-    __piReady = true;
+    __PI_USER = user;
 
-    console.log("✅ Pi User:", user);
+    console.log("✅ Auth success:", user);
 
     return user;
 
   }catch(e){
-
-    console.error("❌ Pi Auth failed:", e);
+    console.error("❌ Auth failed:", e);
     throw e;
-
   }
+
 }
 
 /* ===============================
-   GET CURRENT USER
+   GET USER
 =============================== */
 function getCurrentUser(){
 
-  if(__piUser?.uid){
-    return __piUser;
+  if(__PI_USER?.uid){
+    return __PI_USER;
   }
 
   if(window.Pi && Pi.getUser){
     const u = Pi.getUser();
+
     if(u?.uid){
-      __piUser = u;
+      __PI_USER = u;
       return u;
     }
   }
@@ -80,7 +74,7 @@ function getCurrentUser(){
 }
 
 /* ===============================
-   ENSURE AUTH (AUTO)
+   ENSURE AUTH
 =============================== */
 async function ensurePiAuth(){
 
