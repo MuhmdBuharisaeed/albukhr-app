@@ -849,5 +849,32 @@ load();
 setInterval(updateCapitalAvailable, 5000);
 </script>
 
+<script>
+async function initPi(){
+
+  if(typeof Pi === "undefined"){
+    console.error("❌ Not in Pi Browser");
+    return;
+  }
+
+  try{
+
+    const scopes = ['username','payments'];
+
+    const user = await Pi.authenticate(scopes, function(payment){
+      console.log("Payment callback", payment);
+    });
+
+    console.log("✅ Authenticated:", user);
+
+  }catch(e){
+    console.error("❌ Auth failed:", e);
+  }
+
+}
+
+initPi();
+</script>
+
 </body>
 </html>
