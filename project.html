@@ -178,56 +178,23 @@ Cancel
 </div>
 </div>
   
-<!-- 1. PI SDK FIRST (VERY IMPORTANT) -->
+<!-- 1. PI SDK -->
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-<!-- 2. INIT PI (TESTNET MODE) -->
+<!-- 2. AUTH ENGINE -->
+<script src="js/pi-auth.js"></script>
+
+<!-- 3. INIT -->
 <script>
-Pi.init({
-  version:"2.0",
-  sandbox:false // 🔥 IMPORTANT: TESTNET, NOT SANDBOX
-});
-</script>
-
-<!-- 3. AUTH (MUST COME BEFORE ANY ENGINE) -->
-<script>
-async function initPi(){
-
-  if(typeof Pi === "undefined"){
-    console.error("❌ Pi SDK not available");
-    return;
-  }
-
-  try{
-
-    const scopes = ['username','payments'];
-
-    const user = await Pi.authenticate(scopes, function(payment){
-      console.log("💰 Payment callback:", payment);
-    });
-
-    console.log("✅ Pi Authenticated:", user);
-
-  }catch(e){
-    console.error("❌ Auth failed:", e);
-  }
-
-}
-
 initPi();
+ensurePiAuth();
 </script>
 
-<!-- 4. CONFIG -->
+<!-- 4. OTHER FILES -->
 <script src="js/project-config.js"></script>
-
-<!-- 5. TRANSACTIONS -->
 <script src="js/unified-transactions.js"></script>
 <script src="js/albukhr-transaction-engine.js"></script>
-
-<!-- 6. ENGINES -->
 <script src="smart-liquidity-engine.js"></script>
-
-<!-- 7. CORE -->
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
