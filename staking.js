@@ -176,10 +176,13 @@ async function addStake({project,amount,duration}){
 
   }catch(err){
 
-    console.error("❌ Payment error:", err);
+  console.error("❌ REAL PAYMENT ERROR:", err);
 
-    __stakingLock = false;
-    return {error:"Payment failed"};
+  __stakingLock = false;
+
+  alert(err.message || err);
+
+  return {error:"Payment failed"};
 
   }
 
