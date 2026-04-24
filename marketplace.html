@@ -453,12 +453,26 @@ try{
   stakes = [];
 }
 
-const allProjects =
-Object.keys(PROJECT_CONFIG).map(p => ({
-name: p,
-roi: PROJECT_CONFIG[p]?.roi || 0,
-description: PROJECT_CONFIG[p]?.desc || ""
-}));
+let allProjects = [];
+
+try{
+
+  if(typeof PROJECT_CONFIG === "object"){
+
+    allProjects = Object.keys(PROJECT_CONFIG).map(p => ({
+      name: p,
+      roi: PROJECT_CONFIG[p]?.roi || 0,
+      description: PROJECT_CONFIG[p]?.desc || ""
+    }));
+
+  }
+
+}catch(e){
+
+  console.error("PROJECT_CONFIG error", e);
+  allProjects = [];
+
+  }
 
 /* SEARCH */
 
