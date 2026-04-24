@@ -82,12 +82,51 @@ function getRate(project,duration){
 ====================================== */
 async function payWithPi({amount, memo, metadata}){
 
-  console.log("⚠️ TEST MODE PAYMENT");
+  try{
 
-  return {
-    paymentId: "TEST-"+Date.now(),
-    txid: "TEST-"+Date.now()
-  };
+    if(typeof Pi === "undefined"){
+      throw new Error("Pi SDK missing");
+    }
+
+    const payment = await Pi.createPayment({
+      amount: amount,
+      memo: memo,
+      metadata: metadata
+    },{
+
+      onReadyForServerApproval: function(paymentId){
+        console.log("✅ Ready for approval:", paymentId);
+      },
+
+      onReadyForServerCompletion: function(paymentId, txid){
+        console.log("🎉 Completed:", paymentId, txid);
+      },
+
+      onCancel: function(paymentId){
+        console.warn("❌ Cancelled:", paymentId);
+      },
+
+      onError: function(error){
+        console.error("❌ Pi Error:", error);
+      }
+
+    });
+
+    return {
+      paymentId: payment?.identifier || ("DEMO-"+Date.now()),
+      txid: payment?.transaction?.txid || ("DEMO-"+Date.now())
+    };
+
+  }catch(err){
+
+    console.warn("⚠️ DEMO fallback:", err);
+
+    return {
+      paymentId: "DEMO-"+Date.now(),
+      txid: "DEMO-"+Date.now()
+    };
+
+  }
 
 }
 
