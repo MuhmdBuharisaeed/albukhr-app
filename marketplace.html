@@ -687,12 +687,21 @@ alert("Investment successful");
 
 renderMarketplace();
 renderMarketInsights();
-renderDiscovery();
+
+if(typeof renderDiscovery === "function"){
+  renderDiscovery();
+}
 
 /* AUTO REFRESH */
 setInterval(()=>{
 renderMarketplace();
-},10000);
+renderMarketInsights();
+
+if(typeof renderDiscovery === "function"){
+  renderDiscovery();
+}
+
+},5000);
   
 </script>
 
