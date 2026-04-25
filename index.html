@@ -1187,29 +1187,6 @@ X
 <script src="wallet-core.js"></script>
 
 <script>
-window.addEventListener("DOMContentLoaded", async ()=>{
-
-  initPi(); // ✅ first
-
-  const user = await ensurePiAuth(); // ✅ THIS IS THE FIX
-
-  if(user){
-
-    CURRENT_USER = user;
-
-    updateUserUI();
-
-    loadHome();
-
-  }else{
-    console.error("User not authenticated");
-  }
-
-});
-
-</script>
-  
-<script>
 
 async function loadHome(){
 
