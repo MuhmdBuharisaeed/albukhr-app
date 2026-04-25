@@ -1612,31 +1612,50 @@ function updateUserUI(){
 
 }
 
-updateUserUI();
 </script>
 
 <script>
-(async function(){
+window.addEventListener("DOMContentLoaded", async ()=>{
 
-  initPi();
+  try{
 
-  const user = await ensurePiAuth();
-
-  if(user){
-
-    CURRENT_USER = user;
-
-    updateUserUI();
-
-    if(typeof loadHome === "function"){
-      loadHome();
+    if(typeof Pi === "undefined"){
+      alert("Pi SDK not loaded ❌");
+      return;
     }
 
-  }else{
-    console.error("User not authenticated");
+    initPi();
+
+    console.log("🔄 Starting Pi Auth...");
+
+    const user = await ensurePiAuth();
+
+    console.log("✅ Auth result:", user);
+
+    if(user && user.uid){
+
+      CURRENT_USER = user;
+
+      updateUserUI();
+
+      if(typeof loadHome === "function"){
+        loadHome();
+      }
+
+    }else{
+
+      alert("Login failed ❌");
+
+    }
+
+  }catch(err){
+
+    console.error("🔥 AUTH ERROR:", err);
+    alert("Authentication error");
+
   }
 
-})();
+});
 </script>
 
 </body>
