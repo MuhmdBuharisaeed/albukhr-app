@@ -1,180 +1,108 @@
 // =======================================
-// ALBUKHR AUTH SYSTEM (FINAL)
-// Pi SDK • Auto Login • Secure
+// PI AUTH + LOCALSTORAGE (PRODUCTION)
 // =======================================
 
-const AUTH_KEY = "pi_user";
+let __PI_USER = null;
 
-/* ======================================
-   SAVE USER (SAFE)
-====================================== */
-function saveUser(user){
+/* ===============================
+   INIT PI
+=============================== */
+function initPi(){
 
-  if(!user || !user.uid){
-    console.warn("⚠️ Invalid user");
+  if(typeof Pi === "undefined"){
+    console.error("❌ Pi SDK missing");
     return;
   }
 
-  localStorage.setItem(
-    AUTH_KEY,
-    JSON.stringify({
-      uid: user.uid,
-      username: user.username || "user"
-    })
-  );
+  Pi.init({
+    version: "2.0",
+    sandbox: false
+  });
 
 }
 
-/* ======================================
-   GET USER
-====================================== */
-function getCurrentUser(){
+/* ===============================
+   SAVE USER
+=============================== */
+function saveUser(user){
+  localStorage.setItem("pi_user", JSON.stringify(user));
+}
+
+/* ===============================
+   LOAD USER
+=============================== */
+function loadUser(){
+
+  const saved = localStorage.getItem("pi_user");
+
+  if(!saved) return null;
 
   try{
-    const raw = localStorage.getItem(AUTH_KEY);
+    const user = JSON.parse(saved);
 
-    if(!raw) return null;
-
-    const user = JSON.parse(raw);
-
-    if(!user || !user.uid){
-      localStorage.removeItem(AUTH_KEY);
-      return null;
+    if(user?.uid){
+      __PI_USER = user;
+      return user;
     }
+  }catch(e){}
+
+  return null;
+}
+
+/* ===============================
+   AUTHENTICATE
+=============================== */
+async function authenticatePi(){
+
+  try{
+
+    const user = await Pi.authenticate(
+      ['username','payments'],
+      ()=>{}
+    );
+
+    if(!user?.uid){
+      throw new Error("Invalid user");
+    }
+
+    __PI_USER = user;
+
+    saveUser(user); // ✅ STORE
 
     return user;
 
-  }catch{
-    localStorage.removeItem(AUTH_KEY);
+  }catch(e){
+    console.error("❌ Auth failed:", e);
     return null;
   }
 
 }
 
-/* ======================================
-   LOGOUT
-====================================== */
-function logout(){
+/* ===============================
+   ENSURE AUTH
+=============================== */
+async function ensurePiAuth(){
 
-  localStorage.removeItem(AUTH_KEY);
-
-  location.reload();
-
-}
-
-/* ======================================
-   PI LOGIN
-====================================== */
-function loginWithPi(){
-
-  const PiNetwork = window.Pi;
-
-  if(!PiNetwork){
-    alert("Pi SDK not ready");
-    return;
+  // 1. MEMORY
+  if(__PI_USER?.uid){
+    return __PI_USER;
   }
 
-  PiNetwork.authenticate(
-    ["username"],
+  // 2. LOCALSTORAGE
+  const saved = loadUser();
+  if(saved) return saved;
 
-    function onSuccess(auth){
+  // 3. PI SDK
+  if(window.Pi && Pi.getUser){
+    const u = Pi.getUser();
 
-      if(!auth?.user?.uid){
-        alert("Login failed");
-        return;
-      }
-
-      const user = {
-        uid: auth.user.uid,
-        username: auth.user.username
-      };
-
-      saveUser(user);
-
-      console.log("✅ Logged in:", user);
-
-      location.reload();
-
-    },
-
-    function onIncomplete(){
-      alert("Login incomplete");
-    },
-
-    function onError(error){
-      console.error(error);
-      alert("Login error");
+    if(u?.uid){
+      __PI_USER = u;
+      saveUser(u);
+      return u;
     }
-
-  );
-
-}
-
-/* ======================================
-   AUTO LOGIN (IMPORTANT)
-====================================== */
-async function initAuth(){
-
-  const PiNetwork = window.Pi;
-
-  if(!PiNetwork){
-    console.warn("Pi SDK not loaded");
-    return;
   }
 
-  try{
-
-    const scopes = ["username"];
-
-    const auth = await PiNetwork.authenticate(scopes, true);
-
-    if(auth?.user?.uid){
-
-      const existing = getCurrentUser();
-
-      /* UPDATE IF DIFFERENT */
-      if(!existing || existing.uid !== auth.user.uid){
-
-        saveUser({
-          uid: auth.user.uid,
-          username: auth.user.username
-        });
-
-        console.log("🔄 User synced");
-
-      }
-
-    }
-
-  }catch(err){
-
-    console.warn("Auto login skipped");
-
-  }
-
+  // 4. LOGIN
+  return await authenticatePi();
 }
-
-/* ======================================
-   REQUIRE LOGIN (OPTIONAL)
-====================================== */
-function requireAuth(){
-
-  const user = getCurrentUser();
-
-  if(!user){
-    alert("Please login first");
-    return false;
-  }
-
-  return true;
-
-}
-
-/* ======================================
-   INIT
-====================================== */
-
-/* delay kadan don Pi SDK ya load */
-setTimeout(()=>{
-  initAuth();
-}, 1000);
