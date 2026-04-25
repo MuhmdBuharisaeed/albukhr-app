@@ -57,15 +57,34 @@ async function authenticatePi(){
 =============================== */
 function getCurrentUser(){
 
+  /* ✅ MEMORY FIRST */
   if(__PI_USER?.uid){
     return __PI_USER;
   }
 
+  /* ✅ STORAGE */
+  const saved = localStorage.getItem("pi_user");
+
+  if(saved){
+    try{
+      const parsed = JSON.parse(saved);
+
+      if(parsed?.uid){
+        __PI_USER = parsed;
+        return parsed;
+      }
+    }catch(e){}
+  }
+
+  /* ✅ PI SDK FALLBACK */
   if(window.Pi && Pi.getUser){
     const u = Pi.getUser();
 
     if(u?.uid){
       __PI_USER = u;
+
+      localStorage.setItem("pi_user", JSON.stringify(u)); // ✅ sync
+
       return u;
     }
   }
