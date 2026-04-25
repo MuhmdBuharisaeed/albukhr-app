@@ -1175,7 +1175,6 @@ X
 
 <div id="drawerOverlay" class="drawer-overlay" onclick="closeDrawer()"></div>
 
-<script src="js/auth.js"></script>
 <script src="js/project-config.js"></script>   
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
@@ -1372,10 +1371,6 @@ function applyVisibility(){
 }
 document.addEventListener("DOMContentLoaded",()=>{
   applyVisibility();
-});
-
-window.addEventListener("DOMContentLoaded", async ()=>{
-  await loadHome();
 });
 
 /* SIDE DRAWER */
