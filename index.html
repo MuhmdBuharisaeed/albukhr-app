@@ -6,44 +6,7 @@
 <title>ALBUKHR Projects</title>
 
 <!-- ✅ AUTH GUARD -->
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-<script>
-Pi.init({
-  version:"2.0",
-  sandbox:false
-});
-
-let CURRENT_USER = null;
-
-async function initPi(){
-
-  if(typeof Pi === "undefined"){
-    console.error("Pi SDK not loaded");
-    return;
-  }
-
-  try{
-
-    const scopes = ['username','payments'];
-
-    const user = await Pi.authenticate(scopes, function(payment){});
-
-    console.log("✅ Logged in:", user);
-
-    CURRENT_USER = user;
-
-    // ✅ load dashboard AFTER login
-    loadHome();
-
-  }catch(e){
-    console.error("Auth failed", e);
-  }
-
-}
-
-initPi();
-</script>
+<script src="js/auth.js"></script>
 
 <link rel="stylesheet" href="style.css">
 
@@ -1217,6 +1180,26 @@ X
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
+<script>
+window.addEventListener("DOMContentLoaded", async ()=>{
+
+  const user = await initPi(); // daga auth.js
+
+  if(user){
+
+    CURRENT_USER = user;
+
+    updateUserUI();
+
+    loadHome();
+
+  }else{
+    console.error("User not authenticated");
+  }
+
+});
+</script>
+  
 <script>
 
 async function loadHome(){
