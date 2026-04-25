@@ -16,7 +16,7 @@ function initPi(){
 
   Pi.init({
     version: "2.0",
-    sandbox: false
+    sandbox: true
   });
 
 }
@@ -83,26 +83,33 @@ async function authenticatePi(){
 =============================== */
 async function ensurePiAuth(){
 
-  // 1. MEMORY
+  // 1. INIT
+  initPi();
+
+  // 2. MEMORY
   if(__PI_USER?.uid){
     return __PI_USER;
   }
 
-  // 2. LOCALSTORAGE
+  // 3. LOCAL STORAGE
   const saved = loadUser();
-  if(saved) return saved;
-
-  // 3. PI SDK
-  if(window.Pi && Pi.getUser){
-    const u = Pi.getUser();
-
-    if(u?.uid){
-      __PI_USER = u;
-      saveUser(u);
-      return u;
-    }
+  if(saved){
+    return saved;
   }
 
-  // 4. LOGIN
+  // 4. SAFE Pi.getUser (optional)
+  try{
+    if(window.Pi && Pi.getUser){
+      const u = Pi.getUser();
+
+      if(u?.uid){
+        __PI_USER = u;
+        saveUser(u);
+        return u;
+      }
+    }
+  }catch(e){}
+
+  // 5. AUTHENTICATE (FINAL)
   return await authenticatePi();
 }
