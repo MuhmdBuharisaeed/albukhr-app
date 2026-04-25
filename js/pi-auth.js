@@ -16,7 +16,7 @@ function initPi(){
 
   Pi.init({
     version: "2.0",
-    sandbox: false // ✅ TESTNET
+    sandbox: true // ✅ TESTNET
   });
 
   console.log("✅ Pi initialized");
@@ -105,3 +105,10 @@ async function ensurePiAuth(){
 
   return await authenticatePi();
 }
+
+__PI_USER = user;
+
+localStorage.setItem("pi_user", JSON.stringify(user)); // ✅ ADD THIS
+
+console.log("✅ Auth success:", user);
+
