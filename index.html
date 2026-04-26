@@ -1620,20 +1620,28 @@ function handleAuth(){
 <script>
 function updateUserUI(){
 
-  const user = CURRENT_USER;
   const btn = document.getElementById("userBtn");
 
   if(!btn) return;
 
-  if(user){
+  if(CURRENT_USER && CURRENT_USER.username){
     btn.innerText = "👤✓";
+    btn.title = "@" + CURRENT_USER.username;
   }else{
     btn.innerText = "👤";
+    btn.title = "Not logged in";
   }
 
 }
+window.addEventListener("DOMContentLoaded", async () => {
 
-window.addEventListener("DOMContentLoaded", updateUserUI);
+  const user = await ensurePiAuth();
+
+  CURRENT_USER = user;
+
+  updateUserUI();
+
+});
 </script>
    
 </body>
