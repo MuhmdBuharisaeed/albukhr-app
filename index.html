@@ -1188,21 +1188,20 @@ X
 <script src="wallet-core.js"></script>
 
 <script>
-window.addEventListener("DOMContentLoaded", async ()=>{
+window.addEventListener("DOMContentLoaded", async () => {
 
-  const user = await initPi(); // daga auth.js
+  const user = await ensurePiAuth();
 
-  if(user){
-
-    CURRENT_USER = user;
-
-    updateUserUI();
-
-    loadHome();
-
-  }else{
-    console.error("User not authenticated");
+  if(!user){
+    alert("Pi Auth Failed");
+    return;
   }
+
+  CURRENT_USER = user;
+
+  updateUserUI();
+
+  loadHome(); // 🔥 move here
 
 });
 </script>
