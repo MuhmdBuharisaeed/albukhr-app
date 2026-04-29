@@ -42,6 +42,28 @@ window.addEventListener("DOMContentLoaded", async ()=>{
 });
 </script>
 
+<script>
+async function startLogin(){
+
+  const user = await authenticatePi();
+
+  if(!user){
+    alert("Login failed");
+    return;
+  }
+
+  window.CURRENT_USER = user;
+
+  // close modal
+  const box = document.getElementById("loginBox");
+  if(box) box.style.display = "none";
+
+  updateUserUI();
+  loadHome();
+
+}
+</script>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
@@ -856,12 +878,92 @@ opacity:1;
 transform:translateY(0);
 
 }
+
+.user-profile{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+}
+
+.avatar{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#e6f6ec;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+}
+
+.user-meta{
+  display:flex;
+  flex-direction:column;
+  line-height:1;
+}
+
+.user-meta span{
+  font-size:12px;
+  font-weight:600;
+}
+
+.user-meta small{
+  font-size:10px;
+  color:#aaa;
+}
+
+.login-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:5000;
+  align-items:center;
+  justify-content:center;
+}
+
+.login-card{
+  background:#fff;
+  padding:24px;
+  border-radius:16px;
+  text-align:center;
+  width:80%;
+  max-width:300px;
+}
+
+.login-btn{
+  margin-top:16px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#0f7a3d;
+  color:#fff;
+  font-weight:600;
+}
 </style>
 
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/global-header.css">
 <link rel="stylesheet" href="global-buttons.css">
 </head>
+
+<div id="loginBox" class="login-modal">
+
+  <div class="login-card">
+
+    <h2>Welcome</h2>
+    <p>Login with Pi to continue</p>
+
+    <button onclick="startLogin()" class="login-btn">
+      Login with Pi
+    </button>
+
+  </div>
+
+</div>
+
 <body data-page="home">
 
   <header class="header">
@@ -873,8 +975,17 @@ transform:translateY(0);
 
  <div class="header-right">
 
-  <div class="header-btn" id="userBtn" onclick="handleAuth()">
-  👤
+  <div class="header-btn user-profile" id="userBtn">
+
+  <div class="avatar" id="userAvatar">
+    👤
+  </div>
+
+  <div class="user-meta">
+    <span id="userName">Guest</span>
+    <small id="userStatus">Offline</small>
+  </div>
+
   </div>
 
   <div class="header-btn notification-btn" onclick="openNotifications()">
@@ -1605,45 +1716,71 @@ function handleAuth(){
 
   const user = window.CURRENT_USER;
 
+  // ===============================
+  // NOT LOGGED IN
+  // ===============================
   if(!user){
 
-    // ✅ SHOW LOGIN UI instead of alert
     const box = document.getElementById("loginBox");
 
     if(box){
       box.style.display = "flex";
+    }else{
+      console.warn("loginBox not found");
     }
 
     return;
   }
 
-  // ✅ LOGGED IN → show logout
+  // ===============================
+  // SAFE USERNAME EXTRACTION
+  // ===============================
+  const username =
+    user.username ||
+    user?.user?.username ||
+    "User";
+
+  // ===============================
+  // LOGOUT CONFIRM
+  // ===============================
   const confirmLogout = confirm(
-    "Logged in as @" + user.username + "\n\nLogout?"
+    "Logged in as @" + username + "\n\nLogout?"
   );
 
   if(confirmLogout){
     logout();
   }
 
-  }
+}
 </script>
-   
+
 <script>
 function updateUserUI(){
 
-  const btn = document.getElementById("userBtn");
-
-  if(!btn) return;
-
   const user = window.CURRENT_USER;
 
+  const nameEl = document.getElementById("userName");
+  const statusEl = document.getElementById("userStatus");
+  const avatarEl = document.getElementById("userAvatar");
+
+  if(!nameEl || !statusEl || !avatarEl) return;
+
   if(user && user.username){
-    btn.innerText = "👤✓";
-    btn.title = "@" + user.username;
+
+    nameEl.innerText = "@" + user.username;
+    statusEl.innerText = "Online";
+    statusEl.style.color = "#0f7a3d";
+
+    avatarEl.innerText = user.username.charAt(0).toUpperCase();
+
   }else{
-    btn.innerText = "👤";
-    btn.title = "Not logged in";
+
+    nameEl.innerText = "Guest";
+    statusEl.innerText = "Tap to login";
+    statusEl.style.color = "#999";
+
+    avatarEl.innerText = "👤";
+
   }
 
 }
