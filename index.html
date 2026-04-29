@@ -15,17 +15,14 @@
     const user = JSON.parse(localStorage.getItem("pi_user"));
 
     if(!user || !user.uid){
-
-      // ❌ Not logged in → redirect
       window.location.href = "login.html";
       return;
     }
 
-    // ✅ Save globally
+    // ✅ KEEP USER
     window.CURRENT_USER = user;
 
   }catch(e){
-
     window.location.href = "login.html";
   }
 
@@ -43,10 +40,6 @@
 <!-- ✅ AUTH GUARD -->
 <script src="js/auth.js"></script>
 <script src="js/app-init.js"></script>
-
-<script>
-let CURRENT_USER = null;
-</script>
 
 <link rel="stylesheet" href="style.css">
 
@@ -1220,22 +1213,32 @@ X
 <script src="wallet-core.js"></script>
 
 <script>
+
 window.addEventListener("DOMContentLoaded", async () => {
 
-  const user = await ensurePiAuth();
+  // ✅ Init Pi FIRST
+  if(window.Pi){
+    Pi.init({
+      version: "2.0",
+      sandbox: false
+    });
+  }
+
+  // ✅ Use existing user (no overwrite)
+  const user = window.CURRENT_USER || await ensurePiAuth();
 
   if(!user){
-    alert("Pi Auth Failed");
+    window.location.href = "login.html";
     return;
   }
 
-  CURRENT_USER = user;
+  window.CURRENT_USER = user;
 
   updateUserUI();
-
-  loadHome(); // 🔥 move here
+  loadHome();
 
 });
+
 </script>
   
 <script>
@@ -1655,24 +1658,18 @@ function updateUserUI(){
 
   if(!btn) return;
 
-  if(CURRENT_USER && CURRENT_USER.username){
+  const user = window.CURRENT_USER;
+
+  if(user && user.username){
     btn.innerText = "👤✓";
-    btn.title = "@" + CURRENT_USER.username;
+    btn.title = "@" + user.username;
   }else{
     btn.innerText = "👤";
     btn.title = "Not logged in";
   }
 
 }
-window.addEventListener("DOMContentLoaded", async () => {
 
-  const user = await ensurePiAuth();
-
-  CURRENT_USER = user;
-
-  updateUserUI();
-
-});
 </script>
    
 </body>
