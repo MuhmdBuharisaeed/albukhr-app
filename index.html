@@ -1601,25 +1601,32 @@ ai.classList.remove("minimized");
 </script>
 
 <script>
-
 function handleAuth(){
 
   const user = window.CURRENT_USER;
+
   if(!user){
-    alert("Not logged in");
+
+    // ✅ SHOW LOGIN UI instead of alert
+    const box = document.getElementById("loginBox");
+
+    if(box){
+      box.style.display = "flex";
+    }
+
     return;
   }
 
+  // ✅ LOGGED IN → show logout
   const confirmLogout = confirm(
     "Logged in as @" + user.username + "\n\nLogout?"
   );
 
   if(confirmLogout){
-    location.reload(); // Pi logout = reload
+    logout();
   }
 
-}
-
+  }
 </script>
    
 <script>
