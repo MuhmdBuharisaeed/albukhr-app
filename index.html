@@ -17,6 +17,81 @@
 
 <body>
 
+<div class="header-right">
+
+  <div class="header-btn notification-btn" onclick="openNotifications()">
+    🔔
+    <span id="notifBadge" class="notification-badge"></span>
+  </div>
+
+  <div class="header-btn menu-icon">
+    ☰
+  </div>
+
+ </div>
+
+  </header>
+
+<div class="welcome-bar">
+  <div id="welcomeScroll" class="welcome-track">
+    Welcome to Albukhr Investment Limited — Building sustainable industries & empowering communities through investment.
+  </div>
+</div>
+
+<section class="stats">
+  <div class="stat-card">
+    <span>Total Staking</span>
+    <strong id="homeStake">0.00 Pi</strong>
+  </div>
+  <div class="stat-card">
+    <span>Total Rewards</span>
+    <strong id="homeReward">0.00 Pi</strong>
+  </div>
+</section>
+
+<div class="popular-section">
+  <div class="popular-title">📊 Popular Projects</div>
+  <div class="popular-scroll" id="popularProjects"></div>
+</div>
+
+<!-- ===== ASSETS ===== -->
+<section class="section">
+  <div class="assets-header">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <h3 style="margin:0;">Assets</h3>
+      <span id="toggleAssets" style="cursor:pointer;font-size:16px;">👁</span>
+    </div>
+<span class="assets-search" onclick="location.href='projects.html'">🔍</span>
+  </div>
+
+  <div id="assetsContainer"></div>
+</section>
+
+<!-- ===============================
+ALBUKHR AI FLOATING BUTTON
+================================ -->
+
+<div 
+class="albukhr-ai-btn"
+id="albukhrAI"
+onclick="openAlbukhrAI()"
+>
+
+<img 
+src="ALBUKHR_Logo_Optimized_1024x1024.png"
+class="albukhr-ai-logo"
+/>
+
+</div>
+
+<div 
+id="aiDevNote"
+class="ai-dev-note"
+>
+Albukhr AI is under development
+</div>
+
+
 <!-- LOGIN MODAL -->
 <div id="loginBox" class="login-modal">
   <div class="login-card">
