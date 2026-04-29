@@ -1,191 +1,182 @@
 // =======================================
-// ALBUKHR PI AUTH (TESTNET VERSION)
+// ALBUKHR PRO AUTH SYSTEM (PI SDK)
 // =======================================
 
 let CURRENT_USER = null;
-let PI_INITIALIZED = false;
 
 /* ===============================
    INIT PI SDK
 =============================== */
 function initPi(){
 
-  if(PI_INITIALIZED) return;
-
   if(typeof Pi === "undefined"){
     console.error("❌ Pi SDK not loaded");
-    return;
+    return false;
   }
 
-  Pi.init({
-    version: "2.0",
-    sandbox: true // ✅ TESTNET MODE
-  });
+  try{
+    Pi.init({
+      version: "2.0",
+      sandbox: false
+    });
+    return true;
+  }catch(e){
+    console.error("❌ Pi init error:", e);
+    return false;
+  }
 
-  PI_INITIALIZED = true;
 }
 
 /* ===============================
-   SAVE USER (LOCAL CACHE)
+   SAVE USER
 =============================== */
 function saveUser(user){
   localStorage.setItem("pi_user", JSON.stringify(user));
 }
 
 /* ===============================
-   LOAD USER (CACHE ONLY)
+   LOAD USER (LOCAL STORAGE)
 =============================== */
 function loadUser(){
 
   try{
+
     const saved = localStorage.getItem("pi_user");
+
     if(!saved) return null;
 
     const user = JSON.parse(saved);
 
-    if(user?.uid){
+    if(user && user.uid){
+      CURRENT_USER = user;
       return user;
     }
 
-  }catch(e){}
+  }catch(e){
+    console.warn("⚠️ Corrupted user data");
+  }
 
   return null;
+
 }
 
 /* ===============================
-   PAYMENT HANDLER
+   CLEAR USER (LOGOUT)
 =============================== */
-function onIncompletePaymentFound(payment){
-  console.warn("⚠️ Incomplete payment found:", payment);
-
-  // store for debugging / retry
-  localStorage.setItem(
-    "last_incomplete_payment",
-    JSON.stringify(payment)
-  );
+function clearUser(){
+  localStorage.removeItem("pi_user");
+  CURRENT_USER = null;
 }
 
 /* ===============================
-   AUTHENTICATE USER
+   AUTHENTICATE VIA PI
 =============================== */
 async function authenticatePi(){
 
   try{
 
-    const scopes = ['username','payments'];
+    if(!initPi()){
+      throw new Error("Pi not initialized");
+    }
 
-    const auth = await Pi.authenticate(
-      scopes,
-      onIncompletePaymentFound
+    const user = await Pi.authenticate(
+      ['username','payments'],
+      () => {}
     );
 
-    if(!auth?.user?.uid){
+    if(!user || !user.uid){
       throw new Error("Invalid Pi user");
     }
 
-    CURRENT_USER = auth.user;
+    CURRENT_USER = user;
 
-    saveUser(auth.user);
+    saveUser(user);
 
-    console.log("✅ Pi Auth success:", auth.user);
-
-    return auth.user;
+    return user;
 
   }catch(e){
 
     console.error("❌ Pi Auth failed:", e);
-
     return null;
+
   }
 
 }
 
 /* ===============================
-   ENSURE AUTH (MAIN ENTRY)
+   GET USER FROM PI SDK
+=============================== */
+function getPiUser(){
+
+  try{
+
+    if(window.Pi && Pi.getUser){
+
+      const user = Pi.getUser();
+
+      if(user && user.uid){
+        CURRENT_USER = user;
+        saveUser(user);
+        return user;
+      }
+
+    }
+
+  }catch(e){
+    console.warn("⚠️ Pi.getUser failed");
+  }
+
+  return null;
+
+}
+
+/* ===============================
+   ENSURE AUTH (MAIN ENGINE)
 =============================== */
 async function ensurePiAuth(){
 
-  // 1. INIT SDK
-  initPi();
-
-  // 2. MEMORY
-  if(CURRENT_USER?.uid){
+  // 1. MEMORY
+  if(CURRENT_USER && CURRENT_USER.uid){
     return CURRENT_USER;
   }
 
-  // 3. CACHE
-  const cached = loadUser();
+  // 2. LOCAL STORAGE
+  const local = loadUser();
+  if(local) return local;
 
-  if(cached){
-    CURRENT_USER = cached;
+  // 3. PI SDK SESSION
+  const piUser = getPiUser();
+  if(piUser) return piUser;
+
+  // 4. LOGIN FLOW
+  return await authenticatePi();
+
+}
+
+/* ===============================
+   REQUIRE AUTH (PAGE GUARD)
+=============================== */
+async function requireAuth(){
+
+  const user = await ensurePiAuth();
+
+  if(!user){
+    window.location.href = "login.html";
+    return null;
   }
-
-  // 4. FORCE AUTH (SAFE)
-  const user = await authenticatePi();
 
   return user;
 
 }
 
 /* ===============================
-   TEST PAYMENT (STAKING)
+   LOGOUT
 =============================== */
-async function createTestPayment(amount, project="demo"){
+function logout(){
 
-  try{
+  clearUser();
 
-    const payment = await Pi.createPayment({
-
-      amount: Number(amount),
-
-      memo: "Albukhr Testnet Stake",
-
-      metadata: {
-        type: "staking",
-        project: project
-      }
-
-    });
-
-    console.log("💰 Payment created:", payment);
-
-    // ============================
-    // LOCAL STAKE SIMULATION
-    // ============================
-
-    const stakes = JSON.parse(
-      localStorage.getItem("albukhr_stakes") || "[]"
-    );
-
-    stakes.push({
-      project: project,
-      amount: Number(amount),
-      timestamp: Date.now()
-    });
-
-    localStorage.setItem(
-      "albukhr_stakes",
-      JSON.stringify(stakes)
-    );
-
-    return payment;
-
-  }catch(e){
-
-    console.error("❌ Payment failed:", e);
-
-    return null;
-  }
-
-}
-
-/* ===============================
-   GET LOCAL STAKES
-=============================== */
-function getLocalStakes(){
-
-  return JSON.parse(
-    localStorage.getItem("albukhr_stakes") || "[]"
-  );
+  // reload to reset state
+  location.href = "login.html";
 
 }
