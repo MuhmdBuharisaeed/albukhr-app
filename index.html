@@ -30,6 +30,98 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+window.addEventListener("DOMContentLoaded", ()=>{
+
+  if(window.Pi){
+    Pi.init({
+      version: "2.0",
+      sandbox: false
+    });
+  }
+
+  // ✅ LOAD SAVED USER
+  const saved = localStorage.getItem("pi_user");
+
+  if(saved){
+
+    try{
+      const user = JSON.parse(saved);
+
+      if(user && user.uid){
+        window.CURRENT_USER = user;
+      }
+
+    }catch(e){
+      localStorage.removeItem("pi_user");
+    }
+
+  }
+
+  updateUserUI();
+
+  if(window.CURRENT_USER){
+    loadHome();
+  }
+
+});
+
+function normalizePiUser(raw){
+
+  if(!raw) return null;
+
+  return {
+    uid:
+      raw.uid ||
+      raw?.user?.uid ||
+      null,
+
+    username:
+      raw.username ||
+      raw?.user?.username ||
+      "Unknown"
+  };
+
+}
+
+async function startLogin(){
+
+  try{
+
+    const raw = await Pi.authenticate(
+      ['username'],
+      () => {}
+    );
+
+    console.log("RAW USER:", raw);
+
+    const user = normalizePiUser(raw);
+
+    if(!user || !user.uid){
+      alert("Invalid user");
+      return;
+    }
+
+    // ✅ SAVE
+    localStorage.setItem("pi_user", JSON.stringify(user));
+
+    window.CURRENT_USER = user;
+
+    // ✅ CLOSE MODAL
+    const box = document.getElementById("loginBox");
+    if(box) box.style.display = "none";
+
+    // ✅ UPDATE UI
+    updateUserUI();
+    loadHome();
+
+  }catch(err){
+    console.error(err);
+    alert("Login failed");
+  }
+
+}
+
+
 // LOGIN FUNCTION
 async function login(){
 
@@ -52,6 +144,68 @@ async function login(){
   }catch(err){
     console.error(err);
     alert("Login failed");
+  }
+
+}
+
+function updateUserUI(){
+
+  const user = window.CURRENT_USER;
+
+  const nameEl = document.getElementById("userName");
+  const statusEl = document.getElementById("userStatus");
+  const avatarEl = document.getElementById("userAvatar");
+
+  if(!nameEl || !statusEl || !avatarEl) return;
+
+  if(user){
+
+    nameEl.innerText = "@" + user.username;
+    statusEl.innerText = "Online";
+    statusEl.style.color = "#0f7a3d";
+
+    avatarEl.innerText =
+      user.username.charAt(0).toUpperCase();
+
+  }else{
+
+    nameEl.innerText = "Guest";
+    statusEl.innerText = "Tap to login";
+    statusEl.style.color = "#999";
+
+    avatarEl.innerText = "👤";
+
+  }
+
+}
+
+function logout(){
+
+  localStorage.removeItem("pi_user");
+
+  window.CURRENT_USER = null;
+
+  updateUserUI();
+
+  location.reload();
+
+}
+
+function handleAuth(){
+
+  const user = window.CURRENT_USER;
+
+  if(!user){
+    document.getElementById("loginBox").style.display = "flex";
+    return;
+  }
+
+  const confirmLogout = confirm(
+    "Logged in as @" + user.username + "\n\nLogout?"
+  );
+
+  if(confirmLogout){
+    logout();
   }
 
 }
