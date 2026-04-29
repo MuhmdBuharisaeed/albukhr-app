@@ -133,23 +133,49 @@ function getPiUser(){
 /* ===============================
    ENSURE AUTH (MAIN ENGINE)
 =============================== */
+let AUTH_RUNNING = false;
+let AUTH_DONE = false;
+
 async function ensurePiAuth(){
 
-  // 1. MEMORY
+  // ✅ 1. MEMORY
   if(CURRENT_USER && CURRENT_USER.uid){
     return CURRENT_USER;
   }
 
-  // 2. LOCAL STORAGE
-  const local = loadUser();
-  if(local) return local;
+  // ❌ STOP LOOP
+  if(AUTH_RUNNING || AUTH_DONE){
+    return null;
+  }
 
-  // 3. PI SDK SESSION
-  const piUser = getPiUser();
-  if(piUser) return piUser;
+  AUTH_RUNNING = true;
 
-  // 4. LOGIN FLOW
-  return await authenticatePi();
+  try{
+
+    // ✅ 2. LOCAL STORAGE
+    const local = loadUser();
+    if(local){
+      return local;
+    }
+
+    // ✅ 3. PI SDK SESSION
+    const piUser = getPiUser();
+    if(piUser){
+      return piUser;
+    }
+
+    // 🔥 4. AUTH ONLY ONCE
+    const user = await authenticatePi();
+
+    return user;
+
+  }catch(e){
+    console.error("Auth flow error:", e);
+    return null;
+  }finally{
+    AUTH_RUNNING = false;
+    AUTH_DONE = true; // 🔥 THIS STOPS REPEAT
+  }
 
 }
 
