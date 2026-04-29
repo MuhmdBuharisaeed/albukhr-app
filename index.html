@@ -37,9 +37,39 @@
 <!-- 🔥 Pi SDK (MUST BE FIRST) -->
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-<!-- ✅ AUTH GUARD -->
+<!-- ✅ AUTH SYSTEM -->
 <script src="js/auth.js"></script>
-<script src="js/app-init.js"></script>
+
+<!-- 🚀 INIT APP -->
+<script>
+window.addEventListener("DOMContentLoaded", async ()=>{
+
+  // ✅ Init Pi
+  if(window.Pi){
+    Pi.init({
+      version: "2.0",
+      sandbox: false
+    });
+  }
+
+  // ✅ Ensure user
+  const user = await ensurePiAuth();
+
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+
+  // ✅ Global user
+  window.CURRENT_USER = user;
+
+  // 👉 Call your app
+  if(typeof startApp === "function"){
+    startApp(user);
+  }
+
+});
+</script>
 
 <link rel="stylesheet" href="style.css">
 
