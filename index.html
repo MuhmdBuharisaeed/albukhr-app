@@ -30,23 +30,21 @@
 
   <div class="brand">ALBUKHR</div>
 
-  <div class="header-actions">
+  <div class="header-right">
 
-    <!-- USER -->
-    <div class="header-icon">
-      👤
-      <span class="status-dot"></span>
-    </div>
-
-    <!-- NOTIFICATION -->
-    <div class="header-icon">
+    <div class="header-btn notification-btn">
       🔔
-      <span class="badge">2</span>
+      <span id="notifBadge" class="notification-badge"></span>
     </div>
 
-    <!-- MENU -->
-    <div class="header-icon">
-      ☰
+    <div class="header-btn menu-icon">☰</div>
+
+    <div class="user" onclick="handleAuth()">
+      <div class="avatar" id="avatar">👤</div>
+      <div class="meta">
+        <div id="username">Guest</div>
+        <div id="status">Offline</div>
+      </div>
     </div>
 
   </div>
