@@ -1,16 +1,16 @@
 // =======================================
-// ALBUKHR PRO AUTH SYSTEM (PI SDK)
+// ALBUKHR PRO AUTH SYSTEM (FINAL)
 // =======================================
 
 let CURRENT_USER = null;
 
 /* ===============================
-   INIT PI SDK
+   INIT PI
 =============================== */
 function initPi(){
 
-  if(typeof Pi === "undefined"){
-    console.error("❌ Pi SDK not loaded");
+  if(!window.Pi){
+    console.warn("Pi SDK not loaded");
     return false;
   }
 
@@ -21,109 +21,77 @@ function initPi(){
     });
     return true;
   }catch(e){
-    console.error("❌ Pi init error:", e);
+    console.error("Pi init failed", e);
     return false;
   }
 
 }
 
 /* ===============================
-   SAVE USER
+   STORAGE
 =============================== */
 function saveUser(user){
   localStorage.setItem("pi_user", JSON.stringify(user));
 }
 
-/* ===============================
-   LOAD USER (LOCAL STORAGE)
-=============================== */
 function loadUser(){
-
   try{
-
-    const saved = localStorage.getItem("pi_user");
-
-    if(!saved) return null;
-
-    const user = JSON.parse(saved);
-
-    if(user && user.uid){
-      CURRENT_USER = user;
-      return user;
+    const u = JSON.parse(localStorage.getItem("pi_user"));
+    if(u && u.uid){
+      CURRENT_USER = u;
+      return u;
     }
-
-  }catch(e){
-    console.warn("⚠️ Corrupted user data");
-  }
-
+  }catch{}
   return null;
-
 }
 
-/* ===============================
-   CLEAR USER (LOGOUT)
-=============================== */
 function clearUser(){
   localStorage.removeItem("pi_user");
   CURRENT_USER = null;
 }
 
 /* ===============================
-   AUTHENTICATE VIA PI
+   PI SESSION (NO POPUP)
+=============================== */
+function getPiUser(){
+
+  try{
+    if(window.Pi && Pi.getUser){
+      const u = Pi.getUser();
+      if(u && u.uid){
+        saveUser(u);
+        CURRENT_USER = u;
+        return u;
+      }
+    }
+  }catch{}
+
+  return null;
+
+}
+
+/* ===============================
+   REAL LOGIN (POPUP)
 =============================== */
 async function authenticatePi(){
 
-  try{
+  if(!initPi()) return null;
 
-    if(!initPi()){
-      throw new Error("Pi not initialized");
-    }
+  try{
 
     const user = await Pi.authenticate(
       ['username','payments'],
       () => {}
     );
 
-    if(!user || !user.uid){
-      throw new Error("Invalid Pi user");
-    }
-
-    CURRENT_USER = user;
-
-    saveUser(user);
-
-    return user;
-
-  }catch(e){
-
-    console.error("❌ Pi Auth failed:", e);
-    return null;
-
-  }
-
-}
-
-/* ===============================
-   GET USER FROM PI SDK
-=============================== */
-function getPiUser(){
-
-  try{
-
-    if(window.Pi && Pi.getUser){
-
-      const user = Pi.getUser();
-
-      if(user && user.uid){
-        CURRENT_USER = user;
-        saveUser(user);
-        return user;
-      }
-
+    if(user && user.uid){
+      saveUser(user);
+      CURRENT_USER = user;
+      return user;
     }
 
   }catch(e){
-    console.warn("⚠️ Pi.getUser failed");
+    console.error("Auth error", e);
   }
 
   return null;
@@ -131,67 +99,38 @@ function getPiUser(){
 }
 
 /* ===============================
-   ENSURE AUTH (MAIN ENGINE)
+   SMART AUTH (NO POPUP)
 =============================== */
-let AUTH_RUNNING = false;
-let AUTH_DONE = false;
-
 async function ensurePiAuth(){
 
-  // ✅ 1. MEMORY
-  if(CURRENT_USER && CURRENT_USER.uid){
-    return CURRENT_USER;
-  }
+  if(CURRENT_USER) return CURRENT_USER;
 
-  // ❌ STOP LOOP
-  if(AUTH_RUNNING || AUTH_DONE){
-    return null;
-  }
+  const local = loadUser();
+  if(local) return local;
 
-  AUTH_RUNNING = true;
+  const piUser = getPiUser();
+  if(piUser) return piUser;
 
-  try{
-
-    // ✅ 2. LOCAL STORAGE
-    const local = loadUser();
-    if(local){
-      return local;
-    }
-
-    // ✅ 3. PI SDK SESSION
-    const piUser = getPiUser();
-    if(piUser){
-      return piUser;
-    }
-
-    // 🔥 4. AUTH ONLY ONCE
-    const user = await authenticatePi();
-
-    return user;
-
-  }catch(e){
-    console.error("Auth flow error:", e);
-    return null;
-  }finally{
-    AUTH_RUNNING = false;
-    AUTH_DONE = true; // 🔥 THIS STOPS REPEAT
-  }
+  // ❌ NO AUTO LOGIN HERE
+  return null;
 
 }
 
 /* ===============================
-   REQUIRE AUTH (PAGE GUARD)
+   MANUAL LOGIN BUTTON
 =============================== */
-async function requireAuth(){
+async function startLogin(){
 
-  const user = await ensurePiAuth();
+  const user = await authenticatePi();
 
   if(!user){
-    window.location.href = "login.html";
-    return null;
+    alert("Login failed");
+    return;
   }
 
-  return user;
+  window.CURRENT_USER = user;
+
+  location.reload();
 
 }
 
@@ -199,10 +138,6 @@ async function requireAuth(){
    LOGOUT
 =============================== */
 function logout(){
-
   clearUser();
-
-  // reload to reset state
   location.href = "login.html";
-
 }
