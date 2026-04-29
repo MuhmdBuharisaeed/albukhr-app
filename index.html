@@ -27,8 +27,8 @@ window.addEventListener("DOMContentLoaded", async ()=>{
   const user = await ensurePiAuth();
 
   if(!user){
-    window.location.href = "login.html";
-    return;
+  console.warn("User not ready yet");
+  return;
   }
 
   // ✅ Global user
