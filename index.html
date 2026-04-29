@@ -10,19 +10,7 @@
 
 (function(){
 
-  try{
-
-    const user = JSON.parse(localStorage.getItem("pi_user"));
-
-    if(!user || !user.uid){
-      window.location.href = "login.html";
-      return;
-    }
-
-    // ✅ KEEP USER
-    window.CURRENT_USER = user;
-
-  }catch(e){
+  if(!localStorage.getItem("pi_user")){
     window.location.href = "login.html";
   }
 
@@ -1244,35 +1232,6 @@ X
 
 <script>
 
-window.addEventListener("DOMContentLoaded", async () => {
-
-  // ✅ Init Pi FIRST
-  if(window.Pi){
-    Pi.init({
-      version: "2.0",
-      sandbox: false
-    });
-  }
-
-  // ✅ Use existing user (no overwrite)
-  const user = window.CURRENT_USER || await ensurePiAuth();
-
-  if(!user){
-    window.location.href = "login.html";
-    return;
-  }
-
-  window.CURRENT_USER = user;
-
-  updateUserUI();
-  loadHome();
-
-});
-
-</script>
-  
-<script>
-
 async function loadHome(){
 
   if(typeof getAllStakesMerged !== "function") return;
@@ -1662,8 +1621,7 @@ ai.classList.remove("minimized");
 
 function handleAuth(){
 
-  const user = CURRENT_USER;
-
+  const user = window.CURRENT_USER;
   if(!user){
     alert("Not logged in");
     return;
