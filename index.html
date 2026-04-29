@@ -40,12 +40,14 @@ async function login(){
       () => {}
     );
 
-    console.log("USER:", user);
+    console.log("FULL USER:", user);
 
-    if(user){
-      currentUser = user;
-      alert("Logged in as @" + user.username);
-    }
+    const username =
+      user.username ||
+      user?.user?.username ||
+      "Unknown";
+
+    alert("Logged in as @" + username);
 
   }catch(err){
     console.error(err);
