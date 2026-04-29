@@ -1,214 +1,212 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Pi Test</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR</title>
 
-  <!-- Pi SDK -->
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<!-- Pi SDK -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f4fff8;
+}
+
+/* HEADER */
+.header{
+  background:#0f7a3d;
+  padding:12px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:white;
+}
+
+.brand{
+  font-weight:700;
+}
+
+/* USER */
+.user{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+}
+
+.avatar{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#e6f6ec;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#0f7a3d;
+  font-weight:700;
+}
+
+.meta{
+  font-size:12px;
+  line-height:1;
+}
+
+/* DASHBOARD */
+.container{
+  padding:20px;
+}
+
+/* LOGIN MODAL */
+.login-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  align-items:center;
+  justify-content:center;
+}
+
+.login-card{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+}
+
+button{
+  padding:10px;
+  border:none;
+  background:#0f7a3d;
+  color:white;
+  border-radius:8px;
+  margin-top:10px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Pi Login Test</h2>
+<!-- LOGIN MODAL -->
+<div id="loginBox" class="login-modal">
+  <div class="login-card">
+    <h3>Login Required</h3>
+    <button onclick="startLogin()">Login with Pi</button>
+  </div>
+</div>
 
-<button onclick="login()">Login with Pi</button>
+<!-- HEADER -->
+<div class="header">
+  <div class="brand">ALBUKHR</div>
+
+  <div class="user" onclick="handleAuth()">
+    <div class="avatar" id="avatar">👤</div>
+    <div class="meta">
+      <div id="username">Guest</div>
+      <div id="status">Offline</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+  <h3>Dashboard</h3>
+  <p id="welcomeText">Welcome Guest</p>
+</div>
 
 <script>
-let currentUser = null;
 
-// INIT
-document.addEventListener("DOMContentLoaded", () => {
-  if(window.Pi){
-    Pi.init({
-      version: "2.0",
-      sandbox: false
-    });
-    console.log("✅ Pi Initialized");
-  }else{
-    console.log("❌ Pi not available");
-  }
-});
-
+// ================= INIT =================
 window.addEventListener("DOMContentLoaded", ()=>{
 
   if(window.Pi){
-    Pi.init({
-      version: "2.0",
-      sandbox: false
-    });
+    Pi.init({ version:"2.0", sandbox:false });
   }
 
-  // ✅ LOAD SAVED USER
+  // load saved user
   const saved = localStorage.getItem("pi_user");
 
   if(saved){
-
-    try{
-      const user = JSON.parse(saved);
-
-      if(user && user.uid){
-        window.CURRENT_USER = user;
-      }
-
-    }catch(e){
-      localStorage.removeItem("pi_user");
-    }
-
+    window.CURRENT_USER = JSON.parse(saved);
   }
 
-  updateUserUI();
-
-  if(window.CURRENT_USER){
-    loadHome();
-  }
+  updateUI();
 
 });
 
-function normalizePiUser(raw){
-
-  if(!raw) return null;
-
+// ================= NORMALIZE =================
+function normalize(raw){
   return {
-    uid:
-      raw.uid ||
-      raw?.user?.uid ||
-      null,
-
-    username:
-      raw.username ||
-      raw?.user?.username ||
-      "Unknown"
+    uid: raw.uid || raw?.user?.uid,
+    username: raw.username || raw?.user?.username
   };
-
 }
 
+// ================= LOGIN =================
 async function startLogin(){
 
-  try{
+  const raw = await Pi.authenticate(['username'], ()=>{});
 
-    const raw = await Pi.authenticate(
-      ['username'],
-      () => {}
-    );
+  const user = normalize(raw);
 
-    console.log("RAW USER:", raw);
-
-    const user = normalizePiUser(raw);
-
-    if(!user || !user.uid){
-      alert("Invalid user");
-      return;
-    }
-
-    // ✅ SAVE
-    localStorage.setItem("pi_user", JSON.stringify(user));
-
-    window.CURRENT_USER = user;
-
-    // ✅ CLOSE MODAL
-    const box = document.getElementById("loginBox");
-    if(box) box.style.display = "none";
-
-    // ✅ UPDATE UI
-    updateUserUI();
-    loadHome();
-
-  }catch(err){
-    console.error(err);
+  if(!user || !user.uid){
     alert("Login failed");
+    return;
   }
+
+  localStorage.setItem("pi_user", JSON.stringify(user));
+  window.CURRENT_USER = user;
+
+  document.getElementById("loginBox").style.display="none";
+
+  updateUI();
 
 }
 
-
-// LOGIN FUNCTION
-async function login(){
-
-  try{
-
-    const user = await Pi.authenticate(
-      ['username'],
-      () => {}
-    );
-
-    console.log("FULL USER:", user);
-
-    const username =
-      user.username ||
-      user?.user?.username ||
-      "Unknown";
-
-    alert("Logged in as @" + username);
-
-  }catch(err){
-    console.error(err);
-    alert("Login failed");
-  }
-
-}
-
-function updateUserUI(){
+// ================= UI =================
+function updateUI(){
 
   const user = window.CURRENT_USER;
 
-  const nameEl = document.getElementById("userName");
-  const statusEl = document.getElementById("userStatus");
-  const avatarEl = document.getElementById("userAvatar");
-
-  if(!nameEl || !statusEl || !avatarEl) return;
+  const name = document.getElementById("username");
+  const status = document.getElementById("status");
+  const avatar = document.getElementById("avatar");
+  const welcome = document.getElementById("welcomeText");
 
   if(user){
-
-    nameEl.innerText = "@" + user.username;
-    statusEl.innerText = "Online";
-    statusEl.style.color = "#0f7a3d";
-
-    avatarEl.innerText =
-      user.username.charAt(0).toUpperCase();
-
+    name.innerText = "@" + user.username;
+    status.innerText = "Online";
+    status.style.color = "#0f7a3d";
+    avatar.innerText = user.username[0].toUpperCase();
+    welcome.innerText = "Welcome " + user.username;
   }else{
-
-    nameEl.innerText = "Guest";
-    statusEl.innerText = "Tap to login";
-    statusEl.style.color = "#999";
-
-    avatarEl.innerText = "👤";
-
+    name.innerText = "Guest";
+    status.innerText = "Tap to login";
+    avatar.innerText = "👤";
+    welcome.innerText = "Welcome Guest";
   }
 
 }
 
-function logout(){
-
-  localStorage.removeItem("pi_user");
-
-  window.CURRENT_USER = null;
-
-  updateUserUI();
-
-  location.reload();
-
-}
-
+// ================= HANDLE =================
 function handleAuth(){
 
   const user = window.CURRENT_USER;
 
   if(!user){
-    document.getElementById("loginBox").style.display = "flex";
+    document.getElementById("loginBox").style.display="flex";
     return;
   }
 
-  const confirmLogout = confirm(
-    "Logged in as @" + user.username + "\n\nLogout?"
-  );
-
-  if(confirmLogout){
-    logout();
+  if(confirm("Logout?")){
+    localStorage.removeItem("pi_user");
+    location.reload();
   }
 
 }
+
 </script>
 
 </body>
