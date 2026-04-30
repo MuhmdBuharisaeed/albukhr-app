@@ -156,6 +156,39 @@ Albukhr AI is under development
 
          </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://qexmnghilahsvethlxem.supabase.co",
+  "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+);
+</script>
+  
+<script>
+async function getAllStakesMerged(){
+
+  try{
+
+    const { data, error } = await supabase
+      .from("stakes")
+      .select("*");
+
+    if(error){
+      console.error("Supabase error:", error);
+      return [];
+    }
+
+    return data || [];
+
+  }catch(err){
+    console.error("Fetch failed:", err);
+    return [];
+  }
+
+}
+  </script>
+  
 <script>
 
 let lastScroll = 0;
