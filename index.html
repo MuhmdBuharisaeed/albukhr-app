@@ -854,19 +854,13 @@ ai.classList.remove("minimized");
 
 });
 
-const countMap = {};
-
-stakes.forEach(s=>{
-  if(s.type !== "withdraw"){
-    countMap[s.project] = (countMap[s.project]||0)+1;
-  }
-});
-
-Object.keys(globalMap).forEach(project=>{
-  globalMap[project].investors = countMap[project] || 0;
-});
-
 </script>
- 
+  
+ <script>
+document.addEventListener("DOMContentLoaded", ()=>{
+  loadHome();
+});
+ </script>
+  
 </body>
 </html>
