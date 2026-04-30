@@ -23,22 +23,6 @@
   font-weight: 700;
 }
 
-.user-indicator {
-  position: relative;
-  font-size: 18px;
-}
-
-.user-status {
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
-  background: #00c853;
-  color: #fff;
-  font-size: 10px;
-  border-radius: 50%;
-  padding: 2px 4px;
-  display: none;
-}
 </style>
 
 </head>
@@ -58,11 +42,6 @@
   <div class="header-btn notification-btn" onclick="openNotifications()">
     🔔
     <span id="notifBadge" class="notification-badge"></span>
-  </div>
-
-  <div class="header-btn user-indicator" id="userIndicator">
-  👤
-  <span id="userStatus" class="user-status"></span>
   </div>
 
   <div class="header-btn menu-icon">
@@ -868,21 +847,7 @@ ai.addEventListener("click",()=>{
 ai.classList.remove("minimized");
 
 });
-
-function updateUserIndicator(user){
-
-  const el = document.getElementById("userStatus");
-
-  if(!el) return;
-
-  if(user && user.uid){
-    el.innerText = "√";
-    el.style.display = "inline-block";
-  }else{
-    el.style.display = "none";
-  }
-
- }
+  
 </script>
 
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
