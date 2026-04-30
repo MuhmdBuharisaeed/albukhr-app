@@ -36,6 +36,8 @@
     <span id="notifBadge" class="notification-badge"></span>
   </div>
 
+  <div class="header-btn" id="userBox">👤</div>
+
   <div class="header-btn menu-icon">
     ☰
   </div>
@@ -840,6 +842,18 @@ ai.classList.remove("minimized");
 
 });
 
+function loadUser(){
+
+  const user = JSON.parse(localStorage.getItem("pi_user"));
+
+  const box = document.getElementById("userBox");
+
+  if(!box || !user) return;
+
+  box.innerText = "👤 " + user.username;
+
+}
+
 document.addEventListener("DOMContentLoaded", ()=>{
 
   // 🔐 CHECK LOGIN
@@ -851,6 +865,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 
   // 🚀 LOAD DATA
+  loadUser();   // 👈 NEW
   loadHome();
 
 });
