@@ -57,16 +57,6 @@ body{
 }
 </style>
 
-<!-- 🚨 AUTO REDIRECT IF LOGGED IN -->
-<script>
-try{
-  const user = JSON.parse(localStorage.getItem("pi_user"));
-  if(user){
-    window.location.href = "index.html";
-  }
-}catch{}
-</script>
-
 </head>
 
 <body>
@@ -154,14 +144,7 @@ async function loginWithPi(){
 
   try{
 
-    initPi();
-
-    const raw = await Pi.authenticate(
-      ['username'],
-      function(payment){
-        console.log("Payment:", payment);
-      }
-    );
+    const raw = await Pi.authenticate(['username'], ()=>{});
 
     const user = normalizeUser(raw);
 
@@ -169,17 +152,19 @@ async function loginWithPi(){
       throw new Error("Invalid user data");
     }
 
-    // ✅ STORE CLEAN DATA
     localStorage.setItem("pi_user", JSON.stringify(user));
 
-    // ✅ REDIRECT
+    await new Promise(r => setTimeout(r, 100));
+
+    btn.innerText = "Success...";
+
     window.location.href = "index.html";
 
   }catch(err){
 
     console.error(err);
 
-    alert("Login failed. Try again.");
+    alert("Login failed");
 
     btn.disabled = false;
     btn.innerText = "Login with Pi";
