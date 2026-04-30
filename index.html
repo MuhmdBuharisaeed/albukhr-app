@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ALBUKHR Projects</title>
 
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="css/albukhr-ui.css">
 <link rel="stylesheet" href="css/global-header.css">
@@ -851,6 +853,77 @@ ai.classList.add("minimized");
 ai.addEventListener("click",()=>{
 
 ai.classList.remove("minimized");
+
+});
+
+function initPiSafe(){
+
+  if(!window.Pi){
+    console.warn("Not in Pi Browser");
+    return false;
+  }
+
+  Pi.init({
+    version: "2.0",
+    sandbox: false
+  });
+
+  return true;
+}
+
+async function ensureAuth(){
+
+  try{
+
+    const saved = JSON.parse(localStorage.getItem("pi_user"));
+
+    // ✅ if already logged in
+    if(saved && saved.uid){
+      window.currentUser = saved;
+      return saved;
+    }
+
+    // ❌ if not in Pi browser
+    if(!initPiSafe()){
+      window.location.href = "login.html";
+      return null;
+    }
+
+    // 🔥 silent authenticate
+    const raw = await Pi.authenticate(['username']);
+
+    const user = {
+      uid: raw.uid || raw?.user?.uid,
+      username: raw.username || raw?.user?.username
+    };
+
+    if(!user.uid){
+      throw new Error("Invalid Pi user");
+    }
+
+    localStorage.setItem("pi_user", JSON.stringify(user));
+    window.currentUser = user;
+
+    return user;
+
+  }catch(err){
+
+    console.error("Auth failed:", err);
+
+    window.location.href = "login.html";
+    return null;
+  }
+
+}
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+
+  const user = await ensureAuth();
+
+  if(!user) return;
+
+  // ✅ yanzu safe
+  loadHome();
 
 });
 
