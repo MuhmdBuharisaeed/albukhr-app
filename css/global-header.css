@@ -174,10 +174,21 @@ z-index:900;
   gap: 10px;
 }
 
+.user-box{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.user-icon{
+  font-size: 14px;
+}
+
 #piUser{
-  font-size: 11px;
-  max-width: 90px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 10px;
+  margin-top: 3px; /* 👈 ka iya ƙara/ rage */
   white-space: nowrap;
+  color: #fff;
 }
