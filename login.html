@@ -90,45 +90,89 @@ try{
 <script>
 
 /* ===============================
-   INIT PI
+   SAFE INIT
 =============================== */
+function initPi(){
 
-if(window.Pi){
+  if(!window.Pi){
+    alert("Open inside Pi Browser");
+    throw new Error("Pi not available");
+  }
 
   Pi.init({
     version:"2.0",
-    sandbox:true   // 🔥 CHANGE TO false IN PRODUCTION
+    sandbox:false // ✅ PRODUCTION
   });
 
-}else{
-  alert("Pi Browser required");
 }
+
+/* ===============================
+   NORMALIZE USER
+=============================== */
+function normalizeUser(raw){
+
+  return {
+    uid: raw.uid || raw?.user?.uid,
+    username: raw.username || raw?.user?.username
+  };
+
+}
+
+/* ===============================
+   VALIDATE USER
+=============================== */
+function isValidUser(user){
+  return user && user.uid && user.username;
+}
+
+/* ===============================
+   AUTO REDIRECT (SAFE)
+=============================== */
+(function(){
+
+  try{
+
+    const saved = JSON.parse(localStorage.getItem("pi_user"));
+
+    if(isValidUser(saved)){
+      window.location.href = "index.html";
+    }
+
+  }catch{}
+
+})();
 
 /* ===============================
    LOGIN FUNCTION
 =============================== */
-
 async function loginWithPi(){
 
   const btn = document.getElementById("loginBtn");
 
-  /* LOCK BUTTON */
   btn.disabled = true;
   btn.innerText = "Connecting...";
 
   try{
 
-    const user = await Pi.authenticate(
-      ['username','payments'],
+    initPi();
+
+    const raw = await Pi.authenticate(
+      ['username'],
       function(payment){
-        console.log(payment);
+        console.log("Payment:", payment);
       }
     );
 
-    /* SAVE USER */
+    const user = normalizeUser(raw);
+
+    if(!isValidUser(user)){
+      throw new Error("Invalid user data");
+    }
+
+    // ✅ STORE CLEAN DATA
     localStorage.setItem("pi_user", JSON.stringify(user));
 
-    /* REDIRECT */
+    // ✅ REDIRECT
     window.location.href = "index.html";
 
   }catch(err){
@@ -137,7 +181,6 @@ async function loginWithPi(){
 
     alert("Login failed. Try again.");
 
-    /* RESET BUTTON */
     btn.disabled = false;
     btn.innerText = "Login with Pi";
 
