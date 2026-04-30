@@ -885,21 +885,102 @@ function updateUserIndicator(user){
  }
 </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", async ()=>{
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-  // 👉 TEST CONFIG
-  if(typeof PROJECT_CONFIG === "undefined"){
-    console.error("PROJECT_CONFIG NOT LOADED");
-    return;
+<script>
+
+function showPiUser(user){
+
+  const header = document.querySelector(".header-right");
+
+  let el = document.getElementById("piUser");
+
+  if(!el){
+    el = document.createElement("div");
+    el.id = "piUser";
+    el.style.fontSize = "12px";
+    el.style.color = "#0f7a3d";
+    el.style.marginRight = "8px";
+    header.prepend(el);
   }
 
-  console.log("PROJECT_CONFIG OK");
+  if(user){
+    el.innerText = "👤 " + user.username + " ✓";
+  }else{
+    el.innerText = "❌";
+  }
 
-  // 👉 LOAD DATA
-  await loadHome();
+}
+
+async function initPiAuth(){
+
+  try{
+
+    // 1. check saved user
+    const saved = JSON.parse(localStorage.getItem("pi_user"));
+
+    if(saved && saved.uid){
+      showPiUser(saved);
+      return saved;
+    }
+
+    // 2. check Pi environment
+    if(!window.Pi){
+      showPiUser(null);
+      alert("❌ Open inside Pi Browser");
+      return null;
+    }
+
+    // 3. init
+    Pi.init({
+      version: "2.0",
+      sandbox: false
+    });
+
+    // 4. login
+    const raw = await Pi.authenticate(['username']);
+
+    const user = {
+      uid: raw.uid || raw?.user?.uid,
+      username: raw.username || raw?.user?.username
+    };
+
+    if(!user.uid){
+      throw new Error("Invalid Pi user");
+    }
+
+    localStorage.setItem("pi_user", JSON.stringify(user));
+
+    showPiUser(user);
+
+    return user;
+
+  }catch(err){
+
+    console.error("Pi error:", err);
+
+    showPiUser(null);
+
+    alert("❌ Pi login failed");
+
+    return null;
+
+  }
+
+}
+
+/* ===== RUN APP AFTER LOGIN ===== */
+document.addEventListener("DOMContentLoaded", async ()=>{
+
+  const user = await initPiAuth();
+
+  if(!user) return;
+
+  // 👉 yanzu safe a load data
+  loadHome();
 
 });
+
 </script>
   
 </body>
