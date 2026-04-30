@@ -655,7 +655,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 </script>
 
-<script src="js/security-core.js"></script>
 <script src="js/notifications.js"></script>
 <script src="project-treasury.js"></script>
 <script src="smart-liquidity-engine.js"></script>
@@ -697,25 +696,6 @@ note.classList.remove("show");
 
 }
 
-</script>
-
-<script>
-const sec = getSecurity();
-
-enable2fa.checked = sec.twofa || false;
-encryptData.checked = sec.encrypt || false;
-
-enable2fa.addEventListener("change", e=>{
-  if(e.target.checked){
-    enable2FA();
-  }else{
-    setSecurity({...getSecurity(), twofa:false});
-  }
-});
-
-encryptData.addEventListener("change", e=>{
-  setSecurity({...getSecurity(), encrypt:e.target.checked});
-});
 </script>
 
 <script>
