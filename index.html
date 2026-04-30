@@ -3,88 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pi Test</title>
+
+<title>ALBUKHR</title>
 
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <style>
 body{
+  margin:0;
   font-family:sans-serif;
+}
+
+.header{
+  background:#0f7a3d;
+  color:#fff;
   display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-  flex-direction:column;
-  text-align:center;
+  justify-content:space-between;
+  padding:12px;
 }
-button{
-  padding:12px 20px;
-  font-size:16px;
-  margin-top:20px;
-}
+
 </style>
 
 </head>
 
 <body>
 
-<h2>ALBUKHR Pi Test</h2>
+<header class="header">
+  <div>ALBUKHR</div>
+  <div id="user">...</div>
+</header>
 
-<div id="status">Initializing...</div>
-
-<button onclick="login()">Login with Pi</button>
+<div style="padding:20px;text-align:center;">
+  <h2>Loading...</h2>
+</div>
 
 <script>
-
-function setStatus(msg){
-  document.getElementById("status").innerText = msg;
-  console.log(msg);
-}
-
-async function login(){
+async function init(){
 
   try{
 
-    // 1. check Pi browser
-    if(typeof window.Pi === "undefined"){
-      setStatus("❌ NOT PI BROWSER");
+    if(!window.Pi){
+      document.body.innerHTML = "❌ Open in Pi Browser";
       return;
     }
 
-    setStatus("🔄 Initializing Pi...");
-
-    // 2. init
     Pi.init({
       version:"2.0",
       sandbox:false
     });
 
-    setStatus("🔐 Authenticating...");
-
-    // 3. auth
     const auth = await Pi.authenticate(['username']);
 
-    console.log("AUTH RESULT:", auth);
-
-    const uid = auth.user?.uid || auth.uid;
     const username = auth.user?.username || auth.username;
 
-    if(!uid){
-      throw new Error("UID missing");
-    }
+    document.getElementById("user").innerText =
+      "👤 " + username;
 
-    setStatus("✅ SUCCESS: " + username);
+  }catch(e){
 
-  }catch(err){
-
-    console.error("FULL ERROR:", err);
-
-    setStatus("❌ ERROR: " + err.message);
+    document.body.innerHTML = "❌ Login Failed";
 
   }
 
 }
 
+init();
 </script>
 
 </body>
