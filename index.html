@@ -842,6 +842,25 @@ ai.classList.remove("minimized");
 
 });
 
+function showUser(user){
+
+  const header = document.querySelector(".header-right");
+
+  let box = document.getElementById("userBox");
+
+  if(!box){
+    box = document.createElement("div");
+    box.id = "userBox";
+    box.className = "user-box";
+    header.prepend(box);
+  }
+
+  box.innerHTML = `
+    <div>👤</div>
+    <div id="piUser">${user.username}</div>
+  `;
+}
+
 function loadUser(){
 
   const user = JSON.parse(localStorage.getItem("pi_user"));
