@@ -198,6 +198,15 @@ ensurePiAuth();
 <script src="staking.js"></script>
 <script src="wallet-core.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://qexmnghilahsvethlxem.supabase.co",
+  "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+);
+</script>
+
 <script>
 
 /* ===============================
@@ -290,61 +299,85 @@ function closeWithdraw(){
 
 async function confirmStake(){
 
-if(typeof Pi === "undefined"){
-  alert("Open inside Pi Browser");
-  return;
-}
+  // ===== PI CHECK =====
+  if(typeof Pi === "undefined"){
+    alert("Open inside Pi Browser");
+    return;
+  }
 
-if(typeof hasMinimumLiquidity === "function" && 
-   !hasMinimumLiquidity(PROJECT_NAME)){
-  alert("Project liquidity not ready");
-  return;
-}
+  // ===== LIQUIDITY CHECK =====
+  if(typeof hasMinimumLiquidity === "function" && 
+     !hasMinimumLiquidity(PROJECT_NAME)){
+    alert("Project liquidity not ready");
+    return;
+  }
 
-const amount = Number(amountInput.value);
-const duration = Number(durationSelect.value);
-const min = getMinStake(PROJECT_NAME);
+  const amount = Number(amountInput.value);
+  const duration = Number(durationSelect.value);
+  const min = getMinStake(PROJECT_NAME);
 
-if(!amount || amount < min){
-  alert("Minimum stake is " + min + " Pi");
-  return;
-}
+  // ===== VALIDATION =====
+  if(!amount || amount < min){
+    alert("Minimum stake is " + min + " Pi");
+    return;
+  }
 
-const btn = document.querySelector("#stakeModal .primary");
-btn.innerText = "Processing...";
-btn.disabled = true;
+  // ===== USER =====
+  const user = JSON.parse(localStorage.getItem("pi_user"));
 
-try{
+  if(!user){
+    alert("Login required");
+    return;
+  }
 
-  const res = await addStake({
-    project: PROJECT_NAME,
-    amount,
-    duration
-  });
+  const btn = document.querySelector("#stakeModal .primary");
+  btn.innerText = "Processing...";
+  btn.disabled = true;
 
-  if(res?.success){
+  try{
 
+    // ===== UNLOCK TIME =====
+    const unlockTime =
+      Date.now() + (duration * 24 * 60 * 60 * 1000);
+
+    // ===== INSERT TO SUPABASE =====
+    const { error } = await supabase
+      .from("stakes")
+      .insert([{
+        user_id: user.uid,
+        project: PROJECT_NAME,
+        amount: amount,
+        duration: duration,
+        reward: 0,
+        withdrawnReward: 0,
+        unlockTime: unlockTime,
+        created_at: new Date().toISOString()
+      }]);
+
+    if(error){
+      console.error(error);
+      alert("Stake failed");
+      return;
+    }
+
+    // ===== SUCCESS UI =====
     successText.innerText =
-    `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
+      `You staked ${amount} Pi for ${duration} days in ${CONFIG.title}.`;
 
     closeModal();
     successModal.style.display="flex";
 
-    load();
+    await load(); // 🔄 refresh from DB
 
-  }else{
-    alert(res?.error || "Transaction failed");
+  }catch(e){
+    console.error(e);
+    alert("Something went wrong");
   }
 
-}catch(e){
-  alert("Something went wrong");
-  console.error(e);
+  btn.innerText = "Confirm";
+  btn.disabled = false;
+
 }
-
-btn.innerText = "Confirm";
-btn.disabled = false;
-
-  }
 
 /* ===============================
    LOAD
@@ -785,7 +818,15 @@ UPDATE STAKE STATUS
 =============================== */
 async function updateStakeStatus(){
 
-  const data = await getProjectTotals(PROJECT_NAME);
+  const { data, error } = await supabase
+  .from("stakes")
+  .select("*")
+  .eq("project", PROJECT_NAME);
+
+if(error){
+  console.error(error);
+  return;
+}
 
 let locked = 0;
 let unlocked = 0;
