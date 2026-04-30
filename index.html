@@ -830,7 +830,21 @@ ai.addEventListener("click",()=>{
 ai.classList.remove("minimized");
 
 });
-  
+
+document.addEventListener("DOMContentLoaded", ()=>{
+
+  // 🔐 CHECK LOGIN
+  const user = JSON.parse(localStorage.getItem("pi_user"));
+
+  if(!user || !user.uid){
+    window.location.href = "login.html";
+    return;
+  }
+
+  // 🚀 LOAD DATA
+  loadHome();
+
+});
 </script>
 
 </body>
