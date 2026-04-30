@@ -12,62 +12,72 @@
 body{
   margin:0;
   font-family:sans-serif;
-}
-
-.header{
-  background:#0f7a3d;
-  color:#fff;
   display:flex;
-  justify-content:space-between;
-  padding:12px;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  flex-direction:column;
 }
 
+button{
+  padding:12px 20px;
+  font-size:16px;
+}
 </style>
 
 </head>
 
 <body>
 
-<header class="header">
-  <div>ALBUKHR</div>
-  <div id="user">...</div>
-</header>
+<h2>ALBUKHR</h2>
 
-<div style="padding:20px;text-align:center;">
-  <h2>Loading...</h2>
-</div>
+<div id="status">Click to login</div>
+
+<button onclick="login()">Login with Pi</button>
 
 <script>
-async function init(){
+let initialized = false;
+
+async function login(){
 
   try{
 
     if(!window.Pi){
-      document.body.innerHTML = "❌ Open in Pi Browser";
+      document.getElementById("status").innerText =
+        "❌ Not Pi Browser";
       return;
     }
 
-    Pi.init({
-      version:"2.0",
-      sandbox:false
-    });
+    // INIT ON CLICK (VERY IMPORTANT)
+    if(!initialized){
+      Pi.init({
+        version:"2.0",
+        sandbox:false
+      });
+      initialized = true;
+    }
+
+    document.getElementById("status").innerText =
+      "🔐 Logging in...";
 
     const auth = await Pi.authenticate(['username']);
 
-    const username = auth.user?.username || auth.username;
+    const username =
+      auth.user?.username || auth.username;
 
-    document.getElementById("user").innerText =
-      "👤 " + username;
+    document.getElementById("status").innerText =
+      "✅ " + username;
 
   }catch(e){
 
-    document.body.innerHTML = "❌ Login Failed";
+    console.error(e);
+
+    document.getElementById("status").innerText =
+      "❌ Login Failed";
 
   }
 
 }
-
-init();
 </script>
 
 </body>
