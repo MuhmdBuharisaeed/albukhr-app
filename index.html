@@ -5,65 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ALBUKHR Projects</title>
 
-<!-- 🔥 Pi SDK (MUST BE FIRST) -->
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-<!-- ✅ AUTH SYSTEM -->
-<script src="js/auth.js"></script>
-
-<!-- 🚀 INIT APP -->
-<script>
-window.addEventListener("DOMContentLoaded", async ()=>{
-
-  // ✅ Init Pi
-  if(window.Pi){
-    Pi.init({
-      version: "2.0",
-      sandbox: false
-    });
-  }
-
-  // ✅ Ensure user
-  const user = await ensurePiAuth();
-
-  if(!user){
-  console.warn("User not ready yet");
-  return;
-  }
-
-  // ✅ Global user
-  window.CURRENT_USER = user;
-
-  // 👉 Call your app
-  if(typeof startApp === "function"){
-    startApp(user);
-  }
-
-});
-</script>
-
-<script>
-async function startLogin(){
-
-  const user = await authenticatePi();
-
-  if(!user){
-    alert("Login failed");
-    return;
-  }
-
-  window.CURRENT_USER = user;
-
-  // close modal
-  const box = document.getElementById("loginBox");
-  if(box) box.style.display = "none";
-
-  updateUserUI();
-  loadHome();
-
-}
-</script>
-
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="css/albukhr-ui.css">
 <link rel="stylesheet" href="css/style.css">
@@ -97,19 +38,6 @@ async function startLogin(){
   </div>
 
  <div class="header-right">
-
-  <div class="header-btn user-profile" id="userBtn">
-
-  <div class="avatar" id="userAvatar">
-    👤
-  </div>
-
-  <div class="user-meta">
-    <span id="userName">Guest</span>
-    <small id="userStatus">Offline</small>
-  </div>
-
-  </div>
 
   <div class="header-btn notification-btn" onclick="openNotifications()">
     🔔
@@ -833,82 +761,6 @@ ai.classList.remove("minimized");
 });
 
 </script>
-
-<script>
-function handleAuth(){
-
-  const user = window.CURRENT_USER;
-
-  // ===============================
-  // NOT LOGGED IN
-  // ===============================
-  if(!user){
-
-    const box = document.getElementById("loginBox");
-
-    if(box){
-      box.style.display = "flex";
-    }else{
-      console.warn("loginBox not found");
-    }
-
-    return;
-  }
-
-  // ===============================
-  // SAFE USERNAME EXTRACTION
-  // ===============================
-  const username =
-    user.username ||
-    user?.user?.username ||
-    "User";
-
-  // ===============================
-  // LOGOUT CONFIRM
-  // ===============================
-  const confirmLogout = confirm(
-    "Logged in as @" + username + "\n\nLogout?"
-  );
-
-  if(confirmLogout){
-    logout();
-  }
-
-}
-</script>
-
-<script>
-function updateUserUI(){
-
-  const user = window.CURRENT_USER;
-
-  const nameEl = document.getElementById("userName");
-  const statusEl = document.getElementById("userStatus");
-  const avatarEl = document.getElementById("userAvatar");
-
-  if(!nameEl || !statusEl || !avatarEl) return;
-
-  if(user && user.username){
-
-    nameEl.innerText = "@" + user.username;
-    statusEl.innerText = "Online";
-    statusEl.style.color = "#0f7a3d";
-
-    avatarEl.innerText = user.username.charAt(0).toUpperCase();
-
-  }else{
-
-    nameEl.innerText = "Guest";
-    statusEl.innerText = "Tap to login";
-    statusEl.style.color = "#999";
-
-    avatarEl.innerText = "👤";
-
-  }
-
-}
-
-</script>
-   
+ 
 </body>
-        </html>
+</html>
