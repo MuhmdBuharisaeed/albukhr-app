@@ -3,25 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>ALBUKHR</title>
+<title>Pi Test</title>
 
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <style>
 body{
-  margin:0;
   font-family:sans-serif;
   display:flex;
   align-items:center;
   justify-content:center;
   height:100vh;
   flex-direction:column;
+  text-align:center;
 }
-
 button{
   padding:12px 20px;
   font-size:16px;
+  margin-top:20px;
 }
 </style>
 
@@ -29,55 +28,63 @@ button{
 
 <body>
 
-<h2>ALBUKHR</h2>
+<h2>ALBUKHR Pi Test</h2>
 
-<div id="status">Click to login</div>
+<div id="status">Initializing...</div>
 
 <button onclick="login()">Login with Pi</button>
 
 <script>
-let initialized = false;
+
+function setStatus(msg){
+  document.getElementById("status").innerText = msg;
+  console.log(msg);
+}
 
 async function login(){
 
   try{
 
-    if(!window.Pi){
-      document.getElementById("status").innerText =
-        "❌ Not Pi Browser";
+    // 1. check Pi browser
+    if(typeof window.Pi === "undefined"){
+      setStatus("❌ NOT PI BROWSER");
       return;
     }
 
-    // INIT ON CLICK (VERY IMPORTANT)
-    if(!initialized){
-      Pi.init({
-        version:"2.0",
-        sandbox:false
-      });
-      initialized = true;
-    }
+    setStatus("🔄 Initializing Pi...");
 
-    document.getElementById("status").innerText =
-      "🔐 Logging in...";
+    // 2. init
+    Pi.init({
+      version:"2.0",
+      sandbox:false
+    });
 
+    setStatus("🔐 Authenticating...");
+
+    // 3. auth
     const auth = await Pi.authenticate(['username']);
 
-    const username =
-      auth.user?.username || auth.username;
+    console.log("AUTH RESULT:", auth);
 
-    document.getElementById("status").innerText =
-      "✅ " + username;
+    const uid = auth.user?.uid || auth.uid;
+    const username = auth.user?.username || auth.username;
 
-  }catch(e){
+    if(!uid){
+      throw new Error("UID missing");
+    }
 
-    console.error(e);
+    setStatus("✅ SUCCESS: " + username);
 
-    document.getElementById("status").innerText =
-      "❌ Login Failed";
+  }catch(err){
+
+    console.error("FULL ERROR:", err);
+
+    setStatus("❌ ERROR: " + err.message);
 
   }
 
 }
+
 </script>
 
 </body>
