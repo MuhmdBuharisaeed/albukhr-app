@@ -3,88 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALBUKHR Projects</title>
+<title>ALBUKHR Pi Test</title>
 
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="css/albukhr-ui.css">
-<link rel="stylesheet" href="css/global-header.css">
-<link rel="stylesheet" href="global-buttons.css">
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <style>
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:6px;
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:#f5f5f5;
 }
+
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
 .brand{
   font-size:18px;
   font-weight:700;
 }
-</style>
 
-<!-- ✅ PI SDK FIRST -->
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+.status{
+  font-size:13px;
+}
+
+.center{
+  height:80vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+}
+</style>
 
 </head>
 
 <body>
 
-<header class="header">
-  <div class="header-left">
-    <span class="brand">ALBUKHR</span>
-  </div>
+<div class="header">
+  <div class="brand">ALBUKHR</div>
+  <div id="userBox" class="status">⏳ Loading...</div>
+</div>
 
-  <div class="header-right">
-
-    <div class="header-btn notification-btn">
-      🔔
-      <span id="notifBadge" class="notification-badge"></span>
-    </div>
-
-    <div class="header-btn menu-icon">☰</div>
-
-  </div>
-</header>
-
-<section class="stats">
-  <div class="stat-card">
-    <span>Total Staking</span>
-    <strong id="homeStake">0.00 Pi</strong>
-  </div>
-  <div class="stat-card">
-    <span>Total Rewards</span>
-    <strong id="homeReward">0.00 Pi</strong>
-  </div>
-</section>
-
-<div id="assetsContainer"></div>
-
-<!-- ================= PI AUTH ================= -->
+<div class="center">
+  <h2>Pi Login Test</h2>
+  <p>Testing Pi SDK connection...</p>
+</div>
 
 <script>
-function showUser(user){
-  const header = document.querySelector(".header-right");
 
-  let el = document.getElementById("piUser");
-
-  if(!el){
-    el = document.createElement("div");
-    el.id = "piUser";
-    el.style.color="#fff";
-    el.style.fontSize="12px";
-    el.style.marginRight="8px";
-    header.prepend(el);
-  }
-
-  el.innerText = "👤 "+user.username+" ✓";
+function setStatus(text){
+  document.getElementById("userBox").innerText = text;
 }
 
-function blockNonPi(){
+function showError(msg){
   document.body.innerHTML = `
   <div style="display:flex;justify-content:center;align-items:center;height:100vh;text-align:center;">
     <div>
-      <h2>🔐 Pi Browser Only</h2>
-      <p>Open this app inside Pi Browser</p>
+      <h2>❌ ${msg}</h2>
     </div>
   </div>`;
 }
@@ -93,100 +75,52 @@ async function initPi(){
 
   try{
 
-    if(!window.Pi){
-      blockNonPi();
-      return null;
+    // 1. check environment
+    if(typeof window.Pi === "undefined"){
+      showError("Not in Pi Browser");
+      return;
     }
 
-    console.log("Pi detected");
+    setStatus("🔄 Connecting...");
 
+    // 2. init
     Pi.init({
       version:"2.0",
-      sandbox:true   // ⚠️ IMPORTANT (test mode)
+      sandbox:true
     });
 
+    // 3. auth
     const auth = await Pi.authenticate(['username']);
 
-    console.log("AUTH:",auth);
+    console.log("AUTH:", auth);
 
-    const user = {
-      uid: auth.user.uid,
-      username: auth.user.username
-    };
+    if(!auth || !auth.user){
+      throw new Error("No user");
+    }
 
-    localStorage.setItem("pi_user",JSON.stringify(user));
+    const user = auth.user;
 
-    showUser(user);
+    // 4. success
+    setStatus("👤 " + user.username + " ✓");
 
-    return user;
+    document.querySelector(".center").innerHTML = `
+      <h2>✅ Login Successful</h2>
+      <p>Welcome ${user.username}</p>
+    `;
 
   }catch(err){
 
-    console.error("PI ERROR:",err);
+    console.error(err);
 
-    document.body.innerHTML = `
-    <div style="display:flex;justify-content:center;align-items:center;height:100vh;text-align:center;">
-      <div>
-        <h2>❌ Login Failed</h2>
-        <p>Try again in Pi Browser</p>
-      </div>
-    </div>`;
+    showError("Pi Login Failed");
 
-    return null;
   }
+
 }
-</script>
 
-<!-- ================= DATA ================= -->
+// RUN
+document.addEventListener("DOMContentLoaded", initPi);
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const supabase = window.supabase.createClient(
-  "https://qexmnghilahsvethlxem.supabase.co",
-  "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
-);
-
-async function loadHome(){
-
-  const { data } = await supabase
-    .from("stakes")
-    .select("*");
-
-  let totalStake = 0;
-  let totalReward = 0;
-
-  (data || []).forEach(s=>{
-    if(!s || s.type==="withdraw") return;
-
-    totalStake += Number(s.amount)||0;
-
-    totalReward += Math.max(
-      0,
-      (Number(s.reward)||0) - (Number(s.withdrawnReward)||0)
-    );
-  });
-
-  document.getElementById("homeStake").innerText =
-    totalStake.toFixed(2)+" Pi";
-
-  document.getElementById("homeReward").innerText =
-    totalReward.toFixed(2)+" Pi";
-}
-</script>
-
-<!-- ================= START APP ================= -->
-
-<script>
-document.addEventListener("DOMContentLoaded", async ()=>{
-
-  const user = await initPi();
-
-  if(!user) return;
-
-  loadHome();
-
-});
 </script>
 
 </body>
