@@ -853,71 +853,39 @@ ai.classList.remove("minimized");
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <script>
-function showPiUser(user){
-
-  const header = document.querySelector(".header-right");
-
-  let el = document.getElementById("piUser");
-
-  if(!el){
-    el = document.createElement("div");
-    el.id = "piUser";
-    el.style.fontSize = "12px";
-    el.style.color = "#fff";
-    el.style.marginRight = "8px";
-    header.prepend(el);
-  }
-
-  el.innerText = "👤 " + user.username + " ✓";
-}
-
-/* 🚫 BLOCK NON-PI */
-function blockNonPi(){
-
-  document.body.innerHTML = `
-    <div style="
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      height:100vh;
-      flex-direction:column;
-      font-family:sans-serif;
-      text-align:center;
-      padding:20px;
-    ">
-      <h2>🔐 Pi Browser Required</h2>
-      <p>Open this app inside Pi Browser to continue.</p>
-    </div>
-  `;
-}
-
-/* 🔥 MAIN AUTH */
 async function initPiAuth(){
 
   try{
 
-    // ❌ Not Pi → BLOCK
-    if(typeof window.Pi === "undefined"){
+    if(!window.Pi){
       blockNonPi();
       return null;
     }
 
-    // ✅ INIT
+    console.log("Pi detected");
+
+    // ✅ USE SANDBOX FIRST
     Pi.init({
       version: "2.0",
-      sandbox: false
+      sandbox: true
     });
 
-    // 🔥 FORCE LOGIN
-    const raw = await Pi.authenticate(['username']);
+    // ✅ COMPLETE AUTH
+    const scopes = ['username','payments'];
+
+    const auth = await Pi.authenticate(scopes, function(payment){
+      console.log("Payment event:", payment);
+    });
+
+    console.log("Auth result:", auth);
 
     const user = {
-      uid: raw.uid || raw?.user?.uid,
-      username: raw.username || raw?.user?.username
+      uid: auth.user.uid,
+      username: auth.user.username
     };
 
     if(!user.uid){
-      throw new Error("Invalid Pi user");
+      throw new Error("Invalid user");
     }
 
     localStorage.setItem("pi_user", JSON.stringify(user));
@@ -928,7 +896,7 @@ async function initPiAuth(){
 
   }catch(err){
 
-    console.error("Pi login error:", err);
+    console.error("FULL ERROR:", err);
 
     document.body.innerHTML = `
       <div style="
@@ -940,8 +908,8 @@ async function initPiAuth(){
         font-family:sans-serif;
         text-align:center;
       ">
-        <h2>❌ Login Failed</h2>
-        <p>Please reopen inside Pi Browser and try again.</p>
+        <h2>❌ Pi Login Failed</h2>
+        <p>Check Pi app configuration</p>
       </div>
     `;
 
@@ -949,18 +917,6 @@ async function initPiAuth(){
   }
 
 }
-
-/* 🚀 START APP */
-document.addEventListener("DOMContentLoaded", async ()=>{
-
-  const user = await initPiAuth();
-
-  if(!user) return;
-
-  // ✅ yanzu ne kawai app zai fara
-  loadHome();
-
-});
 </script>
   
 </body>
