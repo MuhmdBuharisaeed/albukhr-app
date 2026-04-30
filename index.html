@@ -884,6 +884,23 @@ function updateUserIndicator(user){
 
  }
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async ()=>{
+
+  // 👉 TEST CONFIG
+  if(typeof PROJECT_CONFIG === "undefined"){
+    console.error("PROJECT_CONFIG NOT LOADED");
+    return;
+  }
+
+  console.log("PROJECT_CONFIG OK");
+
+  // 👉 LOAD DATA
+  await loadHome();
+
+});
+</script>
   
 </body>
 </html>
