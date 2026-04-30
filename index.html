@@ -7,7 +7,6 @@
 
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="css/albukhr-ui.css">
-<link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/global-header.css">
 <link rel="stylesheet" href="global-buttons.css">
   
@@ -162,8 +161,23 @@ Albukhr AI is under development
 let lastScroll = 0;
 let threshold = 10;
 
-const dock =
-document.querySelector(".dock-nav");
+const dock = document.querySelector(".dock-nav");
+
+if(dock){
+  window.addEventListener("scroll",()=>{
+    let current = window.pageYOffset;
+
+    if(Math.abs(current-lastScroll)<=threshold) return;
+
+    if(current > lastScroll){
+      dock.classList.add("hide");
+    }else{
+      dock.classList.remove("hide");
+    }
+
+    lastScroll = current;
+  });
+}
 
 window.addEventListener("scroll",()=>{
 
@@ -366,53 +380,103 @@ X
 
 async function loadHome(){
 
-  if(typeof getAllStakesMerged !== "function") return;
+  try{
 
-  const stakes = await getAllStakesMerged(); // ✅ FIX
-
-  let userMap = {}, globalMap = {};
-  let totalStake=0, totalReward=0;
-
-  stakes.forEach(s=>{
-
-    if(s.type === "withdraw") return; // ✅ skip capital withdraw
-
-    const amount = Number(s.amount)||0;
-
-    const total = Number(s.reward) || 0;
-    const withdrawn = Number(s.withdrawnReward) || 0;
-
-    const reward = Math.max(0, total - withdrawn);
-
-    totalStake += amount;
-    totalReward += reward;
-
-    userMap[s.project] = (userMap[s.project]||0) + amount;
-
-    if(!globalMap[s.project]){
-      globalMap[s.project]={total:0, investors:0};
+    // ===== DEPENDENCY CHECK =====
+    if(typeof getAllStakesMerged !== "function"){
+      console.warn("getAllStakesMerged missing");
+      return;
     }
 
-    globalMap[s.project].total += amount;
+    const stakes = await getAllStakesMerged();
 
-  });
+    if(!Array.isArray(stakes)){
+      console.warn("Invalid stakes data");
+      return;
+    }
 
-  Object.keys(globalMap).forEach(project=>{
-    globalMap[project].investors =
-      stakes.filter(s =>
-        s.project===project && s.type !== "withdraw"
-      ).length;
-  });
+    // ===== MAPS =====
+    const userMap = {};
+    const globalMap = {};
+    const countMap = {}; // ✅ FIX performance
 
-  homeStake.innerText = totalStake.toFixed(2)+" Pi";
-  homeReward.innerText = totalReward.toFixed(2)+" Pi";
+    let totalStake = 0;
+    let totalReward = 0;
 
-  renderPopular(globalMap);
-  renderAssets(userMap, globalMap);
+    // ===== MAIN LOOP =====
+    stakes.forEach(s=>{
+
+      if(!s || s.type === "withdraw") return;
+
+      const amount = Number(s.amount) || 0;
+
+      const total = Number(s.reward) || 0;
+      const withdrawn = Number(s.withdrawnReward) || 0;
+
+      const reward = Math.max(0, total - withdrawn);
+
+      totalStake += amount;
+      totalReward += reward;
+
+      // ===== USER MAP =====
+      userMap[s.project] =
+        (userMap[s.project] || 0) + amount;
+
+      // ===== GLOBAL MAP =====
+      if(!globalMap[s.project]){
+        globalMap[s.project] = {
+          total:0,
+          investors:0
+        };
+      }
+
+      globalMap[s.project].total += amount;
+
+      // ===== INVESTOR COUNT (FAST) =====
+      countMap[s.project] =
+        (countMap[s.project] || 0) + 1;
+
+    });
+
+    // ===== ASSIGN COUNTS =====
+    Object.keys(globalMap).forEach(project=>{
+      globalMap[project].investors =
+        countMap[project] || 0;
+    });
+
+    // ===== SAFE DOM UPDATE =====
+    const stakeEl = document.getElementById("homeStake");
+    const rewardEl = document.getElementById("homeReward");
+
+    if(stakeEl){
+      stakeEl.innerText = totalStake.toFixed(2)+" Pi";
+    }
+
+    if(rewardEl){
+      rewardEl.innerText = totalReward.toFixed(2)+" Pi";
+    }
+
+    // ===== RENDER =====
+    if(typeof renderPopular === "function"){
+      renderPopular(globalMap);
+    }
+
+    if(typeof renderAssets === "function"){
+      renderAssets(userMap, globalMap);
+    }
+
+  }catch(err){
+    console.error("loadHome error:", err);
+  }
 
 }
 
 function renderPopular(globalMap){
+
+if(typeof PROJECT_CONFIG === "undefined"){
+  console.warn("PROJECT_CONFIG missing");
+  return;
+}
 
   const container = document.getElementById("popularProjects");
   container.innerHTML = "";
@@ -448,6 +512,11 @@ function renderPopular(globalMap){
 }
 
 function renderAssets(userMap, globalMap){
+
+if(typeof PROJECT_CONFIG === "undefined"){
+  console.warn("PROJECT_CONFIG missing");
+  return;
+}
 
   const container = document.getElementById("assetsContainer");
   container.innerHTML = "";
@@ -545,7 +614,12 @@ function closeDrawer(){
   document.getElementById("sideDrawer").classList.remove("open");
   document.getElementById("drawerOverlay").classList.remove("show");
 }
-document.querySelector(".menu-icon").addEventListener("click", openDrawer);
+document.addEventListener("DOMContentLoaded", ()=>{
+  const menu = document.querySelector(".menu-icon");
+  if(menu){
+    menu.addEventListener("click", openDrawer);
+  }
+});
 </script>
 
 <script src="js/security-core.js"></script>
@@ -745,6 +819,18 @@ ai.addEventListener("click",()=>{
 
 ai.classList.remove("minimized");
 
+});
+
+const countMap = {};
+
+stakes.forEach(s=>{
+  if(s.type !== "withdraw"){
+    countMap[s.project] = (countMap[s.project]||0)+1;
+  }
+});
+
+Object.keys(globalMap).forEach(project=>{
+  globalMap[project].investors = countMap[project] || 0;
 });
 
 </script>
