@@ -3,24 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pi Test</title>
+
+<title>ALBUKHR</title>
+
+<link rel="stylesheet" href="style.css">
 
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 body{
+  margin:0;
   font-family:sans-serif;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-  flex-direction:column;
-  text-align:center;
+  background:#f5f6f7;
 }
-button{
-  padding:12px 20px;
-  font-size:16px;
-  margin-top:20px;
+
+/* HEADER */
+.header{
+  background:#0f7a3d;
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+}
+
+.header-left{
+  font-weight:bold;
+  font-size:18px;
+}
+
+.header-right{
+  display:flex;
+  gap:10px;
+}
+
+.header-btn{
+  background:rgba(255,255,255,0.15);
+  padding:8px 10px;
+  border-radius:8px;
+}
+
+/* STATS */
+.stats{
+  display:flex;
+  gap:10px;
+  padding:12px;
+}
+
+.stat-card{
+  flex:1;
+  background:#fff;
+  border-radius:10px;
+  padding:12px;
+}
+
+.stat-card strong{
+  display:block;
+  margin-top:6px;
+  color:#0f7a3d;
+}
+
+/* SECTION */
+.section{
+  padding:12px;
+}
+
+.asset{
+  background:#fff;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:8px;
 }
 </style>
 
@@ -28,63 +81,153 @@ button{
 
 <body>
 
-<h2>ALBUKHR Pi Test</h2>
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">ALBUKHR</div>
 
-<div id="status">Initializing...</div>
+  <div class="header-right">
+    <div class="header-btn">🔔</div>
+    <div class="header-btn">☰</div>
+  </div>
+</header>
 
-<button onclick="login()">Login with Pi</button>
+<!-- STATS -->
+<section class="stats">
+  <div class="stat-card">
+    <span>Total Staking</span>
+    <strong id="stake">0.00 Pi</strong>
+  </div>
+
+  <div class="stat-card">
+    <span>Total Rewards</span>
+    <strong id="reward">0.00 Pi</strong>
+  </div>
+</section>
+
+<!-- ASSETS -->
+<section class="section">
+  <h3>Assets</h3>
+  <div id="assets"></div>
+</section>
+
+<!-- ================= PI AUTH ================= -->
 
 <script>
+let currentUser = null;
 
-function setStatus(msg){
-  document.getElementById("status").innerText = msg;
-  console.log(msg);
-}
-
-async function login(){
+async function initPiAuth(){
 
   try{
 
-    // 1. check Pi browser
-    if(typeof window.Pi === "undefined"){
-      setStatus("❌ NOT PI BROWSER");
-      return;
+    if(currentUser) return currentUser;
+
+    const saved = JSON.parse(localStorage.getItem("pi_user"));
+
+    if(saved && saved.uid){
+      currentUser = saved;
+      return saved;
     }
 
-    setStatus("🔄 Initializing Pi...");
+    if(!window.Pi){
+      throw new Error("Open in Pi Browser");
+    }
 
-    // 2. init
     Pi.init({
       version:"2.0",
       sandbox:false
     });
 
-    setStatus("🔐 Authenticating...");
-
-    // 3. auth
     const auth = await Pi.authenticate(['username']);
 
-    console.log("AUTH RESULT:", auth);
+    const user = {
+      uid: auth.user?.uid || auth.uid,
+      username: auth.user?.username || auth.username
+    };
 
-    const uid = auth.user?.uid || auth.uid;
-    const username = auth.user?.username || auth.username;
+    if(!user.uid) throw new Error("Invalid Pi user");
 
-    if(!uid){
-      throw new Error("UID missing");
-    }
+    localStorage.setItem("pi_user", JSON.stringify(user));
 
-    setStatus("✅ SUCCESS: " + username);
+    currentUser = user;
 
-  }catch(err){
+    return user;
 
-    console.error("FULL ERROR:", err);
+  }catch(e){
 
-    setStatus("❌ ERROR: " + err.message);
+    document.body.innerHTML = `
+      <h2 style="text-align:center;margin-top:40vh;">
+        ❌ Pi Login Failed
+      </h2>`;
 
+    return null;
   }
+}
+</script>
+
+<!-- ================= SUPABASE ================= -->
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://qexmnghilahsvethlxem.supabase.co",
+  "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+);
+
+async function loadData(){
+
+  const { data } = await supabase
+    .from("stakes")
+    .select("*");
+
+  let totalStake = 0;
+  let totalReward = 0;
+
+  const container = document.getElementById("assets");
+  container.innerHTML = "";
+
+  (data || []).forEach(s=>{
+
+    if(!s || s.type==="withdraw") return;
+
+    const amount = Number(s.amount)||0;
+    const reward = Math.max(
+      0,
+      (Number(s.reward)||0) - (Number(s.withdrawnReward)||0)
+    );
+
+    totalStake += amount;
+    totalReward += reward;
+
+    const div = document.createElement("div");
+    div.className = "asset";
+    div.innerText = s.project + " — " + amount.toFixed(2) + " Pi";
+
+    container.appendChild(div);
+
+  });
+
+  document.getElementById("stake").innerText =
+    totalStake.toFixed(2)+" Pi";
+
+  document.getElementById("reward").innerText =
+    totalReward.toFixed(2)+" Pi";
 
 }
+</script>
 
+<!-- ================= START ================= -->
+
+<script>
+document.addEventListener("DOMContentLoaded", async ()=>{
+
+  const user = await initPiAuth();
+
+  if(!user) return;
+
+  console.log("LOGGED:", user.username);
+
+  loadData();
+
+});
 </script>
 
 </body>
