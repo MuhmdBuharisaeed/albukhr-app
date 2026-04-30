@@ -3,9 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pi Test</title>
+<title>ALBUKHR Projects</title>
 
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/albukhr-ui.css">
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="global-buttons.css">
 
 <style>
 body{
@@ -26,20 +31,32 @@ button{
 
 </head>
 
+<body data-page="home">
+
+  <header class="header">
+
+  <div class="header-left">
+  <span class="brand">ALBUKHR</span>
+  </div>
+
+ <div class="header-right">
+
+  <div class="header-btn notification-btn" onclick="openNotifications()">
+    🔔
+    <span id="notifBadge" class="notification-badge"></span>
+  </div>
+
+  <div class="header-btn menu-icon">
+    ☰
+  </div>
+
+ </div>
+
+  </header>
+  
 <body>
 
-<header style="
-background:#0f7a3d;
-color:#fff;
-padding:12px;
-display:flex;
-justify-content:space-between;
-">
-  <div>ALBUKHR</div>
-  <div id="userBox">👤</div>
-</header>
 
-  
 <h2>ALBUKHR Pi Test</h2>
 
 <div id="status">Initializing...</div>
