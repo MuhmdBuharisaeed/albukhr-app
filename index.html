@@ -27,11 +27,18 @@
 
  <div class="header-right">
 
+  <!-- 👤 PI USER -->
+  <div id="piUserIndicator" class="header-user">
+    ⏳
+  </div>
+
+  <!-- 🔔 NOTIFICATION -->
   <div class="header-btn notification-btn" onclick="openNotifications()">
     🔔
     <span id="notifBadge" class="notification-badge"></span>
   </div>
 
+  <!-- ☰ MENU -->
   <div class="header-btn menu-icon">
     ☰
   </div>
@@ -871,6 +878,20 @@ function initPiSafe(){
   return true;
 }
 
+function updateUserUI(user){
+
+  const el = document.getElementById("piUserIndicator");
+
+  if(!el) return;
+
+  if(user){
+    el.innerText = "👤 " + user.username + " ✓";
+  }else{
+    el.innerText = "❌";
+  }
+
+}
+
 async function ensureAuth(){
 
   try{
@@ -920,9 +941,10 @@ document.addEventListener("DOMContentLoaded", async ()=>{
 
   const user = await ensureAuth();
 
+  updateUserUI(user);
+
   if(!user) return;
 
-  // ✅ yanzu safe
   loadHome();
 
 });
