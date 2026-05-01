@@ -396,8 +396,13 @@ async function load(){
 try{
   data = await getProjectTotals(PROJECT_NAME);
 }catch(e){
-  console.error(e);
-  alert("Failed to load data");
+  console.error("LOAD ERROR:", e);
+
+  alert(
+    "Load failed:\n" +
+    (e.message || JSON.stringify(e))
+  );
+
   return;
 }
 
