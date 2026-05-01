@@ -1,3 +1,7 @@
+app.get("/", (req, res) => {
+  res.send("ALBUKHR API RUNNING 🚀");
+});
+
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
