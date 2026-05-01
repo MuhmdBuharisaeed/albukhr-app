@@ -299,8 +299,19 @@ function closeWithdraw(){
 
 async function confirmStake(){
 
+  if(typeof Pi === "undefined"){
+    alert("Open inside Pi Browser");
+    return;
+  }
+
   const amount = Number(amountInput.value);
   const duration = Number(durationSelect.value);
+  const min = getMinStake(PROJECT_NAME);
+
+  if(!amount || amount < min){
+    alert("Minimum stake is " + min + " Pi");
+    return;
+  }
 
   const user = JSON.parse(localStorage.getItem("pi_user"));
 
@@ -309,49 +320,70 @@ async function confirmStake(){
     return;
   }
 
+  const btn = document.querySelector("#stakeModal .primary");
+  btn.innerText = "Processing...";
+  btn.disabled = true;
+
   try{
 
-    await Pi.createPayment({
+    /* ========================
+       1. CREATE PAYMENT
+    ======================== */
+    const payment = await Pi.createPayment({
       amount: amount,
       memo: `Stake in ${CONFIG.title}`,
       metadata: {
         project: PROJECT_NAME,
         user: user.uid,
-        duration: duration
+        duration: duration   // 👈 IMPORTANT
       }
-    }, {
-
-      onReadyForServerApproval: function(paymentId){
-
-        fetch("https://albukhr-api.onrender.com/approve-payment", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ paymentId })
-        });
-
-      },
-
-      onReadyForServerCompletion: function(paymentId, txid){
-
-        fetch("https://albukhr-api.onrender.com/complete-payment", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ paymentId, txid })
-        })
-        .then(()=>{
-          alert("Stake successful");
-          load(); // refresh UI
-        });
-
-      }
-
     });
 
-  }catch(err){
-    console.error(err);
-    alert("Payment failed");
+    const paymentId = payment.identifier;
+
+    /* ========================
+       2. APPROVE (BACKEND)
+    ======================== */
+    await fetch("https://albukhr-api.onrender.com/approve-payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ paymentId })
+    });
+
+    /* ========================
+       3. COMPLETE (BACKEND)
+    ======================== */
+    await fetch("https://albukhr-api.onrender.com/complete-payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        paymentId,
+        txid: payment.transaction.txid
+      })
+    });
+
+    /* ========================
+       SUCCESS UI
+    ======================== */
+    successText.innerText =
+      `You staked ${amount} Pi in ${CONFIG.title}`;
+
+    closeModal();
+    successModal.style.display = "flex";
+
+    await load();
+
+  }catch(e){
+    console.error(e);
+    alert("Payment failed or cancelled");
   }
 
+  btn.innerText = "Confirm";
+  btn.disabled = false;
 }
 
 /* ===============================
