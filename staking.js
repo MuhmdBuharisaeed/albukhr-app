@@ -598,3 +598,10 @@ function getStakes(){ return getAllStakesMerged(); }
 function getInternalTotals(){ return getProjectTotals(); }
 function getInternalProjectTotals(p){ return getProjectTotals(p); }
 function addInternalStake(p){ return addStake(p); }
+window.getProjectTotals = getProjectTotals;
+
+window.getAllStakesMerged = getAllStakesMerged;
+window.addStake = addStake;
+window.withdrawProjectReward = withdrawProjectReward;
+window.withdrawCapital = withdrawCapital;
+window.getProjectTotals = getProjectTotals;
