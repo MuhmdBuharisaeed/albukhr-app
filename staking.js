@@ -291,14 +291,14 @@ if(!user?.uid){
   try{
 
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}
-      {
-        headers:{
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    }
+  }
+);
 
     if(!res.ok){
       const err = await res.text();
@@ -375,14 +375,14 @@ async function getUserStakes(){
   const user = getCurrentUser();
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
     }
-  );
+  }
+);
 
   const data = await res.json();
 
@@ -408,15 +408,15 @@ if(!user?.uid){
   }
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&user_id=eq.${user.uid}
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
     }
-  );
-
+  }
+);
+  
   if(!res.ok){
     const err = await res.text();
     console.error(err);
@@ -525,14 +525,14 @@ if(!user?.uid){
   }
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&user_id=eq.${user.uid}&order=created_at.asc`,
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
     }
-  );
+  }
+);
 
   let stakes = await res.json();
 
@@ -598,3 +598,10 @@ function getStakes(){ return getAllStakesMerged(); }
 function getInternalTotals(){ return getProjectTotals(); }
 function getInternalProjectTotals(p){ return getProjectTotals(p); }
 function addInternalStake(p){ return addStake(p); }
+
+window.getProjectTotals = getProjectTotals;
+window.getAllStakesMerged = getAllStakesMerged;
+window.addStake = addStake;
+window.withdrawProjectReward = withdrawProjectReward;
+window.withdrawCapital = withdrawCapital;
+window.getProjectTotals = getProjectTotals;
