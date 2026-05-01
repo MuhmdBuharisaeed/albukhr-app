@@ -90,7 +90,7 @@ function getRate(project,duration){
 async function payWithPi({amount, memo, metadata}){
 
   if(typeof Pi === "undefined"){
-    throw new Error("❌ Open inside Pi Browser");
+    throw new Error("Open inside Pi Browser");
   }
 
   return new Promise((resolve, reject) => {
@@ -101,33 +101,37 @@ async function payWithPi({amount, memo, metadata}){
       metadata
     },{
 
-      onReadyForServerApproval: function(paymentId){
+      onReadyForServerApproval: async function(paymentId){
         console.log("✅ Ready:", paymentId);
-      },
 
-      onReadyForServerCompletion: function(paymentId, txid){
-        console.log("🎉 Completed:", txid);
-
-         // 🔥 VALIDATION
-         if(!paymentId || !txid){
-  reject(new Error("Invalid Pi transaction"));
-  return;
-         }
-
-        resolve({
-          paymentId,
-          txid
+        // 🔥 CALL YOUR BACKEND
+        await fetch("https://albukhr-api.onrender.com/approve-payment",{
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ paymentId })
         });
       },
 
-      onCancel: function(paymentId){
-        console.warn("❌ Cancelled:", paymentId);
+      onReadyForServerCompletion: async function(paymentId, txid){
+        console.log("🎉 Completed:", txid);
+
+        // 🔥 COMPLETE ON SERVER
+        await fetch("https://albukhr-api.onrender.com/complete-payment",{
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ paymentId, txid })
+        });
+
+        resolve({ paymentId, txid });
+      },
+
+      onCancel: function(){
         reject(new Error("User cancelled"));
       },
 
-      onError: function(error){
-        console.error("❌ Pi Error:", error);
-        reject(error);
+      onError: function(err){
+        console.error(err);
+        reject(err);
       }
 
     });
