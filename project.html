@@ -326,32 +326,35 @@ async function confirmStake(){
   btn.disabled = true;
 
   try{
-  const res = await addStake({
-    project: PROJECT_NAME,
-    amount: amount,
-    duration: duration
-  });
 
-  if(res?.error){
-    alert(res.error);
-    return;
+    const res = await addStake({
+      project: PROJECT_NAME,
+      amount: amount,
+      duration: duration
+    });
+
+    if(res?.error){
+      alert(res.error);
+      return;
+    }
+
+    successText.innerText =
+      `You staked ${amount} Pi for ${duration} days`;
+
+    closeModal();
+    successModal.style.display = "flex";
+
+    await load();
+
+  }catch(e){
+    console.error(e);
+    alert("Something went wrong");
   }
 
-  successText.innerText =
-    `You staked ${amount} Pi for ${duration} days`;
-
-  closeModal();
-  successModal.style.display = "flex";
-
-  await load();
-
-}catch(e){
-  console.error(e);
-  alert("Something went wrong");
+  // ✅ ALWAYS RESET BUTTON
+  btn.innerText = "Confirm";
+  btn.disabled = false;
 }
-
-btn.innerText = "Confirm";
-btn.disabled = false;
 
     /* ========================
        1. CREATE PAYMENT
