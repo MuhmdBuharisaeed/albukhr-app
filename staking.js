@@ -90,7 +90,7 @@ function getRate(project,duration){
 async function payWithPi({amount, memo, metadata}){
 
   if(typeof Pi === "undefined"){
-    throw new Error("Open inside Pi Browser");
+    throw new Error("❌ Open inside Pi Browser");
   }
 
   return new Promise((resolve, reject) => {
@@ -101,37 +101,33 @@ async function payWithPi({amount, memo, metadata}){
       metadata
     },{
 
-      onReadyForServerApproval: async function(paymentId){
+      onReadyForServerApproval: function(paymentId){
         console.log("✅ Ready:", paymentId);
-
-        // 🔥 CALL YOUR BACKEND
-        await fetch("https://albukhr-api.onrender.com/approve-payment",{
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify({ paymentId })
-        });
       },
 
-      onReadyForServerCompletion: async function(paymentId, txid){
+      onReadyForServerCompletion: function(paymentId, txid){
         console.log("🎉 Completed:", txid);
 
-        // 🔥 COMPLETE ON SERVER
-        await fetch("https://albukhr-api.onrender.com/complete-payment",{
-          method:"POST",
-          headers:{ "Content-Type":"application/json" },
-          body: JSON.stringify({ paymentId, txid })
-        });
+         // 🔥 VALIDATION
+         if(!paymentId || !txid){
+  reject(new Error("Invalid Pi transaction"));
+  return;
+         }
 
-        resolve({ paymentId, txid });
+        resolve({
+          paymentId,
+          txid
+        });
       },
 
-      onCancel: function(){
+      onCancel: function(paymentId){
+        console.warn("❌ Cancelled:", paymentId);
         reject(new Error("User cancelled"));
       },
 
-      onError: function(err){
-        console.error(err);
-        reject(err);
+      onError: function(error){
+        console.error("❌ Pi Error:", error);
+        reject(error);
       }
 
     });
@@ -602,10 +598,3 @@ function getStakes(){ return getAllStakesMerged(); }
 function getInternalTotals(){ return getProjectTotals(); }
 function getInternalProjectTotals(p){ return getProjectTotals(p); }
 function addInternalStake(p){ return addStake(p); }
-window.getProjectTotals = getProjectTotals;
-
-window.getAllStakesMerged = getAllStakesMerged;
-window.addStake = addStake;
-window.withdrawProjectReward = withdrawProjectReward;
-window.withdrawCapital = withdrawCapital;
-window.getProjectTotals = getProjectTotals;
