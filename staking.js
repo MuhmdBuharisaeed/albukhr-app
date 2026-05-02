@@ -291,15 +291,15 @@ if(!user?.uid){
   try{
 
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}
-      {
-        headers:{
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
-
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    }
+  }
+);
+     
     if(!res.ok){
       const err = await res.text();
       console.error("❌ Fetch error:", err);
@@ -375,15 +375,15 @@ async function getUserStakes(){
   const user = getCurrentUser();
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
     }
-  );
-
+  }
+);
+   
   const data = await res.json();
 
   return Array.isArray(data) ? data : [];
@@ -408,15 +408,15 @@ if(!user?.uid){
   }
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&user_id=eq.${user.uid}
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&user_id=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
     }
-  );
-
+  }
+);
+   
   if(!res.ok){
     const err = await res.text();
     console.error(err);
