@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pi Test</title>
+</head>
+<body>
+
+<h2>Pi Payment Test</h2>
+
+<button onclick="testPayment()">Test Payment</button>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<script>
+Pi.init({ version: "2.0", sandbox: true });
+
+function testPayment(){
+
+  Pi.createPayment(
+    {
+      amount: 1,
+      memo: "Test Payment",
+      metadata: {}
+    },
+    {
+      onReadyForServerApproval: (id)=>{
+        alert("READY: " + id);
+      },
+
+      onReadyForServerCompletion: (id, txid)=>{
+        alert("DONE: " + txid);
+      },
+
+      onCancel: ()=>{
+        alert("CANCELLED");
+      },
+
+      onError: (e)=>{
+        alert("ERROR: " + JSON.stringify(e));
+      }
+    }
+  );
+
+}
+</script>
+
+</body>
+</html>
