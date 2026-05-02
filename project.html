@@ -330,42 +330,64 @@ async function confirmStake(){
     /* ========================
        1. CREATE PAYMENT
     ======================== */
-    const payment = await Pi.createPayment({
-      amount: amount,
-      memo: `Stake in ${CONFIG.title}`,
-      metadata: {
-        project: PROJECT_NAME,
-        user: user.uid,
-        duration: duration   // 👈 IMPORTANT
-      }
-    });
 
-    const paymentId = payment.identifier;
+    await new Promise((resolve, reject) => {
 
-    /* ========================
-       2. APPROVE (BACKEND)
-    ======================== */
-    await fetch("https://albukhr-api.onrender.com/approve-payment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ paymentId })
-    });
+  Pi.createPayment({
+    amount: amount,
+    memo: `Stake in ${CONFIG.title}`,
+    metadata: {
+      project: PROJECT_NAME,
+      user: user.uid,
+      duration: duration
+    }
 
-    /* ========================
-       3. COMPLETE (BACKEND)
-    ======================== */
-    await fetch("https://albukhr-api.onrender.com/complete-payment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        paymentId,
-        txid: payment.transaction.txid
-      })
-    });
+  }, {
+
+    onReadyForServerApproval: async function(paymentId){
+
+      console.log("APPROVE:", paymentId);
+
+      await fetch("https://albukhr-api.onrender.com/approve-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ paymentId })
+      });
+
+    },
+
+    onReadyForServerCompletion: async function(paymentId, txid){
+
+      console.log("COMPLETE:", txid);
+
+      await fetch("https://albukhr-api.onrender.com/complete-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          paymentId,
+          txid
+        })
+      });
+
+      resolve(); // ✅ SUCCESS
+
+    },
+
+    onCancel: function(){
+      reject("User cancelled");
+    },
+
+    onError: function(err){
+      reject(err);
+    }
+
+  });
+
+});
 
     /* ========================
        SUCCESS UI
