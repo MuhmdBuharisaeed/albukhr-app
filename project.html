@@ -401,8 +401,7 @@ async function confirmStake(){
     await load();
 
   catch(e){
-  console.error("REAL ERROR:", e);
-  alert("ERROR:\n" + (e?.message || e));
+  alert("Payment failed or cancelled");
   }
 
   btn.innerText = "Confirm";
