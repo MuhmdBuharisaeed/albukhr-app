@@ -184,10 +184,19 @@ Cancel
 <!-- 2. AUTH ENGINE -->
 <script src="js/pi-auth.js"></script>
 
-<!-- 3. INIT -->
+<!-- 3. WAIT + INIT -->
 <script>
-initPi();
-ensurePiAuth();
+document.addEventListener("DOMContentLoaded", async () => {
+
+  if(typeof initPi === "function"){
+    initPi();
+  }
+
+  if(typeof ensurePiAuth === "function"){
+    await ensurePiAuth();
+  }
+
+});
 </script>
 
 <!-- 4. OTHER FILES -->
