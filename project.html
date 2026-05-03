@@ -400,9 +400,9 @@ async function confirmStake(){
 
     await load();
 
-  }catch(e){
-    console.error(e);
-    alert("Payment failed or cancelled");
+  catch(e){
+  console.error("REAL ERROR:", e);
+  alert("ERROR:\n" + (e?.message || e));
   }
 
   btn.innerText = "Confirm";
