@@ -336,6 +336,12 @@ async function confirmStake(){
 
   try{
 
+     // 🔥 WAKE SERVER
+await fetch("https://albukhr-api.onrender.com/ping");
+
+// dan jira kadan
+await new Promise(r => setTimeout(r, 2000));
+    
     await new Promise((resolve, reject) => {
 
       Pi.createPayment({
