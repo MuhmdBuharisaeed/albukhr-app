@@ -333,90 +333,84 @@ async function confirmStake(){
   const btn = document.querySelector("#stakeModal .primary");
   btn.innerText = "Processing...";
   btn.disabled = true;
+  
+         --------------
+try{
 
-  try{
+  await new Promise((resolve, reject) => {
 
-    /* ========================
-       1. CREATE PAYMENT
-    ======================== */
+    Pi.createPayment({
+      amount: amount,
+      memo: `Stake in ${CONFIG.title}`,
+      metadata: {
+        project: PROJECT_NAME,
+        user: user.uid,
+        duration: duration
+      }
 
-    await new Promise((resolve, reject) => {
+    }, {
 
-  Pi.createPayment({
-    amount: amount,
-    memo: `Stake in ${CONFIG.title}`,
-    metadata: {
-      project: PROJECT_NAME,
-      user: user.uid,
-      duration: duration
-    }
+      onReadyForServerApproval: async function(paymentId){
 
-  }, {
+        console.log("APPROVE:", paymentId);
 
-    onReadyForServerApproval: async function(paymentId){
+        await fetch("https://albukhr-api.onrender.com/approve-payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ paymentId })
+        });
 
-      console.log("APPROVE:", paymentId);
+      },
 
-      await fetch("https://albukhr-api.onrender.com/approve-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ paymentId })
-      });
+      onReadyForServerCompletion: async function(paymentId, txid){
 
-    },
+        console.log("COMPLETE:", txid);
 
-    onReadyForServerCompletion: async function(paymentId, txid){
+        await fetch("https://albukhr-api.onrender.com/complete-payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            paymentId,
+            txid
+          })
+        });
 
-      console.log("COMPLETE:", txid);
+        resolve(); // ✅ SUCCESS
 
-      await fetch("https://albukhr-api.onrender.com/complete-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          paymentId,
-          txid
-        })
-      });
+      },
 
-      resolve(); // ✅ SUCCESS
+      onCancel: function(){
+        reject("User cancelled");
+      },
 
-    },
+      onError: function(err){
+        reject(err);
+      }
 
-    onCancel: function(){
-      reject("User cancelled");
-    },
-
-    onError: function(err){
-      reject(err);
-    }
+    });
 
   });
 
-});
+  // ✅ SUCCESS UI
+  successText.innerText =
+    `You staked ${amount} Pi in ${CONFIG.title}`;
 
-    /* ========================
-       SUCCESS UI
-    ======================== */
-    successText.innerText =
-      `You staked ${amount} Pi in ${CONFIG.title}`;
+  closeModal();
+  successModal.style.display = "flex";
 
-    closeModal();
-    successModal.style.display = "flex";
+  await load();
 
-    await load();
+}catch(e){
 
-  catch(e){
-  alert("Payment failed or cancelled");
-  }
+  console.error("REAL ERROR:", e);
+  alert(e || "Payment failed");
 
-  btn.innerText = "Confirm";
-  btn.disabled = false;
 }
-
+  
 /* ===============================
    LOAD
 =============================== */
@@ -770,7 +764,7 @@ let total = 0;
 
 const now = Date.now();
 
-data.stakes.forEach(s=>{
+data. forEach(s=>{
 
 if(now >= (s.unlockTime||0)){
 total += Number(s.amount)||0;
