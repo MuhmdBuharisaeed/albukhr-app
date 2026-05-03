@@ -18,7 +18,7 @@ async function initPi(){
 
   Pi.init({
     version: "2.0",
-    sandbox: false // 🔥 tabbatar wannan
+    sandbox: true // 🔥 tabbatar wannan
   });
 
   __pi_initialized = true;
