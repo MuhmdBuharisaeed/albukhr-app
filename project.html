@@ -336,11 +336,9 @@ async function confirmStake(){
 
   try{
 
-     // 🔥 WAKE SERVER
+     // 🔥 WAKE SERVER FAST
 await fetch("https://albukhr-api.onrender.com/ping");
-
-// dan jira kadan
-await new Promise(r => setTimeout(r, 10000));
+await fetch("https://albukhr-api.onrender.com/ping");
     
     await new Promise((resolve, reject) => {
 
@@ -357,32 +355,62 @@ await new Promise(r => setTimeout(r, 10000));
 
         onReadyForServerApproval: async function(paymentId){
 
-          await fetch("https://albukhr-api.onrender.com/approve-payment", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ paymentId })
-          });
+  try{
 
-        },
+    const res = await fetch("https://albukhr-api.onrender.com/approve-payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ paymentId })
+    });
+
+    const data = await res.json();
+
+    if(!data.success){
+      throw new Error("Approval failed");
+    }
+
+    console.log("✅ Approved");
+
+  }catch(e){
+    console.error("APPROVE ERROR:", e);
+    throw e;
+  }
+
+},
 
         onReadyForServerCompletion: async function(paymentId, txid){
 
-          await fetch("https://albukhr-api.onrender.com/complete-payment", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              paymentId,
-              txid
-            })
-          });
+  try{
 
-          resolve();
+    const res = await fetch("https://albukhr-api.onrender.com/complete-payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        paymentId,
+        txid
+      })
+    });
 
-        },
+    const data = await res.json();
+
+    if(!data.success){
+      throw new Error("Completion failed");
+    }
+
+    console.log("🎉 Completed");
+
+    resolve();
+
+  }catch(e){
+    console.error("COMPLETE ERROR:", e);
+    reject(e);
+  }
+
+},
 
         onCancel: () => reject("User cancelled"),
         onError: reject
