@@ -340,56 +340,58 @@ async function confirmStake(){
 await fetch("https://albukhr-api.onrender.com/ping");
 
 // dan jira kadan
-await new Promise(r => setTimeout(r, 10000));
+await new Promise(r => setTimeout(r, 1500));
     
     await new Promise((resolve, reject) => {
 
-      Pi.createPayment({
-        amount,
-        memo: `Stake in ${CONFIG.title}`,
-        metadata: {
-          project: PROJECT_NAME,
-          user: user.uid,
-          duration
-        }
+  Pi.createPayment({
+    amount,
+    memo: `Stake in ${CONFIG.title}`,
+    metadata: {
+      project: PROJECT_NAME,
+      user: user.uid,
+      duration
+    }
 
-      }, {
+  }, {
 
-        onReadyForServerApproval: async function(paymentId){
+    // ✅ FAST APPROVE (NO AWAIT)
+    onReadyForServerApproval: function(paymentId){
 
-          await fetch("https://albukhr-api.onrender.com/approve-payment", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ paymentId })
-          });
-
+      fetch("https://albukhr-api.onrender.com/approve-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
         },
+        body: JSON.stringify({ paymentId })
+      }).catch(err => console.error(err));
 
-        onReadyForServerCompletion: async function(paymentId, txid){
+    },
 
-          await fetch("https://albukhr-api.onrender.com/complete-payment", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              paymentId,
-              txid
-            })
-          });
+    // ✅ FAST COMPLETE (NO AWAIT)
+    onReadyForServerCompletion: function(paymentId, txid){
 
-          resolve();
-
+      fetch("https://albukhr-api.onrender.com/complete-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
         },
+        body: JSON.stringify({
+          paymentId,
+          txid
+        })
+      }).catch(err => console.error(err));
 
-        onCancel: () => reject("User cancelled"),
-        onError: reject
+      resolve(); // 🔥 resolve immediately
 
-      });
+    },
 
-    });
+    onCancel: () => reject("User cancelled"),
+    onError: reject
+
+  });
+
+});
 
     successText.innerText =
       `You staked ${amount} Pi in ${CONFIG.title}`;
