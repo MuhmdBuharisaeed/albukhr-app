@@ -355,38 +355,30 @@ await new Promise(r => setTimeout(r, 10000));
 
       }, {
 
-        onReadyForServerApproval: function(paymentId){
+        onReadyForServerApproval: async function(paymentId){
 
-  console.log("APPROVE FAST:", paymentId);
+          await fetch("https://albukhr-api.onrender.com/approve-payment", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ paymentId })
+          });
 
-  // 🔥 NO AWAIT (IMPORTANT)
-  fetch("https://albukhr-api.onrender.com/approve-payment", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ paymentId })
-  }).catch(err => console.error(err));
+        },
 
-},
+        onReadyForServerCompletion: async function(paymentId, txid){
 
-        onReadyForServerCompletion: function(paymentId, txid){
-
-  console.log("COMPLETE FAST:", txid);
-
-  // 🔥 NO await
-  fetch("https://albukhr-api.onrender.com/complete-payment", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      paymentId,
-      txid
-    })
-  }).catch(err => console.error("Complete error:", err));
-
-},
+          await fetch("https://albukhr-api.onrender.com/complete-payment", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              paymentId,
+              txid
+            })
+          });
 
           resolve();
 
