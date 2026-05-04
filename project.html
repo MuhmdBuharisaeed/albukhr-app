@@ -340,7 +340,7 @@ async function confirmStake(){
 await fetch("https://albukhr-api.onrender.com/ping");
 
 // dan jira kadan
-await new Promise(r => setTimeout(r, 5500));
+await new Promise(r => setTimeout(r, 10000));
     
     await new Promise((resolve, reject) => {
 
@@ -367,26 +367,22 @@ await new Promise(r => setTimeout(r, 5500));
 
         },
 
-        onReadyForServerApproval: function(paymentId){
+        onReadyForServerCompletion: async function(paymentId, txid){
 
-  fetch("https://albukhr-api.onrender.com/approve-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ paymentId })
-  }).catch(console.error);
+          await fetch("https://albukhr-api.onrender.com/complete-payment", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              paymentId,
+              txid
+            })
+          });
 
-},
+          resolve();
 
-onReadyForServerCompletion: function(paymentId, txid){
-
-  fetch("https://albukhr-api.onrender.com/complete-payment", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ paymentId, txid })
-  }).catch(console.error);
-
-  resolve();
-}
+        },
 
         onCancel: () => reject("User cancelled"),
         onError: reject
