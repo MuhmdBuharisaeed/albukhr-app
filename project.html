@@ -353,11 +353,11 @@ await fetch("https://albukhr-api.onrender.com/ping");
 
       }, {
 
-        onReadyForServerApproval: async function(paymentId){
+  onReadyForServerApproval: async function(paymentId){
 
   try{
 
-    const res = await fetch("https://albukhr-api.onrender.com/approve-payment", {
+    await fetch("https://albukhr-api.onrender.com/approve-payment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -365,20 +365,13 @@ await fetch("https://albukhr-api.onrender.com/ping");
       body: JSON.stringify({ paymentId })
     });
 
-    const data = await res.json();
-
-    if(!data.success){
-      throw new Error("Approval failed");
-    }
-
-    console.log("✅ Approved");
+    console.log("✅ Approval request sent");
 
   }catch(e){
     console.error("APPROVE ERROR:", e);
-    throw e;
   }
 
-},
+  }
 
         onReadyForServerCompletion: async function(paymentId, txid){
 
