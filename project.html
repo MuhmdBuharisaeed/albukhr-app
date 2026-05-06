@@ -337,8 +337,7 @@ async function confirmStake(){
   try{
 
      // 🔥 WAKE SERVER FAST
-await fetch("https://albukhr-api.onrender.com/ping");
-await fetch("https://albukhr-api.onrender.com/ping");
+
     
     await new Promise((resolve, reject) => {
 
@@ -353,17 +352,20 @@ await fetch("https://albukhr-api.onrender.com/ping");
 
       }, {
 
-        onReadyForServerApproval: async function(paymentId){
+onReadyForServerApproval: async function(paymentId){
 
   try{
 
-    const res = await fetch("https://albukhr-api.onrender.com/approve-payment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ paymentId })
-    });
+    const res = await fetch(
+      "https://albukhr-api-production.up.railway.app/approve-payment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ paymentId })
+      }
+    );
 
     const data = await res.json();
 
@@ -380,21 +382,24 @@ await fetch("https://albukhr-api.onrender.com/ping");
 
 },
 
-        onReadyForServerCompletion: async function(paymentId, txid){
+onReadyForServerCompletion: async function(paymentId, txid){
 
   try{
 
-    const res = await fetch("https://albukhr-api.onrender.com/complete-payment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        paymentId,
-        txid
-      })
-    });
-
+    const res = await fetch(
+      "https://albukhr-api-production.up.railway.app/complete-payment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          paymentId,
+          txid
+        })
+      }
+    );
+  
     const data = await res.json();
 
     if(!data.success){
