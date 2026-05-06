@@ -337,8 +337,9 @@ async function confirmStake(){
   try{
 
      // 🔥 WAKE SERVER FAST
+await fetch("https://albukhr-api-production.up.railway.app/ping");
+await fetch("https://albukhr-api-production.up.railway.app/ping");
 
-    
     await new Promise((resolve, reject) => {
 
       Pi.createPayment({
