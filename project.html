@@ -342,6 +342,7 @@ await fetch("https://albukhr-api-production.up.railway.app/ping");
 
     await new Promise((resolve, reject) => {
 
+      console.log("AUTH USER:", user);
       Pi.createPayment({
         amount: amount,
         memo: `Stake in ${CONFIG.title}`,
@@ -359,6 +360,7 @@ onReadyForServerApproval: async function(paymentId){
 
   try{
 
+    console.log("PAYMENT TO APPROVE:", paymentId);
     const res = await fetch(
       "https://albukhr-api-production.up.railway.app/approve-payment",
       {
