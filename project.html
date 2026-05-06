@@ -343,8 +343,10 @@ await fetch("https://albukhr-api-production.up.railway.app/ping");
     await new Promise((resolve, reject) => {
 
       Pi.createPayment({
-        amount,
+        amount: amount,
         memo: `Stake in ${CONFIG.title}`,
+        uid: user.uid,
+
         metadata: {
           project: PROJECT_NAME,
           user: user.uid,
