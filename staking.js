@@ -55,13 +55,13 @@ function getCurrentUser(){
    PROJECT RULES
 ====================================== */
 const PROJECT_RULES = {
-  Raheem:{minStake:10},
-  Hauwal:{minStake:10},
-  Barsh:{minStake:10},
-  Khairat:{minStake:10},
-  Urban:{minStake:10},
-  Labbaika:{minStake:10},
-  Azman:{minStake:10}
+  Raheem:{minStake:0.1},
+  Hauwal:{minStake:0.1},
+  Barsh:{minStake:0.1},
+  Khairat:{minStake:0.1},
+  Urban:{minStake:0.1},
+  Labbaika:{minStake:0.1},
+  Azman:{minStake:0.1}
 };
 
 function getMinStake(project){
