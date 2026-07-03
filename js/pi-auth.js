@@ -45,7 +45,7 @@ await Pi.authenticate(
   }
 );
 
-console.log("FULL AUTH:", auth);
+console.log("FULL AUTH:", piUser, accessToken);
 
 // ✅ NORMALIZE USER
 const user = {
