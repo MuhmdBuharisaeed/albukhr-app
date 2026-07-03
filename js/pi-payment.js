@@ -11,10 +11,7 @@ async function startPiPayment({ amount, memo }) {
 
   return new Promise((resolve, reject) => {
 
-    await Pi.init({
-  version: "2.0",
-  sandbox: false
-});
+    
 
     Pi.createPayment(
       {
