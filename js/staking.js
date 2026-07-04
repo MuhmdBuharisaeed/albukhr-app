@@ -288,12 +288,12 @@ try{
 
 console.log("SAVING TO SUPABASE...");
    
-  const res = await fetch("https://qexmnghilahsvethlxem.supabase.co/rest/v1/stakes",{
+  const res = await fetch("https://ribpntyqdleytsyktdfb.supabase.co/rest/v1/stakes",{
   method:"POST",
   headers:{
     "Content-Type":"application/json",
-    "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
-    "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+    "apikey":"sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2",
+    "Authorization":"Bearer sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
   },
   body: JSON.stringify({
   userid:user.uid,
