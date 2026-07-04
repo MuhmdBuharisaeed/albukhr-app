@@ -252,6 +252,32 @@ if(!user?.uid){
     return {error:"Minimum stake not reached"};
   }
 
+/* ===============================
+   CREATE PENDING RECORD
+=============================== */
+let pending;
+
+try{
+
+  pending = await createPendingStake({
+    user,
+    project,
+    amount: safeAmount,
+    duration: safeDuration
+  });
+
+}catch(err){
+
+  console.error("CREATE PENDING ERROR:", err);
+
+  __stakingLock = false;
+
+  return {
+    error:"Unable to create pending stake"
+  };
+
+}
+
   /* ===============================
      PI PAYMENT
   =============================== */
@@ -261,10 +287,18 @@ if(!user?.uid){
 
     payment = await startPiPayment({
   amount: safeAmount,
-  memo: `Stake in ${project}`
+  memo: `Stake in ${project}`,
+  stakeId: pending.id
 });
 
   }catch(err){
+
+   await updatePendingStake(
+  pending.id,
+  {
+    status:"cancelled"
+  }
+);
 
   console.error("❌ REAL PAYMENT ERROR:", err);
 
@@ -283,30 +317,28 @@ if(!payment){
   return {error:"Invalid payment"};
 }
 
-   /* SEND TO BACKEND */
 try{
 
-console.log("SAVING TO SUPABASE...");
-   
-  const res = await fetch("https://ribpntyqdleytsyktdfb.supabase.co/rest/v1/stakes",{
-  method:"POST",
-  headers:{
-    "Content-Type":"application/json",
-    "apikey":"sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2",
-    "Authorization":"Bearer sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
-  },
-  body: JSON.stringify({
-  userid:user.uid,
-  project: project,
-  amount:safeAmount,
-  duration:safeDuration,
-  txid: payment.txid || payment.paymentId || ("PI-"+Date.now()),
-  reward: safeAmount * getRate(project, safeDuration),
-  withdrawnReward:0,
-  unlockTime: Date.now() + (safeDuration * 86400000),
-  type:"stake"
-})
-});
+  await updatePendingStake(
+    pending.id,
+    {
+      payment_id: payment.paymentId,
+      txid: payment.txid,
+      status:"completed"
+    }
+  );
+
+}catch(e){
+
+  console.error("UPDATE ERROR:", e);
+
+  __stakingLock = false;
+
+  return {
+    error:"Database update failed"
+  };
+
+}
 
   if(!res.ok){
   const err = await res.text();
