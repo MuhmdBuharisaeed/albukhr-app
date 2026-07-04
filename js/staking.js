@@ -291,31 +291,38 @@ try{
   stakeId: pending.id
 });
 
-  }catch(err){
+}catch(err){
 
-   await updatePendingStake(
-  pending.id,
-  {
-    status:"cancelled"
+  try{
+
+    await updatePendingStake(
+      pending.id,
+      {
+        status:"cancelled"
+      }
+    );
+
+  }catch(e){
+
+    console.error(
+      "Cancel update failed:",
+      e
+    );
+
   }
-);
 
-  console.error("❌ REAL PAYMENT ERROR:", err);
+  console.error(
+    "REAL PAYMENT ERROR:",
+    err
+  );
 
   __stakingLock = false;
 
-  alert(err.message || err);
-
-  return {error:"Payment failed"};
+  return {
+    error:"Payment failed"
+  };
 
   }
-
-  console.log("PAYMENT RESULT:", payment);
-
-if(!payment){
-  __stakingLock = false;
-  return {error:"Invalid payment"};
-}
 
 try{
 
@@ -324,7 +331,7 @@ try{
     {
       payment_id: payment.paymentId,
       txid: payment.txid,
-      status:"completed"
+      status:"paid"
     }
   );
 
@@ -340,19 +347,6 @@ try{
 
 }
 
-  if(!res.ok){
-  const err = await res.text();
-
-console.error("❌ FULL SUPABASE ERROR:");
-console.error(err);
-
-alert(err);
-  __stakingLock = false; // 🔥 VERY IMPORTANT
-
-  return {error:"Database error"};
-}
-
-console.log("✅ Stake saved to Supabase");
    
 }catch(e){
 
