@@ -347,19 +347,6 @@ try{
 
 }
 
-   
-}catch(e){
-
-  console.error("❌ Supabase error", e);
-
-  __stakingLock = false; // 🔥 ADD THIS
-
-  return {
-    error:"Network error"
-  };
-
-}
-
   /* ===============================
      RECORD TRANSACTION (FIX HISTORY)
   =============================== */
