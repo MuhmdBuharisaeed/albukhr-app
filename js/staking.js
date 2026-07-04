@@ -111,7 +111,7 @@ async function createPendingStake({
       },
       body: JSON.stringify({
         userid: user.uid,
-        wallet: user.wallet || "",
+        wallet: user.wallet_address || "",
         project,
         amount,
         duration,
