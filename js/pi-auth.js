@@ -29,51 +29,65 @@ async function initPi(){
 =============================== */
 async function ensurePiAuth(){
 
-try{
-
-const scopes = [
-  "username",
-  "payments",
-  "wallet_address"
-];
-
-const { user: piUser, accessToken } =
-await Pi.authenticate(
-  scopes,
-  function(payment){
-    console.log("Payment callback:", payment);
+  // Return user already loaded
+  if(__pi_user){
+    return __pi_user;
   }
-);
 
-console.log("FULL AUTH:", piUser, accessToken);
+  // Return cached user
+  const cached = JSON.parse(
+    localStorage.getItem("pi_user")
+  );
 
-// ✅ NORMALIZE USER
-const user = {
-  uid: piUser?.uid,
-  username: piUser?.username,
-  wallet_address: piUser?.wallet_address,
-  accessToken
-};
+  if(cached?.uid){
+    __pi_user = cached;
+    return cached;
+  }
 
-if(!user.uid){
-  throw new Error("UID missing");
-}
+  try{
 
-__pi_user = user;
+    const scopes = [
+      "username",
+      "payments",
+      "wallet_address"
+    ];
 
-localStorage.setItem(
-  "pi_user",
-  JSON.stringify(user)
-);
+    const { user: piUser, accessToken } =
+      await Pi.authenticate(
+        scopes,
+        function(payment){
+          console.log("Payment callback:", payment);
+        }
+      );
 
-return user;
+    console.log("FULL AUTH:", piUser, accessToken);
 
-}catch(e){
+    const user = {
+      uid: piUser?.uid,
+      username: piUser?.username,
+      wallet_address: piUser?.wallet_address,
+      accessToken
+    };
 
-console.error("❌ Auth failed:", e);
+    if(!user.uid){
+      throw new Error("UID missing");
+    }
 
-return null;
+    __pi_user = user;
 
-}
+    localStorage.setItem(
+      "pi_user",
+      JSON.stringify(user)
+    );
+
+    return user;
+
+  }catch(e){
+
+    console.error("❌ Auth failed:", e);
+
+    return null;
+
+  }
 
 }
