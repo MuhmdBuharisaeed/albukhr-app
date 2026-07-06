@@ -6,7 +6,9 @@ async function startPiPayment({
   stakeId
 }) {
 
-  const user = await ensurePiAuth();
+  const user = JSON.parse(
+  localStorage.getItem("pi_user")
+);
 
   if (!user?.uid) {
     alert("Pi login required");
