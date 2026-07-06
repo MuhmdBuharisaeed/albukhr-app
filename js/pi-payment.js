@@ -1,6 +1,10 @@
 // js/pi-payment.js
 
-async function startPiPayment({ amount, memo }) {
+async function startPiPayment({
+  amount,
+  memo,
+  stakeId
+}) {
 
   const user = await ensurePiAuth();
 
@@ -18,7 +22,8 @@ async function startPiPayment({ amount, memo }) {
         amount: amount,
         memo: memo,
         metadata: {
-          userId: user.uid
+  userId: user.uid,
+  stakeId: stakeId
         }
       },
 
