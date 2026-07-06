@@ -9,47 +9,45 @@ const SUPABASE_KEY = "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2";
 const INTERNAL_KEY = "albukhr_stakes";
 
 /* ======================================
-STORAGE
+   STORAGE
 ====================================== */
 function _safeParse(key){
-try{
-const data = JSON.parse(localStorage.getItem(key));
-return Array.isArray(data) ? data : [];
-}catch{
-return [];
-}
+  try{
+    const data = JSON.parse(localStorage.getItem(key));
+    return Array.isArray(data) ? data : [];
+  }catch{
+    return [];
+  }
 }
 
 function _save(key,data){
-if(Array.isArray(data)){
-localStorage.setItem(key, JSON.stringify(data));
-}
+  if(Array.isArray(data)){
+    localStorage.setItem(key, JSON.stringify(data));
+  }
 }
 
 /* ======================================
-USER
+   USER
 ====================================== */
 
 function getCurrentUser(){
 
-if(window.Pi && Pi.getUser){
-try{
-const u = Pi.getUser();
+  try{
 
-if(u?.uid){  
-    return {  
-      uid: u.uid,  
-      username: u.username  
-    };  
-  }  
+    const user = JSON.parse(
+      localStorage.getItem("pi_user")
+    );
 
-}catch(e){  
-  console.warn("Pi user not ready yet");  
-}
+    if(user?.uid){
+      return user;
+    }
 
-}
+  }catch(e){
+    console.warn("Unable to load local user");
+  }
 
-return null; // ❗ kar ka saka test123 a production
+  return null;
+
 }
 
 /* ======================================
@@ -87,683 +85,681 @@ return table?.[project]?.[Number(duration)] || 0;
 }
 
 /* ======================================
-CREATE PENDING STAKE
+   CREATE PENDING STAKE
 ====================================== */
 async function createPendingStake({
-user,
-project,
-amount,
-duration
+  user,
+  project,
+  amount,
+  duration
 }) {
 
-const reward =
-Number(amount) *
-getRate(project, Number(duration));
+  const reward =
+    Number(amount) *
+    getRate(project, Number(duration));
 
-const res = await fetch(
-${SUPABASE_URL}/rest/v1/stakes,
-{
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-"apikey": SUPABASE_KEY,
-"Authorization": Bearer ${SUPABASE_KEY},
-"Prefer": "return=representation"
-},
-body: JSON.stringify({
-userid: user.uid,
-wallet: user.wallet_address || "",
-project,
-amount,
-duration,
-reward,
-withdrawnreward: 0,
-withdrawncapital: 0,
-unlocktime:
-Date.now() +
-(Number(duration) * 86400000),
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Prefer": "return=representation"
+      },
+      body: JSON.stringify({
+        userid: user.uid,
+        wallet: user.wallet_address || "",
+        project,
+        amount,
+        duration,
+        reward,
+        withdrawnreward: 0,
+        withdrawncapital: 0,
+        unlocktime:
+          Date.now() +
+          (Number(duration) * 86400000),
 
-type: "stake",  
+        type: "stake",
 
-    status: "pending",  
+        status: "pending",
 
-    payment_id: null,  
+        payment_id: null,
 
-    txid: null  
-  })  
-}
+        txid: null
+      })
+    }
+  );
 
-);
+  if (!res.ok) {
 
-if (!res.ok) {
+  const text = await res.text();
 
-throw new Error(  
-  await res.text()  
-);
+  alert(text);
 
-}
+  throw new Error(text);
 
-const rows = await res.json();
+  }
 
-return rows[0];
+  const rows = await res.json();
+
+  return rows[0];
 
 }
 
 /* ======================================
-UPDATE PENDING STAKE
+   UPDATE PENDING STAKE
 ====================================== */
 async function updatePendingStake(
-id,
-values
+  id,
+  values
 ){
 
-const res = await fetch(
-${SUPABASE_URL}/rest/v1/stakes?id=eq.${id},
-{
-method:"PATCH",
-headers:{
-"Content-Type":"application/json",
-"apikey":SUPABASE_KEY,
-"Authorization":
-Bearer ${SUPABASE_KEY}
-},
-body:JSON.stringify(values)
-}
-);
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?id=eq.${id}`,
+    {
+      method:"PATCH",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_KEY,
+        "Authorization":
+          `Bearer ${SUPABASE_KEY}`
+      },
+      body:JSON.stringify(values)
+    }
+  );
 
-if(!res.ok){
+  if(!res.ok){
 
-throw new Error(  
-  await res.text()  
-);
+    throw new Error(
+      await res.text()
+    );
 
-}
+  }
 
-return true;
+  return true;
 
 }
 
 /* ======================================
-ADD STAKE
+   ADD STAKE
 ====================================== */
 let __stakingLock = false;
 
 async function addStake({project,amount,duration}){
 
-if(__stakingLock){
-return {error:"Processing..."};
-}
+  if(__stakingLock){
+    return {error:"Processing..."};
+  }
 
-__stakingLock = true;
+  __stakingLock = true;
 
-let user = null;
+  let user = null;
 
 try{
 
-user = await ensurePiAuth();
+  user = await ensurePiAuth();
 
 }catch(e){
 
-console.error("AUTH ERROR:", e);
+  console.error("AUTH ERROR:", e);
 
 }
 
 if(!user?.uid){
 
-user = JSON.parse(
-localStorage.getItem("pi_user")
-);
+  user = JSON.parse(
+    localStorage.getItem("pi_user")
+  );
 
 }
 
 if(!user?.uid){
 
-__stakingLock = false;
+  __stakingLock = false;
 
-alert(
-"Pi login required. Please reopen inside Pi Browser."
-);
+  alert(
+    "Pi login required. Please reopen inside Pi Browser."
+  );
 
-return {
-error:"Login required"
-};
+  return {
+    error:"Login required"
+  };
 
 }
 
-if(!user?.uid){
-__stakingLock = false;
-return {error:"User not logged in"};
-}
+  if(!user?.uid){
+    __stakingLock = false;
+    return {error:"User not logged in"};
+  }
 
-/* 🔐 PI CHECK */
-if(typeof window.Pi === "undefined"){
-__stakingLock = false;
-return {error:"Pi SDK not ready"};
-}
+  /* 🔐 PI CHECK */
+  if(typeof window.Pi === "undefined"){
+    __stakingLock = false;
+    return {error:"Pi SDK not ready"};
+  }
 
-const safeAmount = Number(amount);
-const safeDuration = Number(duration);
+  const safeAmount = Number(amount);
+  const safeDuration = Number(duration);
 
-if(!project || safeAmount <= 0){
-__stakingLock = false;
-return {error:"Invalid input"};
-}
+  if(!project || safeAmount <= 0){
+    __stakingLock = false;
+    return {error:"Invalid input"};
+  }
 
-if(safeAmount < getMinStake(project)){
-__stakingLock = false;
-return {error:"Minimum stake not reached"};
-}
+  if(safeAmount < getMinStake(project)){
+    __stakingLock = false;
+    return {error:"Minimum stake not reached"};
+  }
 
 /* ===============================
-CREATE PENDING RECORD
+   CREATE PENDING RECORD
 =============================== */
 let pending;
 
-try{
+try {
 
-pending = await createPendingStake({
-user,
-project,
-amount: safeAmount,
-duration: safeDuration
+  pending = await createPendingStake({
+    user,
+    project,
+    amount: safeAmount,
+    duration: safeDuration
+  });
+
+} catch (err) {
+
+  console.error("CREATE PENDING ERROR:", err);
+
+  alert(err.message);
+
+  __stakingLock = false;
+
+  return {
+    error: err.message
+  };
+
+}
+  /* ===============================
+     PI PAYMENT
+  =============================== */
+  let payment;
+
+  try{
+
+    payment = await startPiPayment({
+  amount: safeAmount,
+  memo: `Stake in ${project}`,
+  stakeId: pending.id
 });
 
 }catch(err){
 
-console.error("CREATE PENDING ERROR:", err);
+  try{
 
-__stakingLock = false;
+    await updatePendingStake(
+      pending.id,
+      {
+        status:"cancelled"
+      }
+    );
 
-return {
-error:"Unable to create pending stake"
-};
+  }catch(e){
 
-}
+    console.error(
+      "Cancel update failed:",
+      e
+    );
 
-/* ===============================
-PI PAYMENT
-=============================== */
-let payment;
+  }
+
+  console.error(
+    "REAL PAYMENT ERROR:",
+    err
+  );
+
+  __stakingLock = false;
+
+  return {
+    error:"Payment failed"
+  };
+
+  }
 
 try{
 
-payment = await startPiPayment({
-
-amount: safeAmount,
-memo: Stake in ${project},
-stakeId: pending.id
-});
-
-}catch(err){
-
-try{
-
-await updatePendingStake(  
-  pending.id,  
-  {  
-    status:"cancelled"  
-  }  
-);
+  await updatePendingStake(
+    pending.id,
+    {
+      payment_id: payment.paymentId,
+      txid: payment.txid,
+      status:"paid"
+    }
+  );
 
 }catch(e){
 
-console.error(  
-  "Cancel update failed:",  
-  e  
-);
+  console.error("UPDATE ERROR:", e);
+
+  __stakingLock = false;
+
+  return {
+    error:"Database update failed"
+  };
 
 }
 
-console.error(
-"REAL PAYMENT ERROR:",
-err
-);
+  /* ===============================
+     RECORD TRANSACTION (FIX HISTORY)
+  =============================== */
 
-__stakingLock = false;
-
-return {
-error:"Payment failed"
-};
-
-}
-
-try{
-
-await updatePendingStake(
-pending.id,
-{
-payment_id: payment.paymentId,
-txid: payment.txid,
-status:"paid"
-}
-);
-
-}catch(e){
-
-console.error("UPDATE ERROR:", e);
-
-__stakingLock = false;
-
-return {
-error:"Database update failed"
-};
-
-}
-
-/* ===============================
-RECORD TRANSACTION (FIX HISTORY)
-=============================== */
-
-if(typeof recordTx === "function"){
-recordTx({
-type:"stake",
-project,
-amount:safeAmount,
-timestamp:Date.now()
-});
+  if(typeof recordTx === "function"){
+  recordTx({
+    type:"stake",
+    project,
+    amount:safeAmount,
+    timestamp:Date.now()
+  });
 }
 
 __stakingLock = false;
 
 return {
-success:true
+  success:true
 };
 
 } // 🔥 THIS LINE IS MISSING (rufe addStake)
 
 /* ======================================
-GET ALL STAKES
+   GET ALL STAKES
 ====================================== */
 async function getAllStakesMerged(){
 
-const user = JSON.parse(localStorage.getItem("pi_user"));
+  const user = JSON.parse(localStorage.getItem("pi_user"));
 
-if(!user?.uid){
-console.warn("No UID");
-return [];
-}
+  if(!user?.uid){
+    console.warn("No UID");
+    return [];
+  }
 
-try{
+  try{
 
-const res = await fetch(  
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,  
-  {  
-    headers:{  
-      "apikey": SUPABASE_KEY,  
-      "Authorization": `Bearer ${SUPABASE_KEY}`  
-    }  
-  }  
-);  
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
+      {
+        headers:{
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
 
-if(!res.ok){  
-  const err = await res.text();  
-  console.error("❌ Fetch error:", err);  
-  return [];  
-}  
+    if(!res.ok){
+      const err = await res.text();
+      console.error("❌ Fetch error:", err);
+      return [];
+    }
 
-const data = await res.json();  
+    const data = await res.json();
 
-console.log("📊 Supabase data:", data);  
+    console.log("📊 Supabase data:", data);
 
-return Array.isArray(data) ? data : [];
+    return Array.isArray(data) ? data : [];
 
-}catch(e){
+  }catch(e){
 
-console.error("❌ Network error:", e);  
-return [];
+    console.error("❌ Network error:", e);
+    return [];
 
-}
+  }
 
 }
 
 /* ======================================
-GLOBAL STAKES
+   GLOBAL STAKES
 ====================================== */
 async function getGlobalStakes(){
 
-try{
+  try{
 
-const res = await fetch(  
-  `${SUPABASE_URL}/rest/v1/stakes?select=*`,  
-  {  
-    headers:{  
-      "apikey": SUPABASE_KEY,  
-      "Authorization": `Bearer ${SUPABASE_KEY}`  
-    }  
-  }  
-);  
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/stakes?select=*`,
+      {
+        headers:{
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
 
-if(!res.ok){  
+    if(!res.ok){
 
-  const err = await res.text();  
+      const err = await res.text();
 
-  console.error(  
-    "GLOBAL STAKES ERROR:",  
-    err  
-  );  
+      console.error(
+        "GLOBAL STAKES ERROR:",
+        err
+      );
 
-  return [];  
+      return [];
 
-}  
+    }
 
-const data = await res.json();  
+    const data = await res.json();
 
-return Array.isArray(data)  
-  ? data  
-  : [];
+    return Array.isArray(data)
+      ? data
+      : [];
 
-}catch(e){
+  }catch(e){
 
-console.error(  
-  "GLOBAL NETWORK ERROR:",  
-  e  
-);  
+    console.error(
+      "GLOBAL NETWORK ERROR:",
+      e
+    );
 
-return [];
+    return [];
 
-}
+  }
 
 }
 
 /* ======================================
-PROJECT TOTALS
+   PROJECT TOTALS
 ====================================== */
 async function getProjectTotals(project){
 
-const stakes = await getAllStakesMerged();
+  const stakes = await getAllStakesMerged();
 
-const projectData = stakes.filter(s =>
-String(s.project).trim().toLowerCase() ===
+  const projectData = stakes.filter(s =>
+  String(s.project).trim().toLowerCase() ===
 String(project).trim().toLowerCase() &&
-(
-s.type === "stake" ||
-s.type === "withdraw" ||
-s.type === "capital"
-)
+  (
+    s.type === "stake" ||
+    s.type === "withdraw" ||
+    s.type === "capital"
+  )
 );
-let stake = 0;
-let reward = 0;
+  let stake = 0;
+  let reward = 0;
 
-projectData.forEach(s => {
+  projectData.forEach(s => {
 
-const amount = Number(s.amount);  
+    const amount = Number(s.amount);
 
-if(!Number.isFinite(amount)) return;  
+    if(!Number.isFinite(amount)) return;
 
-// ✅ STAKE TOTAL
-
+    // ✅ STAKE TOTAL
 if(s.type === "stake"){
-stake += amount;
+  stake += amount;
 }
 
-// ✅ ONLY REAL STAKES FOR REWARD  
-if(s.type === "stake"){  
+    // ✅ ONLY REAL STAKES FOR REWARD
+    if(s.type === "stake"){
 
-  const total = Number(s.reward) || 0;  
-  const withdrawn = Number(s.withdrawnReward) || 0;  
+      const total = Number(s.reward) || 0;
+      const withdrawn = Number(s.withdrawnReward) || 0;
 
-  const remaining = Math.max(0, total - withdrawn);  
+      const remaining = Math.max(0, total - withdrawn);
 
-  reward += remaining;  
+      reward += remaining;
 
-}
+    }
 
-});
+  });
 
 const user = JSON.parse(
-localStorage.getItem("pi_user")
+  localStorage.getItem("pi_user")
 );
 
 if(user?.uid){
 
-const res = await fetch(
-${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid,
-{
-headers:{
-"apikey": SUPABASE_KEY,
-"Authorization": Bearer ${SUPABASE_KEY}
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid`,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
+
+  if(res.ok){
+
+    const withdrawals = await res.json();
+
+    withdrawals.forEach(w=>{
+
+      stake -= Math.abs(
+        Number(w.amount) || 0
+      );
+
+    });
+
+  }
+
 }
-}
-);
-
-if(res.ok){
-
-const withdrawals = await res.json();  
-
-withdrawals.forEach(w=>{  
-
-  stake -= Math.abs(  
-    Number(w.amount) || 0  
-  );  
-
-});
-
-}
-
-}
-
-return {
-stake,
-reward,
-stakes: projectData
-};
+   
+  return {
+    stake,
+    reward,
+    stakes: projectData
+  };
 
 }
 
 /* ======================================
-GET USER STAKE
+   GET USER STAKE
 ====================================== */
 async function getUserStakes(){
 
-const user = getCurrentUser();
+  const user = getCurrentUser();
 
-const res = await fetch(
-${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid},
-{
-headers:{
-"apikey": SUPABASE_KEY,
-"Authorization": Bearer ${SUPABASE_KEY}
-}
-}
+  const res = await fetch(
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    }
+  }
 );
+   
+  const data = await res.json();
 
-const data = await res.json();
-
-return Array.isArray(data) ? data : [];
+  return Array.isArray(data) ? data : [];
 }
 
 /* ======================================
-WITHDRAW PROJECT REWARD
+   WITHDRAW PROJECT REWARD
 ====================================== */
 async function withdrawProjectReward(project, amount){
 
-const user = await ensurePiAuth();
+  const user = await ensurePiAuth();
 
 if(!user?.uid){
-__stakingLock = false;
-return {error:"Login required"};
+  __stakingLock = false;
+  return {error:"Login required"};
 }
 
-let remainingToTake = Number(amount);
+  let remainingToTake = Number(amount);
 
-if(!Number.isFinite(remainingToTake) || remainingToTake <= 0){
-return {error:"Invalid amount"};
-}
+  if(!Number.isFinite(remainingToTake) || remainingToTake <= 0){
+    return {error:"Invalid amount"};
+  }
 
-const res = await fetch(
-${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid},
-{
-headers:{
-"apikey": SUPABASE_KEY,
-"Authorization": Bearer ${SUPABASE_KEY}
-}
-}
+  const res = await fetch(
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    }
+  }
 );
+   
+  if(!res.ok){
+    const err = await res.text();
+    console.error(err);
+    return {error:"Network error"};
+  }
 
-if(!res.ok){
-const err = await res.text();
-console.error(err);
-return {error:"Network error"};
-}
+  let stakes = await res.json();
 
-let stakes = await res.json();
+  if(!Array.isArray(stakes) || !stakes.length){
+    return {error:"No stakes"};
+  }
 
-if(!Array.isArray(stakes) || !stakes.length){
-return {error:"No stakes"};
-}
+  // 🔥 FIX: ONLY STAKES
+  stakes = stakes.filter(s => s.type === "stake");
 
-// 🔥 FIX: ONLY STAKES
-stakes = stakes.filter(s => s.type === "stake");
+  for(const stake of stakes){
 
-for(const stake of stakes){
+    const total = Number(stake.reward) || 0;
+    const withdrawn = Number(stake.withdrawnReward) || 0;
 
-const total = Number(stake.reward) || 0;  
-const withdrawn = Number(stake.withdrawnReward) || 0;  
+    const remaining = total - withdrawn;
 
-const remaining = total - withdrawn;  
+    if(!Number.isFinite(remaining) || remaining <= 0) continue;
 
-if(!Number.isFinite(remaining) || remaining <= 0) continue;  
+    const take = Math.min(remainingToTake, remaining);
 
-const take = Math.min(remainingToTake, remaining);  
+    if(!Number.isFinite(take)) continue;
 
-if(!Number.isFinite(take)) continue;  
+    const updateRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
+      {
+        method:"PATCH",
+        headers:{
+          "Content-Type":"application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({
+          withdrawnReward: withdrawn + take
+        })
+      }
+    );
 
-const updateRes = await fetch(  
-  `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,  
-  {  
-    method:"PATCH",  
-    headers:{  
-      "Content-Type":"application/json",  
-      "apikey": SUPABASE_KEY,  
-      "Authorization": `Bearer ${SUPABASE_KEY}`  
-    },  
-    body: JSON.stringify({  
-      withdrawnReward: withdrawn + take  
-    })  
-  }  
-);  
+    if(!updateRes.ok){
+      const err = await updateRes.text();
+      console.error(err);
+      return {error:"Update failed"};
+    }
 
-if(!updateRes.ok){  
-  const err = await updateRes.text();  
-  console.error(err);  
-  return {error:"Update failed"};  
-}  
+    remainingToTake -= take;
 
-remainingToTake -= take;  
+    if(remainingToTake <= 0) break;
+  }
 
-if(remainingToTake <= 0) break;
+  if(remainingToTake > 0){
+    return {error:"Insufficient reward"};
+  }
 
-}
-
-if(remainingToTake > 0){
-return {error:"Insufficient reward"};
-}
-
-return {success:true, amount};
-}
+  return {success:true, amount};
+  }
 
 /* ======================================
-LOAD DATA
+   LOAD DATA
 ====================================== */
 
 async function loadData(){
 
-try{
+  try{
 
-const stakes = await getAllStakesMerged();  
+    const stakes = await getAllStakesMerged();
 
-console.log("📊 STAKES:", stakes);  
+    console.log("📊 STAKES:", stakes);
 
-// ❗ idan babu data, kada ka nuna error  
-if(!Array.isArray(stakes)){  
-  console.warn("No data returned");  
-  return;  
-}  
+    // ❗ idan babu data, kada ka nuna error
+    if(!Array.isArray(stakes)){
+      console.warn("No data returned");
+      return;
+    }
 
-// OPTIONAL: update UI nan gaba
+    // OPTIONAL: update UI nan gaba
 
-}catch(e){
+  }catch(e){
 
-console.error("❌ Load error:", e);  
+    console.error("❌ Load error:", e);
 
-// ❌ kar ka yi alert nan
-
-}
+    // ❌ kar ka yi alert nan
+  }
 
 }
 
 /* ======================================
-WITHDRAW CAPITAL (ENGINE)
+   WITHDRAW CAPITAL (ENGINE)
 ====================================== */
 async function withdrawCapital({project, amount}){
 
-const user = await ensurePiAuth();
+  const user = await ensurePiAuth();
 
 if(!user?.uid){
-return {error:"Login required"};
+  return {error:"Login required"};
 }
 
-let remaining = Number(amount);
+  let remaining = Number(amount);
 
-if(!Number.isFinite(remaining) || remaining <= 0){
-return {error:"Invalid amount"};
-}
+  if(!Number.isFinite(remaining) || remaining <= 0){
+    return {error:"Invalid amount"};
+  }
 
-const res = await fetch(
-${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc,
-{
-headers:{
-"apikey": SUPABASE_KEY,
-"Authorization": Bearer ${SUPABASE_KEY}
-}
-}
-);
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`
+      }
+    }
+  );
 
-let stakes = await res.json();
+  let stakes = await res.json();
 
-if(!Array.isArray(stakes)){
-return {error:"Invalid data"};
-}
+  if(!Array.isArray(stakes)){
+    return {error:"Invalid data"};
+  }
 
-// ONLY REAL STAKES
+  // ONLY REAL STAKES
 stakes = stakes.filter(s => s.type === "stake");
 
 const now = Date.now();
 
 for(const s of stakes){
 
-if(remaining <= 0) break;
+  if(remaining <= 0) break;
 
-// LOCK CHECK
-const unlockTime = Number(s.unlockTime) || 0;
+  // LOCK CHECK
+  const unlockTime = Number(s.unlockTime) || 0;
 
-if(now < unlockTime){
-continue;
+  if(now < unlockTime){
+    continue;
+  }
+
+  // AVAILABLE CAPITAL
+  const available =
+    (Number(s.amount) || 0) -
+    (Number(s.withdrawnCapital) || 0);
+
+  if(available <= 0){
+    continue;
+  }
+
+  const take = Math.min(available, remaining);
+
+  remaining -= take;
 }
 
-// AVAILABLE CAPITAL
-const available =
-(Number(s.amount) || 0) -
-(Number(s.withdrawnCapital) || 0);
+  if(remaining > 0){
+    return {error:"Insufficient capital"};
+  }
 
-if(available <= 0){
-continue;
-}
-
-const take = Math.min(available, remaining);
-
-remaining -= take;
-}
-
-if(remaining > 0){
-return {error:"Insufficient capital"};
-}
-
-return {success:true, amount};
+  return {success:true, amount};
 }
 
 /* ======================================
-HELPERS
+   HELPERS
 ====================================== */
 function getStakes(){ return getAllStakesMerged(); }
 function getInternalTotals(){ return getProjectTotals(); }
