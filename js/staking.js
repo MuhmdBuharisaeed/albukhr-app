@@ -265,17 +265,20 @@ try{
     duration: safeDuration
   });
 
-}catch(err){
+
+   catch(err){
 
   console.error("CREATE PENDING ERROR:", err);
+
+  alert(err.message);
 
   __stakingLock = false;
 
   return {
-    error:"Unable to create pending stake"
+    error: err.message
   };
 
-}
+   }
 
   /* ===============================
      PI PAYMENT
