@@ -134,9 +134,11 @@ async function createPendingStake({
 
   if (!res.ok) {
 
-    throw new Error(
-      await res.text()
-    );
+  const text = await res.text();
+
+  alert(text);
+
+  throw new Error(text);
 
   }
 
@@ -256,7 +258,7 @@ if(!user?.uid){
 =============================== */
 let pending;
 
-try{
+try {
 
   pending = await createPendingStake({
     user,
@@ -265,8 +267,7 @@ try{
     duration: safeDuration
   });
 
-
-   catch(err){
+} catch (err) {
 
   console.error("CREATE PENDING ERROR:", err);
 
@@ -278,8 +279,7 @@ try{
     error: err.message
   };
 
-   }
-
+}
   /* ===============================
      PI PAYMENT
   =============================== */
