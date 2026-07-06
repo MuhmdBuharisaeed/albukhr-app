@@ -417,11 +417,12 @@ if(!user?.uid){
 
   }catch(e){
 
-    console.error("FULL ERROR:", e);
+  console.error("FULL ERROR:", e);
 
-    alert(
-      JSON.stringify(e, null, 2)
-    );
+  alert(
+    "ERROR:\n" +
+    (e?.message || e?.error || String(e))
+  );
 
   }
 
