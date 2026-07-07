@@ -1,6 +1,6 @@
 const db = window.supabase.createClient(
-  "https://ribpntyqdleytsyktdfb.supabase.co",
-  "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
+  "https://qexmnghilahsvethlxem.supabase.co",
+  "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
 );
 
 window.createWithdrawRequest = async function({
@@ -20,6 +20,7 @@ window.createWithdrawRequest = async function({
   .from("withdraw_requests")
   .select("id,status")
   .eq("userid", user.uid)
+  .eq("network", "mainnet")
   .in("status", ["pending","approved"]);
 
 if(existing.data?.length){
@@ -47,8 +48,9 @@ const result = await db
     receive,
     wallet,
     type,
-    status: "pending"
-  }]);
+    status: "pending",
+    network: "mainnet"
+}]);
 
   if(result.error){
     return { error: result.error };
