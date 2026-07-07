@@ -32,23 +32,22 @@ function _save(key,data){
 
 function getCurrentUser(){
 
-  if(window.Pi && Pi.getUser){
-    try{
-      const u = Pi.getUser();
+  try{
 
-      if(u?.uid){
-        return {
-          uid: u.uid,
-          username: u.username
-        };
-      }
+    const user = JSON.parse(
+      localStorage.getItem("pi_user")
+    );
 
-    }catch(e){
-      console.warn("Pi user not ready yet");
+    if(user?.uid){
+      return user;
     }
+
+  }catch(e){
+    console.warn("Unable to load local user");
   }
 
-  return null; // ❗ kar ka saka test123 a production
+  return null;
+
 }
 
 /* ======================================
