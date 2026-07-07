@@ -415,13 +415,14 @@ if(!user?.uid){
 
     await load();
 
-  }catch(e){
+  catch(e){
 
-    console.error("FULL ERROR:", e);
+  console.error("FULL ERROR:", e);
 
-    alert(
-      JSON.stringify(e, null, 2)
-    );
+  showAlert(
+    "Stake Failed",
+    e?.message || String(e)
+  );
 
   }
 
