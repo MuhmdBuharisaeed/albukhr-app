@@ -241,8 +241,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 <script>
 const supabase = window.supabase.createClient(
-  "https://ribpntyqdleytsyktdfb.supabase.co",
-  "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
+  "https://qexmnghilahsvethlxem.supabase.co",
+  "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
 );
 </script>
 
@@ -417,12 +417,11 @@ if(!user?.uid){
 
   }catch(e){
 
-  console.error("FULL ERROR:", e);
+    console.error("FULL ERROR:", e);
 
-  alert(
-    "ERROR:\n" +
-    (e?.message || e?.error || String(e))
-  );
+    alert(
+      JSON.stringify(e, null, 2)
+    );
 
   }
 
@@ -498,7 +497,7 @@ const user = JSON.parse(
 if(user?.uid){
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/withdraw_requests?select=amount&userid=eq.${user.uid}&project=eq.${PROJECT_NAME}&type=eq.capital&status=eq.paid`,
+`${SUPABASE_URL}/rest/v1/withdraw_requests?select=amount&userid=eq.${user.uid}&project=eq.${PROJECT_NAME}&type=eq.capital&status=eq.paid&network=eq.mainnet`,
     {
       headers:{
         "apikey": SUPABASE_KEY,
@@ -631,11 +630,11 @@ return address.slice(0,6)
   if(user?.uid){
 
     const res = await fetch(
-  `https://ribpntyqdleytsyktdfb.supabase.co/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}`,
+`https://qexmnghilahsvethlxem.supabase.co/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
       {
         headers:{
-          "apikey":"sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2",
-          "Authorization":"Bearer sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
+          "apikey":"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2",
+          "Authorization":"Bearer sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
         }
       }
     );
@@ -1304,7 +1303,8 @@ const { data, error } = await supabase
   .from("stakes")
   .select("*")
   .eq("project", PROJECT_NAME)
-  .eq("userid", user.uid);
+  .eq("userid", user.uid)
+  .eq("network", "mainnet");
   
 if(error){
   console.error(error);
