@@ -1,31 +1,23 @@
 // js/pi-payment.js
 
-async function startPiPayment({
-  amount,
-  memo,
-  stakeId
-}) {
+async function startPiPayment({ amount, memo }) {
 
-  const user = JSON.parse(
-  localStorage.getItem("pi_user")
-);
+  const user = await ensurePiAuth();
 
-  if (!user?.uid) {
-    alert("Pi login required");
-    return;
+  if(!user?.uid){
+    throw new Error("Pi login required");
   }
 
   return new Promise((resolve, reject) => {
-
-    
 
     Pi.createPayment(
       {
         amount: amount,
         memo: memo,
-        metadata: {
-  userId: user.uid,
-  stakeId: stakeId
+        metadata:{
+   userId:user.uid,
+   stakeId,
+   network:"mainnet"
         }
       },
 
