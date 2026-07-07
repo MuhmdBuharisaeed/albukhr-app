@@ -424,12 +424,14 @@ if(!user?.uid){
       e?.message || String(e)
     );
 
-} finally{
+} finally {
 
     btn.innerText = "Confirm";
     btn.disabled = false;
 
-  }
+}
+
+} // <-- Rufe confirmStake()
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
