@@ -432,7 +432,7 @@ async function getGlobalStakes(){
   try{
 
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?select=*`,
+`${SUPABASE_URL}/rest/v1/stakes?select=*&network=eq.mainnet`,
       {
         headers:{
           "apikey": SUPABASE_KEY,
