@@ -1,6 +1,10 @@
 // js/pi-payment.js
 
-async function startPiPayment({ amount, memo }) {
+async function startPiPayment({
+  amount,
+  memo,
+  stakeId
+}) {
 
   const user = await ensurePiAuth();
 
