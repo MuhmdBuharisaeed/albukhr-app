@@ -126,6 +126,8 @@ async function createPendingStake({
 
         status: "pending",
 
+        network: "mainnet",
+
         payment_id: null,
 
         txid: null
@@ -293,30 +295,32 @@ try{
 
 }catch(err){
 
-    await updatePendingStake(
-        pending.id,
-        {
-            status:"cancelled"
-        }
-    );
+    console.error("❌ REAL PAYMENT ERROR:", err);
+
+    try{
+
+        await updatePendingStake(
+            pending.id,
+            {
+                status:"cancelled"
+            }
+        );
+
+    }catch(e){
+
+        console.error("Cancel update failed:", e);
+
+    }
 
     __stakingLock = false;
+
+    alert(err.message || "Payment failed");
 
     return {
         error:"Payment failed"
     };
 
-       }
-
-  console.error("❌ REAL PAYMENT ERROR:", err);
-
-  __stakingLock = false;
-
-  alert(err.message || err);
-
-  return {error:"Payment failed"};
-
-  }
+}
 
   console.log("PAYMENT RESULT:", payment);
 
