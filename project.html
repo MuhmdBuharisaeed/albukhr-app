@@ -486,8 +486,11 @@ data.stakes.forEach(s=>{
 
   const amount = Number(s.amount) || 0;
 
-  if(s.type === "stake"){
-    totalStake += amount;
+  if(
+      s.type === "stake" &&
+      s.status === "paid"
+  ){
+      totalStake += amount;
   }
 
 });
@@ -614,7 +617,10 @@ return address.slice(0,6)
   const stakes = await getAllStakesMerged();
 
   const txs = stakes
-    .filter(tx => tx.project === PROJECT_NAME)
+.filter(tx =>
+    tx.project === PROJECT_NAME &&
+    tx.status === "paid"
+)
     .sort((a,b)=>
       new Date(b.created_at || b.timestamp || 0) -
       new Date(a.created_at || a.timestamp || 0)
@@ -1303,11 +1309,12 @@ async function updateStakeStatus(){
   const user = JSON.parse(localStorage.getItem("pi_user"));
 
 const { data, error } = await supabase
-  .from("stakes")
-  .select("*")
-  .eq("project", PROJECT_NAME)
-  .eq("userid", user.uid)
-  .eq("network", "mainnet");
+.from("stakes")
+.select("*")
+.eq("project", PROJECT_NAME)
+.eq("userid", user.uid)
+.eq("network", "mainnet")
+.eq("status", "paid");
   
 if(error){
   console.error(error);
