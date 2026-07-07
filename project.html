@@ -411,25 +411,25 @@ if(!user?.uid){
 
     closeModal();
 
-    successModal.style.display = "flex";
+    successModal.style.display="flex";
 
     await load();
 
-  catch(e){
+} catch(e){
 
-  console.error("FULL ERROR:", e);
+    console.error("FULL ERROR:", e);
 
-  showAlert(
-    "Stake Failed",
-    e?.message || String(e)
-  );
+    showAlert(
+      "Stake Failed",
+      e?.message || String(e)
+    );
+
+} finally{
+
+    btn.innerText = "Confirm";
+    btn.disabled = false;
 
   }
-
-  btn.innerText = "Confirm";
-  btn.disabled = false;
-
-}
 
 document.addEventListener("DOMContentLoaded", async ()=>{
 
