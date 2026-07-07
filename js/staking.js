@@ -3,8 +3,8 @@
 // Pi SDK Ready • No API • Mobile Safe
 // =======================================
 
-const SUPABASE_URL = "https://ribpntyqdleytsyktdfb.supabase.co";
-const SUPABASE_KEY = "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2";
+const SUPABASE_URL = "https://qexmnghilahsvethlxem.supabase.co";
+const SUPABASE_KEY = "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2";
 
 const INTERNAL_KEY = "albukhr_stakes";
 
@@ -32,22 +32,23 @@ function _save(key,data){
 
 function getCurrentUser(){
 
-  try{
+  if(window.Pi && Pi.getUser){
+    try{
+      const u = Pi.getUser();
 
-    const user = JSON.parse(
-      localStorage.getItem("pi_user")
-    );
+      if(u?.uid){
+        return {
+          uid: u.uid,
+          username: u.username
+        };
+      }
 
-    if(user?.uid){
-      return user;
+    }catch(e){
+      console.warn("Pi user not ready yet");
     }
-
-  }catch(e){
-    console.warn("Unable to load local user");
   }
 
-  return null;
-
+  return null; // ❗ kar ka saka test123 a production
 }
 
 /* ======================================
@@ -134,11 +135,9 @@ async function createPendingStake({
 
   if (!res.ok) {
 
-  const text = await res.text();
-
-  alert(text);
-
-  throw new Error(text);
+    throw new Error(
+      await res.text()
+    );
 
   }
 
@@ -253,99 +252,106 @@ if(!user?.uid){
     return {error:"Minimum stake not reached"};
   }
 
-/* ===============================
-   CREATE PENDING RECORD
-=============================== */
-let pending;
-
-try {
-
-  pending = await createPendingStake({
-    user,
-    project,
-    amount: safeAmount,
-    duration: safeDuration
-  });
-
-} catch (err) {
-
-  console.error("CREATE PENDING ERROR:", err);
-
-  alert(err.message);
-
-  __stakingLock = false;
-
-  return {
-    error: err.message
-  };
-
-}
   /* ===============================
-     PI PAYMENT
-  =============================== */
-  let payment;
+   CREATE PENDING STAKE
+=============================== */
 
-  try{
-
-    payment = await startPiPayment({
-  amount: safeAmount,
-  memo: `Stake in ${project}`,
-  stakeId: pending.id
-});
-
-}catch(err){
-
-  try{
-
-    await updatePendingStake(
-      pending.id,
-      {
-        status:"cancelled"
-      }
-    );
-
-  }catch(e){
-
-    console.error(
-      "Cancel update failed:",
-      e
-    );
-
-  }
-
-  console.error(
-    "REAL PAYMENT ERROR:",
-    err
-  );
-
-  __stakingLock = false;
-
-  return {
-    error:"Payment failed"
-  };
-
-  }
+let pending;
 
 try{
 
-  await updatePendingStake(
-    pending.id,
-    {
-      payment_id: payment.paymentId,
-      txid: payment.txid,
-      status:"paid"
-    }
-  );
+    pending = await createPendingStake({
+        user,
+        project,
+        amount: safeAmount,
+        duration: safeDuration
+    });
 
-}catch(e){
+}catch(err){
 
-  console.error("UPDATE ERROR:", e);
+    __stakingLock = false;
+
+    return {
+        error: err.message
+    };
+
+}
+
+/* ===============================
+   PI PAYMENT
+=============================== */
+
+let payment;
+
+try{
+
+    payment = await startPiPayment({
+        amount: safeAmount,
+        memo: `Stake in ${project}`,
+        stakeId: pending.id
+    });
+
+}catch(err){
+
+    await updatePendingStake(
+        pending.id,
+        {
+            status:"cancelled"
+        }
+    );
+
+    __stakingLock = false;
+
+    return {
+        error:"Payment failed"
+    };
+
+       }
+
+  console.error("❌ REAL PAYMENT ERROR:", err);
 
   __stakingLock = false;
 
-  return {
-    error:"Database update failed"
-  };
+  alert(err.message || err);
+
+  return {error:"Payment failed"};
+
+  }
+
+  console.log("PAYMENT RESULT:", payment);
+
+if(!payment){
+  __stakingLock = false;
+  return {error:"Invalid payment"};
+}
+
+   /* ===============================
+   UPDATE PENDING STAKE
+=============================== */
+
+try{
+
+    await updatePendingStake(
+        pending.id,
+        {
+            payment_id: payment.paymentId,
+            txid: payment.txid,
+            status: "paid",
+            network: "mainnet"
+        }
+    );
+
+    console.log("✅ Stake updated successfully");
+
+}catch(e){
+
+    console.error("❌ UPDATE ERROR:", e);
+
+    __stakingLock = false;
+
+    return {
+        error: "Database update failed"
+    };
 
 }
 
