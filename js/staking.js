@@ -414,7 +414,9 @@ async function getAllStakesMerged(){
 
     console.log("📊 Supabase data:", data);
 
-    return Array.isArray(data) ? data : [];
+    return Array.isArray(data)
+  ? data.filter(s => s.status === "paid")
+  : [];
 
   }catch(e){
 
@@ -483,7 +485,8 @@ async function getProjectTotals(project){
 
   const projectData = stakes.filter(s =>
   String(s.project).trim().toLowerCase() ===
-String(project).trim().toLowerCase() &&
+  String(project).trim().toLowerCase() &&
+  s.status === "paid" &&
   (
     s.type === "stake" ||
     s.type === "withdraw" ||
