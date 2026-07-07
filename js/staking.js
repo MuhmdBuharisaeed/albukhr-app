@@ -115,11 +115,12 @@ async function createPendingStake({
         amount,
         duration,
         reward,
-        withdrawnreward: 0,
-        withdrawncapital: 0,
-        unlocktime:
-          Date.now() +
-          (Number(duration) * 86400000),
+        withdrawnReward: 0,
+        withdrawnCapital: 0,
+
+  unlockTime:
+  Date.now() +
+  (Number(duration) * 86400000),
 
         type: "stake",
 
