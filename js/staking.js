@@ -394,7 +394,7 @@ async function getAllStakesMerged(){
   try{
 
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
+      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
       {
         headers:{
           "apikey": SUPABASE_KEY,
@@ -524,15 +524,15 @@ const user = JSON.parse(
 if(user?.uid){
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid`,
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
+  `${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid&network=eq.mainnet`,
+  {
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
     }
-  );
-
+  }
+);
+   
   if(res.ok){
 
     const withdrawals = await res.json();
@@ -565,7 +565,7 @@ async function getUserStakes(){
   const user = getCurrentUser();
 
   const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
   {
     headers:{
       "apikey": SUPABASE_KEY,
@@ -598,7 +598,7 @@ if(!user?.uid){
   }
 
   const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}`,
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
   {
     headers:{
       "apikey": SUPABASE_KEY,
@@ -715,7 +715,7 @@ if(!user?.uid){
   }
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&order=created_at.asc`,
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&network=eq.mainnet&order=created_at.asc`,
     {
       headers:{
         "apikey": SUPABASE_KEY,
