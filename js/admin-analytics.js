@@ -7,67 +7,58 @@
 =============================== */
 async function loadAnalytics(){
 
-try{
+  const payments =
+    await getWalletPayments();
 
-const payments =
-await getWalletPayments();
+  let received = 0;
+  let sent = 0;
 
-let received = 0;
-let sent = 0;
 let totalFees = 0;
 
-if(typeof supabaseClient !== "undefined"){
-
 const { data: fees } =
-await supabaseClient
-.from("transactions")
-.select("fee")
-.eq("status","paid");
+  await supabaseClient
+    .from("transactions")
+    .select("fee")
+    .eq("status","paid");
 
 (fees || []).forEach(tx=>{
 
-totalFees +=
-Number(tx.fee || 0);
+  totalFees +=
+    Number(tx.fee || 0);
 
 });
 
-}
+  payments.forEach(tx => {
 
-payments.forEach(tx=>{
+    const amount =
+      Number(tx.amount || 0);
 
-const amount =
-Number(tx.amount || 0);
+    if(tx.to === ALBUKHR_WALLET){
 
-if(tx.to === ALBUKHR_WALLET){
+      received += amount;
 
-received += amount;
+    }else if(tx.from === ALBUKHR_WALLET){
 
-}else if(tx.from === ALBUKHR_WALLET){
+      sent += amount;
 
-sent += amount;
+    }
 
-}
+  });
 
+  const totalTransactions =
+    payments.length;
+
+  const netFlow =
+    received - sent;
+
+  renderAnalytics({
+  received,
+  sent,
+  totalTransactions,
+  netFlow,
+  totalFees
 });
 
-renderAnalytics({
-
-received,
-sent,
-totalTransactions: payments.length,
-netFlow: received - sent,
-totalFees
-
-});
-
-}catch(error){
-
-console.error(
-"Analytics Error:",
-error
-);
-
-}
 }
 
 /* ===============================
@@ -75,59 +66,64 @@ error
 =============================== */
 function renderAnalytics(data){
 
-const receivedBox =
-document.getElementById("totalReceived");
+  const receivedBox =
+    document.getElementById(
+      "totalReceived"
+    );
 
-const sentBox =
-document.getElementById("totalSent");
+  const sentBox =
+    document.getElementById(
+      "totalSent"
+    );
 
-const txBox =
-document.getElementById("totalTransactions");
+  const txBox =
+    document.getElementById(
+      "totalTransactions"
+    );
 
-const flowBox =
-document.getElementById("netFlow");
+  const flowBox =
+    document.getElementById(
+      "netFlow"
+    );
 
-const feeBox =
-document.getElementById("totalFees");
+ const feeBox =
+  document.getElementById(
+    "totalFees"
+  );
+   
+  if(receivedBox){
+    receivedBox.innerText =
+      data.received.toFixed(2) + " Pi";
+  }
 
-if(receivedBox){
+  if(sentBox){
+    sentBox.innerText =
+      data.sent.toFixed(2) + " Pi";
+  }
 
-receivedBox.innerText =
-data.received.toFixed(2) + " Pi";
+  if(txBox){
+    txBox.innerText =
+      data.totalTransactions;
+  }
+
+  if(flowBox){
+
+    flowBox.innerText =
+      data.netFlow.toFixed(2) + " Pi";
+
+  if(feeBox){
+
+  feeBox.innerText =
+    (data.totalFees || 0)
+      .toFixed(2) + " Pi";
+
+  }   
+     
+    flowBox.style.color =
+      data.netFlow >= 0
+      ? "green"
+      : "red";
+
+  }
 
 }
-
-if(sentBox){
-
-sentBox.innerText =
-data.sent.toFixed(2) + " Pi";
-
-}
-
-if(txBox){
-
-txBox.innerText =
-data.totalTransactions;
-
-}
-
-if(flowBox){
-
-flowBox.innerText =
-data.netFlow.toFixed(2) + " Pi";
-
-flowBox.style.color =
-data.netFlow >= 0
-? "green"
-: "red";
-
-}
-
-if(feeBox){
-
-feeBox.innerText =
-(data.totalFees || 0).toFixed(2) + " Pi";
-
-}
-
-   }
