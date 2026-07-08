@@ -31,12 +31,7 @@ async function ensurePiAuth(){
 
 try{
 
-const cached = JSON.parse(localStorage.getItem("pi_user"));
-
-if(cached?.uid){
-    __pi_user = cached;
-    return cached;
-}
+localStorage.removeItem("pi_user");
 
 const scopes = [
   "username",
@@ -78,6 +73,9 @@ localStorage.setItem(
   "pi_user",
   JSON.stringify(user)
 );
+
+console.log("Scopes:", auth.scopes);
+console.log("User:", user);
 
 return user;
 
