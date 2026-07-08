@@ -29,7 +29,7 @@ async function getAdmin(){
       .select("*")
       .eq("session_token", token)
       .eq("status", "active")
-      .single();
+      .maybeSingle();
 
     if(error || !data){
 
