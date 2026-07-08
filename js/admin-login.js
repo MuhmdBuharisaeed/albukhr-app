@@ -1,6 +1,6 @@
 // =======================================
-// ALBUKHR ADMIN LOGIN ENGINE v3
-// Mainnet • Supabase
+// ALBUKHR ADMIN LOGIN ENGINE v4
+// Mainnet • Supabase • Pi Browser Safe
 // =======================================
 
 const SUPABASE_URL =
@@ -9,154 +9,242 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2";
 
-const supabase =
+const supabaseClient =
 window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+SUPABASE_URL,
+SUPABASE_KEY
 );
+
+window.supabaseClient =
+supabaseClient;
 
 const SESSION_DURATION =
 2 * 60 * 60 * 1000;
 
-/* ======================================
-   ADMIN LOGIN
-====================================== */
+/* ===============================
+CREATE TOKEN
+=============================== */
+
+function createSessionToken(){
+
+return (
+Date.now().toString(36) +
+Math.random()
+.toString(36)
+.substring(2) +
+Math.random()
+.toString(36)
+.substring(2)
+);
+
+}
+
+/* ===============================
+ADMIN LOGIN
+=============================== */
 
 async function adminLogin(
-  username,
-  password
+username,
+password
 ){
 
-  try{
+try{
 
-    /* FIND ADMIN */
+const {
+data:admin,
+error:adminError
+} =
+await supabaseClient
+.from("admin_users")
+.select("*")
+.eq("username",username)
+.eq("password",password)
+.eq("status","active")
+.single();
 
-    const { data: admin, error } =
-      await supabase
-      .from("admin_users")
-      .select("*")
-      .eq("username", username)
-      .eq("password", password)
-      .eq("status","active")
-      .single();
+if(adminError){
 
-    if(error || !admin){
+console.error(adminError);
 
-      return {
-        success:false,
-        error:"Invalid username or password"
-      };
+return{
+success:false,
+error:adminError.message
+};
 
-    }
+}
 
-    /* CREATE TOKEN */
+if(!admin){
 
-    const token =
-      crypto.randomUUID();
+return{
+success:false,
+error:"Invalid username or password"
+};
 
-    const now =
-      new Date();
+}
 
-    const expires =
-      new Date(
-        now.getTime() +
-        SESSION_DURATION
-      );
+const token =
+createSessionToken();
 
-    /* SAVE SESSION */
+const now =
+new Date();
 
-    const {
-      error: sessionError
-    } =
-    await supabase
-    .from("admin_sessions")
-    .insert({
+const expires =
+new Date(
+now.getTime() +
+SESSION_DURATION
+);
 
-      admin_username:
-        admin.username,
+/* ===============================
+SAVE SESSION
+=============================== */
 
-      admin_role:
-        admin.role,
+const {
+error:sessionError
+} =
+await supabaseClient
+.from("admin_sessions")
+.insert({
 
-      session_token:
-        token,
+admin_username:
+admin.username,
 
-      login_time:
-        now.toISOString(),
+admin_role:
+admin.role,
 
-      expires_at:
-        expires.toISOString(),
+session_token:
+token,
 
-      last_activity:
-        now.toISOString(),
+login_time:
+now.toISOString(),
 
-      status:"active"
+expires_at:
+expires.toISOString(),
 
-    });
+last_activity:
+now.toISOString(),
 
-    if(sessionError){
+status:"active"
 
-      return {
-        success:false,
-        error:sessionError.message
-      };
+});
 
-    }
+if(sessionError){
 
-    /* UPDATE LAST LOGIN */
+console.error(sessionError);
 
-    await supabase
-    .from("admin_users")
-    .update({
+return{
+success:false,
+error:sessionError.message
+};
 
-      last_login:
-        now.toISOString()
+}
 
-    })
-    .eq("id", admin.id);
+/* ===============================
+UPDATE LAST LOGIN
+=============================== */
 
-    /* SAVE LOCAL */
+await supabaseClient
+.from("admin_users")
+.update({
 
-    localStorage.setItem(
-      "albukhr_admin_token",
-      token
-    );
+last_login:
+now.toISOString()
 
-    localStorage.setItem(
-      "albukhr_admin_username",
-      admin.username
-    );
+})
+.eq("id",admin.id);
 
-    localStorage.setItem(
-      "albukhr_admin_role",
-      admin.role
-    );
+/* ===============================
+SAVE LOCAL SESSION
+=============================== */
 
-    return{
+localStorage.setItem(
+"albukhr_admin_token",
+token
+);
 
-      success:true,
+localStorage.setItem(
+"albukhr_admin_username",
+admin.username
+);
 
-      username:
-        admin.username,
+localStorage.setItem(
+"albukhr_admin_role",
+admin.role
+);
 
-      role:
-        admin.role
+/* ===============================
+RETURN SUCCESS
+=============================== */
 
-    };
+return{
 
-  }catch(err){
+success:true,
 
-    console.error(err);
+token,
 
-    return{
+username:
+admin.username,
 
-      success:false,
+role:
+admin.role
 
-      error:
-        err.message
+};
 
-    };
+}catch(err){
 
-  }
+console.error(err);
+
+return{
+
+success:false,
+
+error:
+err.message ||
+"Unexpected login error"
+
+};
+
+}
+
+}
+
+/* ===============================
+AUTO LOGOUT
+=============================== */
+
+async function adminLogout(){
+
+const token =
+localStorage.getItem(
+"albukhr_admin_token"
+);
+
+if(token){
+
+await supabaseClient
+.from("admin_sessions")
+.update({
+status:"logged_out"
+})
+.eq(
+"session_token",
+token
+);
+
+}
+
+localStorage.removeItem(
+"albukhr_admin_token"
+);
+
+localStorage.removeItem(
+"albukhr_admin_username"
+);
+
+localStorage.removeItem(
+"albukhr_admin_role"
+);
+
+window.location.href =
+"admin-login.html";
 
 }
