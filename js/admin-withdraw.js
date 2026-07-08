@@ -15,6 +15,7 @@ async function fetchWithdrawRequests(){
     .from("withdraw_requests")
     .select("*")
     .eq("status", "pending")
+    .eq("network","mainnet")
     .order("created_at", { ascending:false });
 
   if(error){
@@ -54,20 +55,29 @@ async function renderPendingRequests(){
     ? requests
     : requests.slice(0,3);
 
-visible.forEach(req => {
+visible.forEach(req=>{
 
-if(requests.length > 3){
+box.innerHTML += `...`;
 
-  box.innerHTML += `
-    <div style="text-align:center;margin-top:10px;">
-      <button onclick="
-        pendingExpanded=!pendingExpanded;
-        renderPendingRequests();
-      ">
-        ${pendingExpanded ? "Show Less" : "See More"}
-      </button>
-    </div>
-  `;
+});
+
+if(requests.length>3){
+
+box.innerHTML += `
+<div style="text-align:center">
+
+<button onclick="
+pendingExpanded=!pendingExpanded;
+renderPendingRequests();
+">
+
+${pendingExpanded?"Show Less":"See More"}
+
+</button>
+
+</div>
+`;
+
 }
    
     box.innerHTML += `
@@ -134,6 +144,7 @@ async function approveRequest(id){
     .select("*")
     .eq("userid", data.userid)
     .eq("project", data.project);
+    .eq("network","mainnet")
 
   let totalReward = 0;
 
@@ -205,6 +216,7 @@ async function approveRequest(id){
       .from("withdraw_requests")
       .update({
         status: "approved"
+       network:"mainnet" 
       })
       .eq("id", id);
 
@@ -251,6 +263,7 @@ async function fetchApprovedRequests(){
     .from("withdraw_requests")
     .select("*")
     .eq("status","approved")
+    .eq("network","mainnet")
     .order("created_at",{ascending:false});
 
   if(error){
@@ -290,21 +303,30 @@ async function renderApprovedRequests(){
     ? requests
     : requests.slice(0,3);
 
-visible.forEach(req => {
+visible.forEach(req=>{
 
-   if(requests.length > 3){
+box.innerHTML += `...`;
 
-  box.innerHTML += `
-    <div style="text-align:center;margin-top:10px;">
-      <button onclick="
-        approvedExpanded=!approvedExpanded;
-        renderApprovedRequests();
-      ">
-        ${approvedExpanded ? "Show Less" : "See More"}
-      </button>
-    </div>
-  `;
-   }
+});
+
+if(requests.length>3){
+
+box.innerHTML += `
+<div style="text-align:center">
+
+<button onclick="
+pendingExpanded=!pendingExpanded;
+renderPendingRequests();
+">
+
+${pendingExpanded?"Show Less":"See More"}
+
+</button>
+
+</div>
+`;
+
+}
 
     box.innerHTML += `
       <div class="tx">
@@ -341,7 +363,7 @@ async function payRequest(id){
   try{
 
     const response = await fetch(
-      "https://test-albukhr-api.onrender.com/pay-withdraw",
+      "https://albukhr-api.onrender.com/pay-withdraw",
       {
         method:"POST",
         headers:{
@@ -437,6 +459,7 @@ async function fetchPaidRequests(){
     .from("withdraw_requests")
     .select("*")
     .eq("status","paid")
+    .eq("network","mainnet")
     .order("processed_at",{ascending:false});
 
   if(error){
@@ -476,21 +499,30 @@ async function renderPaidRequests(){
     ? requests
     : requests.slice(0,3);
 
-visible.forEach(req => {
+visible.forEach(req=>{
 
-   if(requests.length > 3){
+box.innerHTML += `...`;
 
-  box.innerHTML += `
-    <div style="text-align:center;margin-top:10px;">
-      <button onclick="
-        paidExpanded=!paidExpanded;
-        renderPaidRequests();
-      ">
-        ${paidExpanded ? "Show Less" : "See More"}
-      </button>
-    </div>
-  `;
-   }
+});
+
+if(requests.length>3){
+
+box.innerHTML += `
+<div style="text-align:center">
+
+<button onclick="
+pendingExpanded=!pendingExpanded;
+renderPendingRequests();
+">
+
+${pendingExpanded?"Show Less":"See More"}
+
+</button>
+
+</div>
+`;
+
+}
 
     box.innerHTML += `
       <div class="tx">
@@ -527,6 +559,7 @@ async function markRewardAsPaid(userid, project, amount){
       .select("*")
       .eq("userid", userid)
       .eq("project", project);
+      .eq("network","mainnet")
 
    if(error){
       return { error:error.message };
@@ -589,6 +622,7 @@ async function markCapitalAsPaid(
       .select("*")
       .eq("userid", userid)
       .eq("project", project);
+      .eq("network","mainnet")
 
   if(error){
     return { error:error.message };
