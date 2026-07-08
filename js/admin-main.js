@@ -2,6 +2,8 @@ document.addEventListener(
 "DOMContentLoaded",
 async()=>{
 
+try{
+
 const admin =
 await getCurrentAdminSession();
 
@@ -14,15 +16,11 @@ return;
 
 }
 
-/* Only Super Admin & Finance Admin */
-
 await requireAdminRole([
 "super_admin",
 "finance_admin"
 ]);
 
-/* INITIAL LOAD */
-
 await renderTreasuryOverview();
 
 await loadRecentTransactions();
@@ -36,11 +34,11 @@ await renderPendingRequests();
 await renderApprovedRequests();
 
 await renderPaidRequests();
-
-/* AUTO REFRESH */
 
 setInterval(async()=>{
 
+try{
+
 await renderTreasuryOverview();
 
 await loadRecentTransactions();
@@ -55,7 +53,27 @@ await renderApprovedRequests();
 
 await renderPaidRequests();
 
-},60000);
+}catch(error){
+
+console.error(
+"Auto Refresh Error:",
+error
+);
 
 }
+
+},60000);
+
+}catch(error){
+
+console.error(
+"Admin Wallet Init Error:",
+error
 );
+
+window.location.href =
+"admin-login.html";
+
+}
+
+});
