@@ -210,13 +210,16 @@ animation:flash 1s infinite;
 
   </div>
 
-<!-- ADMIN AUTH -->
-<script src="js/admin-supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
 <script src="js/admin-session.js"></script>
 <script src="js/admin-login.js"></script>
+<script src="js/admin-permissions.js"></script>
+<script src="js/admin-logout.js"></script>
 <script src="js/admin-guard.js"></script>
-  
-<!-- AUTH -->
+
 <script src="smart-liquidity-engine.js"></script>
 <script src="js/staking.js"></script>
 <script src="wallet-core.js"></script>
@@ -256,7 +259,7 @@ window.currentAdmin = admin;
 
 /* APPLY PERMISSIONS */
 
-await loadAdminPermissions(admin);
+await loadAdminPermissions();
 
 });
 
@@ -456,49 +459,6 @@ critical = true;
 triggerCriticalAlert(critical);
 
 }
-
-/* ==========================================
-   LOAD PERMISSIONS
-========================================== */
-
-async function loadAdminPermissions(admin){
-
-const { data, error } = await supabase
-.from("admin_permissions")
-.select("*")
-.eq("role", admin.role)
-.eq("status","active");
-
-if(error){
-
-console.error(error);
-return;
-
-}
-
-document.querySelectorAll(".admin-btn")
-.forEach(btn=>{
-
-btn.style.display = "none";
-
-});
-
-data.forEach(item=>{
-
-const btn =
-document.querySelector(
-`button[onclick="go('${item.page}')"]`
-);
-
-if(btn){
-
-btn.style.display = "block";
-
-}
-
-});
-
-  }
 
 /* ===============================
 TRIGGER ALERT
