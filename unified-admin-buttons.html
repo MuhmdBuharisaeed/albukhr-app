@@ -533,7 +533,14 @@ alert.style.display="none";
 /* INIT */
 
 updateAdminAlerts();
-setInterval(updateAdminAlerts,4000);
+checkCriticalRisk();
+
+setInterval(()=>{
+
+updateAdminAlerts();
+checkCriticalRisk();
+
+},4000);
 
 </script>
   
