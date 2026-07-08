@@ -60,7 +60,7 @@ await supabaseClient
 .eq("username",username)
 .eq("password",password)
 .eq("status","active")
-.single();
+.maybeSingle();
 
 if(adminError){
 
