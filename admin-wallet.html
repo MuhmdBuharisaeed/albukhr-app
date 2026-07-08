@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ALBUKHR – Admin Wallet Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{font-family:system-ui;background:#f4f6f8;margin:0}
+.header{background:#111;color:#fff;padding:14px;font-weight:700;text-align:center}
+.card{
+  background:#fff;
+  margin:16px;
+  padding:16px;
+  border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.06)
+}
+.stat{font-size:22px;font-weight:800}
+.btn{
+  padding:10px;border:none;border-radius:10px;
+  font-weight:700;margin-top:10px;width:100%;cursor:pointer
+}
+.lock{background:#c0392b;color:#fff}
+.unlock{background:#27ae60;color:#fff}
+.tx{font-size:13px;border-bottom:1px solid #eee;padding:10px 0}
+.tx-large{
+  background:#fff5f5;
+  border-left:4px solid #c0392b;
+  padding-left:8px
+}
+small{color:#666}
+.threshold-box{margin-top:10px}
+.threshold-box input{
+  width:100%;padding:8px;border-radius:8px;border:1px solid #ddd
+}
+.tx{
+  font-size:13px;
+  border-bottom:1px solid #eee;
+  padding:10px 0;
+  word-break:break-all;
+  overflow-wrap:anywhere;
+}
+
+.dashboard-row{
+  display:flex;
+  gap:16px;
+  margin:16px;
+}
+
+.half-card{
+  flex:1;
+  margin:0;
+}
+
+/* Mobile */
+@media(max-width:768px){
+  .dashboard-row{
+    flex-direction:column;
+  }
+}
+</style>
+
+<!-- LOAD ORDER IMPORTANT -->
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Supabase Client -->
+<script src="js/supabase.js"></script>
+
+<!-- ADMIN AUTH -->
+<script src="js/admin-supabase.js"></script>
+<script src="js/admin-session.js"></script>
+<script src="js/admin-login.js"></script>
+<script src="js/admin-guard.js"></script>
+
+<!-- Wallet -->
+<script src="js/wallet-tracker.js"></script>
+
+<!-- Admin Modules -->
+<script src="js/admin-treasury.js"></script>
+<script src="js/admin-transactions.js"></script>
+<script src="js/admin-alerts.js"></script>
+<script src="js/admin-analytics.js"></script>
+
+<!-- Reward Engine -->
+<script src="js/admin-reward-engine.js"></script>
+
+<!-- Withdraw System -->
+<script src="js/admin-withdraw.js?v=2"></script>
+
+<!-- Main Loader (LAST) -->
+<script src="js/admin-main.js"></script>
+
+</head>
+
+<!-- AUTO LIQUIDITY WARNING -->
+<div id="liquidityWarning"
+style="
+display:none;
+background:#f39c12;
+color:white;
+padding:12px;
+text-align:center;
+font-weight:700;
+">
+⚠️ Low Project Liquidity Detected
+</div>
+
+<body>
+
+<div class="header">
+  🔐 ALBUKHR – Admin Wallet Monitor
+</div>
+
+<!-- WALLET SUMMARY -->
+<div class="card">
+  <small>Admin Treasury</small>
+  <div class="stat" id="adminBalance">0.00 Pi</div>
+
+  <small>Status</small>
+  <div id="walletStatus">ACTIVE</div>
+</div>
+
+<div class="dashboard-row">
+
+  <!-- Wallet Analytics -->
+  <div class="card half-card">
+
+    <h3>📈 Wallet Analytics</h3>
+
+    <p><strong>Total Received:</strong>
+    <span id="totalReceived">0.00 Pi</span></p>
+
+    <p><strong>Total Sent:</strong>
+    <span id="totalSent">0.00 Pi</span></p>
+
+    <p><strong>Total Transactions:</strong>
+    <span id="totalTransactions">0</span></p>
+
+    <p><strong>Net Flow:</strong>
+    <span id="netFlow">0.00 Pi</span></p>
+
+    <p><strong>Fees Collected:</strong>
+    <span id="totalFees">0.00 Pi</span></p>
+
+  </div>
+
+  <!-- Treasury Overview -->
+  <div class="card half-card">
+
+    <h3>📊 Treasury Overview</h3>
+
+    <p><strong>Treasury:</strong>
+    <span id="treasuryBalance">0.00 Pi</span></p>
+
+    <p><strong>Pending:</strong>
+    <span id="pendingTotal">0.00 Pi</span></p>
+
+    <p><strong>Approved:</strong>
+    <span id="approvedTotal">0.00 Pi</span></p>
+
+    <p><strong>Liquidity Status:</strong>
+    <span id="liquidityStatus">🟢 SAFE</span></p>
+
+    <p><strong>Available Liquidity:</strong>
+    <span id="availableLiquidity">0.00 Pi</span></p>
+
+  </div>
+
+</div>
+
+<!-- WITHDRAWALS -->
+<div class="card">
+  <h4>🟡 Pending Withdraw Requests</h4>
+  <div id="pendingRequests"></div>
+</div>
+
+<div class="card">
+  <h4>🟢 Approved Withdrawals</h4>
+  <div id="approvedRequests"></div>
+</div>
+
+<div class="card">
+  <h4>💰 Paid Withdrawals</h4>
+  <div id="paidRequests"></div>
+</div>
+
+<!-- TRANSACTIONS -->
+<div class="card">
+  <h4>📜 Recent Transactions</h4>
+  <div id="adminTxList"></div>
+</div>
+
+<audio id="alertSound">
+  <source src="alert.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+document.addEventListener(
+"DOMContentLoaded",
+async()=>{
+
+const admin =
+await getCurrentAdminSession();
+
+if(!admin){
+
+window.location.href =
+"admin-login.html";
+
+return;
+
+}
+
+await requireAdminRole([
+"super_admin",
+"finance_admin"
+]);
+
+}); // Rufe addEventListener
+
+</script>
+  
+</body>
+  </html>
