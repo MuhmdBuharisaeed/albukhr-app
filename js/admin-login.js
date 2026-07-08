@@ -51,16 +51,23 @@ password
 try{
 
 const {
-data:admin,
-error:adminError
+data,
+error
 } =
 await supabaseClient
 .from("admin_users")
-.select("*")
-.eq("username",username)
-.eq("password",password)
-.eq("status","active")
-.maybeSingle();
+.select("*");
+
+console.log("ALL ADMINS:", data);
+console.log("ERROR:", error);
+
+const admin = data.find(a =>
+a.username === username &&
+a.password === password &&
+a.status === "active"
+);
+
+const adminError = error;
 
 if(adminError){
 
