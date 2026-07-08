@@ -1,117 +1,114 @@
 // =======================================
-// ALBUKHR ADMIN LOGOUT ENGINE v3
+// ALBUKHR ADMIN LOGOUT ENGINE v5
 // Mainnet • Supabase
 // =======================================
 
-/* ======================================
-   LOGOUT
-====================================== */
+/* ===============================
+CHECK SUPABASE
+=============================== */
+
+if(typeof supabaseClient==="undefined"){
+
+throw new Error(
+"supabase.js must load before admin-logout.js"
+);
+
+}
+
+/* ===============================
+ADMIN LOGOUT
+=============================== */
 
 async function adminLogout(){
 
-  try{
+try{
 
-    const token =
-      localStorage.getItem(
-        "albukhr_admin_token"
-      );
+const admin =
+await getCurrentAdminSession();
 
-    const username =
-      localStorage.getItem(
-        "albukhr_admin_username"
-      );
+const token =
+localStorage.getItem(
+"albukhr_admin_token"
+);
 
-    const role =
-      localStorage.getItem(
-        "albukhr_admin_role"
-      );
+if(admin && token){
 
-    if(token){
+/* Close Session */
 
-      /* CLOSE SESSION */
+await supabaseClient
+.from("admin_sessions")
+.update({
 
-      await supabase
-      .from("admin_sessions")
-      .update({
+status:"logged_out",
 
-        status:"closed",
+last_activity:
+new Date().toISOString()
 
-        last_activity:
-          new Date().toISOString()
+})
+.eq(
+"session_token",
+token
+);
 
-      })
-      .eq("session_token", token);
+/* Write Log */
 
-    }
+await supabaseClient
+.from("admin_logs")
+.insert({
 
-    /* SAVE LOG */
+admin_username:
+admin.username,
 
-    if(username && role){
+admin_role:
+admin.role,
 
-      await supabase
-      .from("admin_logs")
-      .insert({
+action:"logout",
 
-        admin_username:
-          username,
+description:
+"Administrator logged out.",
 
-        admin_role:
-          role,
+created_at:
+new Date().toISOString()
 
-        action:"logout",
-
-        status:"success"
-
-      });
-
-    }
-
-  }catch(e){
-
-    console.error(e);
-
-  }
-
-  /* CLEAR LOCAL STORAGE */
-
-  localStorage.removeItem(
-    "albukhr_admin_token"
-  );
-
-  localStorage.removeItem(
-    "albukhr_admin_username"
-  );
-
-  localStorage.removeItem(
-    "albukhr_admin_role"
-  );
-
-  /* REDIRECT */
-
-  window.location.href =
-    "admin-login.html";
+});
 
 }
 
-/* ======================================
-   FORCE LOGOUT
-====================================== */
+/* Clear Local */
+
+clearAdminSession();
+
+/* Redirect */
+
+window.location.replace(
+"admin-login.html"
+);
+
+}catch(err){
+
+console.error(err);
+
+/* Force Clear */
+
+clearAdminSession();
+
+window.location.replace(
+"admin-login.html"
+);
+
+}
+
+}
+
+/* ===============================
+FORCE LOGOUT
+=============================== */
 
 function forceAdminLogout(){
 
-  localStorage.removeItem(
-    "albukhr_admin_token"
-  );
+clearAdminSession();
 
-  localStorage.removeItem(
-    "albukhr_admin_username"
-  );
-
-  localStorage.removeItem(
-    "albukhr_admin_role"
-  );
-
-  window.location.href =
-    "admin-login.html";
-
-}
+window.location.replace(
+"admin-login.html"
+);
+   }
