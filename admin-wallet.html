@@ -190,32 +190,5 @@ font-weight:700;
   <source src="alert.mp3" type="audio/mpeg">
 </audio>
 
-<script>
-
-document.addEventListener(
-"DOMContentLoaded",
-async()=>{
-
-const admin =
-await getCurrentAdminSession();
-
-if(!admin){
-
-window.location.href =
-"admin-login.html";
-
-return;
-
-}
-
-await requireAdminRole([
-"super_admin",
-"finance_admin"
-]);
-
-}); // Rufe addEventListener
-
-</script>
-  
 </body>
-  </html>
+</html>
