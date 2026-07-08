@@ -166,10 +166,13 @@ body{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="js/supabase.js"></script>
+
 <script src="js/admin-login.js"></script>
 <script src="js/admin-session.js"></script>
 <script src="js/admin-permissions.js"></script>
 <script src="js/admin-logout.js"></script>
+<script src="js/admin-guard.js"></script>
 
 <script>
 
@@ -178,12 +181,13 @@ body{
 (async()=>{
 
 const session =
-await getAdmin();
+await getCurrentAdminSession();
 
 if(session){
 
-window.location.href =
-"unified-admin-buttons.html";
+window.location.replace(
+"unified-admin-buttons.html"
+);
 
 }
 
@@ -192,6 +196,20 @@ window.location.href =
 /* LOGIN */
 
 async function login(){
+
+if(!key){
+
+alert(
+"Please enter your access key."
+);
+
+btn.disabled = false;
+btn.innerText =
+"Access Control Center";
+
+return;
+
+}
 
 const btn =
 document.querySelector(".login-btn");
