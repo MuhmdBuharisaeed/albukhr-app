@@ -10,37 +10,54 @@ const CRITICAL_BALANCE_LIMIT = 20;
 =============================== */
 async function checkLiquidity(){
 
-  const balance =
-    await getWalletBalance();
+try{
 
-  const warning =
-    document.getElementById(
-      "liquidityWarning"
-    );
+const balance =
+await getWalletBalance();
 
-  if(!warning) return;
+const warning =
+document.getElementById(
+"liquidityWarning"
+);
 
-  if(balance <= CRITICAL_BALANCE_LIMIT){
+if(!warning) return;
 
-    warning.style.display = "block";
-    warning.style.background = "#c0392b";
+if(balance <= CRITICAL_BALANCE_LIMIT){
 
-    warning.innerHTML =
-      "🚨 CRITICAL LIQUIDITY";
+warning.style.display="block";
+warning.style.background="#c0392b";
+warning.innerHTML="🚨 CRITICAL LIQUIDITY";
 
-    return;
-  }
+return;
 
-  if(balance <= LOW_BALANCE_LIMIT){
-
-    warning.style.display = "block";
-    warning.style.background = "#f39c12";
-
-    warning.innerHTML =
-      "⚠️ LOW LIQUIDITY";
-
-    return;
-  }
-
-  warning.style.display = "none";
 }
+
+if(balance <= LOW_BALANCE_LIMIT){
+
+warning.style.display="block";
+warning.style.background="#f39c12";
+warning.innerHTML="⚠️ LOW LIQUIDITY";
+
+return;
+
+}
+
+warning.style.display="none";
+
+}catch(error){
+
+console.error(
+"Liquidity check failed:",
+error
+);
+
+}
+
+}
+
+checkLiquidity();
+
+setInterval(
+checkLiquidity,
+30000
+);
