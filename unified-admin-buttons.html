@@ -268,63 +268,6 @@ function go(page){
   window.location.href = page;
 }
 
-/* ==========================================
-   LOAD PERMISSIONS FROM SUPABASE
-========================================== */
-
-async function loadAdminPermissions(admin){
-
-const { data, error } = await supabase
-.from("admin_permissions")
-.select("page")
-.eq("role", admin.role)
-.eq("status","active");
-
-if(error){
-console.error(error);
-return;
-}
-
-/* Boye duk buttons */
-document.querySelectorAll(".admin-btn")
-.forEach(btn=>{
-btn.style.display = "none";
-});
-
-/* Nuna wadanda aka ba permission */
-data.forEach(item=>{
-
-const btn = document.querySelector(
-`button[onclick="go('${item.page}')"]`
-);
-
-if(btn){
-btn.style.display = "block";
-}
-
-});
-
-  }
-
-/* ==========================================
-   HIDE BUTTON
-========================================== */
-
-function hideButton(page){
-
-const btn =
-document.querySelector(
-`button[onclick="go('${page}')"]`
-);
-
-if(btn){
-
-btn.style.display = "none";
-
-}
-
-}
-
 /* ===============================
 UNIFIED ALERT ENGINE
 =============================== */
@@ -407,7 +350,7 @@ EXTERNAL PROJECT ALERT
 function updateExternalBadge(){
 
 const badge =
-document.getElementById("externalBadge");
+document.getElementById("externalAdminBadge");
 
 if(!badge) return;
 
