@@ -1,30 +1,61 @@
 document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+"DOMContentLoaded",
+async()=>{
 
-    renderTreasuryOverview();
-    loadRecentTransactions();
-    checkLiquidity();
-    loadAnalytics();
+const admin =
+await getCurrentAdminSession();
 
-    // Withdraw Sections
-    renderPendingRequests();
-    renderApprovedRequests();
-    renderPaidRequests();
+if(!admin){
 
-    setInterval(() => {
+window.location.href =
+"admin-login.html";
 
-      renderTreasuryOverview();
-      loadRecentTransactions();
-      checkLiquidity();
-      loadAnalytics();
+return;
 
-      // Refresh Withdraw Sections
-      renderPendingRequests();
-      renderApprovedRequests();
-      renderPaidRequests();
+}
 
-    }, 60000);
+/* Only Super Admin & Finance Admin */
 
-  }
+await requireAdminRole([
+"super_admin",
+"finance_admin"
+]);
+
+/* INITIAL LOAD */
+
+await renderTreasuryOverview();
+
+await loadRecentTransactions();
+
+await checkLiquidity();
+
+await loadAnalytics();
+
+await renderPendingRequests();
+
+await renderApprovedRequests();
+
+await renderPaidRequests();
+
+/* AUTO REFRESH */
+
+setInterval(async()=>{
+
+await renderTreasuryOverview();
+
+await loadRecentTransactions();
+
+await checkLiquidity();
+
+await loadAnalytics();
+
+await renderPendingRequests();
+
+await renderApprovedRequests();
+
+await renderPaidRequests();
+
+},60000);
+
+}
 );
