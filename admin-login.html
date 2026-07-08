@@ -168,8 +168,8 @@ body{
 
 <script src="js/supabase.js"></script>
 
-<script src="js/admin-login.js"></script>
 <script src="js/admin-session.js"></script>
+<script src="js/admin-login.js"></script>
 <script src="js/admin-permissions.js"></script>
 <script src="js/admin-logout.js"></script>
 <script src="js/admin-guard.js"></script>
@@ -241,6 +241,11 @@ await adminLogin(
 username,
 key
 );
+
+btn.disabled = false;
+
+btn.innerText =
+"Access Control Center";
 
 btn.disabled=false;
 
