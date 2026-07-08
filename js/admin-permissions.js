@@ -1,137 +1,276 @@
 // =======================================
-// ALBUKHR ADMIN PERMISSIONS ENGINE v3
+// ALBUKHR ADMIN PERMISSIONS ENGINE v5
 // Mainnet • Supabase
 // =======================================
 
-/* ======================================
-   HAS PERMISSION
-====================================== */
+/* ===============================
+CHECK SUPABASE
+=============================== */
 
-async function hasPermission(permission){
+if(typeof supabaseClient==="undefined"){
 
-  const role =
-    localStorage.getItem(
-      "albukhr_admin_role"
-    );
-
-  if(!role){
-    return false;
-  }
-
-  try{
-
-    const { data, error } =
-      await supabase
-      .from("admin_permissions")
-      .select("*")
-      .eq("role", role);
-
-    if(error){
-      console.error(error);
-      return false;
-    }
-
-    if(!Array.isArray(data)){
-      return false;
-    }
-
-    /* Super Admin */
-
-    if(
-      data.some(
-        p => p.permission === "*"
-      )
-    ){
-      return true;
-    }
-
-    /* Specific Permission */
-
-    return data.some(
-      p => p.permission === permission
-    );
-
-  }catch(e){
-
-    console.error(e);
-
-    return false;
-
-  }
+throw new Error(
+"supabase.js must load before admin-permissions.js"
+);
 
 }
 
-/* ======================================
-   REQUIRE PERMISSION
-====================================== */
+/* ===============================
+LOAD ROLE PERMISSIONS
+=============================== */
 
-async function requirePermission(permission){
+async function getRolePermissions(){
 
-  const logged =
-    await isAdminLoggedIn();
+const admin =
+await getCurrentAdminSession();
 
-  if(!logged){
+if(!admin){
 
-    alert("Admin login required");
-
-    window.location.href =
-      "admin-login.html";
-
-    return false;
-
-  }
-
-  const allowed =
-    await hasPermission(permission);
-
-  if(!allowed){
-
-    alert(
-      "You do not have permission to access this page."
-    );
-
-    window.location.href =
-      "unified-admin-buttons.html";
-
-    return false;
-
-  }
-
-  return true;
+return [];
 
 }
 
-/* ======================================
-   REQUIRE ROLE
-====================================== */
+const {
 
-async function requireRole(roles){
+data,
+error
 
-  const role =
-    await getAdminRole();
+} =
+await supabaseClient
+.from("admin_permissions")
+.select("*")
+.eq(
+"role",
+admin.role
+)
+.eq(
+"status",
+"active"
+);
 
-  if(!role){
+if(error){
 
-    window.location.href =
-      "admin-login.html";
+console.error(error);
 
-    return false;
+return [];
 
-  }
+}
 
-  if(
-    !roles.includes(role)
-  ){
+return data || [];
 
-    alert("Access denied");
+}
 
-    window.location.href =
-      "unified-admin-buttons.html";
+/* ===============================
+HAS PERMISSION
+=============================== */
 
-    return false;
+async function hasPermission(
+permission
+){
 
-  }
+const permissions =
+await getRolePermissions();
 
-  return true;
+if(!permissions.length){
+
+return false;
+
+}
+
+/* SUPER ADMIN */
+
+if(
+
+permissions.some(
+p=>p.permission==="*"
+)
+
+){
+
+return true;
+
+}
+
+/* SPECIFIC */
+
+return permissions.some(
+p=>p.permission===permission
+);
+
+/* ===============================
+REQUIRE PERMISSION
+=============================== */
+
+async function requirePermission(
+permission
+){
+
+const logged =
+await isAdminLoggedIn();
+
+if(!logged){
+
+window.location.href =
+"admin-login.html";
+
+return false;
+
+}
+
+const allowed =
+await hasPermission(
+permission
+);
+
+if(!allowed){
+
+alert(
+"You do not have permission to access this page."
+);
+
+window.location.href =
+"unified-admin-buttons.html";
+
+return false;
+
+}
+
+return true;
+
+}
+
+/* ===============================
+REQUIRE ROLE
+=============================== */
+
+async function requireRole(
+roles
+){
+
+const role =
+await getAdminRole();
+
+if(!role){
+
+window.location.href =
+"admin-login.html";
+
+return false;
+
+}
+
+if(
+!roles.includes(role)
+){
+
+alert(
+"Access denied."
+);
+
+window.location.href =
+"unified-admin-buttons.html";
+
+return false;
+
+}
+
+return true;
+
+}
+
+/* ===============================
+LOAD PAGE PERMISSIONS
+=============================== */
+
+async function loadAdminPermissions(){
+
+const admin =
+await getCurrentAdminSession();
+
+if(!admin){
+
+return;
+
+}
+
+const {
+
+data,
+error
+
+} =
+await supabaseClient
+.from("admin_permissions")
+.select("*")
+.eq(
+"role",
+admin.role
+)
+.eq(
+"status",
+"active"
+);
+
+if(error){
+
+console.error(error);
+
+return;
+
+}
+
+document
+.querySelectorAll(
+".admin-btn"
+)
+.forEach(btn=>{
+
+btn.style.display =
+"none";
+
+});
+
+(data||[])
+.forEach(item=>{
+
+const btn =
+document.querySelector(
+
+`button[onclick="go('${item.page}')"]`
+
+);
+
+if(btn){
+
+btn.style.display =
+"block";
+
+}
+
+});
+
+}
+
+/* ===============================
+HIDE BUTTON
+=============================== */
+
+function hideButton(
+page
+){
+
+const btn =
+document.querySelector(
+
+`button[onclick="go('${page}')"]`
+
+);
+
+if(btn){
+
+btn.style.display =
+"none";
+
+}
 
 }
