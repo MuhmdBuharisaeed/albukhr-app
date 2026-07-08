@@ -210,59 +210,30 @@ animation:flash 1s infinite;
 
   </div>
 
-<!-- ADMIN AUTH -->
-<script src="js/admin-supabase.js"></script>
-<script src="js/admin-session.js"></script>
-<script src="js/admin-login.js"></script>
-<script src="js/admin-guard.js"></script>
-  
 <!-- AUTH -->
+<script src="js/admin-auth.js"></script>
 <script src="smart-liquidity-engine.js"></script>
 <script src="js/staking.js"></script>
 <script src="wallet-core.js"></script>
 
 <script>
 
-/* ==========================================
-   LOAD ADMIN SESSION
-========================================== */
+/* Allow all main admin roles */
+requireRole(["super_admin","finance_admin","review_admin","viewer_admin"]);
 
-document.addEventListener("DOMContentLoaded", async ()=>{
+/* Get current admin */
+const admin = getAdmin();
 
-const admin =
-await getCurrentAdminSession();
+/* Show role badge */
+if(admin){
+  document.getElementById("adminRoleBadge").innerText =
+    admin.role.replace("_"," ").toUpperCase();
 
-if(!admin){
-
-window.location.href =
-"admin-login.html";
-
-return;
-
+  /* Show Super Admin button only if role is super_admin */
+  if(admin.role === "super_admin"){
+    document.getElementById("superAdminBtn").style.display = "block";
+  }
 }
-
-/* ROLE BADGE */
-
-document.getElementById(
-"adminRoleBadge"
-).innerText =
-(admin.role || "")
-.replaceAll("_"," ")
-.toUpperCase();
-
-/* SAVE CURRENT ADMIN */
-
-window.currentAdmin = admin;
-
-/* APPLY PERMISSIONS */
-
-await loadAdminPermissions(admin);
-
-});
-
-/* ==========================================
-   GO PAGE
-========================================== */
 
 function go(page){
   window.location.href = page;
@@ -350,7 +321,7 @@ EXTERNAL PROJECT ALERT
 function updateExternalBadge(){
 
 const badge =
-document.getElementById("externalAdminBadge");
+document.getElementById("externalBadge");
 
 if(!badge) return;
 
@@ -457,49 +428,6 @@ triggerCriticalAlert(critical);
 
 }
 
-/* ==========================================
-   LOAD PERMISSIONS
-========================================== */
-
-async function loadAdminPermissions(admin){
-
-const { data, error } = await supabase
-.from("admin_permissions")
-.select("*")
-.eq("role", admin.role)
-.eq("status","active");
-
-if(error){
-
-console.error(error);
-return;
-
-}
-
-document.querySelectorAll(".admin-btn")
-.forEach(btn=>{
-
-btn.style.display = "none";
-
-});
-
-data.forEach(item=>{
-
-const btn =
-document.querySelector(
-`button[onclick="go('${item.page}')"]`
-);
-
-if(btn){
-
-btn.style.display = "block";
-
-}
-
-});
-
-  }
-
 /* ===============================
 TRIGGER ALERT
 =============================== */
@@ -533,16 +461,9 @@ alert.style.display="none";
 /* INIT */
 
 updateAdminAlerts();
-checkCriticalRisk();
-
-setInterval(()=>{
-
-updateAdminAlerts();
-checkCriticalRisk();
-
-},4000);
+setInterval(updateAdminAlerts,4000);
 
 </script>
   
 </body>
-  </html>
+</html>
