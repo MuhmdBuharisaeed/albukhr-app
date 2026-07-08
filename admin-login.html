@@ -194,8 +194,18 @@ window.location.replace(
 })();
 
 /* LOGIN */
-
 async function login(){
+
+const btn =
+document.querySelector(".login-btn");
+
+const role =
+document.getElementById("role").value;
+
+const key =
+document.getElementById("key")
+.value
+.trim();
 
 if(!key){
 
@@ -203,27 +213,15 @@ alert(
 "Please enter your access key."
 );
 
-btn.disabled = false;
-btn.innerText =
-"Access Control Center";
-
 return;
 
 }
 
-const btn =
-document.querySelector(".login-btn");
-
 btn.disabled = true;
-btn.innerText = "Signing in...";
+btn.innerText =
+"Signing in...";
 
-const role =
-document.getElementById("role").value;
-
-const key =
-document.getElementById("key").value.trim();
-
-const USERNAMES = {
+const USERNAMES={
 
 super_admin:"admin",
 
@@ -244,8 +242,9 @@ username,
 key
 );
 
-btn.disabled = false;
-btn.innerText =
+btn.disabled=false;
+
+btn.innerText=
 "Access Control Center";
 
 if(!result.success){
@@ -256,11 +255,12 @@ return;
 
 }
 
-window.location.href =
-"unified-admin-buttons.html";
+window.location.replace(
+"unified-admin-buttons.html"
+);
 
   }
-
+  
 </script>
 
 </body>
