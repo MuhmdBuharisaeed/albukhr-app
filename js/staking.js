@@ -1,59 +1,120 @@
 // =======================================
-// ALBUKHR STAKING ENGINE (LOCAL FINAL)
-// Pi SDK Ready • No API • Mobile Safe
+// ALBUKHR MAINNET STAKING ENGINE v2 FINAL
+// Mainnet • Supabase • Pi SDK
 // =======================================
 
-const SUPABASE_URL = "https://qexmnghilahsvethlxem.supabase.co";
-const SUPABASE_KEY = "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2";
+const SUPABASE_URL =
+"https://ribpntyqdleytsyktdfb.supabase.co";
 
-const INTERNAL_KEY = "albukhr_stakes";
+const SUPABASE_KEY =
+"sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2";
+
+/* ======================================
+   NETWORK
+====================================== */
+
+const NETWORK = "mainnet";
 
 /* ======================================
    STORAGE
 ====================================== */
+
+const INTERNAL_KEY =
+"albukhr_mainnet_stakes";
+
 function _safeParse(key){
+
   try{
-    const data = JSON.parse(localStorage.getItem(key));
-    return Array.isArray(data) ? data : [];
+
+    const data =
+      JSON.parse(localStorage.getItem(key));
+
+    return Array.isArray(data)
+      ? data
+      : [];
+
   }catch{
+
     return [];
+
   }
+
 }
 
 function _save(key,data){
+
   if(Array.isArray(data)){
-    localStorage.setItem(key, JSON.stringify(data));
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(data)
+    );
+
   }
+
 }
 
 /* ======================================
-   USER
+   CURRENT USER
 ====================================== */
 
 function getCurrentUser(){
 
   try{
 
-    const user = JSON.parse(
-      localStorage.getItem("pi_user")
-    );
+    if(window.Pi && Pi.getUser){
 
-    if(user?.uid){
-      return user;
+      const user = Pi.getUser();
+
+      if(user?.uid){
+
+        return{
+
+          uid:user.uid,
+
+          username:user.username || "",
+
+          wallet_address:
+            user.wallet_address || ""
+
+        };
+
+      }
+
     }
 
   }catch(e){
-    console.warn("Unable to load local user");
+
+    console.warn(
+      "Pi user not ready",
+      e
+    );
+
   }
+
+  try{
+
+    const localUser =
+      JSON.parse(
+        localStorage.getItem("pi_user")
+      );
+
+    if(localUser?.uid){
+      return localUser;
+    }
+
+  }catch(e){}
 
   return null;
 
 }
 
 /* ======================================
-PROJECT RULES
+   PROJECT RULES
 ====================================== */
-const PROJECT_RULES = {
+
+const PROJECT_RULES={
+
 Raheem:{minStake:10},
 Hauwal:{minStake:10},
 Barsh:{minStake:10},
@@ -61,17 +122,29 @@ Khairat:{minStake:10},
 Urban:{minStake:10},
 Labbaika:{minStake:10},
 Azman:{minStake:10}
+
 };
 
 function getMinStake(project){
-return PROJECT_RULES?.[project]?.minStake || 0;
+
+  return PROJECT_RULES?.[project]?.minStake || 0;
+
 }
 
 /* ======================================
-REWARD RATES
+   STAKING LOCK
 ====================================== */
+
+let __stakingLock = false;
+
+/* ======================================
+   REWARD RATES
+====================================== */
+
 function getRate(project,duration){
-const table = {
+
+const table={
+
 Raheem:{30:0.01,60:0.025,90:0.05},
 Hauwal:{30:0.02,60:0.04,90:0.08},
 Khairat:{30:0.025,60:0.05,90:0.09},
@@ -79,394 +152,746 @@ Barsh:{30:0.03,60:0.06,90:0.10},
 Labbaika:{30:0.02,60:0.045,90:0.075},
 Urban:{30:0.12,60:0.12,90:0.12},
 Azman:{30:0.04,60:0.07,90:0.12}
+
 };
 
 return table?.[project]?.[Number(duration)] || 0;
+
 }
 
 /* ======================================
    CREATE PENDING STAKE
 ====================================== */
+
 async function createPendingStake({
-  user,
-  project,
-  amount,
-  duration
-}) {
 
-  const reward =
-    Number(amount) *
-    getRate(project, Number(duration));
+user,
+project,
+amount,
+duration
 
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`,
-        "Prefer": "return=representation"
-      },
-      body: JSON.stringify({
-        userid: user.uid,
-        wallet: user.wallet_address || "",
-        project,
-        amount,
-        duration,
-        reward,
-        withdrawnReward: 0,
-        withdrawnCapital: 0,
+}){
 
-  unlockTime:
-  Date.now() +
-  (Number(duration) * 86400000),
+const reward =
+Number(amount) *
+getRate(project,Number(duration));
 
-        type: "stake",
+const res = await fetch(
 
-        status: "pending",
+`${SUPABASE_URL}/rest/v1/stakes`,
 
-        network: "mainnet",
+{
 
-        payment_id: null,
+method:"POST",
 
-        txid: null
-      })
-    }
-  );
+headers:{
 
-  if (!res.ok) {
+"Content-Type":"application/json",
 
-    throw new Error(
-      await res.text()
-    );
+"apikey":SUPABASE_KEY,
 
-  }
+"Authorization":
+`Bearer ${SUPABASE_KEY}`,
 
-  const rows = await res.json();
+"Prefer":"return=representation"
 
-  return rows[0];
+},
+
+body:JSON.stringify({
+
+userid:user.uid,
+
+wallet:
+user.wallet_address || "",
+
+project,
+
+amount:Number(amount),
+
+duration:Number(duration),
+
+reward,
+
+withdrawnReward:0,
+
+withdrawnCapital:0,
+
+unlockTime:
+Date.now() +
+(Number(duration) * 86400000),
+
+type:"stake",
+
+status:"pending",
+
+network:NETWORK,
+
+payment_id:null,
+
+txid:null
+
+})
+
+}
+
+);
+
+if(!res.ok){
+
+throw new Error(
+await res.text()
+);
+
+}
+
+const rows =
+await res.json();
+
+return rows[0];
 
 }
 
 /* ======================================
    UPDATE PENDING STAKE
 ====================================== */
+
 async function updatePendingStake(
-  id,
-  values
+id,
+values
 ){
 
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?id=eq.${id}`,
-    {
-      method:"PATCH",
-      headers:{
-        "Content-Type":"application/json",
-        "apikey":SUPABASE_KEY,
-        "Authorization":
-          `Bearer ${SUPABASE_KEY}`
-      },
-      body:JSON.stringify(values)
-    }
-  );
+const res = await fetch(
 
-  if(!res.ok){
+`${SUPABASE_URL}/rest/v1/stakes?id=eq.${id}&network=eq.${NETWORK}`,
 
-    throw new Error(
-      await res.text()
-    );
+{
 
-  }
+method:"PATCH",
 
-  return true;
+headers:{
+
+"Content-Type":"application/json",
+
+"apikey":SUPABASE_KEY,
+
+"Authorization":
+`Bearer ${SUPABASE_KEY}`
+
+},
+
+body:JSON.stringify(values)
 
 }
 
+);
+
+if(!res.ok){
+
+throw new Error(
+await res.text()
+);
+
+}
+
+return true;
+
+       }
+
 /* ======================================
-   ADD STAKE
+   ADD STAKE (MAINNET)
 ====================================== */
-let __stakingLock = false;
 
-async function addStake({project,amount,duration}){
+async function addStake({
 
-  if(__stakingLock){
-    return {error:"Processing..."};
-  }
+project,
 
-  __stakingLock = true;
+amount,
 
-  let user = null;
+duration
+
+}){
+
+if(__stakingLock){
+
+return{
+error:"Processing..."
+};
+
+}
+
+__stakingLock = true;
 
 try{
 
-  user = await ensurePiAuth();
+/* ===============================
+GET USER
+=============================== */
+
+let user = null;
+
+try{
+
+user = await ensurePiAuth();
 
 }catch(e){
 
-  console.error("AUTH ERROR:", e);
+console.warn(e);
 
 }
 
 if(!user?.uid){
 
-  user = JSON.parse(
-    localStorage.getItem("pi_user")
-  );
+user = getCurrentUser();
 
 }
 
 if(!user?.uid){
 
-  __stakingLock = false;
+__stakingLock = false;
 
-  alert(
-    "Pi login required. Please reopen inside Pi Browser."
-  );
-
-  return {
-    error:"Login required"
-  };
-
-}
-
-  if(!user?.uid){
-    __stakingLock = false;
-    return {error:"User not logged in"};
-  }
-
-  /* 🔐 PI CHECK */
-  if(typeof window.Pi === "undefined"){
-    __stakingLock = false;
-    return {error:"Pi SDK not ready"};
-  }
-
-  const safeAmount = Number(amount);
-  const safeDuration = Number(duration);
-
-  if(!project || safeAmount <= 0){
-    __stakingLock = false;
-    return {error:"Invalid input"};
-  }
-
-  if(safeAmount < getMinStake(project)){
-    __stakingLock = false;
-    return {error:"Minimum stake not reached"};
-  }
-
-  /* ===============================
-   CREATE PENDING STAKE
-=============================== */
-
-let pending;
-
-try{
-
-    pending = await createPendingStake({
-        user,
-        project,
-        amount: safeAmount,
-        duration: safeDuration
-    });
-
-}catch(err){
-
-    __stakingLock = false;
-
-    return {
-        error: err.message
-    };
+return{
+error:"Login required"
+};
 
 }
 
 /* ===============================
-   PI PAYMENT
+VALIDATION
+=============================== */
+
+const safeAmount =
+Number(amount);
+
+const safeDuration =
+Number(duration);
+
+if(!project){
+
+__stakingLock = false;
+
+return{
+error:"Invalid project"
+};
+
+}
+
+if(
+!Number.isFinite(safeAmount) ||
+safeAmount<=0
+){
+
+__stakingLock = false;
+
+return{
+error:"Invalid amount"
+};
+
+}
+
+if(
+safeAmount <
+getMinStake(project)
+){
+
+__stakingLock = false;
+
+return{
+error:"Minimum stake not reached"
+};
+
+}
+
+/* ===============================
+CREATE PENDING
+=============================== */
+
+const pending =
+await createPendingStake({
+
+user,
+
+project,
+
+amount:safeAmount,
+
+duration:safeDuration
+
+});
+
+/* ===============================
+PI PAYMENT
 =============================== */
 
 let payment;
 
 try{
 
-    payment = await startPiPayment({
-        amount: safeAmount,
-        memo: `Stake in ${project}`,
-        stakeId: pending.id
-    });
+payment =
+await startPiPayment({
 
-}catch(err){
+amount:safeAmount,
 
-    console.error("❌ REAL PAYMENT ERROR:", err);
+memo:
+`Stake in ${project}`,
 
-    try{
+stakeId:
+pending.id
 
-        await updatePendingStake(
-            pending.id,
-            {
-                status:"cancelled"
-            }
-        );
+});
 
-    }catch(e){
+}catch(error){
 
-        console.error("Cancel update failed:", e);
+await updatePendingStake(
 
-    }
+pending.id,
 
-    __stakingLock = false;
+{
 
-    alert(err.message || "Payment failed");
-
-    return {
-        error:"Payment failed"
-    };
+status:"cancelled"
 
 }
 
-  console.log("PAYMENT RESULT:", payment);
+);
+
+__stakingLock=false;
+
+return{
+
+error:
+error.message ||
+"Payment cancelled"
+
+};
+
+}
+
+/* ===============================
+VERIFY PAYMENT
+=============================== */
 
 if(!payment){
-  __stakingLock = false;
-  return {error:"Invalid payment"};
+
+await updatePendingStake(
+
+pending.id,
+
+{
+
+status:"cancelled"
+
 }
 
-   /* ===============================
-   UPDATE PENDING STAKE
+);
+
+__stakingLock=false;
+
+return{
+
+error:"Payment failed"
+
+};
+
+}
+
+/* ===============================
+SUCCESS
 =============================== */
+
+await updatePendingStake(
+
+pending.id,
+
+{
+
+payment_id:
+payment.paymentId ||
+
+payment.identifier ||
+
+null,
+
+txid:
+payment.txid ||
+
+payment.transaction?.txid ||
+
+payment.paymentId ||
+
+null,
+
+status:"paid",
+
+network:NETWORK
+
+}
+
+);
+
+/* ===============================
+TRANSACTION HISTORY
+=============================== */
+
+if(typeof recordTx==="function"){
+
+recordTx({
+
+type:"stake",
+
+project,
+
+amount:safeAmount,
+
+timestamp:Date.now(),
+
+network:NETWORK
+
+});
+
+}
+
+__stakingLock=false;
+
+return{
+
+success:true,
+
+payment
+
+};
+
+}catch(error){
+
+console.error(error);
+
+__stakingLock=false;
+
+return{
+
+error:
+error.message ||
+"Unknown staking error"
+
+};
+
+}
+
+}
+
+/* ======================================
+   GET ALL STAKES (MAINNET)
+====================================== */
+
+async function getAllStakesMerged(){
+
+const user = getCurrentUser();
+
+if(!user?.uid){
+
+return [];
+
+}
 
 try{
 
-    await updatePendingStake(
-        pending.id,
-        {
-            payment_id: payment.paymentId,
-            txid: payment.txid,
-            status: "paid",
-            network: "mainnet"
-        }
-    );
+const res = await fetch(
 
-    console.log("✅ Stake updated successfully");
+`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.${NETWORK}&order=created_at.desc`,
 
-}catch(e){
+{
 
-    console.error("❌ UPDATE ERROR:", e);
+headers:{
 
-    __stakingLock = false;
+"apikey":SUPABASE_KEY,
 
-    return {
-        error: "Database update failed"
-    };
+"Authorization":
+`Bearer ${SUPABASE_KEY}`
 
 }
 
-  /* ===============================
-     RECORD TRANSACTION (FIX HISTORY)
-  =============================== */
-
-  if(typeof recordTx === "function"){
-  recordTx({
-    type:"stake",
-    project,
-    amount:safeAmount,
-    timestamp:Date.now()
-  });
 }
 
-__stakingLock = false;
+);
 
-return {
-  success:true
-};
+if(!res.ok){
 
-} // 🔥 THIS LINE IS MISSING (rufe addStake)
+throw new Error(
+await res.text()
+);
 
-/* ======================================
-   GET ALL STAKES
-====================================== */
-async function getAllStakesMerged(){
+}
 
-  const user = JSON.parse(localStorage.getItem("pi_user"));
+const data =
+await res.json();
 
-  if(!user?.uid){
-    console.warn("No UID");
-    return [];
-  }
+return Array.isArray(data)
 
-  try{
+? data.filter(s=>
 
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
-      {
-        headers:{
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
+s.status==="paid" ||
 
-    if(!res.ok){
-      const err = await res.text();
-      console.error("❌ Fetch error:", err);
-      return [];
-    }
+s.status==="approved"
 
-    const data = await res.json();
+)
 
-    console.log("📊 Supabase data:", data);
+:[];
 
-    return Array.isArray(data)
-  ? data.filter(s => s.status === "paid")
-  : [];
+}catch(error){
 
-  }catch(e){
+console.error(
 
-    console.error("❌ Network error:", e);
-    return [];
+"GET STAKES:",
 
-  }
+error
+
+);
+
+return [];
+
+}
 
 }
 
 /* ======================================
-   GLOBAL STAKES
+   GLOBAL STAKES (MAINNET)
 ====================================== */
+
 async function getGlobalStakes(){
 
+try{
+
+const res = await fetch(
+
+`${SUPABASE_URL}/rest/v1/stakes?select=*&network=eq.${NETWORK}&status=eq.paid`,
+
+{
+
+headers:{
+
+"apikey":SUPABASE_KEY,
+
+"Authorization":
+`Bearer ${SUPABASE_KEY}`
+
+}
+
+}
+
+);
+
+if(!res.ok){
+
+throw new Error(
+await res.text()
+);
+
+}
+
+const data =
+await res.json();
+
+return Array.isArray(data)
+
+?data
+
+:[];
+
+}catch(error){
+
+console.error(
+
+"GLOBAL:",
+
+error
+
+);
+
+return[];
+
+}
+
+   }
+
+/* ======================================
+   PROJECT TOTALS (MAINNET)
+====================================== */
+
+async function getProjectTotals(project){
+
+  const stakes =
+  await getAllStakesMerged();
+
+  const projectData = stakes.filter(s=>
+
+    String(s.project)
+      .trim()
+      .toLowerCase()===
+
+    String(project)
+      .trim()
+      .toLowerCase() &&
+
+    (
+      s.type==="stake" ||
+      s.type==="withdraw" ||
+      s.type==="capital"
+    )
+
+  );
+
+  let stake = 0;
+  let reward = 0;
+
+  projectData.forEach(s=>{
+
+    const amount =
+      Number(s.amount)||0;
+
+    if(s.type==="stake"){
+
+      stake += amount;
+
+      const total =
+        Number(s.reward)||0;
+
+      const withdrawn =
+        Number(s.withdrawnReward)||0;
+
+      reward += Math.max(
+        0,
+        total-withdrawn
+      );
+
+    }
+
+  });
+
+  const user =
+  getCurrentUser();
+
+  if(user?.uid){
+
+    try{
+
+      const res =
+      await fetch(
+
+`${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid&network=eq.${NETWORK}`,
+
+      {
+
+      headers:{
+
+      apikey:
+      SUPABASE_KEY,
+
+      Authorization:
+      `Bearer ${SUPABASE_KEY}`
+
+      }
+
+      }
+
+      );
+
+      if(res.ok){
+
+        const withdrawals =
+        await res.json();
+
+        withdrawals.forEach(w=>{
+
+          stake -= Math.abs(
+
+            Number(w.amount)||0
+
+          );
+
+        });
+
+      }
+
+    }catch(e){
+
+      console.error(
+        "Capital history:",
+        e
+      );
+
+    }
+
+  }
+
+  return{
+
+    stake,
+
+    reward,
+
+    stakes:projectData
+
+  };
+
+}
+
+/* ======================================
+   USER STAKES (MAINNET)
+====================================== */
+
+async function getUserStakes(){
+
+  const user =
+  getCurrentUser();
+
+  if(!user?.uid){
+
+    return [];
+
+  }
+
   try{
 
-    const res = await fetch(
-`${SUPABASE_URL}/rest/v1/stakes?select=*&network=eq.mainnet`,
-      {
-        headers:{
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        }
-      }
+    const res =
+    await fetch(
+
+`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.${NETWORK}&status=eq.paid&order=created_at.desc`,
+
+    {
+
+    headers:{
+
+    apikey:
+    SUPABASE_KEY,
+
+    Authorization:
+    `Bearer ${SUPABASE_KEY}`
+
+    }
+
+    }
+
     );
 
     if(!res.ok){
 
-      const err = await res.text();
-
-      console.error(
-        "GLOBAL STAKES ERROR:",
-        err
+      throw new Error(
+        await res.text()
       );
-
-      return [];
 
     }
 
-    const data = await res.json();
+    const data =
+    await res.json();
 
     return Array.isArray(data)
-      ? data
-      : [];
+
+    ? data
+
+    : [];
 
   }catch(e){
 
     console.error(
-      "GLOBAL NETWORK ERROR:",
+      "USER STAKES:",
       e
     );
 
@@ -477,200 +902,408 @@ async function getGlobalStakes(){
 }
 
 /* ======================================
-   PROJECT TOTALS
+   WITHDRAW PROJECT REWARD (MAINNET)
 ====================================== */
-async function getProjectTotals(project){
 
-  const stakes = await getAllStakesMerged();
+async function withdrawProjectReward(
+project,
+amount
+){
 
-  const projectData = stakes.filter(s =>
-  String(s.project).trim().toLowerCase() ===
-  String(project).trim().toLowerCase() &&
-  s.status === "paid" &&
-  (
-    s.type === "stake" ||
-    s.type === "withdraw" ||
-    s.type === "capital"
-  )
-);
-  let stake = 0;
-  let reward = 0;
-
-  projectData.forEach(s => {
-
-    const amount = Number(s.amount);
-
-    if(!Number.isFinite(amount)) return;
-
-    // ✅ STAKE TOTAL
-if(s.type === "stake"){
-  stake += amount;
-}
-
-    // ✅ ONLY REAL STAKES FOR REWARD
-    if(s.type === "stake"){
-
-      const total = Number(s.reward) || 0;
-      const withdrawn = Number(s.withdrawnReward) || 0;
-
-      const remaining = Math.max(0, total - withdrawn);
-
-      reward += remaining;
-
-    }
-
-  });
-
-const user = JSON.parse(
-  localStorage.getItem("pi_user")
-);
-
-if(user?.uid){
-
-  const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid&network=eq.mainnet`,
-  {
-    headers:{
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`
-    }
-  }
-);
-   
-  if(res.ok){
-
-    const withdrawals = await res.json();
-
-    withdrawals.forEach(w=>{
-
-      stake -= Math.abs(
-        Number(w.amount) || 0
-      );
-
-    });
-
-  }
-
-}
-   
-  return {
-    stake,
-    reward,
-    stakes: projectData
-  };
-
-}
-
-/* ======================================
-   GET USER STAKE
-====================================== */
-async function getUserStakes(){
-
-  const user = getCurrentUser();
-
-  const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
-  {
-    headers:{
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`
-    }
-  }
-);
-   
-  const data = await res.json();
-
-  return Array.isArray(data) ? data : [];
-}
-
-/* ======================================
-   WITHDRAW PROJECT REWARD
-====================================== */
-async function withdrawProjectReward(project, amount){
-
-  const user = await ensurePiAuth();
+const user =
+await ensurePiAuth();
 
 if(!user?.uid){
-  __stakingLock = false;
-  return {error:"Login required"};
+
+return{
+error:"Login required"
+};
+
 }
 
-  let remainingToTake = Number(amount);
+let remaining =
+Number(amount);
 
-  if(!Number.isFinite(remainingToTake) || remainingToTake <= 0){
-    return {error:"Invalid amount"};
-  }
+if(
+!Number.isFinite(remaining) ||
+remaining<=0
+){
 
-  const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
-  {
-    headers:{
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`
-    }
-  }
+return{
+error:"Invalid amount"
+};
+
+}
+
+try{
+
+const res =
+await fetch(
+
+`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&project=eq.${project}&network=eq.${NETWORK}&order=created_at.asc`,
+
+{
+
+headers:{
+
+apikey:SUPABASE_KEY,
+
+Authorization:
+`Bearer ${SUPABASE_KEY}`
+
+}
+
+}
+
 );
-   
-  if(!res.ok){
-    const err = await res.text();
-    console.error(err);
-    return {error:"Network error"};
-  }
 
-  let stakes = await res.json();
+if(!res.ok){
 
-  if(!Array.isArray(stakes) || !stakes.length){
-    return {error:"No stakes"};
-  }
+throw new Error(
+await res.text()
+);
 
-  // 🔥 FIX: ONLY STAKES
-  stakes = stakes.filter(s => s.type === "stake");
+}
 
-  for(const stake of stakes){
+let stakes =
+await res.json();
 
-    const total = Number(stake.reward) || 0;
-    const withdrawn = Number(stake.withdrawnReward) || 0;
+if(!Array.isArray(stakes)){
 
-    const remaining = total - withdrawn;
+return{
+error:"Invalid staking data"
+};
 
-    if(!Number.isFinite(remaining) || remaining <= 0) continue;
+}
 
-    const take = Math.min(remainingToTake, remaining);
+/* ===============================
+ONLY PAID STAKES
+=============================== */
 
-    if(!Number.isFinite(take)) continue;
+stakes = stakes.filter(s=>
 
-    const updateRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
-      {
-        method:"PATCH",
-        headers:{
-          "Content-Type":"application/json",
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify({
-          withdrawnReward: withdrawn + take
-        })
-      }
-    );
+s.status==="paid" &&
 
-    if(!updateRes.ok){
-      const err = await updateRes.text();
-      console.error(err);
-      return {error:"Update failed"};
-    }
+s.type==="stake"
 
-    remainingToTake -= take;
+);
 
-    if(remainingToTake <= 0) break;
-  }
+/* ===============================
+PROCESS REWARD
+=============================== */
 
-  if(remainingToTake > 0){
-    return {error:"Insufficient reward"};
-  }
+for(const stake of stakes){
 
-  return {success:true, amount};
-  }
+const reward =
+Number(stake.reward)||0;
+
+const withdrawn =
+Number(stake.withdrawnReward)||0;
+
+const available =
+reward-withdrawn;
+
+if(available<=0){
+
+continue;
+
+}
+
+const take =
+Math.min(
+available,
+remaining
+);
+
+const update =
+await fetch(
+
+`${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}&network=eq.${NETWORK}`,
+
+{
+
+method:"PATCH",
+
+headers:{
+
+"Content-Type":"application/json",
+
+apikey:SUPABASE_KEY,
+
+Authorization:
+`Bearer ${SUPABASE_KEY}`
+
+},
+
+body:JSON.stringify({
+
+withdrawnReward:
+withdrawn+take
+
+})
+
+}
+
+);
+
+if(!update.ok){
+
+throw new Error(
+await update.text()
+);
+
+}
+
+remaining -= take;
+
+if(remaining<=0){
+
+break;
+
+}
+
+}
+
+if(remaining>0){
+
+return{
+
+error:
+"Insufficient reward"
+
+};
+
+}
+
+return{
+
+success:true,
+
+amount
+
+};
+
+}catch(e){
+
+console.error(e);
+
+return{
+
+error:
+e.message
+
+};
+
+}
+
+}
+
+/* ======================================
+   WITHDRAW CAPITAL (MAINNET)
+====================================== */
+
+async function withdrawCapital({
+
+project,
+
+amount
+
+}){
+
+const user =
+await ensurePiAuth();
+
+if(!user?.uid){
+
+return{
+
+error:"Login required"
+
+};
+
+}
+
+let remaining =
+Number(amount);
+
+if(
+!Number.isFinite(remaining) ||
+remaining<=0
+){
+
+return{
+
+error:"Invalid amount"
+
+};
+
+}
+
+try{
+
+const res =
+await fetch(
+
+`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&project=eq.${project}&network=eq.${NETWORK}&status=eq.paid&order=created_at.asc`,
+
+{
+
+headers:{
+
+apikey:SUPABASE_KEY,
+
+Authorization:
+`Bearer ${SUPABASE_KEY}`
+
+}
+
+}
+
+);
+
+if(!res.ok){
+
+throw new Error(
+await res.text()
+);
+
+}
+
+const stakes =
+await res.json();
+
+const now =
+Date.now();
+
+for(const stake of stakes){
+
+if(remaining<=0){
+
+break;
+
+}
+
+/* ONLY REAL STAKES */
+
+if(stake.type!=="stake"){
+
+continue;
+
+}
+
+/* LOCK CHECK */
+
+const unlockTime =
+Number(stake.unlockTime)||0;
+
+if(now<unlockTime){
+
+continue;
+
+}
+
+/* AVAILABLE CAPITAL */
+
+const available =
+
+(Number(stake.amount)||0)
+
+-
+
+(Number(stake.withdrawnCapital)||0);
+
+if(available<=0){
+
+continue;
+
+}
+
+const take =
+Math.min(
+available,
+remaining
+);
+
+const update =
+await fetch(
+
+`${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}&network=eq.${NETWORK}`,
+
+{
+
+method:"PATCH",
+
+headers:{
+
+"Content-Type":"application/json",
+
+apikey:SUPABASE_KEY,
+
+Authorization:
+`Bearer ${SUPABASE_KEY}`
+
+},
+
+body:JSON.stringify({
+
+withdrawnCapital:
+
+(Number(stake.withdrawnCapital)||0)
+
++
+
+take
+
+})
+
+}
+
+);
+
+if(!update.ok){
+
+throw new Error(
+await update.text()
+);
+
+}
+
+remaining -= take;
+
+}
+
+if(remaining>0){
+
+return{
+
+error:
+"Insufficient unlocked capital"
+
+};
+
+}
+
+return{
+
+success:true,
+
+amount
+
+};
+
+}catch(e){
+
+console.error(e);
+
+return{
+
+error:e.message
+
+};
+
+}
+
+}
 
 /* ======================================
    LOAD DATA
@@ -678,103 +1311,55 @@ if(!user?.uid){
 
 async function loadData(){
 
-  try{
+try{
 
-    const stakes = await getAllStakesMerged();
+const stakes =
+await getAllStakesMerged();
 
-    console.log("📊 STAKES:", stakes);
+console.log(
+"MAINNET STAKES:",
+stakes
+);
 
-    // ❗ idan babu data, kada ka nuna error
-    if(!Array.isArray(stakes)){
-      console.warn("No data returned");
-      return;
-    }
+return stakes;
 
-    // OPTIONAL: update UI nan gaba
+}catch(error){
 
-  }catch(e){
+console.error(
+"LOAD DATA:",
+error
+);
 
-    console.error("❌ Load error:", e);
-
-    // ❌ kar ka yi alert nan
-  }
+return[];
 
 }
 
-/* ======================================
-   WITHDRAW CAPITAL (ENGINE)
-====================================== */
-async function withdrawCapital({project, amount}){
-
-  const user = await ensurePiAuth();
-
-if(!user?.uid){
-  return {error:"Login required"};
-}
-
-  let remaining = Number(amount);
-
-  if(!Number.isFinite(remaining) || remaining <= 0){
-    return {error:"Invalid amount"};
-  }
-
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&network=eq.mainnet&order=created_at.asc`,
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      }
-    }
-  );
-
-  let stakes = await res.json();
-
-  if(!Array.isArray(stakes)){
-    return {error:"Invalid data"};
-  }
-
-  // ONLY REAL STAKES
-stakes = stakes.filter(s => s.type === "stake");
-
-const now = Date.now();
-
-for(const s of stakes){
-
-  if(remaining <= 0) break;
-
-  // LOCK CHECK
-  const unlockTime = Number(s.unlockTime) || 0;
-
-  if(now < unlockTime){
-    continue;
-  }
-
-  // AVAILABLE CAPITAL
-  const available =
-    (Number(s.amount) || 0) -
-    (Number(s.withdrawnCapital) || 0);
-
-  if(available <= 0){
-    continue;
-  }
-
-  const take = Math.min(available, remaining);
-
-  remaining -= take;
-}
-
-  if(remaining > 0){
-    return {error:"Insufficient capital"};
-  }
-
-  return {success:true, amount};
 }
 
 /* ======================================
    HELPERS
 ====================================== */
-function getStakes(){ return getAllStakesMerged(); }
-function getInternalTotals(){ return getProjectTotals(); }
-function getInternalProjectTotals(p){ return getProjectTotals(p); }
-function addInternalStake(p){ return addStake(p); }
+
+function getStakes(){
+
+return getAllStakesMerged();
+
+}
+
+function getInternalTotals(){
+
+return getProjectTotals();
+
+}
+
+function getInternalProjectTotals(project){
+
+return getProjectTotals(project);
+
+}
+
+function addInternalStake(data){
+
+return addStake(data);
+
+   }
