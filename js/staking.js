@@ -9,13 +9,6 @@ const SUPABASE_KEY = "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2";
 const INTERNAL_KEY = "albukhr_stakes";
 
 /* ======================================
-   CURRENT NETWORK
-====================================== */
-const CURRENT_NETWORK =
-location.hostname.startsWith("test.")
-  ? "testnet"
-  : "mainnet";
-/* ======================================
    STORAGE
 ====================================== */
 function _safeParse(key){
@@ -133,7 +126,7 @@ async function createPendingStake({
 
         status: "pending",
 
-        network: CURRENT_NETWORK
+        network: "mainnet",
 
         payment_id: null,
 
@@ -348,7 +341,7 @@ try{
             payment_id: payment.paymentId,
             txid: payment.txid,
             status: "paid",
-            network: CURRENT_NETWORK
+            network: "mainnet"
         }
     );
 
@@ -402,7 +395,7 @@ async function getAllStakesMerged(){
   try{
 
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.${CURRENT_NETWORK}`,
+      `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
       {
         headers:{
           "apikey": SUPABASE_KEY,
@@ -442,7 +435,7 @@ async function getGlobalStakes(){
   try{
 
     const res = await fetch(
-`${SUPABASE_URL}/rest/v1/stakes?select=*&network=eq.${CURRENT_NETWORK}`,
+`${SUPABASE_URL}/rest/v1/stakes?select=*&network=eq.mainnet`,
       {
         headers:{
           "apikey": SUPABASE_KEY,
@@ -535,7 +528,7 @@ const user = JSON.parse(
 if(user?.uid){
 
   const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid&network=eq.${CURRENT_NETWORK}`,
+  `${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid&network=eq.mainnet`,
   {
     headers:{
       "apikey": SUPABASE_KEY,
@@ -576,7 +569,7 @@ async function getUserStakes(){
   const user = getCurrentUser();
 
   const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.${CURRENT_NETWORK}`,
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
   {
     headers:{
       "apikey": SUPABASE_KEY,
@@ -609,7 +602,7 @@ if(!user?.uid){
   }
 
   const res = await fetch(
-  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.${CURRENT_NETWORK}`,
+  `${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet`,
   {
     headers:{
       "apikey": SUPABASE_KEY,
@@ -726,7 +719,7 @@ if(!user?.uid){
   }
 
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&network=eq.${CURRENT_NETWORK}&order=created_at.asc`,
+    `${SUPABASE_URL}/rest/v1/stakes?project=eq.${project}&userid=eq.${user.uid}&network=eq.mainnet&order=created_at.asc`,
     {
       headers:{
         "apikey": SUPABASE_KEY,
