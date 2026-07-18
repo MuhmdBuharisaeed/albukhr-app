@@ -235,7 +235,7 @@ type:"stake",
 
 status:"pending",
 
-network:"testnet",
+network:"mainnet",
 
 payment_id:null,
 
