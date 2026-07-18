@@ -1,33 +1,29 @@
 // =======================================
-// ALBUKHR MAINNET STAKING ENGINE v2 FINAL
-// Mainnet • Supabase • Pi SDK
+// ALBUKHR TESTNET STAKING ENGINE v1
+// Pi Mainnet • Supabase
 // =======================================
 
 const SUPABASE_URL =
-"https://ribpntyqdleytsyktdfb.supabase.co";
+"https://qexmnghilahsvethlxem.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2";
+"sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2";
 
-/* ======================================
-   NETWORK
-====================================== */
-
-const NETWORK = "mainnet";
+const INTERNAL_KEY =
+"albukhr_testnet_stakes";
 
 /* ======================================
    STORAGE
 ====================================== */
-
-const INTERNAL_KEY =
-"albukhr_mainnet_stakes";
 
 function _safeParse(key){
 
   try{
 
     const data =
-      JSON.parse(localStorage.getItem(key));
+      JSON.parse(
+        localStorage.getItem(key)
+      );
 
     return Array.isArray(data)
       ? data
@@ -116,18 +112,24 @@ function getCurrentUser(){
 const PROJECT_RULES={
 
 Raheem:{minStake:10},
+
 Hauwal:{minStake:10},
+
 Barsh:{minStake:10},
+
 Khairat:{minStake:10},
+
 Urban:{minStake:10},
+
 Labbaika:{minStake:10},
+
 Azman:{minStake:10}
 
 };
 
 function getMinStake(project){
 
-  return PROJECT_RULES?.[project]?.minStake || 0;
+return PROJECT_RULES?.[project]?.minStake || 0;
 
 }
 
@@ -146,11 +148,17 @@ function getRate(project,duration){
 const table={
 
 Raheem:{30:0.01,60:0.025,90:0.05},
+
 Hauwal:{30:0.02,60:0.04,90:0.08},
+
 Khairat:{30:0.025,60:0.05,90:0.09},
+
 Barsh:{30:0.03,60:0.06,90:0.10},
+
 Labbaika:{30:0.02,60:0.045,90:0.075},
+
 Urban:{30:0.12,60:0.12,90:0.12},
+
 Azman:{30:0.04,60:0.07,90:0.12}
 
 };
@@ -166,8 +174,11 @@ return table?.[project]?.[Number(duration)] || 0;
 async function createPendingStake({
 
 user,
+
 project,
+
 amount,
+
 duration
 
 }){
@@ -224,7 +235,7 @@ type:"stake",
 
 status:"pending",
 
-network:NETWORK,
+network:"testnet",
 
 payment_id:null,
 
@@ -262,7 +273,7 @@ values
 
 const res = await fetch(
 
-`${SUPABASE_URL}/rest/v1/stakes?id=eq.${id}&network=eq.${NETWORK}`,
+`${SUPABASE_URL}/rest/v1/stakes?id=eq.${id}&network=eq.mainnet`,
 
 {
 
@@ -295,10 +306,10 @@ await res.text()
 
 return true;
 
-       }
+   }
 
 /* ======================================
-   ADD STAKE (MAINNET)
+   ADD STAKE (TESTNET)
 ====================================== */
 
 async function addStake({
@@ -521,7 +532,7 @@ null,
 
 status:"paid",
 
-network:NETWORK
+network:"mainnet"
 
 }
 
@@ -543,7 +554,7 @@ amount:safeAmount,
 
 timestamp:Date.now(),
 
-network:NETWORK
+network:"mainnet"
 
 });
 
@@ -578,7 +589,7 @@ error.message ||
 }
 
 /* ======================================
-   GET ALL STAKES (MAINNET)
+   GET ALL STAKES (TESTNET)
 ====================================== */
 
 async function getAllStakesMerged(){
@@ -595,7 +606,7 @@ try{
 
 const res = await fetch(
 
-`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.${NETWORK}&order=created_at.desc`,
+`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet&order=created_at.desc`,
 
 {
 
@@ -627,9 +638,7 @@ return Array.isArray(data)
 
 ? data.filter(s=>
 
-s.status==="paid" ||
-
-s.status==="approved"
+s.status==="paid"
 
 )
 
@@ -652,7 +661,7 @@ return [];
 }
 
 /* ======================================
-   GLOBAL STAKES (MAINNET)
+   GLOBAL STAKES (TESTNET)
 ====================================== */
 
 async function getGlobalStakes(){
@@ -661,7 +670,7 @@ try{
 
 const res = await fetch(
 
-`${SUPABASE_URL}/rest/v1/stakes?select=*&network=eq.${NETWORK}&status=eq.paid`,
+`${SUPABASE_URL}/rest/v1/stakes?select=*&network=eq.mainnet&status=eq.paid`,
 
 {
 
@@ -712,49 +721,38 @@ return[];
    }
 
 /* ======================================
-   PROJECT TOTALS (MAINNET)
+   PROJECT TOTALS (TESTNET)
 ====================================== */
 
 async function getProjectTotals(project){
 
-  const stakes =
-  await getAllStakesMerged();
+  const stakes = await getAllStakesMerged();
 
   const projectData = stakes.filter(s=>
 
-    String(s.project)
-      .trim()
-      .toLowerCase()===
+    String(s.project).trim().toLowerCase()===
 
-    String(project)
-      .trim()
-      .toLowerCase() &&
-
-    (
-      s.type==="stake" ||
-      s.type==="withdraw" ||
-      s.type==="capital"
-    )
+    String(project).trim().toLowerCase()
 
   );
 
   let stake = 0;
+
   let reward = 0;
 
   projectData.forEach(s=>{
 
-    const amount =
-      Number(s.amount)||0;
+    const amount = Number(s.amount)||0;
 
     if(s.type==="stake"){
 
       stake += amount;
 
       const total =
-        Number(s.reward)||0;
+      Number(s.reward)||0;
 
       const withdrawn =
-        Number(s.withdrawnReward)||0;
+      Number(s.withdrawnReward)||0;
 
       reward += Math.max(
         0,
@@ -764,62 +762,6 @@ async function getProjectTotals(project){
     }
 
   });
-
-  const user =
-  getCurrentUser();
-
-  if(user?.uid){
-
-    try{
-
-      const res =
-      await fetch(
-
-`${SUPABASE_URL}/rest/v1/withdraw_requests?select=*&userid=eq.${user.uid}&project=eq.${project}&type=eq.capital&status=eq.paid&network=eq.${NETWORK}`,
-
-      {
-
-      headers:{
-
-      apikey:
-      SUPABASE_KEY,
-
-      Authorization:
-      `Bearer ${SUPABASE_KEY}`
-
-      }
-
-      }
-
-      );
-
-      if(res.ok){
-
-        const withdrawals =
-        await res.json();
-
-        withdrawals.forEach(w=>{
-
-          stake -= Math.abs(
-
-            Number(w.amount)||0
-
-          );
-
-        });
-
-      }
-
-    }catch(e){
-
-      console.error(
-        "Capital history:",
-        e
-      );
-
-    }
-
-  }
 
   return{
 
@@ -834,75 +776,71 @@ async function getProjectTotals(project){
 }
 
 /* ======================================
-   USER STAKES (MAINNET)
+   USER STAKES (TESTNET)
 ====================================== */
 
 async function getUserStakes(){
 
-  const user =
-  getCurrentUser();
+const user =
+getCurrentUser();
 
-  if(!user?.uid){
+if(!user?.uid){
 
-    return [];
+return [];
 
-  }
+}
 
-  try{
+try{
 
-    const res =
-    await fetch(
+const res =
+await fetch(
 
-`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.${NETWORK}&status=eq.paid&order=created_at.desc`,
+`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&network=eq.mainnet&status=eq.paid&order=created_at.desc`,
 
-    {
+{
 
-    headers:{
+headers:{
 
-    apikey:
-    SUPABASE_KEY,
+apikey:SUPABASE_KEY,
 
-    Authorization:
-    `Bearer ${SUPABASE_KEY}`
+Authorization:
+`Bearer ${SUPABASE_KEY}`
 
-    }
+}
 
-    }
+}
 
-    );
+);
 
-    if(!res.ok){
+if(!res.ok){
 
-      throw new Error(
-        await res.text()
-      );
+throw new Error(
+await res.text()
+);
 
-    }
+}
 
-    const data =
-    await res.json();
+const data =
+await res.json();
 
-    return Array.isArray(data)
+return Array.isArray(data)
 
-    ? data
+?data
 
-    : [];
+:[];
 
-  }catch(e){
+}catch(e){
 
-    console.error(
-      "USER STAKES:",
-      e
-    );
+console.error(e);
 
-    return [];
+return[];
 
-  }
+}
 
 }
 
 /* ======================================
-   WITHDRAW PROJECT REWARD (MAINNET)
+   WITHDRAW PROJECT REWARD (TESTNET)
 ====================================== */
 
 async function withdrawProjectReward(
@@ -940,7 +878,7 @@ try{
 const res =
 await fetch(
 
-`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&project=eq.${project}&network=eq.${NETWORK}&order=created_at.asc`,
+`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&project=eq.${project}&network=eq.mainnet&status=eq.paid&order=created_at.asc`,
 
 {
 
@@ -965,32 +903,8 @@ await res.text()
 
 }
 
-let stakes =
+const stakes =
 await res.json();
-
-if(!Array.isArray(stakes)){
-
-return{
-error:"Invalid staking data"
-};
-
-}
-
-/* ===============================
-ONLY PAID STAKES
-=============================== */
-
-stakes = stakes.filter(s=>
-
-s.status==="paid" &&
-
-s.type==="stake"
-
-);
-
-/* ===============================
-PROCESS REWARD
-=============================== */
 
 for(const stake of stakes){
 
@@ -1018,7 +932,7 @@ remaining
 const update =
 await fetch(
 
-`${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}&network=eq.${NETWORK}`,
+`${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
 
 {
 
@@ -1089,17 +1003,16 @@ console.error(e);
 
 return{
 
-error:
-e.message
+error:e.message
 
 };
 
 }
 
-}
+   }
 
 /* ======================================
-   WITHDRAW CAPITAL (MAINNET)
+   WITHDRAW CAPITAL (TESTNET)
 ====================================== */
 
 async function withdrawCapital({
@@ -1144,7 +1057,7 @@ try{
 const res =
 await fetch(
 
-`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&project=eq.${project}&network=eq.${NETWORK}&status=eq.paid&order=created_at.asc`,
+`${SUPABASE_URL}/rest/v1/stakes?select=*&userid=eq.${user.uid}&project=eq.${project}&network=eq.mainnet&status=eq.paid&order=created_at.asc`,
 
 {
 
@@ -1180,14 +1093,6 @@ for(const stake of stakes){
 if(remaining<=0){
 
 break;
-
-}
-
-/* ONLY REAL STAKES */
-
-if(stake.type!=="stake"){
-
-continue;
 
 }
 
@@ -1227,7 +1132,7 @@ remaining
 const update =
 await fetch(
 
-`${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}&network=eq.${NETWORK}`,
+`${SUPABASE_URL}/rest/v1/stakes?id=eq.${stake.id}`,
 
 {
 
@@ -1303,7 +1208,7 @@ error:e.message
 
 }
 
-}
+   }
 
 /* ======================================
    LOAD DATA
@@ -1362,4 +1267,4 @@ function addInternalStake(data){
 
 return addStake(data);
 
-   }
+          }
