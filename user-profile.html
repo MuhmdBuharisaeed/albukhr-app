@@ -14,6 +14,9 @@ content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/user-profile.css">
 
+<!-- Custom App Alert -->
+<link rel="stylesheet" href="css/app-alert.css">
+
 <link
 rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -627,6 +630,25 @@ SCRIPTS
 <script src="js/pi-sdk.js"></script>
 
 <script src="js/profile/user-profile.js"></script>
+
+<!-- Custom App Alert -->
+<script src="js/app-alert.js"></script>
+
+<div id="appAlert" class="app-alert">
+
+  <div class="app-alert-box">
+
+    <h3 id="appAlertTitle">
+      Notice
+    </h3>
+
+    <p id="appAlertText"></p>
+
+    <button onclick="closeAppAlert()">
+      OK
+    </button>
+
+  </div>
 
 <script>
 
