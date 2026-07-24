@@ -575,3 +575,12 @@ document.addEventListener(
 /* ==========================================
    END OF USER PROFILE.JS
 ========================================== */
+
+function comingSoon(feature){
+
+    alert(
+        feature +
+        " will be available in a future update."
+    );
+
+}
