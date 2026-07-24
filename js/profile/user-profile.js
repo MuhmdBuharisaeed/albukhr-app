@@ -578,9 +578,16 @@ document.addEventListener(
 
 function comingSoon(feature){
 
-    alert(
-        feature +
-        " will be available in a future update."
-    );
+    showAppAlert({
+
+        title: "Coming Soon",
+
+        message:
+            feature +
+            " will be available in a future ALBUKHR update.",
+
+        icon: "🚀"
+
+    });
 
 }
