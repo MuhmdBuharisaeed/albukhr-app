@@ -575,19 +575,3 @@ document.addEventListener(
 /* ==========================================
    END OF USER PROFILE.JS
 ========================================== */
-
-function comingSoon(feature){
-
-    showAppAlert({
-
-        title: "Coming Soon",
-
-        message:
-            feature +
-            " will be available in a future ALBUKHR update.",
-
-        icon: "🚀"
-
-    });
-
-}
