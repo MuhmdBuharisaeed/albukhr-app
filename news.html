@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>ALBUKHR News</title>
+
+<!-- GLOBAL CSS -->
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/albukhr-ui.css">
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="css/app-alert.css">
+
+<!-- NEWS CSS -->
+
+<link rel="stylesheet" href="css/news.css">
+
+<style>
+
+.header-right{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.user-box{
+display:flex;
+flex-direction:column;
+align-items:flex-end;
+justify-content:center;
+max-width:90px;
+}
+
+#piUser{
+font-size:10px;
+margin-top:2px;
+color:#fff;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+text-align:right;
+}
+
+</style>
+
+</head>
+
+<body data-page="news">
+
+<!-- LOGIN CHECK -->
+
+<script>
+
+(function(){
+
+const user=
+JSON.parse(
+localStorage.getItem("pi_user")
+);
+
+if(!user || !user.uid){
+
+window.location.replace(
+"login.html"
+);
+
+}
+
+})();
+
+</script>
+
+<!-- ===================================
+HEADER
+=================================== -->
+
+<header class="header">
+
+<div class="header-left">
+
+<span class="brand">
+
+ALBUKHR
+
+</span>
+
+</div>
+
+<div class="header-right">
+
+<div
+class="header-btn user-box"
+id="userBox">
+
+<div class="user-icon">
+
+👤
+
+</div>
+
+<div id="piUser"></div>
+
+</div>
+
+<div
+class="header-btn notification-btn"
+onclick="openNotifications()">
+
+🔔
+
+<span
+id="notifBadge"
+class="notification-badge">
+
+</span>
+
+</div>
+
+</div>
+
+</header>
+
+<!-- ===================================
+NEWS HEADER
+=================================== -->
+
+<section class="news-header">
+
+<div class="news-title">
+
+<div class="news-icon">
+
+📰
+
+</div>
+
+<div>
+
+<h2>
+
+ALBUKHR News
+
+</h2>
+
+<p>
+
+Official ecosystem announcements,
+project transparency updates,
+and personalized news.
+
+</p>
+
+</div>
+
+</div>
+
+<button
+id="refreshNewsBtn"
+class="refresh-news-btn">
+
+Refresh
+
+</button>
+
+</section>
+<!-- =========================================
+NEWS HERO
+========================================= -->
+
+<section class="news-hero">
+
+  <div class="hero-left">
+
+    <div class="hero-badge">
+      📰 Official News Center
+    </div>
+
+    <h1>
+      ALBUKHR News
+    </h1>
+
+    <p>
+      Official ecosystem announcements, company updates,
+      transparency reports and personalized project news
+      based on your investments.
+    </p>
+
+  </div>
+
+  <div class="hero-right">
+
+    <button
+      id="refreshNewsBtn"
+      class="primary-btn">
+
+      🔄 Refresh
+
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================
+NEWS SUMMARY
+========================================= -->
+
+<section class="news-summary">
+
+  <div class="summary-card">
+
+    <div class="summary-icon">
+      📢
+    </div>
+
+    <div class="summary-info">
+
+      <span>
+        Ecosystem News
+      </span>
+
+      <strong id="officialNewsCount">
+        0
+      </strong>
+
+    </div>
+
+  </div>
+
+  <div class="summary-card">
+
+    <div class="summary-icon">
+      📂
+    </div>
+
+    <div class="summary-info">
+
+      <span>
+        My Projects
+      </span>
+
+      <strong id="projectNewsCount">
+        0
+      </strong>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================
+SEARCH
+========================================= -->
+
+<section class="news-search">
+
+  <div class="search-box">
+
+    <span class="search-icon">
+      🔍
+    </span>
+
+    <input
+
+      type="text"
+
+      id="newsSearch"
+
+      placeholder="Search news..."
+
+      autocomplete="off"
+
+    >
+
+  </div>
+
+</section>
+
+
+<!-- =========================================
+FILTER TABS
+========================================= -->
+
+<section class="news-tabs">
+
+  <button
+
+    class="news-tab active"
+
+    id="tabAll"
+
+    data-tab="all">
+
+    All News
+
+  </button>
+
+  <button
+
+    class="news-tab"
+
+    id="tabOfficial"
+
+    data-tab="official">
+
+    📢 Ecosystem
+
+  </button>
+
+  <button
+
+    class="news-tab"
+
+    id="tabProjects"
+
+    data-tab="projects">
+
+    📂 My Projects
+
+  </button>
+
+</section>
+
+
+<!-- =========================================
+NEWS FEED
+========================================= -->
+
+<section
+class="news-feed"
+id="newsFeed">
+
+  <div class="loading-card">
+
+    <div class="loading-spinner"></div>
+
+    <p>
+
+      Loading latest news...
+
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================
+EMPTY STATE
+========================================= -->
+
+<section
+
+id="newsEmpty"
+
+class="news-empty"
+
+style="display:none;">
+
+  <div class="empty-icon">
+
+    📰
+
+  </div>
+
+  <h3>
+
+    No News Available
+
+  </h3>
+
+  <p>
+
+    There are currently no official announcements
+    or project updates available.
+
+  </p>
+
+</section>
+
+
+<!-- =========================================
+LOAD MORE
+========================================= -->
+
+<section class="news-footer">
+
+  <button
+
+    id="loadMoreNews"
+
+    class="secondary-btn">
+
+    Load More
+
+  </button>
+
+</section>
+<!-- =========================================
+NEWS FEED
+========================================= -->
+
+<main class="news-container">
+
+<section
+id="newsFeed"
+class="news-feed">
+
+<div class="loading-card">
+
+<div class="loading-spinner"></div>
+
+<h3>Loading News...</h3>
+
+<p>
+Please wait while we load the latest updates.
+</p>
+
+</div>
+
+</section>
+
+<!-- =========================================
+EMPTY STATE
+========================================= -->
+
+<section
+id="newsEmpty"
+class="news-empty"
+style="display:none;">
+
+<div class="empty-icon">
+
+📰
+
+</div>
+
+<h3>
+
+No News Available
+
+</h3>
+
+<p>
+
+There are currently no announcements or
+project updates available.
+
+Please check again later.
+
+</p>
+
+<button
+id="refreshEmptyBtn"
+class="primary-btn">
+
+Refresh
+
+</button>
+
+</section>
+
+</main>
+
+<!-- =========================================
+LOAD MORE
+========================================= -->
+
+<footer class="news-footer">
+
+<button
+id="loadMoreNews"
+class="secondary-btn">
+
+Load More
+
+</button>
+
+</footer>
+
+<!-- =========================================
+IMAGE PREVIEW MODAL
+========================================= -->
+
+<div
+id="imagePreviewModal"
+class="image-preview-modal">
+
+<div
+class="image-preview-overlay"
+onclick="closeImagePreview()">
+
+</div>
+
+<div
+class="image-preview-box">
+
+<button
+class="image-close-btn"
+onclick="closeImagePreview()">
+
+✕
+
+</button>
+
+<img
+id="previewImage"
+src=""
+alt="Preview">
+
+</div>
+
+</div>
+
+<!-- =========================================
+FULL NEWS MODAL
+========================================= -->
+
+<div
+id="newsModal"
+class="news-modal">
+
+<div
+class="news-modal-overlay"
+onclick="closeNewsModal()">
+
+</div>
+
+<div
+class="news-modal-box">
+
+<!-- HEADER -->
+
+<div
+class="news-modal-header">
+
+<div>
+
+<h2
+id="modalTitle">
+
+Loading...
+
+</h2>
+
+<div
+class="news-modal-meta">
+
+<span
+id="modalCategory">
+
+</span>
+
+<span class="dot">
+
+•
+
+</span>
+
+<span
+id="modalDate">
+
+</span>
+
+</div>
+
+</div>
+
+<button
+class="modal-close-btn"
+onclick="closeNewsModal()">
+
+✕
+
+</button>
+
+</div>
+
+<!-- IMAGE -->
+
+<img
+id="modalImage"
+class="modal-image"
+src=""
+alt="">
+
+<!-- CONTENT -->
+
+<div
+id="modalContent"
+class="modal-content">
+
+</div>
+
+<!-- FOOTER -->
+
+<div
+class="news-modal-footer">
+
+<button
+id="shareNewsBtn"
+class="secondary-btn">
+
+📤 Share
+
+</button>
+
+<button
+onclick="closeNewsModal()"
+class="primary-btn">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+<!-- =========================================
+SHARE MODAL
+========================================= -->
+
+<div
+id="shareModal"
+class="share-modal">
+
+<div
+class="share-overlay"
+onclick="closeShareModal()">
+
+</div>
+
+<div
+class="share-box">
+
+<h3>
+
+Share News
+
+</h3>
+
+<input
+id="shareLink"
+type="text"
+readonly>
+
+<div
+class="share-actions">
+
+<button
+id="copyShareLink"
+class="primary-btn">
+
+📋 Copy Link
+
+</button>
+
+<button
+onclick="closeShareModal()"
+class="secondary-btn">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- =========================================
+LOADING OVERLAY
+========================================= -->
+
+<div
+id="newsLoading"
+class="news-loading"
+style="display:none;">
+
+<div class="loading-spinner">
+
+</div>
+
+<p>
+
+Loading...
+
+</p>
+
+</div>
+
+<!-- =========================================
+APP ALERT
+========================================= -->
+
+<div
+id="appAlert"
+class="app-alert">
+
+<div
+class="app-alert-box">
+
+<h3
+id="appAlertTitle">
+
+Notice
+
+</h3>
+
+<p
+id="appAlertText">
+
+</p>
+
+<button
+onclick="closeAppAlert()">
+
+OK
+
+</button>
+
+</div>
+
+</div>
+
+<!-- =========================================
+SUPABASE
+========================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase-core.js"></script>
+
+<!-- =========================================
+PROJECT ENGINE
+========================================= -->
+
+<script src="js/project-config.js"></script>
+
+<script src="js/project-updates.js"></script>
+
+<script src="js/staking.js"></script>
+
+<!-- =========================================
+GLOBAL JS
+========================================= -->
+
+<script src="js/app-alert.js"></script>
+
+<script src="js/notifications.js"></script>
+
+<!-- =========================================
+NEWS ENGINE
+========================================= -->
+
+<script src="js/news-engine.js"></script>
+
+<script src="js/news.js"></script>
+
+</body>
+  </html>
