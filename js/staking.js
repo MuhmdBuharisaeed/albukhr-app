@@ -1,5 +1,5 @@
 // =======================================
-// ALBUKHR TESTNET STAKING ENGINE v1
+// ALBUKHR MAINNET STAKING ENGINE v1
 // Pi Mainnet • Supabase
 // =======================================
 
