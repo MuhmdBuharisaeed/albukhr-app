@@ -1267,4 +1267,4 @@ function addInternalStake(data){
 
 return addStake(data);
 
-          }
+                         }
