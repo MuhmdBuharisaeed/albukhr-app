@@ -9,6 +9,7 @@
    - Provide shared authenticated-user state
    - Depend on ALBUKHR Environment Core
    - Keep Mainnet/Testnet network context explicit
+   - Keep authentication state in memory only
    - No LocalStorage authentication persistence
    - No UI manipulation
    - No direct Supabase client creation
@@ -42,7 +43,10 @@
 
   function getEnvironmentCore() {
 
-    if (!window.ALBukhrEnvironment) {
+    const environment =
+      window.ALBukhrEnvironment;
+
+    if (!environment) {
 
       throw new Error(
         "ALBUKHR Environment Core is not loaded."
@@ -50,7 +54,7 @@
 
     }
 
-    return window.ALBukhrEnvironment;
+    return environment;
 
   }
 
@@ -64,7 +68,10 @@
     const environment =
       getEnvironmentCore();
 
-    if (!environment.isKnown()) {
+    if (
+      typeof environment.isKnown !== "function" ||
+      !environment.isKnown()
+    ) {
 
       throw new Error(
         "ALBUKHR environment is not recognized."
@@ -125,23 +132,40 @@
       requirePiSDK();
 
 
+    const network =
+      environment.getNetwork();
+
+
+    if (
+      network !== "mainnet" &&
+      network !== "testnet"
+    ) {
+
+      throw new Error(
+        "Invalid ALBUKHR Pi network."
+      );
+
+    }
+
+
+    console.info(
+      "🔐 Initializing Pi SDK:",
+      {
+        environment:
+          environment.getName(),
+
+        network
+      }
+    );
+
+
     /*
-     * ALBUKHR environment is already responsible
-     * for Mainnet/Testnet application separation.
+     * ALBUKHR environment determines whether
+     * Pi SDK runs against Mainnet or Testnet.
      *
-     * Pi SDK initialization is kept here so
-     * every page uses exactly one authentication core.
+     * Mainnet  → sandbox:false
+     * Testnet  → sandbox:true
      */
-
-    console.info(
-      "🔐 Initializing Pi SDK"
-    );
-
-    console.info(
-      "🌐 ALBUKHR Network:",
-      environment.getNetwork()
-    );
-
 
     await Pi.init({
 
@@ -157,7 +181,8 @@
 
 
     console.info(
-      "✅ Pi SDK initialized"
+      "✅ Pi SDK initialized:",
+      network
     );
 
 
@@ -280,13 +305,18 @@
             getEnvironment();
 
 
-          console.info(
-            "🔐 Authenticating Pi user..."
-          );
+          const network =
+            environment.getNetwork();
+
 
           console.info(
-            "🧭 Network:",
-            environment.getNetwork()
+            "🔐 Authenticating Pi user:",
+            {
+              environment:
+                environment.getName(),
+
+              network
+            }
           );
 
 
@@ -308,6 +338,15 @@
             );
 
 
+          if (!authResult) {
+
+            throw new Error(
+              "Pi authentication returned no result."
+            );
+
+          }
+
+
           console.log(
             "FULL PI AUTH RESULT:",
             authResult
@@ -322,7 +361,8 @@
            * Access token remains memory-only.
            *
            * It is deliberately NOT written
-           * to LocalStorage.
+           * to LocalStorage, sessionStorage,
+           * cookies, or any persistent store.
            */
 
           accessToken =
@@ -336,7 +376,15 @@
 
           console.info(
             "✅ Pi authentication successful:",
-            user.username
+            {
+              uid:
+                user.uid,
+
+              username:
+                user.username,
+
+              network
+            }
           );
 
 
@@ -457,15 +505,27 @@
       );
 
 
-      if (
-        redirectUrl &&
-        window.location.pathname !==
-        redirectUrl
-      ) {
+      if (redirectUrl) {
 
-        window.location.replace(
-          redirectUrl
-        );
+        const currentPath =
+          window.location.pathname;
+
+        const targetPath =
+          new URL(
+            redirectUrl,
+            window.location.href
+          ).pathname;
+
+
+        if (
+          currentPath !== targetPath
+        ) {
+
+          window.location.replace(
+            redirectUrl
+          );
+
+        }
 
       }
 
@@ -484,11 +544,11 @@
   function logout() {
 
     /*
-     * Pi SDK does not provide an application-level
-     * persistent login session that we should emulate
-     * with LocalStorage here.
+     * Clear only ALBUKHR in-memory
+     * authentication state.
      *
-     * We therefore clear only our in-memory state.
+     * No LocalStorage cleanup is needed
+     * because this core does not persist auth.
      */
 
     authenticatedUser =
