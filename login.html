@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>ALBUKHR Login</title><meta name="theme-color" content="#087a3e">
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<link rel="stylesheet" href="css/login-css/login.css">
+</head>
+<body>
+<main class="login-page">
+<header class="brand-header">
+<img src="images/albukhr-eagle-logo.jpg" class="brand-logo" alt="ALBUKHR eagle logo">
+<div class="brand-name">ALBUKHR</div><div class="brand-company">INVESTMENT LIMITED</div>
+<div class="brand-divider"><span></span><b>✦</b><span></span></div>
+<div class="brand-tagline">Investing Today, Building Tomorrow</div>
+</header>
+<section class="login-card" aria-labelledby="loginTitle">
+<div class="security-orb"><div class="security-shield"><svg viewBox="0 0 64 64"><path d="M32 6 51 14v15c0 13-7.7 23.7-19 29C20.7 52.7 13 42 13 29V14L32 6Z"/><rect x="25" y="29" width="14" height="13" rx="2"/><path d="M28 29v-5a4 4 0 0 1 8 0v5"/><circle cx="32" cy="35" r="1.5" class="lock-dot"/></svg></div></div>
+<h1 id="loginTitle">Welcome to ALBUKHR</h1>
+<p class="login-subtitle">Login securely with your Pi account<br>to access your dashboard</p>
+<div class="benefits">
+<div class="benefit"><div class="benefit-icon">✓</div><span>Secure<br>Pi Authentication</span></div>
+<div class="benefit"><div class="benefit-icon">●</div><span>Fast &amp;<br>Easy Access</span></div>
+<div class="benefit"><div class="benefit-icon">↗</div><span>Track Your<br>Investments</span></div>
+</div>
+<div id="status" class="status" aria-live="polite" aria-atomic="true">Ready to authenticate with Pi</div>
+<button id="piLoginButton" class="pi-login-button" type="button" onclick="login()"><span class="pi-mark">π</span><span class="pi-login-text">Login with Pi</span><span class="pi-arrow">→</span></button>
+<div class="security-notice"><div class="notice-icon"><svg viewBox="0 0 32 32"><rect x="7" y="14" width="18" height="14" rx="3"/><path d="M10 14V9a6 6 0 0 1 12 0v5"/><circle cx="16" cy="21" r="1.5"/><path d="M16 22.5v2.5"/></svg></div><div><strong>Your Security is Our Priority</strong><p>We never store your password. Authentication is handled securely by the Pi Network.</p></div></div>
+</section>
+<div class="trusted"><div class="trusted-icon">✓</div><div><strong>Trusted by our community</strong><span>Secured by Pi Network</span></div></div>
+<section class="values">
+<div class="value-item"><div class="value-icon">⌁</div><h2>Sustainable<br>Investment</h2><p>Building industries that<br>create lasting impact</p></div>
+<div class="value-item"><div class="value-icon">♧</div><h2>Community<br>Driven</h2><p>Empowering people<br>through opportunities</p></div>
+<div class="value-item"><div class="value-icon">✓</div><h2>Transparent<br>&amp; Trusted</h2><p>Open governance<br>and full transparency</p></div>
+<div class="value-item"><div class="value-icon">↗</div><h2>Growing<br>Together</h2><p>Stronger ecosystem,<br>better future</p></div>
+</section>
+<footer class="footer"><div class="footer-brand"><img src="images/albukhr-eagle-logo.jpg" alt=""><div><strong>ALBUKHR</strong><span>INVESTMENT LIMITED</span></div></div><div class="footer-security">Secure • Trusted • Transparent</div><div class="footer-copy">© 2026 ALBUKHR INVESTMENT LIMITED<br>All rights reserved.</div></footer>
+</main>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/login.js"></script>
+</body></html>
