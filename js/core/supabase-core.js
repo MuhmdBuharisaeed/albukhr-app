@@ -1,16 +1,21 @@
 /* =========================================================
    ALBUKHR SUPABASE CORE
-   =========================================================
+   File:
+   js/core/supabase-core.js
 
    Purpose:
    - Central Supabase client
    - Environment-aware connection
-   - MAINNET / TESTNET isolation
+   - Strict MAINNET / TESTNET isolation
    - Single client per page
+   - No LocalStorage dependency
+   - No direct authentication logic
    - No direct table-write logic
-   - Designed for ALBUKHR new architecture
+   - Compatible with ALBUKHR Environment Core
 
-   Environments:
+   Required before this file:
+   1. Supabase JS SDK
+   2. js/core/environment-core.js
 
    MAINNET
    https://app.albukhr.com
@@ -19,10 +24,9 @@
    TESTNET
    https://test.albukhr.com
    → Test Albukhr Supabase
-
    ========================================================= */
 
-(function () {
+(function (window) {
 
   "use strict";
 
@@ -32,11 +36,13 @@
   ======================================================= */
 
   if (window.ALBUKHR_SUPABASE) {
+
     console.warn(
-      "ALBUKHR Supabase Core already initialized."
+      "⚠️ ALBUKHR Supabase Core already initialized."
     );
 
     return;
+
   }
 
 
@@ -54,6 +60,7 @@
     );
 
     return;
+
   }
 
 
@@ -61,28 +68,45 @@
      ENVIRONMENT CORE CHECK
   ======================================================= */
 
-  if (!window.ALBUKHR_ENVIRONMENT) {
+  const environment =
+    window.ALBukhrEnvironment;
+
+
+  if (!environment) {
 
     console.error(
       "❌ ALBUKHR Environment Core is not loaded."
     );
 
     return;
+
   }
 
 
   /* =======================================================
-     ENVIRONMENT
+     ENVIRONMENT VALIDATION
   ======================================================= */
 
-  const environment =
-    window.ALBUKHR_ENVIRONMENT;
+  if (
+    typeof environment.isKnown !== "function" ||
+    !environment.isKnown()
+  ) {
 
+    console.error(
+      "❌ ALBUKHR environment is unknown."
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     CURRENT ENVIRONMENT
+  ======================================================= */
 
   const currentEnvironment =
-    typeof environment.getEnvironment === "function"
-      ? environment.getEnvironment()
-      : environment.environment;
+    environment.getKey();
 
 
   if (
@@ -96,6 +120,7 @@
     );
 
     return;
+
   }
 
 
@@ -103,34 +128,42 @@
      SUPABASE CONFIGURATION
   ======================================================= */
 
-  const CONFIG = {
+  const CONFIG = Object.freeze({
 
-    mainnet: {
+    mainnet: Object.freeze({
 
-      name: "App Albukhr",
+      name:
+        "App Albukhr",
 
       url:
         "https://ribpntyqdleytsyktdfb.supabase.co",
 
       key:
-        "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
+        "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2",
 
-    },
+      network:
+        "mainnet"
+
+    }),
 
 
-    testnet: {
+    testnet: Object.freeze({
 
-      name: "Test Albukhr",
+      name:
+        "Test Albukhr",
 
       url:
         "https://vhvkwvngmrlgyzwemttt.supabase.co",
 
       key:
-        "sb_publishable_5YNtKXSpO1xvPXbpLTo2Nw_mrxDp1qT"
+        "sb_publishable_5YNtKXSpO1xvPXbpLTo2Nw_mrxDp1qT",
 
-    }
+      network:
+        "testnet"
 
-  };
+    })
+
+  });
 
 
   /* =======================================================
@@ -149,6 +182,66 @@
     );
 
     return;
+
+  }
+
+
+  /* =======================================================
+     CROSS-CHECK ENVIRONMENT CORE
+  ======================================================= */
+
+  const environmentSupabaseUrl =
+    environment.getSupabaseUrl();
+
+
+  if (
+    environmentSupabaseUrl !==
+    selectedConfig.url
+  ) {
+
+    console.error(
+      "❌ Supabase URL mismatch between environment-core and supabase-core.",
+      {
+        environment:
+          currentEnvironment,
+
+        environmentUrl:
+          environmentSupabaseUrl,
+
+        configuredUrl:
+          selectedConfig.url
+      }
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     NETWORK CROSS-CHECK
+  ======================================================= */
+
+  const environmentNetwork =
+    environment.getNetwork();
+
+
+  if (
+    environmentNetwork !==
+    selectedConfig.network
+  ) {
+
+    console.error(
+      "❌ Network mismatch.",
+      {
+        environmentNetwork,
+        configuredNetwork:
+          selectedConfig.network
+      }
+    );
+
+    return;
+
   }
 
 
@@ -158,6 +251,7 @@
 
   let client;
 
+
   try {
 
     client =
@@ -166,7 +260,8 @@
         selectedConfig.key
       );
 
-  } catch (error) {
+  }
+  catch (error) {
 
     console.error(
       "❌ Failed to create Supabase client:",
@@ -174,17 +269,18 @@
     );
 
     return;
+
   }
 
 
   /* =======================================================
-     PUBLIC CORE OBJECT
+     PUBLIC CORE
   ======================================================= */
 
   const core = {
 
     /* -----------------------------------------------
-       CLIENT
+       SUPABASE CLIENT
     ------------------------------------------------ */
 
     client,
@@ -196,6 +292,14 @@
 
     environment:
       currentEnvironment,
+
+
+    /* -----------------------------------------------
+       NETWORK
+    ------------------------------------------------ */
+
+    network:
+      selectedConfig.network,
 
 
     /* -----------------------------------------------
@@ -215,28 +319,53 @@
 
 
     /* -----------------------------------------------
-       ENVIRONMENT CHECKS
+       ENVIRONMENT CHECK
     ------------------------------------------------ */
 
     isMainnet() {
 
-      return this.environment === "mainnet";
+      return (
+        this.environment ===
+        "mainnet"
+      );
 
     },
 
 
     isTestnet() {
 
-      return this.environment === "testnet";
+      return (
+        this.environment ===
+        "testnet"
+      );
 
     },
 
 
     /* -----------------------------------------------
-       RPC HELPER
+       NETWORK CHECK
     ------------------------------------------------ */
 
-    async rpc(functionName, params = {}) {
+    isNetwork(network) {
+
+      return (
+        this.network ===
+        String(network || "")
+          .trim()
+          .toLowerCase()
+      );
+
+    },
+
+
+    /* -----------------------------------------------
+       RPC
+    ------------------------------------------------ */
+
+    async rpc(
+      functionName,
+      params = {}
+    ) {
 
       if (!functionName) {
 
@@ -245,6 +374,7 @@
         );
 
       }
+
 
       return await this.client.rpc(
         functionName,
@@ -255,18 +385,7 @@
 
 
     /* -----------------------------------------------
-       AUTH CLIENT ACCESS
-    ------------------------------------------------ */
-
-    get auth() {
-
-      return this.client.auth;
-
-    },
-
-
-    /* -----------------------------------------------
-       DATABASE ACCESS
+       DATABASE TABLE ACCESS
     ------------------------------------------------ */
 
     from(tableName) {
@@ -279,7 +398,21 @@
 
       }
 
-      return this.client.from(tableName);
+
+      return this.client.from(
+        tableName
+      );
+
+    },
+
+
+    /* -----------------------------------------------
+       AUTH ACCESS
+    ------------------------------------------------ */
+
+    get auth() {
+
+      return this.client.auth;
 
     },
 
@@ -303,6 +436,31 @@
 
       return this.client;
 
+    },
+
+
+    /* -----------------------------------------------
+       CONFIG SNAPSHOT
+    ------------------------------------------------ */
+
+    getConfig() {
+
+      return Object.freeze({
+
+        environment:
+          this.environment,
+
+        network:
+          this.network,
+
+        project:
+          this.project,
+
+        url:
+          this.url
+
+      });
+
     }
 
   };
@@ -316,29 +474,27 @@
 
 
   /* =======================================================
-     EXPOSE GLOBAL CORE
+     GLOBAL EXPORT
   ======================================================= */
 
-  window.ALBUKHR_SUPABASE = core;
+  window.ALBUKHR_SUPABASE =
+    core;
 
 
   /* =======================================================
      COMPATIBILITY ALIAS
      
-     Existing engines can temporarily use:
+     Existing engines can temporarily access:
 
-       supabase.from(...)
-       supabase.rpc(...)
+       window.supabaseClient
 
-     while migration is being completed.
-
-     New code should use:
+     New architecture should use:
 
        ALBUKHR_SUPABASE.client
 
-     or:
-
        ALBUKHR_SUPABASE.from(...)
+
+       ALBUKHR_SUPABASE.rpc(...)
   ======================================================= */
 
   if (!window.supabaseClient) {
@@ -353,13 +509,19 @@
      DEVELOPMENT LOG
   ======================================================= */
 
-  console.log(
-    "✅ ALBUKHR Supabase Core initialized:",
+  console.info(
+    "✅ ALBUKHR Supabase Core initialized.",
     {
-      environment: core.environment,
-      project: core.project
+      environment:
+        core.environment,
+
+      network:
+        core.network,
+
+      project:
+        core.project
     }
   );
 
 
-})();
+})(window);
