@@ -1,54 +1,60 @@
 /* =========================================================
- * ALBUKHR — SUPABASE CORE
- * =========================================================
- *
- * Common Supabase connection layer for:
- *
- * MAINNET:
- *   https://app.albukhr.com
- *   → App Albukhr project
- *
- * TESTNET:
- *   https://test.albukhr.com
- *   → Test Albukhr project
- *
- * IMPORTANT:
- * - Browser-safe publishable keys only.
- * - NEVER put a service-role key here.
- * - Environment is determined by hostname.
- * - Mainnet and Testnet use completely separate
- *   Supabase projects/databases.
- * ========================================================= */
+   ALBUKHR SUPABASE CORE
+   ---------------------------------------------------------
+   MAINNET
+   app.albukhr.com
+   → App Albukhr project
+
+   TESTNET
+   test.albukhr.com
+   → Test Albukhr project
+
+   IMPORTANT SECURITY RULES
+   ---------------------------------------------------------
+   1. Environment is determined by environment.js.
+   2. MAINNET can only use MAINNET Supabase.
+   3. TESTNET can only use TESTNET Supabase.
+   4. Unknown environment is blocked.
+   5. No service-role/secret key belongs in frontend code.
+   6. All application engines should use this shared client.
+   ========================================================= */
 
 (function (window) {
     "use strict";
 
-    /* =======================================================
-     * SUPABASE PROJECT CONFIGURATION
-     * ======================================================= */
+    /* -----------------------------------------------------
+       REQUIRE ENVIRONMENT ENGINE
+       ----------------------------------------------------- */
 
-    const SUPABASE_CONFIG = Object.freeze({
+    if (!window.ALBUKHR_ENV) {
+        throw new Error(
+            "ALBUKHR: environment.js must load before supabase-core.js"
+        );
+    }
+
+    const env = window.ALBUKHR_ENV.requireValidEnvironment();
+
+    /* -----------------------------------------------------
+       SUPABASE CONFIGURATION
+       -----------------------------------------------------
+       These are PUBLIC publishable keys intended for
+       browser-side use.
+
+       NEVER place a Supabase service-role/secret key here.
+       ----------------------------------------------------- */
+
+    const CONFIG = Object.freeze({
 
         mainnet: Object.freeze({
-            name: "App Albukhr project",
-            environment: "mainnet",
-            appUrl: "https://app.albukhr.com",
-
-            supabaseUrl:
-                "https://ribpntyqdleytsyktdfb.supabase.co",
-
+            name: "mainnet",
+            url: "https://ribpntyqdleytsyktdfb.supabase.co",
             publishableKey:
                 "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
         }),
 
         testnet: Object.freeze({
-            name: "Test Albukhr project",
-            environment: "testnet",
-            appUrl: "https://test.albukhr.com",
-
-            supabaseUrl:
-                "https://vhvkwvngmrlgyzwemttt.supabase.co",
-
+            name: "testnet",
+            url: "https://vhvkwvngmrlgyzwemttt.supabase.co",
             publishableKey:
                 "sb_publishable_5YNtKXSpO1xvPXbpLTo2Nw_mrxDp1qT"
         })
@@ -56,503 +62,114 @@
     });
 
 
-    /* =======================================================
-     * HOSTNAME NORMALIZATION
-     * ======================================================= */
+    /* -----------------------------------------------------
+       SELECT CONFIGURATION
+       ----------------------------------------------------- */
 
-    function getHostname() {
-        return (
-            window.location.hostname ||
-            ""
-        )
-            .toLowerCase()
-            .trim();
-    }
+    const selectedConfig = CONFIG[env.name];
 
-
-    /* =======================================================
-     * ENVIRONMENT DETECTION
-     *
-     * MAINNET:
-     *   app.albukhr.com
-     *
-     * TESTNET:
-     *   test.albukhr.com
-     *
-     * IMPORTANT:
-     * Unknown production hosts are rejected.
-     * ======================================================= */
-
-    function detectEnvironment() {
-
-        const hostname = getHostname();
-
-
-        /* -----------------------------------------------
-         * MAINNET
-         * ----------------------------------------------- */
-
-        if (
-            hostname === "app.albukhr.com" ||
-            hostname === "www.app.albukhr.com"
-        ) {
-            return "mainnet";
-        }
-
-
-        /* -----------------------------------------------
-         * TESTNET
-         * ----------------------------------------------- */
-
-        if (
-            hostname === "test.albukhr.com" ||
-            hostname === "www.test.albukhr.com"
-        ) {
-            return "testnet";
-        }
-
-
-        /* -----------------------------------------------
-         * LOCAL DEVELOPMENT
-         *
-         * Local development defaults to TESTNET.
-         *
-         * This prevents accidental connection to
-         * Mainnet during development.
-         * ----------------------------------------------- */
-
-        if (
-            hostname === "localhost" ||
-            hostname === "127.0.0.1" ||
-            hostname === "::1"
-        ) {
-            return "testnet";
-        }
-
-
-        /* -----------------------------------------------
-         * UNKNOWN HOST
-         * ----------------------------------------------- */
-
+    if (!selectedConfig) {
         throw new Error(
-            "[ALBUKHR] Unknown application host. " +
-            "Supabase environment cannot be determined."
+            "ALBUKHR: No Supabase configuration exists for " +
+            env.name
         );
     }
 
 
-    /* =======================================================
-     * RESOLVE ACTIVE CONFIGURATION
-     * ======================================================= */
+    /* -----------------------------------------------------
+       EXTRA ENVIRONMENT SAFETY CHECK
+       ----------------------------------------------------- */
 
-    function getActiveConfig() {
+    if (env.name === "mainnet") {
 
-        const environment = detectEnvironment();
-
-        const config =
-            SUPABASE_CONFIG[environment];
-
-        if (!config) {
+        if (env.host !== "app.albukhr.com") {
             throw new Error(
-                "[ALBUKHR] Supabase configuration missing for environment: " +
-                environment
+                "ALBUKHR SECURITY: Mainnet host mismatch."
             );
         }
 
-        return config;
     }
 
+    if (env.name === "testnet") {
 
-    /* =======================================================
-     * SUPABASE LIBRARY CHECK
-     * ======================================================= */
-
-    function assertSupabaseLibrary() {
-
-        if (
-            !window.supabase ||
-            typeof window.supabase.createClient !== "function"
-        ) {
+        if (env.host !== "test.albukhr.com") {
             throw new Error(
-                "[ALBUKHR] Supabase JS client is not loaded. " +
-                "Load the Supabase library before supabase-core.js."
-            );
-        }
-    }
-
-
-    /* =======================================================
-     * CREATE SINGLE CLIENT
-     *
-     * Singleton pattern:
-     * The application receives one Supabase client for
-     * the active environment.
-     * ======================================================= */
-
-    let supabaseClient = null;
-
-
-    function createSupabaseClient() {
-
-        if (supabaseClient) {
-            return supabaseClient;
-        }
-
-
-        assertSupabaseLibrary();
-
-
-        const config =
-            getActiveConfig();
-
-
-        /* -----------------------------------------------
-         * Safety validation
-         * ----------------------------------------------- */
-
-        if (!config.supabaseUrl) {
-            throw new Error(
-                "[ALBUKHR] Supabase URL is missing."
+                "ALBUKHR SECURITY: Testnet host mismatch."
             );
         }
 
-
-        if (!config.publishableKey) {
-            throw new Error(
-                "[ALBUKHR] Supabase publishable key is missing."
-            );
-        }
-
-
-        /* -----------------------------------------------
-         * Create client
-         * ----------------------------------------------- */
-
-        supabaseClient =
-            window.supabase.createClient(
-                config.supabaseUrl,
-                config.publishableKey,
-                {
-                    auth: {
-                        persistSession: true,
-                        autoRefreshToken: true,
-                        detectSessionInUrl: true
-                    },
-
-                    global: {
-                        headers: {
-                            "x-albukhr-environment":
-                                config.environment
-                        }
-                    }
-                }
-            );
-
-
-        return supabaseClient;
     }
 
 
-    /* =======================================================
-     * PUBLIC ACCESSOR
-     * ======================================================= */
+    /* -----------------------------------------------------
+       SUPABASE LIBRARY CHECK
+       ----------------------------------------------------- */
 
-    function getSupabase() {
-
-        return createSupabaseClient();
-
-    }
-
-
-    /* =======================================================
-     * ENVIRONMENT INFORMATION
-     * ======================================================= */
-
-    function getEnvironment() {
-
-        return getActiveConfig().environment;
-
-    }
-
-
-    function isMainnet() {
-
-        return getEnvironment() === "mainnet";
-
-    }
-
-
-    function isTestnet() {
-
-        return getEnvironment() === "testnet";
-
-    }
-
-
-    /* =======================================================
-     * ACTIVE PROJECT INFORMATION
-     * ======================================================= */
-
-    function getProjectInfo() {
-
-        const config =
-            getActiveConfig();
-
-        return Object.freeze({
-
-            name: config.name,
-
-            environment:
-                config.environment,
-
-            appUrl:
-                config.appUrl,
-
-            supabaseUrl:
-                config.supabaseUrl
-        });
-    }
-
-
-    /* =======================================================
-     * NETWORK GUARD
-     *
-     * Used by future engines before sensitive operations.
-     *
-     * Example:
-     *
-     * ALBUKHR.supabase.assertNetwork("testnet");
-     *
-     * ======================================================= */
-
-    function assertNetwork(expectedNetwork) {
-
-        const actualNetwork =
-            getEnvironment();
-
-
-        if (
-            expectedNetwork !==
-            actualNetwork
-        ) {
-
-            throw new Error(
-                "[ALBUKHR] Network mismatch. " +
-                "Expected " +
-                expectedNetwork +
-                " but active environment is " +
-                actualNetwork +
-                "."
-            );
-        }
-
-
-        return true;
-    }
-
-
-    /* =======================================================
-     * SAFE DATABASE HELPERS
-     * ======================================================= */
-
-    async function rpc(functionName, parameters) {
-
-        if (
-            typeof functionName !== "string" ||
-            !functionName.trim()
-        ) {
-            throw new Error(
-                "[ALBUKHR] RPC function name is required."
-            );
-        }
-
-
-        const client =
-            getSupabase();
-
-
-        return await client.rpc(
-            functionName,
-            parameters || {}
+    if (
+        !window.supabase ||
+        typeof window.supabase.createClient !== "function"
+    ) {
+        throw new Error(
+            "ALBUKHR: Supabase JavaScript library is not loaded."
         );
     }
 
 
-    /* =======================================================
-     * AUTH ACCESSOR
-     * ======================================================= */
+    /* -----------------------------------------------------
+       CREATE CLIENT
+       ----------------------------------------------------- */
 
-    function getAuth() {
-
-        return getSupabase().auth;
-
-    }
-
-
-    /* =======================================================
-     * SESSION
-     * ======================================================= */
-
-    async function getSession() {
-
-        return await getAuth()
-            .getSession();
-
-    }
-
-
-    /* =======================================================
-     * CURRENT USER
-     * ======================================================= */
-
-    async function getUser() {
-
-        return await getAuth()
-            .getUser();
-
-    }
-
-
-    /* =======================================================
-     * AUTH STATE LISTENER
-     * ======================================================= */
-
-    function onAuthStateChange(callback) {
-
-        if (
-            typeof callback !== "function"
-        ) {
-            throw new Error(
-                "[ALBUKHR] Auth callback must be a function."
-            );
+    const client = window.supabase.createClient(
+        selectedConfig.url,
+        selectedConfig.publishableKey,
+        {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
         }
+    );
 
 
-        return getAuth()
-            .onAuthStateChange(callback);
-    }
+    /* -----------------------------------------------------
+       PUBLIC API
+       ----------------------------------------------------- */
+
+    const api = Object.freeze({
+
+        client,
+
+        environment: env.name,
+
+        environmentLabel: env.label,
+
+        supabaseUrl: selectedConfig.url,
+
+        isMainnet: env.name === "mainnet",
+
+        isTestnet: env.name === "testnet"
+
+    });
 
 
-    /* =======================================================
-     * SIGN OUT
-     * ======================================================= */
+    /* -----------------------------------------------------
+       EXPOSE SHARED ALBUKHR SUPABASE CORE
+       ----------------------------------------------------- */
 
-    async function signOut() {
-
-        return await getAuth()
-            .signOut();
-
-    }
+    window.ALBUKHR_SUPABASE = api;
 
 
-    /* =======================================================
-     * DEBUG INFORMATION
-     *
-     * Does NOT expose the publishable key.
-     * Does NOT expose secrets.
-     * ======================================================= */
+    /* -----------------------------------------------------
+       DEVELOPMENT INFORMATION
+       -----------------------------------------------------
+       This does not expose credentials beyond the already
+       public browser configuration.
+       ----------------------------------------------------- */
 
-    function getDebugInfo() {
-
-        const config =
-            getActiveConfig();
-
-
-        return Object.freeze({
-
-            hostname:
-                getHostname(),
-
-            environment:
-                config.environment,
-
-            project:
-                config.name,
-
-            appUrl:
-                config.appUrl,
-
-            supabaseUrl:
-                config.supabaseUrl
-        });
-    }
-
-
-    /* =======================================================
-     * FREEZE PUBLIC API
-     * ======================================================= */
-
-    const ALBUKHR_SUPABASE =
-        Object.freeze({
-
-            /* Client */
-            getSupabase,
-
-            /* Environment */
-            getEnvironment,
-            isMainnet,
-            isTestnet,
-
-            /* Project */
-            getProjectInfo,
-
-            /* Security */
-            assertNetwork,
-
-            /* RPC */
-            rpc,
-
-            /* Auth */
-            getAuth,
-            getSession,
-            getUser,
-            onAuthStateChange,
-            signOut,
-
-            /* Debug */
-            getDebugInfo
-
-        });
-
-
-    /* =======================================================
-     * GLOBAL EXPORT
-     * ======================================================= */
-
-    window.ALBUKHR =
-        window.ALBUKHR || {};
-
-
-    window.ALBUKHR.supabase =
-        ALBUKHR_SUPABASE;
-
-
-    /* =======================================================
-     * INITIALIZATION CHECK
-     *
-     * We intentionally do not create the client immediately.
-     * It will be created when getSupabase() is called.
-     * ======================================================= */
-
-    try {
-
-        const info =
-            getDebugInfo();
-
-
-        console.info(
-            "[ALBUKHR] Supabase Core initialized:",
-            info.environment,
-            info.project
-        );
-
-    } catch (error) {
-
-        console.error(
-            "[ALBUKHR] Supabase Core initialization failed:",
-            error
-        );
-
-    }
+    console.info(
+        "ALBUKHR Supabase Core:",
+        env.label
+    );
 
 })(window);
