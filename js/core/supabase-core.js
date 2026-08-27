@@ -1,175 +1,365 @@
 /* =========================================================
    ALBUKHR SUPABASE CORE
-   ---------------------------------------------------------
+   =========================================================
+
+   Purpose:
+   - Central Supabase client
+   - Environment-aware connection
+   - MAINNET / TESTNET isolation
+   - Single client per page
+   - No direct table-write logic
+   - Designed for ALBUKHR new architecture
+
+   Environments:
+
    MAINNET
-   app.albukhr.com
-   → App Albukhr project
+   https://app.albukhr.com
+   → App Albukhr Supabase
 
    TESTNET
-   test.albukhr.com
-   → Test Albukhr project
+   https://test.albukhr.com
+   → Test Albukhr Supabase
 
-   IMPORTANT SECURITY RULES
-   ---------------------------------------------------------
-   1. Environment is determined by environment.js.
-   2. MAINNET can only use MAINNET Supabase.
-   3. TESTNET can only use TESTNET Supabase.
-   4. Unknown environment is blocked.
-   5. No service-role/secret key belongs in frontend code.
-   6. All application engines should use this shared client.
    ========================================================= */
 
-(function (window) {
-    "use strict";
+(function () {
 
-    /* -----------------------------------------------------
-       REQUIRE ENVIRONMENT ENGINE
-       ----------------------------------------------------- */
+  "use strict";
 
-    if (!window.ALBUKHR_ENV) {
-        throw new Error(
-            "ALBUKHR: environment.js must load before supabase-core.js"
-        );
+
+  /* =======================================================
+     PREVENT DUPLICATE INITIALIZATION
+  ======================================================= */
+
+  if (window.ALBUKHR_SUPABASE) {
+    console.warn(
+      "ALBUKHR Supabase Core already initialized."
+    );
+
+    return;
+  }
+
+
+  /* =======================================================
+     SUPABASE SDK CHECK
+  ======================================================= */
+
+  if (
+    !window.supabase ||
+    typeof window.supabase.createClient !== "function"
+  ) {
+
+    console.error(
+      "❌ Supabase SDK is not loaded."
+    );
+
+    return;
+  }
+
+
+  /* =======================================================
+     ENVIRONMENT CORE CHECK
+  ======================================================= */
+
+  if (!window.ALBUKHR_ENVIRONMENT) {
+
+    console.error(
+      "❌ ALBUKHR Environment Core is not loaded."
+    );
+
+    return;
+  }
+
+
+  /* =======================================================
+     ENVIRONMENT
+  ======================================================= */
+
+  const environment =
+    window.ALBUKHR_ENVIRONMENT;
+
+
+  const currentEnvironment =
+    typeof environment.getEnvironment === "function"
+      ? environment.getEnvironment()
+      : environment.environment;
+
+
+  if (
+    currentEnvironment !== "mainnet" &&
+    currentEnvironment !== "testnet"
+  ) {
+
+    console.error(
+      "❌ Invalid ALBUKHR environment:",
+      currentEnvironment
+    );
+
+    return;
+  }
+
+
+  /* =======================================================
+     SUPABASE CONFIGURATION
+  ======================================================= */
+
+  const CONFIG = {
+
+    mainnet: {
+
+      name: "App Albukhr",
+
+      url:
+        "https://ribpntyqdleytsyktdfb.supabase.co",
+
+      key:
+        "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
+
+    },
+
+
+    testnet: {
+
+      name: "Test Albukhr",
+
+      url:
+        "https://vhvkwvngmrlgyzwemttt.supabase.co",
+
+      key:
+        "sb_publishable_5YNtKXSpO1xvPXbpLTo2Nw_mrxDp1qT"
+
     }
 
-    const env = window.ALBUKHR_ENV.requireValidEnvironment();
-
-    /* -----------------------------------------------------
-       SUPABASE CONFIGURATION
-       -----------------------------------------------------
-       These are PUBLIC publishable keys intended for
-       browser-side use.
-
-       NEVER place a Supabase service-role/secret key here.
-       ----------------------------------------------------- */
-
-    const CONFIG = Object.freeze({
-
-        mainnet: Object.freeze({
-            name: "mainnet",
-            url: "https://ribpntyqdleytsyktdfb.supabase.co",
-            publishableKey:
-                "sb_publishable_6pRDCPwk97eCz2Fpu1cadg__XIQlZX2"
-        }),
-
-        testnet: Object.freeze({
-            name: "testnet",
-            url: "https://vhvkwvngmrlgyzwemttt.supabase.co",
-            publishableKey:
-                "sb_publishable_5YNtKXSpO1xvPXbpLTo2Nw_mrxDp1qT"
-        })
-
-    });
+  };
 
 
-    /* -----------------------------------------------------
-       SELECT CONFIGURATION
-       ----------------------------------------------------- */
+  /* =======================================================
+     SELECT CURRENT BACKEND
+  ======================================================= */
 
-    const selectedConfig = CONFIG[env.name];
-
-    if (!selectedConfig) {
-        throw new Error(
-            "ALBUKHR: No Supabase configuration exists for " +
-            env.name
-        );
-    }
+  const selectedConfig =
+    CONFIG[currentEnvironment];
 
 
-    /* -----------------------------------------------------
-       EXTRA ENVIRONMENT SAFETY CHECK
-       ----------------------------------------------------- */
+  if (!selectedConfig) {
 
-    if (env.name === "mainnet") {
+    console.error(
+      "❌ Supabase configuration missing for:",
+      currentEnvironment
+    );
 
-        if (env.host !== "app.albukhr.com") {
-            throw new Error(
-                "ALBUKHR SECURITY: Mainnet host mismatch."
-            );
-        }
-
-    }
-
-    if (env.name === "testnet") {
-
-        if (env.host !== "test.albukhr.com") {
-            throw new Error(
-                "ALBUKHR SECURITY: Testnet host mismatch."
-            );
-        }
-
-    }
+    return;
+  }
 
 
-    /* -----------------------------------------------------
-       SUPABASE LIBRARY CHECK
-       ----------------------------------------------------- */
+  /* =======================================================
+     CREATE SUPABASE CLIENT
+  ======================================================= */
 
-    if (
-        !window.supabase ||
-        typeof window.supabase.createClient !== "function"
-    ) {
-        throw new Error(
-            "ALBUKHR: Supabase JavaScript library is not loaded."
-        );
-    }
+  let client;
 
+  try {
 
-    /* -----------------------------------------------------
-       CREATE CLIENT
-       ----------------------------------------------------- */
-
-    const client = window.supabase.createClient(
+    client =
+      window.supabase.createClient(
         selectedConfig.url,
-        selectedConfig.publishableKey,
-        {
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            }
-        }
+        selectedConfig.key
+      );
+
+  } catch (error) {
+
+    console.error(
+      "❌ Failed to create Supabase client:",
+      error
     );
 
-
-    /* -----------------------------------------------------
-       PUBLIC API
-       ----------------------------------------------------- */
-
-    const api = Object.freeze({
-
-        client,
-
-        environment: env.name,
-
-        environmentLabel: env.label,
-
-        supabaseUrl: selectedConfig.url,
-
-        isMainnet: env.name === "mainnet",
-
-        isTestnet: env.name === "testnet"
-
-    });
+    return;
+  }
 
 
-    /* -----------------------------------------------------
-       EXPOSE SHARED ALBUKHR SUPABASE CORE
-       ----------------------------------------------------- */
+  /* =======================================================
+     PUBLIC CORE OBJECT
+  ======================================================= */
 
-    window.ALBUKHR_SUPABASE = api;
+  const core = {
+
+    /* -----------------------------------------------
+       CLIENT
+    ------------------------------------------------ */
+
+    client,
 
 
-    /* -----------------------------------------------------
-       DEVELOPMENT INFORMATION
-       -----------------------------------------------------
-       This does not expose credentials beyond the already
-       public browser configuration.
-       ----------------------------------------------------- */
+    /* -----------------------------------------------
+       ENVIRONMENT
+    ------------------------------------------------ */
 
-    console.info(
-        "ALBUKHR Supabase Core:",
-        env.label
-    );
+    environment:
+      currentEnvironment,
 
-})(window);
+
+    /* -----------------------------------------------
+       PROJECT NAME
+    ------------------------------------------------ */
+
+    project:
+      selectedConfig.name,
+
+
+    /* -----------------------------------------------
+       SUPABASE URL
+    ------------------------------------------------ */
+
+    url:
+      selectedConfig.url,
+
+
+    /* -----------------------------------------------
+       ENVIRONMENT CHECKS
+    ------------------------------------------------ */
+
+    isMainnet() {
+
+      return this.environment === "mainnet";
+
+    },
+
+
+    isTestnet() {
+
+      return this.environment === "testnet";
+
+    },
+
+
+    /* -----------------------------------------------
+       RPC HELPER
+    ------------------------------------------------ */
+
+    async rpc(functionName, params = {}) {
+
+      if (!functionName) {
+
+        throw new Error(
+          "Supabase RPC function name is required."
+        );
+
+      }
+
+      return await this.client.rpc(
+        functionName,
+        params
+      );
+
+    },
+
+
+    /* -----------------------------------------------
+       AUTH CLIENT ACCESS
+    ------------------------------------------------ */
+
+    get auth() {
+
+      return this.client.auth;
+
+    },
+
+
+    /* -----------------------------------------------
+       DATABASE ACCESS
+    ------------------------------------------------ */
+
+    from(tableName) {
+
+      if (!tableName) {
+
+        throw new Error(
+          "Supabase table name is required."
+        );
+
+      }
+
+      return this.client.from(tableName);
+
+    },
+
+
+    /* -----------------------------------------------
+       STORAGE ACCESS
+    ------------------------------------------------ */
+
+    get storage() {
+
+      return this.client.storage;
+
+    },
+
+
+    /* -----------------------------------------------
+       RAW CLIENT
+    ------------------------------------------------ */
+
+    getClient() {
+
+      return this.client;
+
+    }
+
+  };
+
+
+  /* =======================================================
+     FREEZE CORE
+  ======================================================= */
+
+  Object.freeze(core);
+
+
+  /* =======================================================
+     EXPOSE GLOBAL CORE
+  ======================================================= */
+
+  window.ALBUKHR_SUPABASE = core;
+
+
+  /* =======================================================
+     COMPATIBILITY ALIAS
+     
+     Existing engines can temporarily use:
+
+       supabase.from(...)
+       supabase.rpc(...)
+
+     while migration is being completed.
+
+     New code should use:
+
+       ALBUKHR_SUPABASE.client
+
+     or:
+
+       ALBUKHR_SUPABASE.from(...)
+  ======================================================= */
+
+  if (!window.supabaseClient) {
+
+    window.supabaseClient =
+      core.client;
+
+  }
+
+
+  /* =======================================================
+     DEVELOPMENT LOG
+  ======================================================= */
+
+  console.log(
+    "✅ ALBUKHR Supabase Core initialized:",
+    {
+      environment: core.environment,
+      project: core.project
+    }
+  );
+
+
+})();
