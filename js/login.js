@@ -1,1 +1,30 @@
-(function(w){"use strict";const status=()=>document.getElementById("status"),btn=()=>document.getElementById("piLoginButton");function setStatus(m){const e=status();if(e)e.textContent=String(m||"")}function loading(v){const b=btn();if(!b)return;b.disabled=!!v;b.classList.toggle("is-loading",!!v);const t=b.querySelector(".pi-login-text");if(t)t.textContent=v?"Connecting to Pi...":"Login with Pi"}function check(){if(!w.ALBukhrEnvironment?.isKnown?.())throw new Error("ALBUKHR environment is unavailable.");if(!w.ALBUKHR_SUPABASE)throw new Error("ALBUKHR Supabase Core is unavailable.");if(!w.AlbukhrPiAuth)throw new Error("ALBUKHR Pi Auth Core is unavailable.")}function target(){const x=new URLSearchParams(location.search).get("returnTo");return x&&x.startsWith("/")&&!x.startsWith("//")?x:"index.html"}async function login(){try{check();loading(true);setStatus("Initializing secure Pi authentication...");const u=await w.AlbukhrPiAuth.ensurePiAuth();if(!u?.uid)throw new Error("Pi authentication returned an invalid user.");setStatus(`Login successful: ${u.username}`);setTimeout(()=>location.replace(target()),500)}catch(e){loading(false);setStatus(e?.message?`Login failed: ${e.message}`:"Login failed.")}}w.login=login;function init(){try{check();setStatus("Ready to login with Pi.")}catch(e){loading(true);setStatus("Login system is unavailable.")}}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init):init()})(window);
+/* ALBUKHR LOGIN PAGE CONTROLLER */
+(function(window){"use strict";
+function el(id){return document.getElementById(id)}
+function setStatus(message){const e=el("status");if(e)e.textContent=String(message||"")}
+function setLoading(loading,text){const b=el("piLoginButton");if(!b)return;b.disabled=Boolean(loading);const t=b.querySelector(".pi-login-text");if(t&&typeof text==="string")t.textContent=text}
+function checkDependencies(){
+ if(!window.ALBukhrEnvironment||!window.ALBukhrEnvironment.isKnown())throw new Error("ALBUKHR environment is unavailable.");
+ if(!window.ALBUKHR_SUPABASE)throw new Error("ALBUKHR Supabase Core is unavailable.");
+ if(!window.AlbukhrPiAuth)throw new Error("ALBUKHR Pi Auth Core is unavailable.");
+}
+function getTarget(){const r=new URLSearchParams(location.search).get("returnTo");return r&&r.startsWith("/")&&!r.startsWith("//")?r:"index.html"}
+async function login(){
+ try{
+  checkDependencies();setLoading(true,"Connecting to Pi...");setStatus("Initializing secure Pi authentication...");
+  const user=await window.AlbukhrPiAuth.ensurePiAuth();
+  if(!user||!user.uid)throw new Error("Pi authentication returned an invalid user.");
+  setStatus("Login successful: "+user.username);setLoading(true,"Opening Dashboard...");
+  window.setTimeout(()=>window.location.replace(getTarget()),600);
+ }catch(error){
+  console.error("[ALBUKHR LOGIN]",error);setLoading(false,"Login with Pi");
+  setStatus(error&&error.message?"Login failed: "+error.message:"Login failed.");
+ }
+}
+window.login=login;
+function init(){
+ try{checkDependencies();setStatus("Ready to login with Pi.");setLoading(false,"Login with Pi")}
+ catch(error){console.error(error);setLoading(true,"Login unavailable");setStatus("Login system is unavailable.")}
+}
+document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init):init();
+})(window);
