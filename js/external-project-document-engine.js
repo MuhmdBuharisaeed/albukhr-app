@@ -1,0 +1,9 @@
+(function(w){'use strict';
+const BUCKET='external-project-documents';
+async function ctx(){if(!w.ALBukhrEnvironment||!w.ALBUKHR_SUPABASE||!w.AlbukhrPiAuth)throw Error('Required ALBUKHR cores are missing.');const u=await w.AlbukhrPiAuth.ensurePiAuth();return{uid:u.uid,network:w.ALBukhrEnvironment.getNetwork(),client:w.ALBUKHR_SUPABASE.client};}
+function path(id,name){const safe=String(name||'document').replace(/[^a-zA-Z0-9._-]/g,'_');const x=w.crypto?.randomUUID?w.crypto.randomUUID():Date.now();return id+'/'+x+'-'+safe;}
+async function upload(o){const c=await ctx(),p=path(o.applicationId,o.file.name),b=o.bucket||BUCKET;let r=await c.client.storage.from(b).upload(p,o.file,{upsert:false,contentType:o.file.type||'application/octet-stream'});if(r.error)throw r.error;try{r=await c.client.rpc('register_my_external_project_document',{p_application_id:o.applicationId,p_pi_uid:c.uid,p_network:c.network,p_document_type:o.documentType,p_document_name:o.file.name,p_storage_bucket:b,p_storage_path:p,p_document_url:null});if(r.error)throw r.error;return{documentId:r.data,storageBucket:b,storagePath:p};}catch(e){await c.client.storage.from(b).remove([p]);throw e;}}
+async function list(applicationId){const c=await ctx(),r=await c.client.rpc('get_my_external_project_documents',{p_application_id:applicationId,p_pi_uid:c.uid,p_network:c.network});if(r.error)throw r.error;return r.data||[];}
+async function del(documentId){const c=await ctx(),r=await c.client.rpc('delete_my_external_project_document',{p_document_id:documentId,p_pi_uid:c.uid,p_network:c.network});if(r.error)throw r.error;const x=r.data?.[0];if(x)await c.client.storage.from(x.storage_bucket).remove([x.storage_path]);return true;}
+w.ALBukhrExternalProjectDocuments=Object.freeze({BUCKET,uploadDocument:upload,getDocuments:list,deleteDocument:del});
+})(window);
