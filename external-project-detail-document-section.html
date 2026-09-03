@@ -1,0 +1,70 @@
+<!-- =====================================================
+     ALBUKHR EXTERNAL PROJECT DOCUMENTS SECTION
+     Add inside external-project-detail.html
+===================================================== -->
+
+<section class="external-project-documents-section">
+
+  <div class="external-project-documents-heading">
+    <div>
+      <h2>Project Documents</h2>
+      <p>Documents submitted for this external project.</p>
+    </div>
+  </div>
+
+  <div
+    id="externalProjectDocumentStatus"
+    class="external-document-status"
+    role="status"
+    aria-live="polite">
+  </div>
+
+  <div
+    id="externalProjectDocuments"
+    class="external-project-documents-list">
+  </div>
+
+  <div class="external-project-document-upload-panel">
+
+    <label for="externalProjectDocumentType">
+      Document Type
+    </label>
+
+    <select id="externalProjectDocumentType">
+      <option value="business_registration">
+        Business Registration
+      </option>
+
+      <option value="identity">
+        Identity Document
+      </option>
+
+      <option value="business_plan">
+        Business Plan
+      </option>
+
+      <option value="financial_document">
+        Financial Document
+      </option>
+
+      <option value="other">
+        Other
+      </option>
+    </select>
+
+    <label
+      class="external-document-upload-button"
+      for="externalProjectDocumentUpload">
+
+      Upload Document
+
+    </label>
+
+    <input
+      id="externalProjectDocumentUpload"
+      type="file"
+      hidden>
+
+  </div>
+
+</section>
