@@ -1,120 +1,187 @@
-/* ALBUKHR External Project Create Controller
-   Uses only shared cores and existing database RPC:
-   create_external_project_application(...)
-*/
-(function(window){
-"use strict";
+/* =========================================================
+   ALBUKHR EXTERNAL CREATE / EDIT CONTROLLER
+   File: js/external-create.js
 
-const Auth = window.AlbukhrPiAuth;
-const Environment = window.ALBukhrEnvironment;
-const DB = window.ALBUKHR_SUPABASE;
+   Engine:
+   - create_external_project_application
+   - update_external_project_application
 
-function status(message,type){
- const el=document.getElementById("status");
- if(!el)return;
- el.textContent=message;
- el.className="status"+(type?" "+type:"");
-}
-function button(disabled,text){
- const b=document.getElementById("submitButton");
- if(!b)return;
- b.disabled=!!disabled;
- if(text)b.innerHTML="<span>"+text+"</span><span>→</span>";
-}
-function slugify(value){
- return String(value||"").trim().toLowerCase()
- .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
-}
-function required(value,name){
- if(value===null||value===undefined||String(value).trim()===""){
-   throw new Error(name+" is required.");
- }
- return value;
-}
-function getFormData(){
- const form=document.getElementById("externalProjectForm");
- const fd=new FormData(form);
- const projectName=required(fd.get("project_name"),"Project name");
- const slug=slugify(fd.get("project_slug")||projectName);
- const funding=Number(fd.get("funding_required"));
- const duration=Number(fd.get("project_duration_days"));
- if(!Number.isFinite(funding)||funding<0)throw new Error("Funding required must be a valid amount.");
- if(!Number.isInteger(duration)||duration<1)throw new Error("Project duration must be at least 1 day.");
- return {
-  p_project_code:String(required(fd.get("project_code"),"Project code")).trim(),
-  p_project_slug:required(slug,"Project slug"),
-  p_project_name:String(projectName).trim(),
-  p_business_name:String(required(fd.get("business_name"),"Business name")).trim(),
-  p_country:String(required(fd.get("country"),"Country")).trim(),
-  p_contact_email:String(required(fd.get("contact_email"),"Contact email")).trim(),
-  p_project_description:String(required(fd.get("project_description"),"Project description")).trim(),
-  p_business_registration_number:String(fd.get("business_registration_number")||"").trim(),
-  p_industry:String(required(fd.get("industry"),"Industry")).trim(),
-  p_category:String(required(fd.get("category"),"Category")).trim(),
-  p_state:String(fd.get("state")||"").trim(),
-  p_city:String(fd.get("city")||"").trim(),
-  p_business_address:String(fd.get("business_address")||"").trim(),
-  p_website:String(fd.get("website")||"").trim(),
-  p_contact_phone:String(fd.get("contact_phone")||"").trim(),
-  p_pi_wallet:String(fd.get("pi_wallet")||"").trim(),
-  p_funding_required:funding,
-  p_funding_asset:String(required(fd.get("funding_asset"),"Funding asset")).trim(),
-  p_investment_model:String(required(fd.get("investment_model"),"Investment model")).trim(),
-  p_project_duration_days:duration
- };
-}
-async function initialize(){
- try{
-  if(!Environment||!Environment.isKnown())throw new Error("ALBUKHR environment is unavailable.");
-  if(!DB)throw new Error("ALBUKHR database core is unavailable.");
-  if(!Auth)throw new Error("ALBUKHR Pi Auth Core is unavailable.");
-  document.getElementById("networkBadge").textContent=Environment.getName();
-  status("Secure Pi authentication required.");
-  const user=await Auth.requireAuth("login.html");
-  if(!user)return;
-  status("Authenticated as "+user.username+". You can create an external project application.","success");
- }catch(e){
-  console.error("[ALBUKHR EXTERNAL CREATE]",e);
-  status(e.message||"Unable to initialize secure application access.","error");
-  button(true,"Access unavailable");
- }
-}
-async function submit(event){
- event.preventDefault();
- try{
-  if(!document.getElementById("truthDeclaration").checked){
-   throw new Error("Please confirm the information declaration.");
+   Security:
+   - Pi Auth required
+   - Environment aware
+   - No LocalStorage
+========================================================= */
+
+(function (window) {
+  "use strict";
+
+  let currentUser = null;
+  let applicationId = null;
+  let editMode = false;
+
+  const fields = {
+    projectCode:"projectCode", projectSlug:"projectSlug", projectName:"projectName",
+    businessName:"businessName", country:"country", state:"state", city:"city",
+    industry:"industry", category:"category", businessRegistrationNumber:"businessRegistrationNumber",
+    businessAddress:"businessAddress", contactEmail:"contactEmail", contactPhone:"contactPhone",
+    website:"website", piWallet:"piWallet", fundingRequired:"fundingRequired",
+    fundingAsset:"fundingAsset", investmentModel:"investmentModel",
+    projectDurationDays:"projectDurationDays", projectDescription:"projectDescription"
+  };
+
+  function el(id){return document.getElementById(id)}
+  function value(key){return String(el(fields[key]).value || "").trim()}
+  function setStatus(message,type){
+    const s=el("formStatus"); s.textContent=message||""; s.className="form-status"+(type?" "+type:"");
   }
-  const user=await Auth.requireAuth("login.html");
-  if(!user)throw new Error("Authentication is required.");
-  const params=getFormData();
-  button(true,"Submitting application...");
-  status("Submitting your external project application...");
-  const result=await DB.rpc("create_external_project_application",params);
-  if(result.error)throw result.error;
-  status("Application created successfully. Your project is now awaiting the next review stage.","success");
-  button(true,"Application submitted");
-  console.info("[ALBUKHR EXTERNAL PROJECT CREATED]",result.data);
- }catch(e){
-  console.error("[ALBUKHR EXTERNAL CREATE SUBMIT]",e);
-  status(e.message||"Unable to submit application.","error");
-  button(false,"Submit Project Application");
- }
-}
-document.addEventListener("DOMContentLoaded",function(){
- const name=document.getElementById("projectName");
- const slug=document.getElementById("projectSlug");
- if(name&&slug){
-   name.addEventListener("input",function(){
-     if(!slug.dataset.userEdited)slug.value=slugify(name.value);
-   });
-   slug.addEventListener("input",function(){
-     slug.dataset.userEdited="true";
-     slug.value=slugify(slug.value);
-   });
- }
- const form=document.getElementById("externalProjectForm");
- if(form)form.addEventListener("submit",submit);
- initialize();
-});
+  function requireDeps(){
+    if(!window.ALBukhrEnvironment) throw new Error("ALBUKHR Environment Core is unavailable.");
+    if(!window.ALBUKHR_SUPABASE) throw new Error("ALBUKHR Supabase Core is unavailable.");
+    if(!window.AlbukhrPiAuth) throw new Error("ALBUKHR Pi Auth Core is unavailable.");
+    if(!window.ALBukhrEnvironment.isKnown()) throw new Error("ALBUKHR environment is not recognized.");
+  }
+  function payload(){
+    return {
+      project_code:value("projectCode"),
+      project_slug:value("projectSlug"),
+      project_name:value("projectName"),
+      business_name:value("businessName"),
+      country:value("country"),
+      contact_email:value("contactEmail"),
+      project_description:value("projectDescription"),
+      business_registration_number:value("businessRegistrationNumber"),
+      industry:value("industry"),
+      category:value("category"),
+      state:value("state"),
+      city:value("city"),
+      business_address:value("businessAddress"),
+      website:value("website"),
+      contact_phone:value("contactPhone"),
+      pi_wallet:value("piWallet"),
+      funding_required:Number(value("fundingRequired")),
+      funding_asset:value("fundingAsset"),
+      investment_model:value("investmentModel"),
+      project_duration_days:Number(value("projectDurationDays"))
+    };
+  }
+  function validate(p){
+    const required=["project_code","project_slug","project_name","business_name","country","contact_email","project_description","industry","category","funding_asset","investment_model"];
+    for(const key of required) if(!String(p[key]||"").trim()) throw new Error("Please complete all required fields.");
+    if(!Number.isFinite(p.funding_required)||p.funding_required<0) throw new Error("Funding Required must be valid.");
+    if(!Number.isInteger(p.project_duration_days)||p.project_duration_days<1) throw new Error("Project Duration must be at least 1 day.");
+    return true;
+  }
+  function setField(id,val){
+    if(val!==undefined && val!==null && el(id)) el(id).value=val;
+  }
+  function mapApplication(row){
+    const m={
+      projectCode:row.project_code,projectSlug:row.project_slug,projectName:row.project_name||row.name,
+      businessName:row.business_name,country:row.country,state:row.state,city:row.city,
+      industry:row.industry,category:row.category,businessRegistrationNumber:row.business_registration_number,
+      businessAddress:row.business_address,contactEmail:row.contact_email,contactPhone:row.contact_phone,
+      website:row.website,piWallet:row.pi_wallet,fundingRequired:row.funding_required,
+      fundingAsset:row.funding_asset,investmentModel:row.investment_model,
+      projectDurationDays:row.project_duration_days,projectDescription:row.project_description||row.description
+    };
+    Object.entries(m).forEach(([k,v])=>setField(k,v));
+  }
+
+  async function loadForEdit(){
+    if(!applicationId) return;
+    setStatus("Loading application for secure editing...");
+    const network=window.ALBukhrEnvironment.getNetwork();
+
+    const {data,error}=await window.ALBUKHR_SUPABASE
+      .from("external_project_applications")
+      .select("*")
+      .eq("id",applicationId)
+      .eq("network",network)
+      .maybeSingle();
+
+    if(error) throw error;
+    if(!data) throw new Error("Application was not found or is not available in this network.");
+
+    const status=String(data.status||data.application_status||"draft").toLowerCase();
+    if(["approved","rejected"].includes(status)) throw new Error("This application can no longer be edited.");
+    mapApplication(data);
+    setStatus("Application loaded. Update the details and save your changes.","success");
+  }
+
+  async function submitForm(event){
+    event.preventDefault();
+    const button=el("saveButton");
+    try{
+      const p=payload(); validate(p);
+      button.disabled=true;
+      setStatus(editMode?"Saving secure application changes...":"Creating secure project application...");
+
+      let result;
+      if(editMode){
+        result=await window.ALBUKHR_SUPABASE.rpc("update_external_project_application",{
+          p_application_id:applicationId,
+          p_payload:p
+        });
+      }else{
+        result=await window.ALBUKHR_SUPABASE.rpc("create_external_project_application",p);
+      }
+
+      if(result.error) throw result.error;
+
+      setStatus(editMode?"Application updated successfully.":"Application created successfully.","success");
+      button.textContent=editMode?"Saved":"Created";
+
+      window.setTimeout(()=>window.location.replace("external-project-dashboard.html"),700);
+    }catch(error){
+      console.error("[ALBUKHR EXTERNAL CREATE]",error);
+      setStatus("Unable to save application: "+(error.message||"Unknown error"),"error");
+      button.disabled=false;
+      button.textContent=editMode?"Save Changes":"Create Application";
+    }
+  }
+
+  function setupSlug(){
+    el("projectName").addEventListener("input",function(){
+      if(editMode||value("projectSlug")) return;
+      el("projectSlug").value=this.value.toLowerCase().trim()
+        .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+    });
+  }
+
+  async function initialize(){
+    try{
+      requireDeps();
+      currentUser=await window.AlbukhrPiAuth.requireAuth("login.html");
+      if(!currentUser) return;
+
+      const network=window.ALBukhrEnvironment.getNetwork();
+      el("networkIndicator").textContent=network.toUpperCase();
+      el("authUsername").textContent=currentUser.username||"ALBUKHR User";
+      el("authNetwork").textContent=`Authenticated with Pi • ${network.toUpperCase()}`;
+      el("authAvatar").textContent=String(currentUser.username||"A").charAt(0).toUpperCase();
+
+      applicationId=new URLSearchParams(window.location.search).get("application_id");
+      editMode=Boolean(applicationId);
+
+      if(editMode){
+        el("modeEyebrow").textContent="EXTERNAL PROJECT APPLICATION";
+        el("pageTitle").textContent="Edit External Project";
+        el("pageDescription").textContent="Update your draft or revision-requested application within the ALBUKHR review framework.";
+        el("saveButton").textContent="Save Changes";
+        await loadForEdit();
+      }
+
+      el("externalProjectForm").addEventListener("submit",submitForm);
+      el("cancelButton").addEventListener("click",()=>window.location.href="external-project-dashboard.html");
+      el("backButton").addEventListener("click",()=>window.location.href="external-project-dashboard.html");
+      setupSlug();
+    }catch(error){
+      console.error("[ALBUKHR EXTERNAL CREATE INIT]",error);
+      setStatus("Application form unavailable: "+(error.message||"Unknown error"),"error");
+      el("saveButton").disabled=true;
+    }
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initialize,{once:true});
+  else initialize();
 })(window);
