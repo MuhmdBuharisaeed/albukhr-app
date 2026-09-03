@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>External Project Detail | ALBUKHR</title>
+<link rel="stylesheet" href="css/external-project-detail.css">
+</head>
+<body class="detail-loading" data-page="external-project-detail">
+
+<main class="detail-page">
+  <div id="detailError" hidden></div>
+
+  <section class="detail-hero">
+    <div class="detail-title-row">
+      <div>
+        <h1 id="projectName">Loading…</h1>
+        <div class="detail-code">
+          <span id="projectCode">—</span> · <span id="applicationCode">—</span>
+        </div>
+      </div>
+      <span id="projectStatus" class="detail-status">LOADING</span>
+    </div>
+  </section>
+
+  <section class="detail-section">
+    <h2>Project Information</h2>
+    <div class="detail-grid">
+      <div class="detail-field"><span>Business</span><strong id="businessName">—</strong></div>
+      <div class="detail-field"><span>Industry</span><strong id="industry">—</strong></div>
+      <div class="detail-field"><span>Category</span><strong id="category">—</strong></div>
+      <div class="detail-field"><span>Location</span><strong id="location">—</strong></div>
+      <div class="detail-field"><span>Funding Required</span><strong id="fundingRequired">—</strong></div>
+      <div class="detail-field"><span>Investment Model</span><strong id="investmentModel">—</strong></div>
+      <div class="detail-field"><span>Duration</span><strong id="duration">—</strong></div>
+      <div class="detail-field"><span>Submitted</span><strong id="submittedAt">—</strong></div>
+    </div>
+  </section>
+
+  <section class="detail-section">
+    <h2>Description</h2>
+    <div id="projectDescription" class="detail-description">—</div>
+  </section>
+
+  <section class="detail-section"><h2>Team</h2><div id="teamList"></div></section>
+  <section class="detail-section"><h2>Documents</h2><div id="documentList"></div></section>
+  <section class="detail-section"><h2>Reviews</h2><div id="reviewList"></div></section>
+  <section class="detail-section"><h2>Activity History</h2><div id="auditList"></div></section>
+</main>
+
+<!-- Required global order -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/core/page-auth-guard.js"></script>
+
+<script src="js/external-projects/external-project-detail-engine.js"></script>
+<script src="js/external-projects/external-project-detail-ui.js"></script>
+
+<script>
+(async function () {
+  try {
+    await window.ALBukhrExternalProjectDetail.load();
+  } catch (error) {
+    console.error("External project detail failed:", error);
+    if (window.ALBukhrExternalProjectDetailUI) {
+      window.ALBukhrExternalProjectDetailUI.showError(error);
+    }
+  }
+})();
+</script>
+</body>
+</html>
