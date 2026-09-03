@@ -1,0 +1,51 @@
+<!-- Add inside your External Project Dashboard page -->
+
+<link rel="stylesheet" href="css/external-project-dashboard.css">
+
+<section class="external-project-dashboard">
+
+  <div
+    id="externalProjectsLoading"
+    class="external-project-state"
+  >
+    Loading your external projects...
+  </div>
+
+  <div
+    id="externalProjectsError"
+    class="external-project-state error"
+    hidden
+  ></div>
+
+  <div
+    id="externalProjectsEmpty"
+    class="external-project-state"
+    hidden
+  >
+    You have not created any external project applications yet.
+  </div>
+
+  <div id="externalProjectsList"></div>
+
+</section>
+
+<!-- Required order -->
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/core/page-auth-guard.js"></script>
+<script src="js/external-projects/external-project-dashboard-engine.js"></script>
+
+<script>
+document.addEventListener(
+  "albukhr:authenticated",
+  function () {
+    ALBukhrExternalProjectDashboard
+      .render()
+      .catch(function (error) {
+        console.error(error);
+      });
+  },
+  { once: true }
+);
+</script>
