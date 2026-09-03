@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#087a3e">
+<title>ALBUKHR External Projects</title>
+
+<link rel="stylesheet" href="albukhr-ui.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="css/global-buttons.css">
+<link rel="stylesheet" href="css/external-project-dashboard.css">
+</head>
+
+<body data-page="external-projects">
+
+<header class="header">
+  <div class="header-left">
+    <button class="back-button" type="button" onclick="window.location.href='services.html'" aria-label="Back to services">←</button>
+    <span class="brand">ALBUKHR</span>
+  </div>
+  <div class="header-right">
+    <div class="network-indicator" id="networkIndicator">NETWORK</div>
+  </div>
+</header>
+
+<main class="external-project-page">
+
+  <section class="page-hero">
+    <div class="eyebrow">ALBUKHR ECOSYSTEM</div>
+    <h1>External Projects</h1>
+    <p>Manage your independent project applications under the ALBUKHR review and approval framework.</p>
+
+    <div class="hero-actions">
+      <button class="primary-action" id="createProjectButton" type="button">
+        <span>+</span> Create New Project
+      </button>
+      <button class="secondary-action" id="refreshButton" type="button">Refresh</button>
+    </div>
+  </section>
+
+  <section class="user-summary" id="userSummary" aria-live="polite">
+    <div class="summary-avatar" id="summaryAvatar">A</div>
+    <div>
+      <strong id="summaryUsername">Loading user...</strong>
+      <span id="summaryNetwork">Checking network...</span>
+    </div>
+  </section>
+
+  <section class="project-stats" aria-label="Project application statistics">
+    <article class="stat-card">
+      <span class="stat-label">Total</span>
+      <strong id="totalCount">0</strong>
+    </article>
+    <article class="stat-card pending">
+      <span class="stat-label">In Progress</span>
+      <strong id="progressCount">0</strong>
+    </article>
+    <article class="stat-card approved">
+      <span class="stat-label">Approved</span>
+      <strong id="approvedCount">0</strong>
+    </article>
+  </section>
+
+  <section class="projects-section">
+    <div class="section-heading">
+      <div>
+        <h2>Your Applications</h2>
+        <p id="applicationsSubtitle">Loading applications...</p>
+      </div>
+      <div class="section-count" id="sectionCount">0</div>
+    </div>
+
+    <div class="dashboard-status" id="dashboardStatus" aria-live="polite">
+      Preparing secure project access...
+    </div>
+
+    <div class="projects-list" id="projectsList"></div>
+
+    <div class="empty-state" id="emptyState" hidden>
+      <div class="empty-mark">⌁</div>
+      <h3>No project applications yet</h3>
+      <p>Create an external project application to begin the ALBUKHR review process.</p>
+      <button class="primary-action" id="emptyCreateButton" type="button">Create External Project</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="project-modal" id="projectModal" hidden aria-hidden="true">
+  <div class="modal-backdrop" data-close-modal="true"></div>
+  <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <div>
+        <div class="eyebrow">APPLICATION DETAILS</div>
+        <h2 id="modalTitle">Project</h2>
+      </div>
+      <button class="modal-close" type="button" id="modalCloseButton" aria-label="Close">×</button>
+    </div>
+
+    <div class="modal-status" id="modalStatus"></div>
+
+    <div class="modal-grid" id="modalGrid"></div>
+
+    <div class="modal-actions">
+      <button class="secondary-action" type="button" id="modalCloseAction">Close</button>
+      <button class="primary-action" type="button" id="modalEditButton" hidden>Continue / Edit</button>
+    </div>
+  </section>
+</div>
+
+<div class="dock-nav">
+
+  <a href="index.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon"><path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg>
+    <span>Home</span>
+  </a>
+
+  <a href="investor-dashboard.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon"><path d="M16 11c1.66 0 3-1.34 3-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/><path d="M8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/><path d="M2 20v-1c0-2.21 3.58-4 6-4s6 1.79 6 4v1z"/><path d="M14 20v-1c0-1.5 1.5-2.8 3.5-3.5 2 .7 3.5 2 3.5 3.5v1z"/></svg>
+    <span>Investors</span>
+  </a>
+
+  <a href="transparency.html" class="dock-item">
+    <svg viewBox="0 0 24 24" class="dock-icon"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M8 11h8"/><path d="M8 14h8"/><ellipse cx="12" cy="18" rx="4" ry="2"/><circle cx="12" cy="18" r="0.8"/></svg>
+    <span>Transparency</span>
+  </a>
+
+  <a href="services.html" class="dock-item active">
+    <svg viewBox="0 0 24 24" class="dock-icon"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1 1 0 000-6l2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2l-2-1-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/></svg>
+    <span>Services</span>
+  </a>
+</div>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/core/environment-switcher.js"></script>
+<script src="js/external-project-dashboard.js"></script>
+</body>
+  </html>
