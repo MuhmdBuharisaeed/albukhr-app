@@ -5,32 +5,210 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#087a3e">
 <title>ALBUKHR Create External Project</title>
+
 <link rel="stylesheet" href="css/albukhr-ui.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/global-header.css">
 <link rel="stylesheet" href="css/global-buttons.css">
 <link rel="stylesheet" href="css/external-create.css">
 </head>
+
 <body data-page="external-create">
-<header class="header"><div class="header-left"><button class="back-button" id="backButton" type="button" aria-label="Back">←</button><span class="brand">ALBUKHR</span></div><div class="header-right"><span class="network-indicator" id="networkIndicator">NETWORK</span></div></header>
+
+<header class="header">
+  <div class="header-left">
+    <button class="back-button" id="backButton" type="button" aria-label="Back">←</button>
+    <span class="brand">ALBUKHR</span>
+  </div>
+  <div class="header-right">
+    <span class="network-indicator" id="networkIndicator">NETWORK</span>
+  </div>
+</header>
+
 <main class="external-create-page">
-<section class="form-hero"><div class="eyebrow" id="modeEyebrow">EXTERNAL PROJECT SERVICE</div><h1 id="pageTitle">Create External Project</h1><p id="pageDescription">Register your independent project for ALBUKHR review, escrow protection and possible public listing.</p></section>
-<section class="auth-strip"><div class="auth-avatar" id="authAvatar">A</div><div><strong id="authUsername">Checking authentication...</strong><span id="authNetwork">Secure Pi authentication required</span></div></section>
-<form id="externalProjectForm" novalidate>
-<section class="form-section"><div class="section-title"><span class="section-number">1</span><div><h2>Project Identity</h2><p>Identify the project and the business behind it.</p></div></div><div class="form-grid">
-<label>Project Code<input id="projectCode" required maxlength="80" placeholder="Example: EXT-001"></label>
-<label>Project Slug<input id="projectSlug" required maxlength="120" placeholder="example-project"></label>
-<label>Project Name<input id="projectName" required maxlength="200"></label>
-<label>Business Name<input id="businessName" required maxlength="200"></label></div></section>
-<section class="form-section"><div class="section-title"><span class="section-number">2</span><div><h2>Business Profile</h2><p>Describe the location and operating category.</p></div></div><div class="form-grid">
-<label>Country<input id="country" required maxlength="120"></label><label>State / Region<input id="state"></label><label>City<input id="city"></label><label>Industry<input id="industry" required></label><label>Category<input id="category" required></label><label>Business Registration Number<input id="businessRegistrationNumber"></label><label class="full">Business Address<input id="businessAddress"></label></div></section>
-<section class="form-section"><div class="section-title"><span class="section-number">3</span><div><h2>Contact & Web</h2><p>Provide valid business contact details.</p></div></div><div class="form-grid">
-<label>Contact Email<input id="contactEmail" type="email" required></label><label>Contact Phone<input id="contactPhone" type="tel"></label><label>Website<input id="website" type="url" placeholder="https://"></label><label>Pi Wallet<input id="piWallet"></label></div></section>
-<section class="form-section"><div class="section-title"><span class="section-number">4</span><div><h2>Investment Request</h2><p>Explain the funding and investment model.</p></div></div><div class="form-grid">
-<label>Funding Required<input id="fundingRequired" type="number" min="0.0000001" step="0.0000001" required></label><label>Funding Asset<input id="fundingAsset" required value="PI"></label><label>Investment Model<input id="investmentModel" required></label><label>Project Duration (Days)<input id="projectDurationDays" type="number" min="1" step="1" required></label></div></section>
-<section class="form-section"><div class="section-title"><span class="section-number">5</span><div><h2>Project Description</h2><p>Explain what the project does and why it should be reviewed.</p></div></div><label class="textarea-label">Project Description<textarea id="projectDescription" required maxlength="10000" rows="8"></textarea></label></section>
-<div class="form-status" id="formStatus" aria-live="polite">Complete the form to continue.</div>
-<div class="form-actions"><button class="secondary-action" id="cancelButton" type="button">Cancel</button><button class="primary-action" id="saveButton" type="submit">Create Application</button></div>
-</form></main>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/core/environment-core.js"></script><script src="js/core/supabase-core.js"></script><script src="js/core/pi-auth-core.js"></script><script src="js/core/page-auth-guard.js"></script><script src="js/core/environment-switcher.js"></script><script src="js/external-create.js"></script>
-</body></html>
+
+  <section class="form-hero">
+    <div class="eyebrow" id="modeEyebrow">EXTERNAL PROJECT SERVICE</div>
+    <h1 id="pageTitle">Create External Project</h1>
+    <p id="pageDescription">
+      Register your independent project for ALBUKHR review, escrow protection and possible public listing.
+    </p>
+  </section>
+
+  <section class="auth-strip">
+    <div class="auth-avatar" id="authAvatar">A</div>
+    <div>
+      <strong id="authUsername">Checking authentication...</strong>
+      <span id="authNetwork">Secure Pi authentication required</span>
+    </div>
+  </section>
+
+  <form id="externalProjectForm" novalidate>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span class="section-number">1</span>
+        <div>
+          <h2>Project Identity</h2>
+          <p>Identify the project and the business behind it.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label>Project Code
+          <input id="projectCode" required maxlength="80" placeholder="Example: EXT-001">
+        </label>
+
+        <label>Project Slug
+          <input id="projectSlug" required maxlength="120" placeholder="example-project">
+        </label>
+
+        <label>Project Name
+          <input id="projectName" required maxlength="200">
+        </label>
+
+        <label>Business Name
+          <input id="businessName" required maxlength="200">
+        </label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span class="section-number">2</span>
+        <div>
+          <h2>Business Profile</h2>
+          <p>Describe the location and operating category.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label>Country
+          <input id="country" required maxlength="120">
+        </label>
+
+        <label>State / Region
+          <input id="state">
+        </label>
+
+        <label>City
+          <input id="city">
+        </label>
+
+        <label>Industry
+          <input id="industry" required>
+        </label>
+
+        <label>Category
+          <input id="category" required>
+        </label>
+
+        <label>Business Registration Number
+          <input id="businessRegistrationNumber">
+        </label>
+
+        <label class="full">Business Address
+          <input id="businessAddress">
+        </label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span class="section-number">3</span>
+        <div>
+          <h2>Contact & Web</h2>
+          <p>Provide valid business contact details.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label>Contact Email
+          <input id="contactEmail" type="email" required>
+        </label>
+
+        <label>Contact Phone
+          <input id="contactPhone" type="tel">
+        </label>
+
+        <label>Website
+          <input id="website" type="url" placeholder="https://">
+        </label>
+
+        <label>Pi Wallet
+          <input id="piWallet">
+        </label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span class="section-number">4</span>
+        <div>
+          <h2>Investment Request</h2>
+          <p>Explain the funding and investment model.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label>Funding Required
+          <input id="fundingRequired" type="number" min="0.0000001" step="0.0000001" required>
+        </label>
+
+        <label>Funding Asset
+          <input id="fundingAsset" required value="PI">
+        </label>
+
+        <label>Investment Model
+          <input id="investmentModel" required>
+        </label>
+
+        <label>Project Duration (Days)
+          <input id="projectDurationDays" type="number" min="1" step="1" required>
+        </label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span class="section-number">5</span>
+        <div>
+          <h2>Project Description</h2>
+          <p>Explain what the project does and why it should be reviewed.</p>
+        </div>
+      </div>
+
+      <label class="textarea-label">Project Description
+        <textarea id="projectDescription" required maxlength="10000" rows="8"></textarea>
+      </label>
+    </section>
+
+    <div class="form-status" id="formStatus" aria-live="polite">
+      Complete the form to continue.
+    </div>
+
+    <div class="form-actions">
+      <button class="secondary-action" id="cancelButton" type="button">Cancel</button>
+      <button class="secondary-action" id="saveDraftButton" type="submit">Save Draft</button>
+      <button class="primary-action" id="submitApplicationButton" type="button" hidden>
+        Submit Application
+      </button>
+    </div>
+
+  </form>
+
+</main>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/core/page-auth-guard.js"></script>
+<script src="js/core/environment-switcher.js"></script>
+
+<script src="js/external-create.js"></script>
+
+</body>
+</html>
