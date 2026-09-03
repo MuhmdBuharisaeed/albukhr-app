@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#087a3e">
+<title>Create External Project | ALBUKHR</title>
+
+<link rel="stylesheet" href="albukhr-ui.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="css/global-buttons.css">
+<link rel="stylesheet" href="css/external-create.css">
+</head>
+
+<body data-page="external-create">
+
+<header class="header">
+  <div class="header-left">
+    <button class="back-btn" type="button" onclick="history.back()" aria-label="Go back">←</button>
+    <span class="brand">ALBUKHR</span>
+  </div>
+  <div class="header-right">
+    <span id="networkBadge" class="network-badge">NETWORK</span>
+  </div>
+</header>
+
+<main class="external-page">
+  <section class="hero">
+    <p class="eyebrow">ALBUKHR ECOSYSTEM SERVICE</p>
+    <h1>Create External Project</h1>
+    <p>Register an independent project for review and possible approval under the ALBUKHR ecosystem.</p>
+  </section>
+
+  <section class="security-strip">
+    <span>🔐</span>
+    <div>
+      <strong>Protected by Pi Authentication</strong>
+      <p>Your application is bound to the authenticated ALBUKHR user.</p>
+    </div>
+  </section>
+
+  <div id="status" class="status" role="status" aria-live="polite">
+    Checking secure application access...
+  </div>
+
+  <form id="externalProjectForm" class="project-form" novalidate>
+    <section class="form-card">
+      <div class="card-heading">
+        <span class="step">1</span>
+        <div><h2>Project Identity</h2><p>Basic identification for your project.</p></div>
+      </div>
+
+      <div class="form-grid">
+        <label>Project Code
+          <input id="projectCode" name="project_code" maxlength="80" placeholder="e.g. EXT-2026-001" required>
+        </label>
+        <label>Project Name
+          <input id="projectName" name="project_name" maxlength="160" placeholder="Project name" required>
+        </label>
+        <label>Project Slug
+          <input id="projectSlug" name="project_slug" maxlength="180" placeholder="project-name" required>
+          <small>Lowercase letters, numbers and hyphens.</small>
+        </label>
+        <label>Business Name
+          <input id="businessName" name="business_name" maxlength="180" placeholder="Registered business name" required>
+        </label>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <div class="card-heading">
+        <span class="step">2</span>
+        <div><h2>Business & Location</h2><p>Tell us where the project operates.</p></div>
+      </div>
+
+      <div class="form-grid">
+        <label>Country
+          <input name="country" maxlength="100" placeholder="Country" required>
+        </label>
+        <label>State / Region
+          <input name="state" maxlength="120" placeholder="State or region">
+        </label>
+        <label>City
+          <input name="city" maxlength="120" placeholder="City">
+        </label>
+        <label>Industry
+          <input name="industry" maxlength="120" placeholder="e.g. Agriculture" required>
+        </label>
+        <label>Category
+          <input name="category" maxlength="120" placeholder="Project category" required>
+        </label>
+        <label>Business Registration Number
+          <input name="business_registration_number" maxlength="120" placeholder="If applicable">
+        </label>
+      </div>
+
+      <label class="full-label">Business Address
+        <textarea name="business_address" rows="3" maxlength="500" placeholder="Business address"></textarea>
+      </label>
+    </section>
+
+    <section class="form-card">
+      <div class="card-heading">
+        <span class="step">3</span>
+        <div><h2>Project Details</h2><p>Explain the project and its proposed funding model.</p></div>
+      </div>
+
+      <label class="full-label">Project Description
+        <textarea name="project_description" rows="6" maxlength="5000" placeholder="Describe the project, objectives, operations and expected impact." required></textarea>
+      </label>
+
+      <div class="form-grid">
+        <label>Funding Required
+          <input name="funding_required" type="number" min="0" step="0.0000001" placeholder="0" required>
+        </label>
+        <label>Funding Asset
+          <input name="funding_asset" maxlength="30" value="PI" required>
+        </label>
+        <label>Investment Model
+          <input name="investment_model" maxlength="160" placeholder="Describe investment model" required>
+        </label>
+        <label>Project Duration (Days)
+          <input name="project_duration_days" type="number" min="1" step="1" placeholder="e.g. 365" required>
+        </label>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <div class="card-heading">
+        <span class="step">4</span>
+        <div><h2>Contact & Verification</h2><p>Information required for communication and review.</p></div>
+      </div>
+
+      <div class="form-grid">
+        <label>Contact Email
+          <input name="contact_email" type="email" maxlength="254" placeholder="email@example.com" required>
+        </label>
+        <label>Contact Phone
+          <input name="contact_phone" type="tel" maxlength="60" placeholder="Phone number">
+        </label>
+        <label>Website
+          <input name="website" type="url" maxlength="500" placeholder="https://example.com">
+        </label>
+        <label>Pi Wallet Address
+          <input name="pi_wallet" maxlength="255" placeholder="Pi wallet address">
+        </label>
+      </div>
+    </section>
+
+    <div class="disclosure">
+      <input id="truthDeclaration" type="checkbox" required>
+      <label for="truthDeclaration">I confirm that the information provided is accurate and that I understand submission does not guarantee approval or funding.</label>
+    </div>
+
+    <button id="submitButton" class="submit-btn" type="submit">
+      <span>Submit Project Application</span><span>→</span>
+    </button>
+  </form>
+</main>
+
+<div class="dock-nav">
+  <a href="index.html" class="dock-item"><span>Home</span></a>
+  <a href="investor-dashboard.html" class="dock-item"><span>Investors</span></a>
+  <a href="transparency.html" class="dock-item"><span>Transparency</span></a>
+  <a href="services.html" class="dock-item active"><span>Services</span></a>
+</div>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/external-create.js"></script>
+</body>
+  </html>
