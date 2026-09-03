@@ -1,56 +1,102 @@
-*{box-sizing:border-box}
-:root{--green:#087a3e;--green-dark:#063e29;--green-soft:#edf8f2;--gold:#d6b329;--text:#173d2c;--muted:#68796f;--line:#dce8e1;--bg:#f4f7f6}
-html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
-body{padding-bottom:104px}
-button{font:inherit}
-.header{position:sticky;top:0;z-index:20}
-.header-left{display:flex;align-items:center;gap:10px}
-.back-button{width:38px;height:38px;border:0;border-radius:12px;background:#eef6f1;color:var(--green);font-size:22px;cursor:pointer}
-.network-indicator{font-size:10px;font-weight:800;letter-spacing:.8px;padding:7px 9px;border-radius:20px;background:#edf8f2;color:var(--green);border:1px solid #cfe8da}
-.external-project-page{max-width:900px;margin:0 auto;padding:18px 16px 30px}
-.page-hero{padding:24px 20px;border-radius:22px;background:linear-gradient(135deg,#087a3e,#056532);color:#fff;box-shadow:0 12px 28px rgba(8,122,62,.16)}
-.eyebrow{font-size:10px;font-weight:800;letter-spacing:1.2px;opacity:.78}
-.page-hero h1{margin:7px 0 8px;font-size:clamp(26px,7vw,40px);line-height:1.08}
-.page-hero p{margin:0;max-width:650px;font-size:14px;line-height:1.55;opacity:.9}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-.primary-action,.secondary-action{min-height:44px;border-radius:13px;padding:0 15px;font-weight:750;cursor:pointer}
-.primary-action{border:1px solid var(--gold);background:var(--green);color:#fff}
-.page-hero .primary-action{background:#fff;color:var(--green);border-color:#fff}
-.secondary-action{border:1px solid rgba(255,255,255,.42);background:transparent;color:inherit}
-.projects-section .secondary-action,.modal-panel .secondary-action{color:var(--green);border-color:#cfe0d6;background:#fff}
-.user-summary{display:flex;align-items:center;gap:12px;padding:15px;margin-top:15px;background:#fff;border:1px solid var(--line);border-radius:18px}
-.summary-avatar{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:850}
-.user-summary strong,.user-summary span{display:block}.user-summary span{font-size:12px;color:var(--muted);margin-top:3px}
-.project-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}
-.stat-card{padding:15px;border-radius:17px;background:#fff;border:1px solid var(--line)}
-.stat-label{display:block;font-size:11px;color:var(--muted);font-weight:700}.stat-card strong{display:block;font-size:25px;margin-top:4px;color:var(--green-dark)}
-.stat-card.pending{border-color:#eadba1}.stat-card.approved{border-color:#b8dfc6}
-.projects-section{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px}
-.section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.section-heading h2{margin:0;font-size:19px}.section-heading p{margin:5px 0 0;font-size:12px;color:var(--muted)}
-.section-count{min-width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:800}
-.dashboard-status{margin:16px 0 12px;padding:11px 12px;border-radius:12px;background:#f7faf8;color:#597065;font-size:12px}
-.dashboard-status.error{background:#fff1f1;color:#9d3131}.dashboard-status.success{background:#edf8f2;color:#087a3e}
-.projects-list{display:grid;gap:12px}
-.project-card{border:1px solid var(--line);border-radius:18px;padding:15px;background:#fff;cursor:pointer;transition:.18s}
-.project-card:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(0,0,0,.05)}
-.project-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.project-card h3{margin:0;font-size:16px}.project-code{font-size:11px;color:var(--muted);margin-top:4px}
-.project-description{margin:11px 0 12px;font-size:13px;line-height:1.5;color:#52665a}
-.project-meta{display:flex;gap:8px;flex-wrap:wrap}.meta-chip,.status-chip{font-size:10px;font-weight:800;padding:5px 8px;border-radius:20px;border:1px solid #dce8e1;color:#587065;background:#f8fbf9}
-.status-chip.status-approved{background:#e9f8ee;color:#13753d;border-color:#bfe5ca}
-.status-chip.status-rejected{background:#fff0f0;color:#a33333;border-color:#f0c3c3}
-.status-chip.status-revision{background:#fff7df;color:#8a6610;border-color:#eadb9e}
-.status-chip.status-submitted,.status-chip.status-under_review,.status-chip.status-review{background:#eef5ff;color:#275b96;border-color:#c9dcf6}
-.project-card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:13px;padding-top:12px;border-top:1px solid #eef2ef;font-size:11px;color:var(--muted)}
-.view-link{font-weight:800;color:var(--green)}
-.empty-state{text-align:center;padding:34px 14px}.empty-mark{font-size:42px;color:var(--green);margin-bottom:8px}.empty-state h3{margin:0 0 7px}.empty-state p{margin:0 auto 17px;max-width:430px;color:var(--muted);font-size:13px;line-height:1.55}
-.project-modal[hidden]{display:none}.project-modal{position:fixed;inset:0;z-index:100;display:grid;place-items:end center}
-.modal-backdrop{position:absolute;inset:0;background:rgba(5,30,19,.52)}
-.modal-panel{position:relative;width:min(760px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:20px}
-.modal-header{display:flex;justify-content:space-between;gap:12px}.modal-header h2{margin:5px 0 0;font-size:22px}
-.modal-close{width:40px;height:40px;border:0;border-radius:12px;background:#f1f5f2;font-size:24px;cursor:pointer}
-.modal-status{margin:16px 0 12px}
-.modal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.detail-item{padding:12px;border-radius:13px;background:#f7faf8;border:1px solid #edf1ee}.detail-item span{display:block;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}.detail-item strong{display:block;margin-top:5px;font-size:13px;word-break:break-word}.detail-item.full{grid-column:1/-1}
-.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
-@media(max-width:560px){.external-project-page{padding:12px}.page-hero{padding:20px 16px;border-radius:18px}.project-stats{gap:7px}.stat-card{padding:12px}.stat-card strong{font-size:21px}.projects-section{padding:14px;border-radius:18px}.modal-grid{grid-template-columns:1fr}.detail-item.full{grid-column:auto}.modal-panel{padding:17px}.hero-actions{display:grid;grid-template-columns:1fr}.hero-actions button{width:100%}}
+/* =========================================================
+   ALBUKHR EXTERNAL PROJECT DASHBOARD
+   File: css/external-project-dashboard.css
+========================================================= */
+
+.external-project-dashboard-card {
+  width: 100%;
+  border: 0;
+  text-align: left;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 0 0 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  cursor: pointer;
+  font: inherit;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.external-project-dashboard-card:hover,
+.external-project-dashboard-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.09);
+}
+
+.external-project-card-top,
+.external-project-card-meta,
+.external-project-card-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.external-project-card-top {
+  align-items: flex-start;
+}
+
+.external-project-name {
+  font-weight: 750;
+  font-size: 16px;
+  color: #17221b;
+}
+
+.external-project-business,
+.external-project-card-meta {
+  color: #69746d;
+  font-size: 12px;
+}
+
+.external-project-business {
+  margin-top: 4px;
+}
+
+.external-project-card-meta {
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.external-project-card-footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #edf1ee;
+  font-size: 12px;
+  color: #69746d;
+}
+
+.external-project-open {
+  color: #0f7a3d;
+  font-weight: 700;
+}
+
+.external-project-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: #eef1ef;
+  color: #566059;
+}
+
+.status-draft { background: #edf0f2; color: #4e5961; }
+.status-submitted { background: #e7f1ff; color: #084298; }
+.status-under_review,
+.status-reviewing { background: #fff3cd; color: #856404; }
+.status-approved { background: #e6f5ec; color: #0f7a3d; }
+.status-rejected { background: #f8d7da; color: #842029; }
+.status-converted { background: #e8e2ff; color: #533f9f; }
+
+.external-project-state {
+  padding: 18px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  background: #ffffff;
+  color: #68736b;
+}
+
+.external-project-state.error {
+  background: #fff1f1;
+  color: #9b2929;
+}
