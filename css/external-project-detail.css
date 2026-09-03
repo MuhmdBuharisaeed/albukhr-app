@@ -1,1 +1,20 @@
-*{box-sizing:border-box}body{margin:0;background:#f4f7f6;font-family:system-ui;color:#16372a;padding-bottom:30px}header{padding:15px;background:#fff;display:flex;gap:12px;align-items:center}header button{border:0;background:none;font-size:24px;color:#087a3e}main{max-width:850px;margin:auto;padding:15px}.hero,.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 5px 18px #0000000d}.hero{background:linear-gradient(135deg,#087a3e,#005d32);color:#fff}.hero h1{margin:7px 0}small{font-weight:700}#project,#business,#funding{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.field,.item{border:1px solid #dfe9e4;border-radius:10px;padding:10px;font-size:13px}.field small{display:block;color:#63766d;margin-bottom:4px}.item{margin-bottom:8px}.empty{color:#63766d;font-size:13px}button{width:100%;padding:14px;margin-top:9px;border-radius:12px;border:1px solid #087a3e;font-weight:700}#edit{background:#087a3e;color:#fff}#submit{background:#fff;color:#087a3e}#dash{border:0;background:transparent;color:#63766d}#msg{color:#9b2727}@media(max-width:520px){#project,#business,#funding{grid-template-columns:1fr}main{padding:12px}}
+/* ALBUKHR EXTERNAL PROJECT DETAIL */
+.detail-page{padding:16px;padding-bottom:110px;max-width:900px;margin:0 auto}
+.detail-hero,.detail-section{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.detail-title-row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.detail-title-row h1{margin:0;font-size:22px;color:#173126}
+.detail-code{font-size:12px;color:#6b7280;margin-top:6px}
+.detail-status{font-size:11px;font-weight:700;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.status-submitted,.status-pending{background:#fff3cd;color:#856404}.status-approved{background:#e6f5ec;color:#0f7a3d}.status-rejected{background:#f8d7da;color:#842029}.status-draft{background:#e7f1ff;color:#084298}
+.detail-section h2{font-size:15px;margin:0 0 12px;color:#173126}
+.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.detail-field{background:#f7faf8;border-radius:12px;padding:12px}
+.detail-field span{display:block;font-size:11px;color:#6b7280;margin-bottom:4px}
+.detail-field strong{font-size:13px;color:#17211c;word-break:break-word}
+.detail-description{font-size:14px;line-height:1.65;color:#4b5563;white-space:pre-wrap}
+.detail-row{border-top:1px solid #edf0ee;padding:12px 0}.detail-row:first-child{border-top:0;padding-top:0}
+.detail-row strong{display:block;font-size:13px}.detail-row span{display:block;font-size:11px;color:#6b7280;margin-top:4px}.detail-row p{font-size:12px;color:#4b5563;margin:7px 0 0;line-height:1.5}.detail-row a{color:#0f7a3d;font-weight:700;text-decoration:none}
+.detail-empty{font-size:12px;color:#6b7280;padding:10px 0}
+#detailError{background:#f8d7da;color:#842029;padding:12px;border-radius:12px;margin-bottom:16px;font-size:13px}
+.detail-loading .detail-page{opacity:.65}
+@media(max-width:600px){.detail-grid{grid-template-columns:1fr}.detail-title-row{flex-direction:column}.detail-status{align-self:flex-start}}
