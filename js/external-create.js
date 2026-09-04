@@ -2,13 +2,18 @@
    ALBUKHR EXTERNAL PROJECT CREATE / EDIT / SUBMIT
    File: js/external-create.js
 
-   Security:
-   - Shared Page Auth Guard is the page identity boundary.
-   - Database auth.uid() remains the ownership authority.
-   - No applicant_user_id is sent from the browser.
+   Architecture:
+   - Shared Page Auth Guard establishes the authenticated session.
+   - Supabase/Postgres remains the source of truth.
    - No LocalStorage application state.
-   - Network is read from shared environment core.
-   - Submit is performed only through the security RPC.
+   - Browser never sends applicant_user_id.
+   - Pi identity and network are passed only to the public
+     ownership-boundary RPCs where required by the current
+     ALBUKHR Pi identity architecture.
+   - Mainnet/Testnet isolation is enforced by p_network.
+   - Application lifecycle:
+       draft -> submitted -> reviewing -> approved/rejected
+       needs_revision -> draft/editable -> submitted
 ========================================================= */
 
 (function (window) {
@@ -16,7 +21,7 @@
 
   let currentUser = null;
   let applicationId = null;
-  let applicationStatus = null;
+  let applicationStatus = "draft";
   let editMode = false;
 
   const fields = {
@@ -48,7 +53,6 @@
 
   function setStatus(message, type) {
     const status = byId("formStatus");
-
     if (!status) return;
 
     status.textContent = String(message || "");
@@ -74,13 +78,37 @@
   }
 
   function getNetwork() {
-    const network = window.ALBukhrEnvironment.getNetwork();
+    const network = String(
+      window.ALBukhrEnvironment.getNetwork() || ""
+    ).trim().toLowerCase();
 
     if (network !== "mainnet" && network !== "testnet") {
       throw new Error("Invalid ALBUKHR network.");
     }
 
     return network;
+  }
+
+  function getPiUid() {
+    const candidates = [
+      currentUser && currentUser.pi_uid,
+      currentUser && currentUser.piUid,
+      currentUser && currentUser.uid,
+      currentUser && currentUser.user_uid,
+      currentUser && currentUser.username
+    ];
+
+    const piUid = candidates.find(function (item) {
+      return typeof item === "string" && item.trim();
+    });
+
+    if (!piUid) {
+      throw new Error(
+        "Verified Pi identity is unavailable for this session."
+      );
+    }
+
+    return String(piUid).trim();
   }
 
   function value(key) {
@@ -91,8 +119,13 @@
     ).trim();
   }
 
-  function normalizeStatus(value) {
-    return String(value || "draft")
+  function nullableValue(key) {
+    const item = value(key);
+    return item || null;
+  }
+
+  function normalizeStatus(status) {
+    return String(status || "draft")
       .trim()
       .toLowerCase()
       .replace(/\s+/g, "_");
@@ -101,9 +134,7 @@
   function isEditableStatus(status) {
     return [
       "draft",
-      "revision_requested",
-      "revision",
-      "changes_requested"
+      "needs_revision"
     ].includes(normalizeStatus(status));
   }
 
@@ -123,41 +154,22 @@
       project_slug: value("projectSlug"),
       project_name: value("projectName"),
       business_name: value("businessName"),
-
       country: value("country"),
       contact_email: value("contactEmail"),
-
       project_description: value("projectDescription"),
-
       business_registration_number:
-        value("businessRegistrationNumber") || null,
-
+        nullableValue("businessRegistrationNumber"),
       industry: value("industry"),
       category: value("category"),
-
-      state: value("state") || null,
-      city: value("city") || null,
-
-      business_address:
-        value("businessAddress") || null,
-
-      website: value("website") || null,
-
-      contact_phone:
-        value("contactPhone") || null,
-
-      pi_wallet:
-        value("piWallet") || null,
-
-      funding_required:
-        Number(value("fundingRequired")),
-
-      funding_asset:
-        value("fundingAsset"),
-
-      investment_model:
-        value("investmentModel"),
-
+      state: nullableValue("state"),
+      city: nullableValue("city"),
+      business_address: nullableValue("businessAddress"),
+      website: nullableValue("website"),
+      contact_phone: nullableValue("contactPhone"),
+      pi_wallet: nullableValue("piWallet"),
+      funding_required: Number(value("fundingRequired")),
+      funding_asset: value("fundingAsset"),
+      investment_model: value("investmentModel"),
       project_duration_days:
         Number(value("projectDurationDays"))
     };
@@ -180,9 +192,7 @@
 
     required.forEach(function (key) {
       if (!String(payload[key] || "").trim()) {
-        throw new Error(
-          "Please complete all required fields."
-        );
+        throw new Error("Please complete all required fields.");
       }
     });
 
@@ -196,30 +206,28 @@
     }
 
     if (
-      !Number.isInteger(
-        payload.project_duration_days
-      ) ||
+      !Number.isInteger(payload.project_duration_days) ||
       payload.project_duration_days < 1
     ) {
       throw new Error(
         "Project Duration must be at least 1 day."
       );
     }
-  }
 
-  function assertRpcSuccess(data, fallback) {
     if (
-      !data ||
-      typeof data !== "object" ||
-      data.success !== true
+      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(
+        payload.project_slug
+      )
     ) {
       throw new Error(
-        (data && data.message) || fallback
+        "Project Slug may contain letters, numbers and hyphens only."
       );
     }
   }
 
   function mapApplication(row) {
+    if (!row || typeof row !== "object") return;
+
     const mapping = {
       projectCode: row.project_code,
       projectSlug: row.project_slug,
@@ -230,66 +238,40 @@
       city: row.city,
       industry: row.industry,
       category: row.category,
-
       businessRegistrationNumber:
         row.business_registration_number,
-
-      businessAddress:
-        row.business_address,
-
-      contactEmail:
-        row.contact_email,
-
-      contactPhone:
-        row.contact_phone,
-
-      website:
-        row.website,
-
-      piWallet:
-        row.pi_wallet,
-
-      fundingRequired:
-        row.funding_required,
-
-      fundingAsset:
-        row.funding_asset,
-
-      investmentModel:
-        row.investment_model,
-
-      projectDurationDays:
-        row.project_duration_days,
-
-      projectDescription:
-        row.project_description
+      businessAddress: row.business_address,
+      contactEmail: row.contact_email,
+      contactPhone: row.contact_phone,
+      website: row.website,
+      piWallet: row.pi_wallet,
+      fundingRequired: row.funding_required,
+      fundingAsset: row.funding_asset,
+      investmentModel: row.investment_model,
+      projectDurationDays: row.project_duration_days,
+      projectDescription: row.project_description
     };
 
-    Object.entries(mapping).forEach(
-      function (entry) {
-        const id = entry[0];
-        const fieldValue = entry[1];
-        const input = byId(id);
+    Object.keys(mapping).forEach(function (id) {
+      const input = byId(id);
 
-        if (
-          fieldValue != null &&
-          input
-        ) {
-          input.value = fieldValue;
-        }
+      if (
+        input &&
+        mapping[id] !== null &&
+        mapping[id] !== undefined
+      ) {
+        input.value = mapping[id];
       }
-    );
+    });
   }
 
   function updateActionState() {
     const saveButton = byId("saveDraftButton");
-    const submitButton =
-      byId("submitApplicationButton");
+    const submitButton = byId("submitApplicationButton");
 
     if (!editMode) {
       if (saveButton) {
-        saveButton.textContent =
-          "Create Application";
+        saveButton.textContent = "Create Application";
       }
 
       if (submitButton) {
@@ -299,44 +281,83 @@
       return;
     }
 
+    const editable = isEditableStatus(applicationStatus);
+
     if (saveButton) {
-      saveButton.textContent =
-        "Save Changes";
+      saveButton.textContent = "Save Changes";
+      saveButton.disabled = !editable;
     }
 
     if (submitButton) {
-      submitButton.hidden =
-        !isEditableStatus(applicationStatus);
+      submitButton.hidden = !editable;
+      submitButton.disabled = !editable;
     }
   }
 
-  async function loadEditApplication() {
-    setStatus(
-      "Loading application for secure editing..."
-    );
+  function createRpcArgs(payload) {
+    return {
+      p_pi_uid: getPiUid(),
+      p_network: getNetwork(),
+      p_project_name: payload.project_name,
+      p_business_name: payload.business_name,
+      p_country: payload.country,
+      p_contact_email: payload.contact_email,
+      p_project_code: payload.project_code,
+      p_project_slug: payload.project_slug,
+      p_project_description: payload.project_description,
+      p_business_registration_number:
+        payload.business_registration_number,
+      p_industry: payload.industry,
+      p_category: payload.category,
+      p_state: payload.state,
+      p_city: payload.city,
+      p_business_address: payload.business_address,
+      p_website: payload.website,
+      p_contact_phone: payload.contact_phone,
+      p_pi_wallet: payload.pi_wallet,
+      p_funding_required: payload.funding_required,
+      p_funding_asset: payload.funding_asset,
+      p_investment_model: payload.investment_model,
+      p_project_duration_days:
+        payload.project_duration_days
+    };
+  }
 
-    const network = getNetwork();
+  function updateRpcArgs(payload) {
+    return Object.assign(
+      {
+        p_application_id: applicationId
+      },
+      createRpcArgs(payload)
+    );
+  }
+
+  async function loadEditApplication() {
+    setStatus("Loading application securely...");
 
     const { data, error } =
-      await window.ALBUKHR_SUPABASE
-        .from("external_project_applications")
-        .select("*")
-        .eq("id", applicationId)
-        .eq("network", network)
-        .maybeSingle();
+      await window.ALBUKHR_SUPABASE.rpc(
+        "get_my_external_project_detail",
+        {
+          p_application_id: applicationId,
+          p_pi_uid: getPiUid(),
+          p_network: getNetwork()
+        }
+      );
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
-    if (!data) {
+    const row = Array.isArray(data)
+      ? data[0]
+      : data;
+
+    if (!row) {
       throw new Error(
         "Application was not found or you do not have access to it."
       );
     }
 
-    applicationStatus =
-      normalizeStatus(data.status);
+    applicationStatus = normalizeStatus(row.status);
 
     if (!isEditableStatus(applicationStatus)) {
       throw new Error(
@@ -344,7 +365,7 @@
       );
     }
 
-    mapApplication(data);
+    mapApplication(row);
     updateActionState();
 
     setStatus(
@@ -356,23 +377,17 @@
   async function saveApplication(event) {
     event.preventDefault();
 
-    const saveButton =
-      byId("saveDraftButton");
-
-    const submitButton =
-      byId("submitApplicationButton");
+    const saveButton = byId("saveDraftButton");
+    const submitButton = byId("submitApplicationButton");
 
     try {
       const payload = buildPayload();
-
       validatePayload(payload);
 
       setBusy(
         saveButton,
         true,
-        editMode
-          ? "Saving..."
-          : "Creating..."
+        editMode ? "Saving..." : "Creating..."
       );
 
       if (submitButton) {
@@ -381,7 +396,7 @@
 
       setStatus(
         editMode
-          ? "Saving secure application changes..."
+          ? "Saving application changes..."
           : "Creating secure project application..."
       );
 
@@ -390,35 +405,27 @@
       if (editMode) {
         result =
           await window.ALBUKHR_SUPABASE.rpc(
-            "update_external_project_application",
-            {
-              p_application_id: applicationId,
-              p_payload: payload
-            }
+            "update_my_external_project_application",
+            updateRpcArgs(payload)
           );
-      }
-      else {
+      } else {
         result =
           await window.ALBUKHR_SUPABASE.rpc(
-            "create_external_project_application",
-            payload
+            "create_my_external_project_application",
+            createRpcArgs(payload)
           );
       }
 
-      if (result.error) {
-        throw result.error;
-      }
+      if (result.error) throw result.error;
 
-      assertRpcSuccess(
-        result.data,
-        editMode
-          ? "Application update was not accepted."
-          : "Application creation was not accepted."
-      );
-
-      if (!editMode) {
-        applicationId =
-          result.data.application_id;
+      if (editMode) {
+        if (result.data !== true) {
+          throw new Error(
+            "Application update was not accepted."
+          );
+        }
+      } else {
+        applicationId = result.data;
 
         if (!applicationId) {
           throw new Error(
@@ -427,78 +434,42 @@
         }
 
         editMode = true;
-        applicationStatus =
-          normalizeStatus(
-            result.data.status || "draft"
-          );
-
-        const url =
-          "external-create.html?application_id=" +
-          encodeURIComponent(applicationId);
+        applicationStatus = "draft";
 
         window.history.replaceState(
           null,
           "",
-          url
+          "external-create.html?application_id=" +
+          encodeURIComponent(applicationId)
         );
-
-        updateActionState();
-
-        setStatus(
-          "Draft created successfully. Review your information, then submit the application when ready.",
-          "success"
-        );
-
-        setBusy(
-          saveButton,
-          false,
-          "Save Changes"
-        );
-
-        if (submitButton) {
-          submitButton.disabled = false;
-        }
-
-        return;
       }
-
-      applicationStatus =
-        normalizeStatus(
-          result.data.status ||
-          applicationStatus
-        );
 
       updateActionState();
 
       setStatus(
-        "Application changes saved successfully. You may now submit it for review.",
+        editMode
+          ? "Application saved successfully. You may submit it for review when ready."
+          : "Application created successfully.",
         "success"
       );
-    }
-    catch (error) {
-      console.error(
-        "[ALBUKHR EXTERNAL CREATE]",
-        error
-      );
+    } catch (error) {
+      console.error("[ALBUKHR EXTERNAL CREATE]", error);
 
       setStatus(
         "Unable to save application: " +
         (error.message || "Unknown error"),
         "error"
       );
-    }
-    finally {
+    } finally {
       if (saveButton) {
         saveButton.disabled = false;
-
         saveButton.textContent =
-          editMode
-            ? "Save Changes"
-            : "Create Application";
+          editMode ? "Save Changes" : "Create Application";
       }
 
       if (
         submitButton &&
+        editMode &&
         isEditableStatus(applicationStatus)
       ) {
         submitButton.disabled = false;
@@ -507,11 +478,8 @@
   }
 
   async function submitApplication() {
-    const submitButton =
-      byId("submitApplicationButton");
-
-    const saveButton =
-      byId("saveDraftButton");
+    const submitButton = byId("submitApplicationButton");
+    const saveButton = byId("saveDraftButton");
 
     try {
       if (!applicationId) {
@@ -526,11 +494,7 @@
         );
       }
 
-      setBusy(
-        submitButton,
-        true,
-        "Submitting..."
-      );
+      setBusy(submitButton, true, "Submitting...");
 
       if (saveButton) {
         saveButton.disabled = true;
@@ -542,26 +506,23 @@
 
       const { data, error } =
         await window.ALBUKHR_SUPABASE.rpc(
-          "submit_external_project_application",
+          "submit_my_external_project_application",
           {
-            p_application_id: applicationId
+            p_application_id: applicationId,
+            p_pi_uid: getPiUid(),
+            p_network: getNetwork()
           }
         );
 
-      if (error) {
-        throw error;
+      if (error) throw error;
+
+      if (data !== true) {
+        throw new Error(
+          "Application submission was not accepted."
+        );
       }
 
-      assertRpcSuccess(
-        data,
-        "Application submission was not accepted."
-      );
-
-      applicationStatus =
-        normalizeStatus(
-          data.status || "submitted"
-        );
-
+      applicationStatus = "submitted";
       updateActionState();
 
       setStatus(
@@ -573,20 +534,14 @@
         submitButton.hidden = true;
       }
 
-      setTimeout(
-        function () {
-          window.location.replace(
-            "external-project-dashboard.html"
-          );
-        },
-        700
-      );
-    }
-    catch (error) {
-      console.error(
-        "[ALBUKHR EXTERNAL SUBMIT]",
-        error
-      );
+      window.setTimeout(function () {
+        window.location.replace(
+          "external-project-dashboard.html"
+        );
+      }, 700);
+
+    } catch (error) {
+      console.error("[ALBUKHR EXTERNAL SUBMIT]", error);
 
       setStatus(
         "Unable to submit application: " +
@@ -599,11 +554,9 @@
         isEditableStatus(applicationStatus)
       ) {
         submitButton.disabled = false;
-        submitButton.textContent =
-          "Submit Application";
+        submitButton.textContent = "Submit Application";
       }
-    }
-    finally {
+    } finally {
       if (
         saveButton &&
         isEditableStatus(applicationStatus)
@@ -614,18 +567,13 @@
   }
 
   function setupUI() {
-    const form =
-      byId("externalProjectForm");
+    const form = byId("externalProjectForm");
 
     if (form) {
-      form.addEventListener(
-        "submit",
-        saveApplication
-      );
+      form.addEventListener("submit", saveApplication);
     }
 
-    const submitButton =
-      byId("submitApplicationButton");
+    const submitButton = byId("submitApplicationButton");
 
     if (submitButton) {
       submitButton.addEventListener(
@@ -634,64 +582,54 @@
       );
     }
 
-    const cancelButton =
-      byId("cancelButton");
+    ["cancelButton", "backButton"].forEach(function (id) {
+      const button = byId(id);
 
-    if (cancelButton) {
-      cancelButton.addEventListener(
-        "click",
-        function () {
+      if (button) {
+        button.addEventListener("click", function () {
           window.location.href =
             "external-project-dashboard.html";
+        });
+      }
+    });
+
+    const projectName = byId("projectName");
+    const projectSlug = byId("projectSlug");
+
+    if (projectName && projectSlug) {
+      projectName.addEventListener("input", function () {
+        if (editMode || projectSlug.value.trim()) {
+          return;
         }
-      );
+
+        projectSlug.value =
+          this.value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+      });
     }
+  }
 
-    const backButton =
-      byId("backButton");
+  function renderIdentity() {
+    const network = getNetwork();
+    const username =
+      currentUser.username ||
+      currentUser.pi_username ||
+      "ALBUKHR User";
 
-    if (backButton) {
-      backButton.addEventListener(
-        "click",
-        function () {
-          window.location.href =
-            "external-project-dashboard.html";
-        }
-      );
-    }
+    byId("networkIndicator").textContent =
+      network.toUpperCase();
 
-    const projectName =
-      byId("projectName");
+    byId("authUsername").textContent = username;
 
-    if (projectName) {
-      projectName.addEventListener(
-        "input",
-        function () {
-          if (
-            editMode ||
-            value("projectSlug")
-          ) {
-            return;
-          }
+    byId("authNetwork").textContent =
+      "Authenticated with Pi • " +
+      network.toUpperCase();
 
-          const slug =
-            this.value
-              .toLowerCase()
-              .trim()
-              .replace(
-                /[^a-z0-9]+/g,
-                "-"
-              )
-              .replace(
-                /^-+|-+$/g,
-                ""
-              );
-
-          byId("projectSlug").value =
-            slug;
-        }
-      );
-    }
+    byId("authAvatar").textContent =
+      String(username).charAt(0).toUpperCase();
   }
 
   async function initialize() {
@@ -699,40 +637,19 @@
       requireDependencies();
 
       currentUser =
-        await window.AlbukhrPageAuthGuard
-          .waitForAuth();
+        await window.AlbukhrPageAuthGuard.waitForAuth();
 
-      if (!currentUser) {
-        return;
-      }
+      if (!currentUser) return;
 
-      const network = getNetwork();
-
-      byId("networkIndicator").textContent =
-        network.toUpperCase();
-
-      byId("authUsername").textContent =
-        currentUser.username ||
-        "ALBUKHR User";
-
-      byId("authNetwork").textContent =
-        "Authenticated with Pi • " +
-        network.toUpperCase();
-
-      byId("authAvatar").textContent =
-        String(
-          currentUser.username || "A"
-        )
-          .charAt(0)
-          .toUpperCase();
+      getPiUid();
+      renderIdentity();
 
       applicationId =
         new URLSearchParams(
           window.location.search
         ).get("application_id");
 
-      editMode =
-        Boolean(applicationId);
+      editMode = Boolean(applicationId);
 
       if (editMode) {
         byId("modeEyebrow").textContent =
@@ -751,8 +668,8 @@
       if (editMode) {
         await loadEditApplication();
       }
-    }
-    catch (error) {
+
+    } catch (error) {
       console.error(
         "[ALBUKHR EXTERNAL CREATE INIT]",
         error
@@ -764,19 +681,11 @@
         "error"
       );
 
-      const saveButton =
-        byId("saveDraftButton");
+      const saveButton = byId("saveDraftButton");
+      const submitButton = byId("submitApplicationButton");
 
-      const submitButton =
-        byId("submitApplicationButton");
-
-      if (saveButton) {
-        saveButton.disabled = true;
-      }
-
-      if (submitButton) {
-        submitButton.disabled = true;
-      }
+      if (saveButton) saveButton.disabled = true;
+      if (submitButton) submitButton.disabled = true;
     }
   }
 
@@ -786,8 +695,7 @@
       initialize,
       { once: true }
     );
-  }
-  else {
+  } else {
     initialize();
   }
 
