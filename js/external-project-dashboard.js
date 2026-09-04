@@ -4,40 +4,21 @@ File: js/external-project-dashboard.js
 
 Architecture:
 
-- Shared Page Auth Guard provides authenticated Pi identity.
-- Shared Environment Core provides MAINNET / TESTNET.
-- Public applicant RPC provides network-isolated data.
+- Shared Page Auth Guard is the authentication boundary.
+- Pi identity is resolved from authenticated user context.
 - No LocalStorage application state.
-- Browser never chooses applicant_user_id.
-- Application ownership is resolved server-side.
-
-RPC:
-public.get_my_external_project_applications(
-p_pi_uid,
-p_network
-)
-========================================================= */
+- Network comes from ALBUKHR Environment Core.
+- Applications are loaded through secure RPC.
+- Strict Mainnet/Testnet isolation.
+  ========================================================= */
 
 (function (window) {
 "use strict";
 
-/* =========================================================
-STATE
-========================================================= */
-
 let currentUser = null;
-
 let currentNetwork = null;
-
 let applications = [];
-
-let activeStatusFilter = "all";
-
-let loading = false;
-
-/* =========================================================
-DOM
-========================================================= */
+let activeStatus = "all";
 
 function byId(id) {
 return document.getElementById(id);
@@ -48,21 +29,15 @@ STATUS
 ========================================================= */
 
 function setDashboardStatus(message, type) {
-const element =
-byId("dashboardStatus");
+const element = byId("dashboardStatus");
 
-if (!element) {
-  return;
-}
+if (!element) return;
 
-element.textContent =
-  String(message || "");
+element.textContent = String(message || "");
 
 element.className =
   "dashboard-status" +
-  (type
-    ? " " + type
-    : "");
+  (type ? " " + type : "");
 
 }
 
@@ -71,13 +46,11 @@ DEPENDENCIES
 ========================================================= */
 
 function requireDependencies() {
-
 if (!window.ALBukhrEnvironment) {
-  throw new Error(
-    "ALBUKHR Environment Core is unavailable."
-  );
+throw new Error(
+"ALBUKHR Environment Core is unavailable."
+);
 }
-
 
 if (!window.ALBUKHR_SUPABASE) {
   throw new Error(
@@ -85,17 +58,13 @@ if (!window.ALBUKHR_SUPABASE) {
   );
 }
 
-
 if (!window.AlbukhrPageAuthGuard) {
   throw new Error(
     "ALBUKHR Page Auth Guard is unavailable."
   );
 }
 
-
-if (
-  !window.ALBukhrEnvironment.isKnown()
-) {
+if (!window.ALBukhrEnvironment.isKnown()) {
   throw new Error(
     "ALBUKHR environment is not recognized."
   );
@@ -108,15 +77,8 @@ NETWORK
 ========================================================= */
 
 function getNetwork() {
-
 const network =
-  String(
-    window.ALBukhrEnvironment
-      .getNetwork() || ""
-  )
-    .trim()
-    .toLowerCase();
-
+window.ALBukhrEnvironment.getNetwork();
 
 if (
   network !== "mainnet" &&
@@ -127,59 +89,33 @@ if (
   );
 }
 
-
 return network;
 
 }
 
 /* =========================================================
-PI USER ID
+PI UID
 ========================================================= */
 
-function getPiUid(user) {
-
-if (!user) {
-  return null;
-}
-
-
-const possibleValues = [
-
-  user.pi_uid,
-
-  user.piUid,
-
-  user.uid,
-
-  user.user_uid,
-
-  user.userUid,
-
-  user.id
-
+function getPiUid() {
+const candidates = [
+currentUser && currentUser.pi_uid,
+currentUser && currentUser.piUid,
+currentUser && currentUser.uid
 ];
 
-
-for (
-  let index = 0;
-  index < possibleValues.length;
-  index += 1
-) {
-
+for (const candidate of candidates) {
   const value =
-    String(
-      possibleValues[index] || ""
-    ).trim();
-
+    String(candidate || "").trim();
 
   if (value) {
     return value;
   }
-
 }
 
-
-return null;
+throw new Error(
+  "Authenticated Pi user ID is unavailable."
+);
 
 }
 
@@ -187,434 +123,175 @@ return null;
 NORMALIZATION
 ========================================================= */
 
-function normalizeStatus(status) {
-
-return String(
-  status || "draft"
-)
-  .trim()
-  .toLowerCase()
-  .replace(
-    /\s+/g,
-    "_"
-  )
-  .replace(
-    /-/g,
-    "_"
-  );
-
+function normalizeStatus(value) {
+return String(value || "draft")
+.trim()
+.toLowerCase()
+.replace(/\s+/g, "_");
 }
 
-function statusLabel(status) {
+function normalizeApplication(row) {
+return {
+id: row.id,
 
-const normalized =
-  normalizeStatus(status);
+  application_code:
+    row.application_code || "",
 
+  project_code:
+    row.project_code || "",
 
-const labels = {
+  project_slug:
+    row.project_slug || "",
 
-  draft:
-    "Draft",
+  project_name:
+    row.project_name || "",
 
-  submitted:
-    "Submitted",
+  business_name:
+    row.business_name || "",
 
-  under_review:
-    "Under Review",
+  industry:
+    row.industry || "",
 
-  review:
-    "Under Review",
+  category:
+    row.category || "",
 
-  revision_requested:
-    "Revision Requested",
+  country:
+    row.country || "",
 
-  revision:
-    "Revision Requested",
+  funding_required:
+    row.funding_required,
 
-  changes_requested:
-    "Revision Requested",
+  funding_asset:
+    row.funding_asset || "PI",
 
-  approved:
-    "Approved",
+  investment_model:
+    row.investment_model || "",
 
-  rejected:
-    "Rejected",
+  project_duration_days:
+    row.project_duration_days,
 
-  converted:
-    "Converted"
+  network:
+    row.network || currentNetwork,
 
+  status:
+    normalizeStatus(row.status),
+
+  submitted_at:
+    row.submitted_at,
+
+  review_started_at:
+    row.review_started_at,
+
+  approved_at:
+    row.approved_at,
+
+  rejected_at:
+    row.rejected_at,
+
+  converted_at:
+    row.converted_at,
+
+  converted_project_id:
+    row.converted_project_id,
+
+  created_at:
+    row.created_at,
+
+  updated_at:
+    row.updated_at
 };
 
-
-return (
-  labels[normalized] ||
-  normalized
-    .replace(
-      /_/g,
-      " "
-    )
-    .replace(
-      /\b\w/g,
-      function (letter) {
-        return letter.toUpperCase();
-      }
-    )
-);
-
 }
 
 /* =========================================================
-DATE FORMAT
-========================================================= */
-
-function formatDate(value) {
-
-if (!value) {
-  return "Not available";
-}
-
-
-const date =
-  new Date(value);
-
-
-if (
-  Number.isNaN(
-    date.getTime()
-  )
-) {
-  return "Not available";
-}
-
-
-try {
-
-  return new Intl.DateTimeFormat(
-    undefined,
-    {
-      year:
-        "numeric",
-
-      month:
-        "short",
-
-      day:
-        "numeric",
-
-      hour:
-        "2-digit",
-
-      minute:
-        "2-digit"
-    }
-  ).format(date);
-
-}
-catch (error) {
-
-  return date.toLocaleString();
-
-}
-
-}
-
-/* =========================================================
-NUMBER FORMAT
-========================================================= */
-
-function formatFunding(
-amount,
-asset
-) {
-
-const numericAmount =
-  Number(amount);
-
-
-const formattedAmount =
-  Number.isFinite(
-    numericAmount
-  )
-    ? new Intl.NumberFormat(
-        undefined,
-        {
-          maximumFractionDigits:
-            7
-        }
-      ).format(
-        numericAmount
-      )
-    : "Not specified";
-
-
-const normalizedAsset =
-  String(
-    asset || "PI"
-  )
-    .trim()
-    .toUpperCase();
-
-
-if (
-  formattedAmount ===
-  "Not specified"
-) {
-  return formattedAmount;
-}
-
-
-return (
-  formattedAmount +
-  " " +
-  normalizedAsset
-);
-
-}
-
-/* =========================================================
-URL HELPERS
-========================================================= */
-
-function buildCreateUrl() {
-
-return (
-  "external-create.html"
-);
-
-}
-
-function buildEditUrl(
-applicationId
-) {
-
-return (
-  "external-create.html?application_id=" +
-  encodeURIComponent(
-    applicationId
-  )
-);
-
-}
-
-function buildDetailUrl(
-applicationId
-) {
-
-return (
-  "external-project-detail.html?application_id=" +
-  encodeURIComponent(
-    applicationId
-  )
-);
-
-}
-
-/* =========================================================
-APPLICATION EDITABILITY
-========================================================= */
-
-function isEditableStatus(
-status
-) {
-
-const normalized =
-  normalizeStatus(status);
-
-
-return [
-
-  "draft",
-
-  "revision_requested",
-
-  "revision",
-
-  "changes_requested"
-
-].includes(
-  normalized
-);
-
-}
-
-/* =========================================================
-VIEW STATE
+UI STATES
 ========================================================= */
 
 function showLoading() {
+const loading =
+byId("applicationsLoading");
 
-const loadingElement =
-  byId("applicationsLoading");
-
-const emptyElement =
+const empty =
   byId("emptyState");
 
-const listElement =
+const list =
   byId("applicationsList");
 
-const errorElement =
+const error =
   byId("dashboardError");
 
-
-if (loadingElement) {
-  loadingElement.hidden =
-    false;
-}
-
-
-if (emptyElement) {
-  emptyElement.hidden =
-    true;
-}
-
-
-if (listElement) {
-  listElement.hidden =
-    true;
-}
-
-
-if (errorElement) {
-  errorElement.hidden =
-    true;
-}
+if (loading) loading.hidden = false;
+if (empty) empty.hidden = true;
+if (list) list.hidden = true;
+if (error) error.hidden = true;
 
 }
 
 function showEmpty() {
+const loading =
+byId("applicationsLoading");
 
-const loadingElement =
-  byId("applicationsLoading");
-
-const emptyElement =
+const empty =
   byId("emptyState");
 
-const listElement =
+const list =
   byId("applicationsList");
 
-const errorElement =
+const error =
   byId("dashboardError");
 
-
-if (loadingElement) {
-  loadingElement.hidden =
-    true;
-}
-
-
-if (emptyElement) {
-  emptyElement.hidden =
-    false;
-}
-
-
-if (listElement) {
-  listElement.hidden =
-    true;
-}
-
-
-if (errorElement) {
-  errorElement.hidden =
-    true;
-}
+if (loading) loading.hidden = true;
+if (empty) empty.hidden = false;
+if (list) list.hidden = true;
+if (error) error.hidden = true;
 
 }
 
 function showApplications() {
+const loading =
+byId("applicationsLoading");
 
-const loadingElement =
-  byId("applicationsLoading");
-
-const emptyElement =
+const empty =
   byId("emptyState");
 
-const listElement =
+const list =
   byId("applicationsList");
 
-const errorElement =
+const error =
   byId("dashboardError");
 
-
-if (loadingElement) {
-  loadingElement.hidden =
-    true;
-}
-
-
-if (emptyElement) {
-  emptyElement.hidden =
-    true;
-}
-
-
-if (listElement) {
-  listElement.hidden =
-    false;
-}
-
-
-if (errorElement) {
-  errorElement.hidden =
-    true;
-}
+if (loading) loading.hidden = true;
+if (empty) empty.hidden = true;
+if (list) list.hidden = false;
+if (error) error.hidden = true;
 
 }
 
-function showError(
-message
-) {
+function showError(message) {
+const loading =
+byId("applicationsLoading");
 
-const loadingElement =
-  byId("applicationsLoading");
-
-const emptyElement =
+const empty =
   byId("emptyState");
 
-const listElement =
+const list =
   byId("applicationsList");
 
-const errorElement =
+const error =
   byId("dashboardError");
 
 const errorMessage =
-  byId(
-    "dashboardErrorMessage"
-  );
+  byId("dashboardErrorMessage");
 
-
-if (loadingElement) {
-  loadingElement.hidden =
-    true;
-}
-
-
-if (emptyElement) {
-  emptyElement.hidden =
-    true;
-}
-
-
-if (listElement) {
-  listElement.hidden =
-    true;
-}
-
-
-if (errorElement) {
-  errorElement.hidden =
-    false;
-}
-
+if (loading) loading.hidden = true;
+if (empty) empty.hidden = true;
+if (list) list.hidden = true;
+if (error) error.hidden = false;
 
 if (errorMessage) {
-
   errorMessage.textContent =
-    String(
-      message ||
-      "An unexpected error occurred."
-    );
-
+    message ||
+    "An unexpected error occurred.";
 }
 
 }
@@ -623,75 +300,51 @@ if (errorMessage) {
 AUTH UI
 ========================================================= */
 
-function updateAuthenticationUI() {
-
+function renderAuthenticatedUser() {
 const username =
-  String(
-    currentUser &&
-    (
-      currentUser.username ||
-      currentUser.pi_username ||
-      currentUser.piUsername
-    ) ||
-    "ALBUKHR User"
-  ).trim();
+String(
+(currentUser &&
+currentUser.username) ||
+"ALBUKHR User"
+);
 
-
-const network =
-  currentNetwork
-    ? currentNetwork.toUpperCase()
-    : "NETWORK";
-
-
-const avatar =
-  username
-    .charAt(0)
-    .toUpperCase();
-
-
-const usernameElement =
+const authUsername =
   byId("authUsername");
 
-const networkElement =
+const authNetwork =
   byId("authNetwork");
 
-const avatarElement =
+const authAvatar =
   byId("authAvatar");
 
 const networkIndicator =
   byId("networkIndicator");
 
 
-if (usernameElement) {
-
-  usernameElement.textContent =
+if (authUsername) {
+  authUsername.textContent =
     username;
-
 }
 
 
-if (networkElement) {
-
-  networkElement.textContent =
+if (authNetwork) {
+  authNetwork.textContent =
     "Authenticated with Pi • " +
-    network;
-
+    currentNetwork.toUpperCase();
 }
 
 
-if (avatarElement) {
-
-  avatarElement.textContent =
-    avatar || "A";
-
+if (authAvatar) {
+  authAvatar.textContent =
+    username
+      .charAt(0)
+      .toUpperCase();
 }
 
 
 if (networkIndicator) {
-
   networkIndicator.textContent =
-    network;
-
+    currentNetwork.toUpperCase();
 }
 
 }
@@ -700,136 +353,58 @@ if (networkIndicator) {
 SUMMARY
 ========================================================= */
 
-function calculateSummary() {
+function setText(id, value) {
+const element = byId(id);
 
-const summary = {
+if (!element) return;
 
-  total:
-    applications.length,
+element.textContent =
+  String(value);
 
-  draft:
-    0,
+}
 
-  review:
-    0,
+function renderSummary() {
+const total =
+applications.length;
 
-  approved:
-    0
+const drafts =
+  applications.filter(function (item) {
+    return item.status === "draft";
+  }).length;
 
-};
+const review =
+  applications.filter(function (item) {
+    return [
+      "submitted",
+      "under_review"
+    ].includes(item.status);
+  }).length;
 
-
-applications.forEach(
-  function (
-    application
-  ) {
-
-    const status =
-      normalizeStatus(
-        application.status
-      );
-
-
-    if (
-      status === "draft"
-    ) {
-
-      summary.draft += 1;
-
-    }
+const approved =
+  applications.filter(function (item) {
+    return item.status === "approved";
+  }).length;
 
 
-    if (
-
-      status ===
-        "submitted" ||
-
-      status ===
-        "under_review" ||
-
-      status ===
-        "review"
-
-    ) {
-
-      summary.review += 1;
-
-    }
-
-
-    if (
-      status === "approved"
-    ) {
-
-      summary.approved += 1;
-
-    }
-
-  }
+setText(
+  "totalApplications",
+  total
 );
 
+setText(
+  "draftApplications",
+  drafts
+);
 
-return summary;
+setText(
+  "reviewApplications",
+  review
+);
 
-}
-
-function updateSummary() {
-
-const summary =
-  calculateSummary();
-
-
-const totalElement =
-  byId("totalApplications");
-
-const draftElement =
-  byId("draftApplications");
-
-const reviewElement =
-  byId("reviewApplications");
-
-const approvedElement =
-  byId("approvedApplications");
-
-
-if (totalElement) {
-
-  totalElement.textContent =
-    String(
-      summary.total
-    );
-
-}
-
-
-if (draftElement) {
-
-  draftElement.textContent =
-    String(
-      summary.draft
-    );
-
-}
-
-
-if (reviewElement) {
-
-  reviewElement.textContent =
-    String(
-      summary.review
-    );
-
-}
-
-
-if (approvedElement) {
-
-  approvedElement.textContent =
-    String(
-      summary.approved
-    );
-
-}
+setText(
+  "approvedApplications",
+  approved
+);
 
 }
 
@@ -838,155 +413,147 @@ FILTERING
 ========================================================= */
 
 function getFilteredApplications() {
-
-if (
-  activeStatusFilter ===
-  "all"
-) {
-
-  return applications.slice();
-
+if (activeStatus === "all") {
+return applications.slice();
 }
 
-
 return applications.filter(
-  function (
-    application
-  ) {
-
-    return (
-      normalizeStatus(
-        application.status
-      ) ===
-      activeStatusFilter
-    );
-
+  function (item) {
+    return item.status === activeStatus;
   }
 );
 
 }
 
 function updateFilterButtons() {
-
 const buttons =
-  document.querySelectorAll(
-    ".status-filter"
+document.querySelectorAll(
+".status-filter"
+);
+
+buttons.forEach(function (button) {
+  const status =
+    button.dataset.status;
+
+  const active =
+    status === activeStatus;
+
+  button.classList.toggle(
+    "active",
+    active
   );
 
-
-buttons.forEach(
-  function (
-    button
-  ) {
-
-    const status =
-      String(
-        button.dataset.status ||
-        ""
-      )
-        .trim()
-        .toLowerCase();
-
-
-    button.classList.toggle(
-      "active",
-
-      status ===
-        activeStatusFilter
-    );
-
-
-    button.setAttribute(
-
-      "aria-selected",
-
-      status ===
-        activeStatusFilter
-          ? "true"
-          : "false"
-
-    );
-
-  }
-);
+  button.setAttribute(
+    "aria-selected",
+    active ? "true" : "false"
+  );
+});
 
 }
 
 /* =========================================================
-COUNT TEXT
+FORMATTING
 ========================================================= */
 
-function updateApplicationCountText(
-filteredApplications
-) {
-
-const element =
-  byId(
-    "applicationCountText"
-  );
-
-
-if (!element) {
-  return;
+function escapeHtml(value) {
+return String(value || "")
+.replace(/&/g, "&")
+.replace(/</g, "<")
+.replace(/>/g, ">")
+.replace(/"/g, """)
+.replace(/'/g, "'");
 }
 
+function formatStatus(status) {
+return normalizeStatus(status)
+.split("_")
+.map(function (part) {
+return (
+part.charAt(0).toUpperCase() +
+part.slice(1)
+);
+})
+.join(" ");
+}
 
-const total =
-  applications.length;
+function formatAmount(amount, asset) {
+const number =
+Number(amount);
 
-const visible =
-  filteredApplications.length;
+if (!Number.isFinite(number)) {
+  return "—";
+}
 
+return (
+  new Intl.NumberFormat(
+    undefined,
+    {
+      maximumFractionDigits: 7
+    }
+  ).format(number) +
+  " " +
+  String(asset || "PI")
+);
+
+}
+
+function formatDate(value) {
+if (!value) {
+return "—";
+}
+
+const date =
+  new Date(value);
 
 if (
-  total === 0
+  Number.isNaN(
+    date.getTime()
+  )
 ) {
+  return "—";
+}
 
-  element.textContent =
-    "No applications on this network.";
-
-  return;
+return new Intl.DateTimeFormat(
+  undefined,
+  {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  }
+).format(date);
 
 }
 
-
-if (
-  activeStatusFilter ===
-  "all"
-) {
-
-  element.textContent =
-
-    total === 1
-
-      ? "1 application"
-
-      : total +
-        " applications";
-
-  return;
-
+function getStatusClass(status) {
+return (
+"status-" +
+normalizeStatus(status)
+);
 }
 
+/* =========================================================
+ACTION STATE
+========================================================= */
 
-element.textContent =
+function isEditable(application) {
+return [
+"draft",
+"revision_requested",
+"revision",
+"changes_requested"
+].includes(
+normalizeStatus(
+application.status
+)
+);
+}
 
-  visible === 1
+function getApplicationAction(application) {
+if (isEditable(application)) {
+return "Edit Application";
+}
 
-    ? "1 " +
-      statusLabel(
-        activeStatusFilter
-      )
-        .toLowerCase() +
-      " application"
-
-    : visible +
-      " " +
-      statusLabel(
-        activeStatusFilter
-      )
-        .toLowerCase() +
-      " applications";
+return "View Application";
 
 }
 
@@ -994,646 +561,338 @@ element.textContent =
 APPLICATION CARD
 ========================================================= */
 
-function createApplicationCard(
-application
-) {
+function createApplicationCard(application) {
+const article =
+document.createElement("article");
 
-const card =
-  document.createElement(
-    "article"
-  );
-
-
-card.className =
+article.className =
   "application-card";
 
+const editable =
+  isEditable(application);
 
-const status =
-  normalizeStatus(
-    application.status
+const actionLabel =
+  getApplicationAction(application);
+
+article.innerHTML =
+
+  '<div class="application-card-header">' +
+
+    '<div class="application-title-block">' +
+
+      '<span class="application-code">' +
+        escapeHtml(
+          application.application_code
+        ) +
+      '</span>' +
+
+      '<h3>' +
+        escapeHtml(
+          application.project_name
+        ) +
+      '</h3>' +
+
+      '<p>' +
+        escapeHtml(
+          application.business_name
+        ) +
+      '</p>' +
+
+    '</div>' +
+
+    '<span class="application-status ' +
+      escapeHtml(
+        getStatusClass(
+          application.status
+        )
+      ) +
+    '">' +
+
+      escapeHtml(
+        formatStatus(
+          application.status
+        )
+      ) +
+
+    '</span>' +
+
+  '</div>' +
+
+
+  '<div class="application-meta">' +
+
+    '<div class="application-meta-item">' +
+
+      '<span>Industry</span>' +
+
+      '<strong>' +
+        escapeHtml(
+          application.industry || "—"
+        ) +
+      '</strong>' +
+
+    '</div>' +
+
+
+    '<div class="application-meta-item">' +
+
+      '<span>Country</span>' +
+
+      '<strong>' +
+        escapeHtml(
+          application.country || "—"
+        ) +
+      '</strong>' +
+
+    '</div>' +
+
+
+    '<div class="application-meta-item">' +
+
+      '<span>Funding</span>' +
+
+      '<strong>' +
+        escapeHtml(
+          formatAmount(
+            application.funding_required,
+            application.funding_asset
+          )
+        ) +
+      '</strong>' +
+
+    '</div>' +
+
+
+    '<div class="application-meta-item">' +
+
+      '<span>Updated</span>' +
+
+      '<strong>' +
+        escapeHtml(
+          formatDate(
+            application.updated_at ||
+            application.created_at
+          )
+        ) +
+      '</strong>' +
+
+    '</div>' +
+
+  '</div>' +
+
+
+  '<div class="application-card-footer">' +
+
+    '<span class="application-network">' +
+
+      escapeHtml(
+        String(
+          application.network
+        ).toUpperCase()
+      ) +
+
+    '</span>' +
+
+
+    '<button ' +
+
+      'class="application-action-button" ' +
+
+      'type="button" ' +
+
+      'data-application-id="' +
+        escapeHtml(application.id) +
+      '" ' +
+
+      'data-editable="' +
+        String(editable) +
+      '">' +
+
+      escapeHtml(actionLabel) +
+
+    '</button>' +
+
+  '</div>';
+
+
+const actionButton =
+  article.querySelector(
+    ".application-action-button"
   );
 
 
-card.dataset.applicationId =
-  application.id || "";
+if (actionButton) {
 
-card.dataset.status =
-  status;
-
-
-const top =
-  document.createElement(
-    "div"
-  );
-
-top.className =
-  "application-card-top";
-
-
-const identity =
-  document.createElement(
-    "div"
-  );
-
-identity.className =
-  "application-identity";
-
-
-const title =
-  document.createElement(
-    "h3"
-  );
-
-title.textContent =
-  application.project_name ||
-  "Unnamed Project";
-
-
-const code =
-  document.createElement(
-    "span"
-  );
-
-code.className =
-  "application-code";
-
-code.textContent =
-
-  application.application_code ||
-
-  application.project_code ||
-
-  "APPLICATION";
-
-
-identity.appendChild(
-  title
-);
-
-identity.appendChild(
-  code
-);
-
-
-const badge =
-  document.createElement(
-    "span"
-  );
-
-badge.className =
-  "application-status status-" +
-  status;
-
-badge.textContent =
-  statusLabel(
-    status
-  );
-
-
-top.appendChild(
-  identity
-);
-
-top.appendChild(
-  badge
-);
-
-
-/* -----------------------------------------
-   BUSINESS
------------------------------------------ */
-
-const business =
-  document.createElement(
-    "div"
-  );
-
-business.className =
-  "application-business";
-
-
-const businessName =
-  document.createElement(
-    "strong"
-  );
-
-businessName.textContent =
-  application.business_name ||
-  "Business not specified";
-
-
-const location =
-  document.createElement(
-    "span"
-  );
-
-
-const locationParts = [
-
-  application.city,
-
-  application.state,
-
-  application.country
-
-].filter(
-  function (
-    item
-  ) {
-
-    return Boolean(
-      String(
-        item || ""
-      ).trim()
-    );
-
-  }
-);
-
-
-location.textContent =
-
-  locationParts.length
-
-    ? locationParts.join(
-        ", "
-      )
-
-    : "Location not specified";
-
-
-business.appendChild(
-  businessName
-);
-
-business.appendChild(
-  location
-);
-
-
-/* -----------------------------------------
-   META
------------------------------------------ */
-
-const meta =
-  document.createElement(
-    "div"
-  );
-
-meta.className =
-  "application-meta";
-
-
-function createMetaItem(
-  label,
-  value
-) {
-
-  const item =
-    document.createElement(
-      "div"
-    );
-
-
-  item.className =
-    "application-meta-item";
-
-
-  const metaLabel =
-    document.createElement(
-      "span"
-    );
-
-  metaLabel.className =
-    "meta-label";
-
-  metaLabel.textContent =
-    label;
-
-
-  const metaValue =
-    document.createElement(
-      "strong"
-    );
-
-  metaValue.className =
-    "meta-value";
-
-  metaValue.textContent =
-    value;
-
-
-  item.appendChild(
-    metaLabel
-  );
-
-  item.appendChild(
-    metaValue
-  );
-
-
-  return item;
-
-}
-
-
-meta.appendChild(
-
-  createMetaItem(
-
-    "Funding",
-
-    formatFunding(
-
-      application.funding_required,
-
-      application.funding_asset
-
-    )
-
-  )
-
-);
-
-
-meta.appendChild(
-
-  createMetaItem(
-
-    "Model",
-
-    application.investment_model ||
-    "Not specified"
-
-  )
-
-);
-
-
-meta.appendChild(
-
-  createMetaItem(
-
-    "Duration",
-
-    application.project_duration_days
-
-      ? application.project_duration_days +
-        " days"
-
-      : "Not specified"
-
-  )
-
-);
-
-
-/* -----------------------------------------
-   FOOTER
------------------------------------------ */
-
-const footer =
-  document.createElement(
-    "div"
-  );
-
-footer.className =
-  "application-footer";
-
-
-const date =
-  document.createElement(
-    "span"
-  );
-
-date.className =
-  "application-date";
-
-date.textContent =
-
-  "Updated " +
-
-  formatDate(
-    application.updated_at ||
-    application.created_at
-  );
-
-
-const actions =
-  document.createElement(
-    "div"
-  );
-
-actions.className =
-  "application-actions";
-
-
-const viewButton =
-  document.createElement(
-    "button"
-  );
-
-viewButton.type =
-  "button";
-
-viewButton.className =
-  "application-action secondary-action";
-
-viewButton.textContent =
-  "View";
-
-
-viewButton.addEventListener(
-
-  "click",
-
-  function () {
-
-    if (!application.id) {
-      return;
-    }
-
-
-    window.location.href =
-      buildDetailUrl(
-        application.id
-      );
-
-  }
-
-);
-
-
-actions.appendChild(
-  viewButton
-);
-
-
-if (
-  isEditableStatus(
-    status
-  )
-) {
-
-  const editButton =
-    document.createElement(
-      "button"
-    );
-
-
-  editButton.type =
-    "button";
-
-  editButton.className =
-    "application-action primary-action";
-
-  editButton.textContent =
-    status ===
-    "revision_requested"
-
-      ? "Revise"
-
-      : "Edit";
-
-
-  editButton.addEventListener(
-
+  actionButton.addEventListener(
     "click",
-
     function () {
 
-      if (!application.id) {
-        return;
-      }
-
-
-      window.location.href =
-        buildEditUrl(
-          application.id
-        );
+      openApplication(
+        application,
+        editable
+      );
 
     }
-
-  );
-
-
-  actions.appendChild(
-    editButton
   );
 
 }
 
 
-footer.appendChild(
-  date
-);
-
-footer.appendChild(
-  actions
-);
-
-
-/* -----------------------------------------
-   ASSEMBLE
------------------------------------------ */
-
-card.appendChild(
-  top
-);
-
-card.appendChild(
-  business
-);
-
-card.appendChild(
-  meta
-);
-
-card.appendChild(
-  footer
-);
-
-
-return card;
+return article;
 
 }
 
 /* =========================================================
-EMPTY FILTER RESULT
+OPEN APPLICATION
 ========================================================= */
 
-function createFilteredEmptyState() {
-
-const container =
-  document.createElement(
-    "div"
-  );
-
-
-container.className =
-  "filtered-empty-state";
-
-
-const title =
-  document.createElement(
-    "strong"
-  );
-
-title.textContent =
-  "No matching applications";
-
-
-const text =
-  document.createElement(
-    "span"
-  );
-
-text.textContent =
-
-  "There are no " +
-
-  statusLabel(
-    activeStatusFilter
-  )
-    .toLowerCase() +
-
-  " applications to display.";
-
-
-container.appendChild(
-  title
+function openApplication(
+application,
+editable
+) {
+if (
+!application ||
+!application.id
+) {
+setDashboardStatus(
+"Application ID is unavailable.",
+"error"
 );
 
-container.appendChild(
-  text
-);
-
-
-return container;
-
-}
-
-/* =========================================================
-RENDER
-========================================================= */
-
-function renderApplications() {
-
-const container =
-  byId(
-    "applicationsList"
-  );
-
-
-if (!container) {
   return;
 }
 
 
-const filteredApplications =
+const applicationId =
+  encodeURIComponent(
+    application.id
+  );
+
+
+if (editable) {
+
+  window.location.href =
+    "external-create.html?application_id=" +
+    applicationId;
+
+  return;
+}
+
+
+window.location.href =
+  "external-project-detail.html?application_id=" +
+  applicationId;
+
+}
+
+/* =========================================================
+RENDER APPLICATIONS
+========================================================= */
+
+function renderApplications() {
+const list =
+byId("applicationsList");
+
+const countText =
+  byId("applicationCountText");
+
+
+if (!list) {
+  return;
+}
+
+
+const filtered =
   getFilteredApplications();
 
 
-updateApplicationCountText(
-  filteredApplications
-);
+list.innerHTML = "";
 
 
-container.innerHTML =
-  "";
+if (!applications.length) {
 
-
-if (
-  applications.length === 0
-) {
+  if (countText) {
+    countText.textContent =
+      "You have not created any applications yet.";
+  }
 
   showEmpty();
 
   return;
-
 }
 
 
-showApplications();
+if (!filtered.length) {
+
+  if (countText) {
+    countText.textContent =
+      "No applications match this status.";
+  }
 
 
-if (
-  filteredApplications.length === 0
-) {
+  showApplications();
 
-  container.appendChild(
-    createFilteredEmptyState()
+
+  const emptyFilter =
+    document.createElement("div");
+
+  emptyFilter.className =
+    "filter-empty-state";
+
+  emptyFilter.textContent =
+    "No applications found for " +
+    formatStatus(activeStatus) +
+    ".";
+
+
+  list.appendChild(
+    emptyFilter
   );
 
   return;
+}
+
+
+if (countText) {
+
+  countText.textContent =
+    filtered.length +
+    (
+      filtered.length === 1
+        ? " application"
+        : " applications"
+    ) +
+    " shown.";
 
 }
 
 
-filteredApplications.forEach(
-  function (
-    application
-  ) {
+filtered.forEach(
+  function (application) {
 
-    container.appendChild(
-
+    list.appendChild(
       createApplicationCard(
         application
       )
-
     );
 
   }
 );
 
+
+showApplications();
+
 }
 
 /* =========================================================
-RPC LOAD
+LOAD APPLICATIONS
 ========================================================= */
 
-async function loadApplications(
-options
-) {
-
-const settings =
-  options || {};
-
-
-if (loading) {
-  return;
-}
-
-
-loading = true;
-
-
-const refreshButton =
-  byId(
-    "refreshApplicationsButton"
-  );
-
+async function loadApplications() {
 
 try {
 
-  if (
-    settings.showLoading !== false
-  ) {
-
-    showLoading();
-
-  }
-
-
-  if (refreshButton) {
-
-    refreshButton.disabled =
-      true;
-
-    refreshButton.textContent =
-      "Refreshing...";
-
-  }
+  showLoading();
 
 
   setDashboardStatus(
@@ -1642,212 +901,73 @@ try {
 
 
   const piUid =
-    getPiUid(
-      currentUser
-    );
+    getPiUid();
 
 
-  if (!piUid) {
-
-    throw new Error(
-      "Authenticated Pi user ID is unavailable."
-    );
-
-  }
-
-
-  const {
-    data,
-    error
-  } =
+  const result =
     await window.ALBUKHR_SUPABASE.rpc(
-
       "get_my_external_project_applications",
-
       {
-
-        p_pi_uid:
-          piUid,
-
-        p_network:
-          currentNetwork
-
+        p_pi_uid: piUid,
+        p_network: currentNetwork
       }
-
     );
 
 
-  if (error) {
-    throw error;
+  if (result.error) {
+    throw result.error;
   }
 
 
-  if (
-    !Array.isArray(data)
-  ) {
-
-    applications =
-      [];
-
-  }
-  else {
-
-    applications =
-      data.slice();
-
-  }
+  applications =
+    Array.isArray(result.data)
+      ? result.data.map(
+          normalizeApplication
+        )
+      : [];
 
 
-  applications.sort(
-    function (
-      first,
-      second
-    ) {
-
-      const firstDate =
-        new Date(
-
-          first.updated_at ||
-
-          first.created_at ||
-
-          0
-
-        ).getTime();
-
-
-      const secondDate =
-        new Date(
-
-          second.updated_at ||
-
-          second.created_at ||
-
-          0
-
-        ).getTime();
-
-
-      return (
-        secondDate -
-        firstDate
-      );
-
-    }
-  );
-
-
-  updateSummary();
-
-  updateFilterButtons();
+  renderSummary();
 
   renderApplications();
 
 
   setDashboardStatus(
-
-    applications.length === 0
-
-      ? "No external project applications were found on this network."
-
-      : "Your external project applications were loaded securely.",
-
+    applications.length
+      ? "Applications loaded securely."
+      : "No external project applications found on this network.",
     "success"
-
   );
 
 }
 catch (error) {
 
   console.error(
-    "[ALBUKHR EXTERNAL PROJECT DASHBOARD]",
+    "[ALBUKHR EXTERNAL DASHBOARD]",
     error
   );
 
 
-  applications =
-    [];
+  applications = [];
+
+  renderSummary();
 
 
-  updateSummary();
-
-
-  updateApplicationCountText(
-    []
-  );
-
-
-  showError(
-
+  const message =
     error.message ||
-
-    "Unable to load external project applications."
-
-  );
+    "Unable to load external projects.";
 
 
   setDashboardStatus(
-
-    "Unable to load your applications securely.",
-
+    "Unable to load applications: " +
+    message,
     "error"
-
   );
 
-}
-finally {
 
-  loading =
-    false;
-
-
-  if (refreshButton) {
-
-    refreshButton.disabled =
-      false;
-
-    refreshButton.textContent =
-      "Refresh";
-
-  }
+  showError(message);
 
 }
-
-}
-
-/* =========================================================
-FILTER
-========================================================= */
-
-function handleFilterClick(
-event
-) {
-
-const button =
-  event.currentTarget;
-
-
-if (!button) {
-  return;
-}
-
-
-const status =
-  String(
-    button.dataset.status ||
-    "all"
-  )
-    .trim()
-    .toLowerCase();
-
-
-activeStatusFilter =
-  status || "all";
-
-
-updateFilterButtons();
-
-renderApplications();
 
 }
 
@@ -1855,32 +975,10 @@ renderApplications();
 CREATE PROJECT
 ========================================================= */
 
-function openCreateProject() {
+function goToCreateProject() {
 
 window.location.href =
-  buildCreateUrl();
-
-}
-
-/* =========================================================
-BACK
-========================================================= */
-
-function goBack() {
-
-if (
-  window.history.length > 1
-) {
-
-  window.history.back();
-
-  return;
-
-}
-
-
-window.location.href =
-  "index.html";
+  "external-create.html";
 
 }
 
@@ -1890,51 +988,37 @@ UI EVENTS
 
 function setupUI() {
 
-/* -----------------------------------------
-   CREATE
------------------------------------------ */
-
-const createButton =
-  byId(
-    "createProjectButton"
-  );
+const createProjectButton =
+  byId("createProjectButton");
 
 
-if (createButton) {
+if (createProjectButton) {
 
-  createButton.addEventListener(
-
+  createProjectButton.addEventListener(
     "click",
-
-    openCreateProject
-
+    goToCreateProject
   );
 
 }
 
 
-const emptyCreateButton =
+
+const emptyCreateProjectButton =
   byId(
     "emptyCreateProjectButton"
   );
 
 
-if (emptyCreateButton) {
+if (emptyCreateProjectButton) {
 
-  emptyCreateButton.addEventListener(
-
+  emptyCreateProjectButton.addEventListener(
     "click",
-
-    openCreateProject
-
+    goToCreateProject
   );
 
 }
 
 
-/* -----------------------------------------
-   REFRESH
------------------------------------------ */
 
 const refreshButton =
   byId(
@@ -1945,26 +1029,15 @@ const refreshButton =
 if (refreshButton) {
 
   refreshButton.addEventListener(
-
     "click",
-
     function () {
-
-      loadApplications({
-        showLoading:
-          false
-      });
-
+      loadApplications();
     }
-
   );
 
 }
 
 
-/* -----------------------------------------
-   RETRY
------------------------------------------ */
 
 const retryButton =
   byId(
@@ -1975,73 +1048,72 @@ const retryButton =
 if (retryButton) {
 
   retryButton.addEventListener(
-
     "click",
-
     function () {
-
-      loadApplications({
-        showLoading:
-          true
-      });
-
+      loadApplications();
     }
-
   );
 
 }
 
 
-/* -----------------------------------------
-   BACK
------------------------------------------ */
 
 const backButton =
-  byId(
-    "backButton"
-  );
+  byId("backButton");
 
 
 if (backButton) {
 
   backButton.addEventListener(
-
     "click",
+    function () {
 
-    goBack
+      window.location.href =
+        "index.html";
 
+    }
   );
 
 }
 
 
-/* -----------------------------------------
-   FILTERS
------------------------------------------ */
 
-const filterButtons =
+const filters =
   document.querySelectorAll(
     ".status-filter"
   );
 
 
-filterButtons.forEach(
-
-  function (
-    button
-  ) {
+filters.forEach(
+  function (button) {
 
     button.addEventListener(
-
       "click",
+      function () {
 
-      handleFilterClick
+        const status =
+          String(
+            button.dataset.status ||
+            "all"
+          );
 
+
+        activeStatus =
+          normalizeStatus(status);
+
+
+        updateFilterButtons();
+
+        renderApplications();
+
+      }
     );
 
   }
-
 );
+
+
+updateFilterButtons();
 
 }
 
@@ -2062,17 +1134,12 @@ try {
 
 
   currentUser =
-
     await window.AlbukhrPageAuthGuard
       .waitForAuth();
 
 
   if (!currentUser) {
-
-    throw new Error(
-      "Pi authentication is required."
-    );
-
+    return;
   }
 
 
@@ -2080,76 +1147,43 @@ try {
     getNetwork();
 
 
-  updateAuthenticationUI();
+  renderAuthenticatedUser();
 
 
   setupUI();
 
 
-  setDashboardStatus(
-    "Secure authentication verified. Loading your projects..."
-  );
-
-
-  await loadApplications({
-    showLoading:
-      true
-  });
+  await loadApplications();
 
 }
 catch (error) {
 
   console.error(
-
     "[ALBUKHR EXTERNAL DASHBOARD INIT]",
-
     error
-
   );
 
 
-  showError(
-
+  const message =
     error.message ||
-
-    "Unable to initialize the external project dashboard."
-
-  );
+    "Unknown initialization error";
 
 
   setDashboardStatus(
-
     "External project dashboard unavailable: " +
-
-    (
-      error.message ||
-      "Unknown error"
-    ),
-
+    message,
     "error"
-
   );
 
 
-  const refreshButton =
-    byId(
-      "refreshApplicationsButton"
-    );
-
-
-  if (refreshButton) {
-
-    refreshButton.disabled =
-      true;
-
-  }
+  showError(message);
 
 }
 
 }
 
 /* =========================================================
-DOM READY
+BOOTSTRAP
 ========================================================= */
 
 if (
@@ -2158,16 +1192,9 @@ document.readyState ===
 ) {
 
 document.addEventListener(
-
   "DOMContentLoaded",
-
   initialize,
-
-  {
-    once:
-      true
-  }
-
+  { once: true }
 );
 
 }
