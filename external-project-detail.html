@@ -1,1 +1,729 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ALBUKHR External Project</title><link rel="stylesheet" href="css/external-project-detail.css"></head><body><header><button id="back">←</button><b>ALBUKHR</b></header><main><section class="hero"><small>EXTERNAL PROJECT APPLICATION</small><h1 id="name">Loading...</h1><p id="code"></p><b id="network"></b> <b id="status"></b></section><p id="msg"></p><section id="content" hidden><div class="card"><h2>Review Status</h2><p id="statusText"></p></div><div class="card"><h2>Project Information</h2><div id="project"></div></div><div class="card"><h2>Business & Contact</h2><div id="business"></div></div><div class="card"><h2>Investment Request</h2><div id="funding"></div></div><div class="card"><h2>Project Team</h2><div id="team"></div></div><div class="card"><h2>Documents</h2><div id="docs"></div></div><div class="card"><h2>Review History</h2><div id="history"></div></div><button id="edit">Continue Editing</button><button id="submit">Submit Application</button><button id="dash">Back to Dashboard</button></section><section id="loading">Loading application...</section></main><script src="https://sdk.minepi.com/pi-sdk.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/core/environment-core.js"></script><script src="js/core/supabase-core.js"></script><script src="js/core/pi-auth-core.js"></script><script src="js/core/environment-switcher.js"></script><script src="js/external-project-detail.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
+
+<meta
+  name="theme-color"
+  content="#087a3e"
+>
+
+<title>
+  ALBUKHR External Project
+</title>
+
+
+<!-- =========================================
+     ALBUKHR SHARED UI
+========================================= -->
+
+<link
+  rel="stylesheet"
+  href="css/albukhr-ui.css"
+>
+
+<link
+  rel="stylesheet"
+  href="css/style.css"
+>
+
+<link
+  rel="stylesheet"
+  href="css/global-header.css"
+>
+
+<link
+  rel="stylesheet"
+  href="css/global-buttons.css"
+>
+
+
+<!-- =========================================
+     PAGE STYLE
+========================================= -->
+
+<link
+  rel="stylesheet"
+  href="css/external-project-detail.css"
+>
+
+</head>
+
+
+<body data-page="external-project-detail">
+
+
+<!-- =========================================
+     HEADER
+========================================= -->
+
+<header class="header">
+
+  <div class="header-left">
+
+    <button
+      id="backButton"
+      class="back-button"
+      type="button"
+      aria-label="Back to External Projects"
+    >
+      ←
+    </button>
+
+
+    <span class="brand">
+      ALBUKHR
+    </span>
+
+  </div>
+
+
+  <div class="header-right">
+
+    <span
+      id="networkIndicator"
+      class="network-indicator"
+    >
+      NETWORK
+    </span>
+
+  </div>
+
+</header>
+
+
+
+<!-- =========================================
+     PAGE
+========================================= -->
+
+<main class="external-project-detail-page">
+
+
+  <!-- =========================================
+       PROJECT HERO
+  ========================================== -->
+
+  <section
+    class="project-hero"
+    aria-labelledby="projectName"
+  >
+
+    <div class="project-hero-top">
+
+      <div
+        class="eyebrow"
+        id="projectType"
+      >
+        EXTERNAL PROJECT APPLICATION
+      </div>
+
+
+      <div class="hero-badges">
+
+        <span
+          id="projectNetwork"
+          class="network-badge"
+        >
+          NETWORK
+        </span>
+
+
+        <span
+          id="projectStatus"
+          class="status-badge"
+        >
+          LOADING
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <h1 id="projectName">
+      Loading Application...
+    </h1>
+
+
+    <p
+      id="applicationCode"
+      class="application-code"
+    >
+      Preparing secure application access...
+    </p>
+
+
+    <p
+      id="projectSubtitle"
+      class="project-subtitle"
+    >
+      Loading your external project information.
+    </p>
+
+  </section>
+
+
+
+  <!-- =========================================
+       AUTH STRIP
+  ========================================== -->
+
+  <section
+    class="auth-strip"
+    aria-live="polite"
+  >
+
+    <div
+      id="authAvatar"
+      class="auth-avatar"
+    >
+      A
+    </div>
+
+
+    <div class="auth-details">
+
+      <strong id="authUsername">
+        Checking authentication...
+      </strong>
+
+
+      <span id="authNetwork">
+        Secure Pi authentication required
+      </span>
+
+    </div>
+
+
+    <div class="auth-security">
+
+      <span class="security-dot"></span>
+
+      <span>
+        Secure
+      </span>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       PAGE STATUS
+  ========================================== -->
+
+  <div
+    id="detailStatus"
+    class="detail-status"
+    aria-live="polite"
+  >
+    Initializing secure application access...
+  </div>
+
+
+
+  <!-- =========================================
+       LOADING
+  ========================================== -->
+
+  <section
+    id="detailLoading"
+    class="detail-loading"
+  >
+
+    <div
+      class="loading-spinner"
+      aria-hidden="true"
+    ></div>
+
+
+    <strong>
+      Loading Application...
+    </strong>
+
+
+    <span>
+      Please wait while your project is loaded securely.
+    </span>
+
+  </section>
+
+
+
+  <!-- =========================================
+       CONTENT
+  ========================================== -->
+
+  <section
+    id="detailContent"
+    class="detail-content"
+    hidden
+  >
+
+
+    <!-- =====================================
+         REVIEW STATUS
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            APPLICATION STATE
+          </span>
+
+          <h2>
+            Review Status
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="reviewStatusContent"
+        class="review-status-content"
+      >
+        Loading review status...
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         PROJECT INFORMATION
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            PROJECT
+          </span>
+
+          <h2>
+            Project Information
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="projectInformation"
+        class="detail-grid"
+      >
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         BUSINESS INFORMATION
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            BUSINESS
+          </span>
+
+          <h2>
+            Business & Contact
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="businessInformation"
+        class="detail-grid"
+      >
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         INVESTMENT REQUEST
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            FUNDING
+          </span>
+
+          <h2>
+            Investment Request
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="fundingInformation"
+        class="detail-grid"
+      >
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         PROJECT DESCRIPTION
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            DESCRIPTION
+          </span>
+
+          <h2>
+            Project Description
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="projectDescription"
+        class="description-content"
+      >
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         PROJECT TEAM
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            PEOPLE
+          </span>
+
+          <h2>
+            Project Team
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="teamInformation"
+        class="team-list"
+      >
+
+        <div class="section-loading">
+          Loading project team...
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         DOCUMENTS
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            DOCUMENTATION
+          </span>
+
+          <h2>
+            Documents
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="documentsInformation"
+        class="documents-list"
+      >
+
+        <div class="section-loading">
+          Loading documents...
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         REVIEW HISTORY
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            ALBUKHR REVIEW
+          </span>
+
+          <h2>
+            Review History
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="reviewHistory"
+        class="review-history"
+      >
+
+        <div class="section-loading">
+          Loading review history...
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         APPLICATION TIMELINE
+    ====================================== -->
+
+    <section class="detail-card">
+
+      <div class="card-heading">
+
+        <div>
+
+          <span class="card-eyebrow">
+            ACTIVITY
+          </span>
+
+          <h2>
+            Application Timeline
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="applicationTimeline"
+        class="timeline"
+      >
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         ACTIONS
+    ====================================== -->
+
+    <section
+      id="applicationActions"
+      class="application-actions"
+    >
+
+
+      <button
+        id="editApplicationButton"
+        class="primary-action"
+        type="button"
+        hidden
+      >
+        Continue Editing
+      </button>
+
+
+
+      <button
+        id="submitApplicationButton"
+        class="primary-action"
+        type="button"
+        hidden
+      >
+        Submit Application
+      </button>
+
+
+
+      <button
+        id="dashboardButton"
+        class="secondary-action"
+        type="button"
+      >
+        Back to Dashboard
+      </button>
+
+
+    </section>
+
+
+  </section>
+
+
+
+  <!-- =========================================
+       ERROR
+  ========================================== -->
+
+  <section
+    id="detailError"
+    class="detail-error"
+    hidden
+  >
+
+    <h2>
+      Unable to Load Application
+    </h2>
+
+
+    <p id="detailErrorMessage">
+      An unexpected error occurred.
+    </p>
+
+
+    <div class="error-actions">
+
+      <button
+        id="retryDetailButton"
+        class="primary-action"
+        type="button"
+      >
+        Try Again
+      </button>
+
+
+      <button
+        id="errorDashboardButton"
+        class="secondary-action"
+        type="button"
+      >
+        Back to Dashboard
+      </button>
+
+    </div>
+
+  </section>
+
+
+</main>
+
+
+
+<!-- =========================================
+     PI SDK
+========================================= -->
+
+<script
+  src="https://sdk.minepi.com/pi-sdk.js"
+></script>
+
+
+
+<!-- =========================================
+     SUPABASE
+========================================= -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
+
+
+<!-- =========================================
+     ALBUKHR CORE
+========================================= -->
+
+<script src="js/core/environment-core.js"></script>
+
+<script src="js/core/supabase-core.js"></script>
+
+<script src="js/core/pi-auth-core.js"></script>
+
+<script src="js/core/page-auth-guard.js"></script>
+
+<script src="js/core/environment-switcher.js"></script>
+
+
+
+<!-- =========================================
+     PAGE ENGINE
+========================================= -->
+
+<script
+  src="js/external-project-detail.js"
+></script>
+
+
+</body>
+
+</html>
