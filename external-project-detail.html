@@ -2,57 +2,34 @@
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8">
 
-<meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
->
+  <meta name="theme-color" content="#087a3e">
 
-<meta
-  name="theme-color"
-  content="#087a3e"
->
+  <title>ALBUKHR External Project</title>
 
-<title>
-  ALBUKHR External Project
-</title>
+  <!-- =========================================
+       GLOBAL ALBUKHR UI
+  ========================================== -->
 
+  <link rel="stylesheet" href="css/albukhr-ui.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/global-header.css">
+  <link rel="stylesheet" href="css/global-buttons.css">
 
-<!-- =========================================
-     ALBUKHR SHARED UI
-========================================= -->
+  <!-- =========================================
+       PAGE UI
+  ========================================== -->
 
-<link
-  rel="stylesheet"
-  href="css/albukhr-ui.css"
->
-
-<link
-  rel="stylesheet"
-  href="css/style.css"
->
-
-<link
-  rel="stylesheet"
-  href="css/global-header.css"
->
-
-<link
-  rel="stylesheet"
-  href="css/global-buttons.css"
->
-
-
-<!-- =========================================
-     PAGE STYLE
-========================================= -->
-
-<link
-  rel="stylesheet"
-  href="css/external-project-detail.css"
->
+  <link
+    rel="stylesheet"
+    href="css/external-project-detail.css"
+  >
 
 </head>
 
@@ -60,668 +37,629 @@
 <body data-page="external-project-detail">
 
 
-<!-- =========================================
-     HEADER
-========================================= -->
-
-<header class="header">
-
-  <div class="header-left">
-
-    <button
-      id="backButton"
-      class="back-button"
-      type="button"
-      aria-label="Back to External Projects"
-    >
-      ←
-    </button>
-
-
-    <span class="brand">
-      ALBUKHR
-    </span>
-
-  </div>
-
-
-  <div class="header-right">
-
-    <span
-      id="networkIndicator"
-      class="network-indicator"
-    >
-      NETWORK
-    </span>
-
-  </div>
-
-</header>
-
-
-
-<!-- =========================================
-     PAGE
-========================================= -->
-
-<main class="external-project-detail-page">
-
-
   <!-- =========================================
-       PROJECT HERO
+       HEADER
   ========================================== -->
 
-  <section
-    class="project-hero"
-    aria-labelledby="projectName"
-  >
+  <header class="header">
 
-    <div class="project-hero-top">
+    <div class="header-left">
 
-      <div
-        class="eyebrow"
-        id="projectType"
+      <button
+        id="backButton"
+        class="back-button"
+        type="button"
+        aria-label="Back to External Projects"
       >
-        EXTERNAL PROJECT APPLICATION
-      </div>
+        ←
+      </button>
 
 
-      <div class="hero-badges">
-
-        <span
-          id="projectNetwork"
-          class="network-badge"
-        >
-          NETWORK
-        </span>
-
-
-        <span
-          id="projectStatus"
-          class="status-badge"
-        >
-          LOADING
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <h1 id="projectName">
-      Loading Application...
-    </h1>
-
-
-    <p
-      id="applicationCode"
-      class="application-code"
-    >
-      Preparing secure application access...
-    </p>
-
-
-    <p
-      id="projectSubtitle"
-      class="project-subtitle"
-    >
-      Loading your external project information.
-    </p>
-
-  </section>
-
-
-
-  <!-- =========================================
-       AUTH STRIP
-  ========================================== -->
-
-  <section
-    class="auth-strip"
-    aria-live="polite"
-  >
-
-    <div
-      id="authAvatar"
-      class="auth-avatar"
-    >
-      A
-    </div>
-
-
-    <div class="auth-details">
-
-      <strong id="authUsername">
-        Checking authentication...
-      </strong>
-
-
-      <span id="authNetwork">
-        Secure Pi authentication required
+      <span class="brand">
+        ALBUKHR
       </span>
 
     </div>
 
 
-    <div class="auth-security">
+    <div class="header-right">
 
-      <span class="security-dot"></span>
-
-      <span>
-        Secure
+      <span
+        class="network-indicator"
+        id="networkIndicator"
+      >
+        NETWORK
       </span>
 
     </div>
 
-  </section>
+  </header>
 
 
 
   <!-- =========================================
-       PAGE STATUS
+       PAGE
   ========================================== -->
 
-  <div
-    id="detailStatus"
-    class="detail-status"
-    aria-live="polite"
-  >
-    Initializing secure application access...
-  </div>
+  <main class="detail-page">
 
 
-
-  <!-- =========================================
-       LOADING
-  ========================================== -->
-
-  <section
-    id="detailLoading"
-    class="detail-loading"
-  >
-
-    <div
-      class="loading-spinner"
-      aria-hidden="true"
-    ></div>
-
-
-    <strong>
-      Loading Application...
-    </strong>
-
-
-    <span>
-      Please wait while your project is loaded securely.
-    </span>
-
-  </section>
-
-
-
-  <!-- =========================================
-       CONTENT
-  ========================================== -->
-
-  <section
-    id="detailContent"
-    class="detail-content"
-    hidden
-  >
-
-
-    <!-- =====================================
-         REVIEW STATUS
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            APPLICATION STATE
-          </span>
-
-          <h2>
-            Review Status
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="reviewStatusContent"
-        class="review-status-content"
-      >
-        Loading review status...
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         PROJECT INFORMATION
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            PROJECT
-          </span>
-
-          <h2>
-            Project Information
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="projectInformation"
-        class="detail-grid"
-      >
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         BUSINESS INFORMATION
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            BUSINESS
-          </span>
-
-          <h2>
-            Business & Contact
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="businessInformation"
-        class="detail-grid"
-      >
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         INVESTMENT REQUEST
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            FUNDING
-          </span>
-
-          <h2>
-            Investment Request
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="fundingInformation"
-        class="detail-grid"
-      >
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         PROJECT DESCRIPTION
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            DESCRIPTION
-          </span>
-
-          <h2>
-            Project Description
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="projectDescription"
-        class="description-content"
-      >
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         PROJECT TEAM
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            PEOPLE
-          </span>
-
-          <h2>
-            Project Team
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="teamInformation"
-        class="team-list"
-      >
-
-        <div class="section-loading">
-          Loading project team...
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         DOCUMENTS
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            DOCUMENTATION
-          </span>
-
-          <h2>
-            Documents
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="documentsInformation"
-        class="documents-list"
-      >
-
-        <div class="section-loading">
-          Loading documents...
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         REVIEW HISTORY
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            ALBUKHR REVIEW
-          </span>
-
-          <h2>
-            Review History
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="reviewHistory"
-        class="review-history"
-      >
-
-        <div class="section-loading">
-          Loading review history...
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         APPLICATION TIMELINE
-    ====================================== -->
-
-    <section class="detail-card">
-
-      <div class="card-heading">
-
-        <div>
-
-          <span class="card-eyebrow">
-            ACTIVITY
-          </span>
-
-          <h2>
-            Application Timeline
-          </h2>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="applicationTimeline"
-        class="timeline"
-      >
-      </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         ACTIONS
-    ====================================== -->
+    <!-- =========================================
+         AUTH STRIP
+    ========================================== -->
 
     <section
-      id="applicationActions"
-      class="application-actions"
+      class="detail-auth-strip"
+      aria-live="polite"
     >
 
-
-      <button
-        id="editApplicationButton"
-        class="primary-action"
-        type="button"
-        hidden
+      <div
+        class="detail-auth-avatar"
+        id="authAvatar"
       >
-        Continue Editing
-      </button>
+        A
+      </div>
 
 
+      <div class="detail-auth-details">
 
-      <button
-        id="submitApplicationButton"
-        class="primary-action"
-        type="button"
-        hidden
-      >
-        Submit Application
-      </button>
+        <strong id="authUsername">
+          Checking authentication...
+        </strong>
 
 
+        <span id="authNetwork">
+          Secure Pi authentication required
+        </span>
 
-      <button
-        id="dashboardButton"
-        class="secondary-action"
-        type="button"
-      >
-        Back to Dashboard
-      </button>
+      </div>
 
+
+      <div class="detail-security">
+
+        <span class="detail-security-dot"></span>
+
+        <span>
+          Secure
+        </span>
+
+      </div>
 
     </section>
 
 
-  </section>
+
+    <!-- =========================================
+         STATUS MESSAGE
+    ========================================== -->
+
+    <div
+      id="detailStatus"
+      class="detail-status-message"
+      aria-live="polite"
+    >
+      Initializing secure application access...
+    </div>
 
 
 
-  <!-- =========================================
-       ERROR
-  ========================================== -->
+    <!-- =========================================
+         ERROR
+    ========================================== -->
 
-  <section
-    id="detailError"
-    class="detail-error"
-    hidden
-  >
+    <section
+      id="detailError"
+      class="detail-error"
+      hidden
+    >
 
-    <h2>
-      Unable to Load Application
-    </h2>
-
-
-    <p id="detailErrorMessage">
-      An unexpected error occurred.
-    </p>
+      <h2>
+        Unable to Load Application
+      </h2>
 
 
-    <div class="error-actions">
+      <p id="detailErrorMessage">
+        An unexpected error occurred.
+      </p>
+
 
       <button
-        id="retryDetailButton"
+        id="retryButton"
         class="primary-action"
         type="button"
       >
         Try Again
       </button>
 
-
-      <button
-        id="errorDashboardButton"
-        class="secondary-action"
-        type="button"
-      >
-        Back to Dashboard
-      </button>
-
-    </div>
-
-  </section>
-
-
-</main>
+    </section>
 
 
 
-<!-- =========================================
-     PI SDK
-========================================= -->
+    <!-- =========================================
+         LOADING
+    ========================================== -->
 
-<script
-  src="https://sdk.minepi.com/pi-sdk.js"
-></script>
+    <section
+      id="detailLoading"
+      class="detail-loading"
+    >
 
-
-
-<!-- =========================================
-     SUPABASE
-========================================= -->
-
-<script
-  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-></script>
+      <div class="detail-spinner"></div>
 
 
+      <strong>
+        Loading External Project...
+      </strong>
 
-<!-- =========================================
-     ALBUKHR CORE
-========================================= -->
 
-<script src="js/core/environment-core.js"></script>
+      <span>
+        Retrieving your application securely.
+      </span>
 
-<script src="js/core/supabase-core.js"></script>
-
-<script src="js/core/pi-auth-core.js"></script>
-
-<script src="js/core/page-auth-guard.js"></script>
-
-<script src="js/core/environment-switcher.js"></script>
+    </section>
 
 
 
-<!-- =========================================
-     PAGE ENGINE
-========================================= -->
+    <!-- =========================================
+         APPLICATION CONTENT
+    ========================================== -->
 
-<script
-  src="js/external-project-detail.js"
-></script>
+    <section
+      id="detailContent"
+      hidden
+    >
+
+
+      <!-- =====================================
+           HERO
+      ====================================== -->
+
+      <section class="detail-hero">
+
+
+        <div class="detail-eyebrow">
+          EXTERNAL PROJECT APPLICATION
+        </div>
+
+
+        <div class="detail-title-row">
+
+          <div>
+
+            <h1 id="projectName">
+              External Project
+            </h1>
+
+
+            <p
+              class="detail-code"
+              id="applicationCode"
+            >
+              —
+            </p>
+
+          </div>
+
+
+          <span
+            class="detail-status"
+            id="applicationStatus"
+          >
+            DRAFT
+          </span>
+
+        </div>
+
+
+        <div class="detail-meta">
+
+
+          <div class="detail-meta-item">
+
+            <span>
+              NETWORK
+            </span>
+
+            <strong id="applicationNetwork">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="detail-meta-item">
+
+            <span>
+              PROJECT CODE
+            </span>
+
+            <strong id="projectCode">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="detail-meta-item">
+
+            <span>
+              APPLICATION ID
+            </span>
+
+            <strong
+              id="applicationIdDisplay"
+              class="detail-id"
+            >
+              —
+            </strong>
+
+          </div>
+
+
+        </div>
+
+
+      </section>
+
+
+
+      <!-- =====================================
+           REVIEW STATUS
+      ====================================== -->
+
+      <section class="detail-section">
+
+        <div class="detail-section-heading">
+
+          <div>
+
+            <h2>
+              Review Status
+            </h2>
+
+            <p>
+              Current position of your application
+              in the ALBUKHR review framework.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="reviewStatusBox"
+          class="review-status-box"
+        >
+
+          <strong id="reviewStatusTitle">
+            Application Status
+          </strong>
+
+
+          <p id="reviewStatusText">
+            —
+          </p>
+
+        </div>
+
+
+      </section>
+
+
+
+      <!-- =====================================
+           PROJECT INFORMATION
+      ====================================== -->
+
+      <section class="detail-section">
+
+        <div class="detail-section-heading">
+
+          <div>
+
+            <h2>
+              Project Information
+            </h2>
+
+            <p>
+              Core information about your proposed project.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="projectInformation"
+          class="detail-grid"
+        >
+        </div>
+
+
+        <div class="detail-description-box">
+
+          <span>
+            PROJECT DESCRIPTION
+          </span>
+
+
+          <p
+            id="projectDescription"
+            class="detail-description"
+          >
+            —
+          </p>
+
+        </div>
+
+
+      </section>
+
+
+
+      <!-- =====================================
+           BUSINESS INFORMATION
+      ====================================== -->
+
+      <section class="detail-section">
+
+        <div class="detail-section-heading">
+
+          <div>
+
+            <h2>
+              Business & Contact
+            </h2>
+
+            <p>
+              Registered business and communication details.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="businessInformation"
+          class="detail-grid"
+        >
+        </div>
+
+
+      </section>
+
+
+
+      <!-- =====================================
+           INVESTMENT REQUEST
+      ====================================== -->
+
+      <section class="detail-section">
+
+        <div class="detail-section-heading">
+
+          <div>
+
+            <h2>
+              Investment Request
+            </h2>
+
+            <p>
+              Funding and investment information submitted
+              with this application.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="fundingInformation"
+          class="detail-grid"
+        >
+        </div>
+
+
+      </section>
+
+
+
+      <!-- =====================================
+           PROJECT TEAM
+      ====================================== -->
+
+      <section class="detail-section">
+
+        <div class="detail-section-heading">
+
+          <div>
+
+            <h2>
+              Project Team
+            </h2>
+
+            <p>
+              Team members associated with this application.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="projectTeam"
+          class="detail-list"
+        >
+        </div>
+
+
+      </section>
+
+
+
+      <!-- =====================================
+           DOCUMENTS
+      ====================================== -->
+
+      <section class="detail-section">
+
+        <div class="detail-section-heading">
+
+          <div>
+
+            <h2>
+              Documents
+            </h2>
+
+            <p>
+              Supporting documents registered with the project.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="projectDocuments"
+          class="detail-list"
+        >
+        </div>
+
+
+      </section>
+
+
+
+      <!-- =====================================
+           REVIEW HISTORY
+      ====================================== -->
+
+      <section class="detail-section">
+
+        <div class="detail-section-heading">
+
+          <div>
+
+            <h2>
+              Review History
+            </h2>
+
+            <p>
+              Review and approval activity recorded
+              for this application.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="reviewHistory"
+          class="detail-list detail-history"
+        >
+        </div>
+
+
+      </section>
+
+
+
+      <!-- =====================================
+           APPLICATION ACTIONS
+      ====================================== -->
+
+      <section class="detail-actions">
+
+
+        <button
+          id="editApplicationButton"
+          class="secondary-action"
+          type="button"
+          hidden
+        >
+          Continue Editing
+        </button>
+
+
+        <button
+          id="submitApplicationButton"
+          class="primary-action"
+          type="button"
+          hidden
+        >
+          Submit Application
+        </button>
+
+
+        <button
+          id="dashboardButton"
+          class="ghost-action"
+          type="button"
+        >
+          Back to Dashboard
+        </button>
+
+
+      </section>
+
+
+    </section>
+
+
+  </main>
+
+
+
+  <!-- =========================================
+       PI SDK
+  ========================================== -->
+
+  <script
+    src="https://sdk.minepi.com/pi-sdk.js"
+  ></script>
+
+
+
+  <!-- =========================================
+       SUPABASE
+  ========================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+
+
+  <!-- =========================================
+       ALBUKHR CORE
+  ========================================== -->
+
+  <script src="js/core/environment-core.js"></script>
+
+  <script src="js/core/supabase-core.js"></script>
+
+  <script src="js/core/pi-auth-core.js"></script>
+
+  <script src="js/core/page-auth-guard.js"></script>
+
+  <script src="js/core/environment-switcher.js"></script>
+
+
+
+  <!-- =========================================
+       PAGE ENGINE
+  ========================================== -->
+
+  <script
+    src="js/external-project-detail.js"
+  ></script>
 
 
 </body>
