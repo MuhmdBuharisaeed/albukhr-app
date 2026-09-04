@@ -46,7 +46,7 @@
   }
 
   function goCreateExternal() {
-    window.location.assign("external-create.html");
+  window.location.assign("external-project-dashboard.html");
   }
 
   function goDappService() {
