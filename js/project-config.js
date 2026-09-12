@@ -69,7 +69,12 @@
     },
     Raheem: {
       title: "Raheem Pharmacy",
-      icon: "💊",
+      // The official project logo is the visual identity for Raheem.
+      // The existing index renderer consumes `icon`, so keep this field as
+      // a trusted HTML logo bridge until index.html is migrated to a native
+      // logo_url renderer. No project emoji/icon is used for Raheem.
+      icon: '<img class="project-logo" src="https://ribpntyqdleytsyktdfb.supabase.co/storage/v1/object/public/project-logos/projects/25af782e-d91b-467a-9219-3dd45294aaff/logo" alt="Raheem Pharmacy" loading="lazy">',
+      logo_url: "https://ribpntyqdleytsyktdfb.supabase.co/storage/v1/object/public/project-logos/projects/25af782e-d91b-467a-9219-3dd45294aaff/logo",
       desc: "Healthcare project improving access to essential medicines.",
       info: "Raheem provides transparent, community-driven pharmaceutical distribution.",
       durations: [30, 60, 90],
@@ -140,7 +145,16 @@
         logo_url: row.logo_url || null
       });
 
-      if (row.logo_url) PROJECT_CONFIG[key].logo_url = row.logo_url;
+      if (row.logo_url) {
+        PROJECT_CONFIG[key].logo_url = row.logo_url;
+        PROJECT_CONFIG[key].icon = '<img class="project-logo" src="' + String(row.logo_url)
+          .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;").replace(/>/g, "&gt;") + '" alt="'
+          + String(row.name || PROJECT_CONFIG[key].title || "Project")
+            .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+            .replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          + '" loading="lazy">';
+      }
       if (row.name) PROJECT_CONFIG[key].title = row.name;
       if (row.description) PROJECT_CONFIG[key].desc = row.description;
     });
