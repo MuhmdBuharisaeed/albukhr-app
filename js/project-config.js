@@ -1,137 +1,205 @@
 /* =========================================================
-   ALBUKHR PROJECT CONFIG COMPATIBILITY LAYER
-   Source of truth: server-authoritative public project registry.
-   This file is NOT a static project registry.
+   ALBUKHR — PROJECT CATALOG + SERVER REGISTRY BRIDGE
 
-   Destination: /js/project-config.js
+   Purpose:
+   - Preserve the seven-project Home catalog used by index.html.
+   - Keep legacy project keys stable for existing staking/UI code.
+   - Overlay server-authoritative registry metadata when available.
+   - Never treat this client catalog as an authorization authority.
+   - No LocalStorage.
+   - Network is always resolved from ALBUKHR Environment Core.
 ========================================================= */
 (function (window) {
   "use strict";
 
-  const CONFIG = {};
-  window.PROJECT_CONFIG = CONFIG;
+  const PROJECT_CONFIG = {
+    Azman: {
+      title: "Azman Futures Makers Lab",
+      icon: "🧪",
+      desc: "Long-term science, technology, and innovation project focused on future invention and engineering.",
+      info: "Azman supports research labs, prototyping, and advanced engineering capacity building.",
+      durations: [180, 365, 430],
+      project_code: "AZMAN",
+      slug: "azman-futures-makers-lab"
+    },
+    Labbaika: {
+      title: "Labbaika Bakery Center",
+      icon: "🍞",
+      desc: "Food production project focused on modern bread and flour processing.",
+      info: "Labbaika enables scalable bakery production within the ALBUKHR ecosystem.",
+      durations: [30, 60, 90],
+      project_code: "LABBAIKA",
+      slug: "labbaika-bakery-center"
+    },
+    Barsh: {
+      title: "Barsh Agro & Livestock",
+      icon: "🌾",
+      desc: "Mechanized farming and livestock project for large-scale agricultural production.",
+      info: "Barsh integrates modern farming, livestock, and sustainable agriculture systems.",
+      durations: [30, 60, 90],
+      project_code: "BARSH",
+      slug: "barsh-agro-livestock"
+    },
+    Urban: {
+      title: "Urban Mobility System",
+      icon: "🚍",
+      desc: "Infrastructure project focused on modern transportation of people and goods.",
+      info: "Urban improves accessibility and builds sustainable mobility networks.",
+      durations: [30, 60, 90],
+      project_code: "URBAN",
+      slug: "urban-mobility-system"
+    },
+    Khairat: {
+      title: "Khairat Fertiliser",
+      icon: "♻️",
+      desc: "Agricultural supply project improving fertiliser access and farm productivity.",
+      info: "Khairat supports transparent distribution systems and sustainable farming inputs.",
+      durations: [30, 60, 90],
+      project_code: "KHAIRAT",
+      slug: "khairat-fertiliser"
+    },
+    Hauwal: {
+      title: "Hauwal Maize Processing",
+      icon: "🌽",
+      desc: "Agro-processing project modernizing maize milling into scalable production.",
+      info: "Hauwal focuses on clean processing, packaging, and food system efficiency.",
+      durations: [30, 60, 90],
+      project_code: "HAUWAL",
+      slug: "hauwal-maize-processing"
+    },
+    Raheem: {
+      title: "Raheem Pharmacy",
+      icon: "💊",
+      desc: "Healthcare project improving access to essential medicines.",
+      info: "Raheem provides transparent, community-driven pharmaceutical distribution.",
+      durations: [30, 60, 90],
+      project_code: "RAHEEM-25",
+      slug: "raheem-pharmacy",
+      project_id: "25af782e-d91b-467a-9219-3dd45294aaff",
+      core_slot: 1,
+      network: "mainnet"
+    }
+  };
 
-  function env() {
-    const e = window.ALBukhrEnvironment;
-    if (!e || typeof e.getNetwork !== "function" || !e.isKnown()) {
+  window.PROJECT_CONFIG = PROJECT_CONFIG;
+
+  let registry = [];
+  let registryReady = false;
+  let registryPromise = null;
+
+  function getEnvironment() {
+    const env = window.AlbukhrEnvironment;
+    if (!env || !env.isKnown || !env.isKnown()) {
       throw new Error("ALBUKHR environment is unavailable.");
     }
-    const network = String(e.getNetwork() || "").toLowerCase();
+    return env;
+  }
+
+  function getNetwork() {
+    const network = String(getEnvironment().getNetwork() || "").toLowerCase();
     if (network !== "mainnet" && network !== "testnet") {
       throw new Error("Invalid ALBUKHR network.");
     }
     return network;
   }
 
-  function client() {
+  function getClient() {
     const core = window.ALBUKHR_SUPABASE;
-    const db = core?.client || core;
-    if (!db || typeof db.rpc !== "function") {
+    const client = core?.client || core;
+    if (!client || typeof client.rpc !== "function") {
       throw new Error("ALBUKHR Supabase Core is unavailable.");
     }
-    return db;
+    return client;
   }
 
-  function normalizeProject(p) {
-    if (!p || !p.id || !p.project_code || !p.slug || !p.name) return null;
-    return {
-      id: String(p.id),
-      code: String(p.project_code),
-      slug: String(p.slug),
-      title: String(p.name),
-      description: p.description ? String(p.description) : "",
-      type: p.project_type ? String(p.project_type) : "project",
-      status: p.status ? String(p.status).toLowerCase() : "",
-      core_slot: p.core_slot == null ? null : Number(p.core_slot),
-      network: String(p.network || "").toLowerCase(),
-      logo_url: p.logo_url ? String(p.logo_url) : "",
-      liquidity: Number(p.liquidity || 0),
-      investors: Number(p.investors || 0)
+  function applyRegistry(rows) {
+    registry = Array.isArray(rows) ? rows : [];
+
+    registry.forEach(function (row) {
+      if (!row || !row.project_code) return;
+      if (String(row.network || "").toLowerCase() !== getNetwork()) return;
+
+      const code = String(row.project_code);
+      const key = Object.keys(PROJECT_CONFIG).find(function (name) {
+        return String(PROJECT_CONFIG[name].project_code || "").toLowerCase() === code.toLowerCase()
+          || String(PROJECT_CONFIG[name].slug || "").toLowerCase() === String(row.slug || "").toLowerCase()
+          || String(name).toLowerCase() === code.toLowerCase().replace(/-25$/, "");
+      });
+
+      if (!key) return;
+
+      PROJECT_CONFIG[key].server = Object.freeze({
+        id: row.id || null,
+        project_code: row.project_code,
+        slug: row.slug,
+        name: row.name,
+        project_type: row.project_type || null,
+        core_slot: row.core_slot == null ? null : Number(row.core_slot),
+        network: String(row.network || "").toLowerCase(),
+        status: String(row.status || "").toLowerCase(),
+        logo_url: row.logo_url || null
+      });
+
+      if (row.logo_url) PROJECT_CONFIG[key].logo_url = row.logo_url;
+      if (row.name) PROJECT_CONFIG[key].title = row.name;
+      if (row.description) PROJECT_CONFIG[key].desc = row.description;
+    });
+
+    registryReady = true;
+    return Object.freeze(registry.slice());
+  }
+
+  async function loadRegistry() {
+    if (registryPromise) return registryPromise;
+
+    registryPromise = (async function () {
+      const network = getNetwork();
+      const result = await getClient().rpc("get_public_project_registry", {
+        p_network: network
+      });
+      if (result.error) throw result.error;
+      return applyRegistry(Array.isArray(result.data) ? result.data : []);
+    })();
+
+    try {
+      return await registryPromise;
+    } catch (error) {
+      registryReady = false;
+      console.error("ALBUKHR public project registry unavailable:", error);
+      return [];
+    }
+  }
+
+  function getProjectConfig(name) {
+    return PROJECT_CONFIG[name] || {
+      title: name,
+      icon: "📦",
+      desc: "ALBUKHR Project",
+      info: "Project information not available.",
+      durations: [30, 60, 90]
     };
   }
 
-  async function load() {
-    const network = env();
-    const { data, error } = await client().rpc("get_public_project_registry", {
-      p_network: network
-    });
-    if (error) throw error;
-
-    const list = Array.isArray(data) ? data : [];
-    Object.keys(CONFIG).forEach(k => delete CONFIG[k]);
-
-    list.map(normalizeProject).filter(Boolean).forEach(project => {
-      if (project.network !== network) return;
-      CONFIG[project.code] = project;
-    });
-
-    return Object.values(CONFIG);
-  }
-
-  function render(list) {
-    const popular = document.getElementById("popularProjects");
-    const assets = document.getElementById("assetsContainer");
-    if (!popular || !assets) return;
-
-    popular.innerHTML = "";
-    assets.innerHTML = "";
-
-    list.slice(0, 10).forEach((p, index) => {
-      const card = document.createElement("div");
-      card.className = "popular-card";
-      card.dataset.rank = `#${index + 1}`;
-      card.innerHTML = `
-        <div class="popular-icon"><img src="${escapeHtml(p.logo_url)}" alt="" loading="lazy"></div>
-        <div class="popular-name">${escapeHtml(p.title)}</div>
-        <div class="popular-amount">${escapeHtml(p.status.toUpperCase())}</div>`;
-      card.addEventListener("click", () => {
-        location.href = "project.html?project=" + encodeURIComponent(p.code);
-      });
-      popular.appendChild(card);
-
-      const item = document.createElement("div");
-      item.className = "asset-item";
-      item.innerHTML = `
-        <div class="asset-icon"><img src="${escapeHtml(p.logo_url)}" alt="" loading="lazy"></div>
-        <div class="asset-left">
-          <div class="asset-header">
-            <div class="asset-info">
-              <div class="asset-name">${escapeHtml(p.title)}</div>
-              <div class="asset-stake">${escapeHtml(p.code)} · ${escapeHtml(p.status.toUpperCase())}</div>
-            </div>
-            <div class="asset-mini-chart" aria-hidden="true"></div>
-          </div>
-          <div class="asset-status">${escapeHtml(p.type.toUpperCase())} · ${escapeHtml(p.network.toUpperCase())}</div>
-        </div>`;
-      item.addEventListener("click", () => {
-        location.href = "project.html?project=" + encodeURIComponent(p.code);
-      });
-      assets.appendChild(item);
-    });
-  }
-
-  function escapeHtml(value) {
-    return String(value || "").replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;").replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-  }
-
+  window.getProjectConfig = getProjectConfig;
   window.AlbukhrProjectRegistry = Object.freeze({
-    load,
-    getAll: () => Object.values(CONFIG),
-    getByCode: code => CONFIG[String(code || "").trim()] || null
+    load: loadRegistry,
+    getAll: function () { return Object.values(PROJECT_CONFIG); },
+    getByKey: function (key) { return PROJECT_CONFIG[String(key || "").trim()] || null; },
+    getByCode: function (code) {
+      const target = String(code || "").trim().toLowerCase();
+      return Object.values(PROJECT_CONFIG).find(function (p) {
+        return String(p.project_code || "").toLowerCase() === target
+          || String(p.server?.project_code || "").toLowerCase() === target;
+      }) || null;
+    },
+    isReady: function () { return registryReady; }
   });
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const list = await load();
-      render(list);
-      console.info("ALBUKHR project registry loaded", {
-        network: env(),
-        projects: list.length
-      });
-    } catch (error) {
-      console.error("ALBUKHR project registry unavailable:", error);
-    }
-  });
+  /* Keep the seven-project catalog immediately available to index.html.
+     The server registry is an overlay, never a replacement for the catalog. */
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { void loadRegistry(); }, { once: true });
+  } else {
+    void loadRegistry();
+  }
 })(window);
