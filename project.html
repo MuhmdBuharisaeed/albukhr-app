@@ -1,60 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Project | ALBUKHR</title>
-<meta name="theme-color" content="#0f7a3d">
-<style>
-:root{--g:#0f7a3d;--bg:#f4f7f5;--card:#fff;--tx:#173024;--mut:#68776f;--bd:#dce6df}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font-family:Arial,sans-serif}
-main{max-width:760px;margin:auto;padding:18px 14px 90px}
-a{color:var(--g);font-weight:700;text-decoration:none}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:20px;margin-top:16px}
-.hero{display:flex;gap:16px;align-items:center}
-.logo{width:88px;height:88px;border-radius:16px;object-fit:cover;border:1px solid var(--bd);background:#f0f3f1}
-h1{margin:0 0 6px;font-size:28px}
-.code{color:var(--mut);font-size:13px}
-.badge{display:inline-block;margin-top:8px;padding:6px 10px;border-radius:999px;background:#eaf6ee;color:var(--g);font-size:11px;font-weight:800}
-.desc{color:var(--mut);line-height:1.6;margin-top:18px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
-.metric{background:#f7faf8;border-radius:12px;padding:12px}
-.metric span{display:block;color:var(--mut);font-size:11px}
-.metric strong{display:block;margin-top:5px}
-.note{margin-top:18px;padding:13px;border-radius:12px;background:#eef6f1;color:#29583f;line-height:1.5}
-.error{margin-top:16px;padding:14px;border-radius:12px;background:#fff0ee;color:#9c2a1f}
-@media(max-width:560px){.hero{align-items:flex-start}.grid{grid-template-columns:1fr}}
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Project</title>
+  
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/global-core.css">
+<link rel="stylesheet" href="css/global-layout.css">
+<link rel="stylesheet" href="css/global-components.css">
+<link rel="stylesheet" href="css/global-style.css">
+
+<!-- Custom App Alert -->
+<link rel="stylesheet" href="css/app-alert.css">
+  
 </head>
+
 <body>
-<main>
-<a href="index.html">Back to ALBUKHR Home</a>
-<section class="card">
-  <div class="hero">
-    <img id="projectLogo" class="logo" alt="" hidden>
-    <div>
-      <h1 id="projectName">Loading project...</h1>
-      <div id="projectCode" class="code"></div>
-      <span id="projectStatus" class="badge">CHECKING</span>
+
+<header class="header">
+  <div class="header-left">
+    <span id="projectTitle"></span>
+  </div>
+  <div class="header-right" onclick="openInfo()">ℹ️</div>
+</header>
+
+<div class="fixed-section">
+
+  <div class="stats">
+
+<div class="stat-card">
+<span>Your Stake</span>
+<strong id="aStake">0.00 Pi</strong>
+
+<div id="stakeStatus"
+style="font-size:12px;color:#666;margin-top:4px">
+</div>
+
+</div>
+
+<div class="stat-card">
+<span>Your Reward</span>
+<strong id="aReward">0.00 Pi</strong>
+</div>
+
+  </div>
+
+  <div class="short-info" id="projectDescription"></div>
+
+  <div class="btns">
+<button class="btn primary" onclick="openModal()">
+Stake
+</button>
+
+<button class="btn secondary" onclick="openWithdrawModal()">
+💸 Withdraw Rewards
+</button>
+</div>
+
+<div class="capital-wrapper">
+<button class="btn capital-btn" onclick="openCapitalModal()">
+🏦 Withdraw Capital
+</button>
+</div>
+
+<div class="scroll-area">
+
+  <div class="scroll-area">
+    <div class="tx-header">
+
+    <h3 id="txTitle">
+        Transaction History
+    </h3>
+
+    <button
+        id="refreshBtn"
+        class="refresh-btn"
+        onclick="manualRefresh()">
+
+        🔄 Refresh
+
+    </button>
+
+</div>
+
+<div id="projectHistory"></div>
+  </div>
+
+</div>
+
+<!-- STAKE MODAL -->
+<div class="modal" id="stakeModal">
+  <div class="modal-box">
+    <h3 id="stakeTitle"></h3>
+
+    <label>Amount (Pi)</label>
+    <input type="number" id="amountInput">
+
+    <small id="minHint"></small>
+
+    <label>Duration</label>
+    <select id="durationSelect"></select>
+
+    <div class="btns">
+      <button class="btn primary" onclick="confirmStake()">Confirm</button>
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
     </div>
   </div>
-  <p id="projectDescription" class="desc">Loading authoritative project data...</p>
-  <div class="grid">
-    <div class="metric"><span>Type</span><strong id="projectType">—</strong></div>
-    <div class="metric"><span>Network</span><strong id="projectNetwork">—</strong></div>
-    <div class="metric"><span>Core Slot</span><strong id="projectSlot">—</strong></div>
-    <div class="metric"><span>Liquidity</span><strong id="projectLiquidity">—</strong></div>
-    <div class="metric"><span>Investors</span><strong id="projectInvestors">—</strong></div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal" id="successModal">
+  <div class="modal-box success">
+    <h3>Stake Successful</h3>
+    <p id="successText"></p>
+    <button class="btn primary" onclick="closeSuccess()">OK</button>
   </div>
-  <div id="lifecycleNote" class="note">Checking project lifecycle...</div>
-  <div id="projectError" class="error" hidden></div>
-</section>
-</main>
+</div>
+
+<!-- INFO MODAL -->
+<div class="modal" id="infoModal">
+  <div class="modal-box">
+    <h3 id="infoTitle"></h3>
+    <p id="infoText"></p>
+    <button class="btn secondary" onclick="closeInfo()">Close</button>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal">
+  <div class="modal-box">
+    <h3>Withdraw Rewards</h3>
+
+    <label>Amount</label>
+
+<input
+    type="number"
+    id="withdrawAmount"
+    min="0.01"
+    step="0.0000001">
+
+    <small id="availableBalance"></small>
+
+    <div style="font-size:12px;color:#666;margin-top:6px">
+Fee (1%): 
+<strong id="withdrawFee">0.00 Pi</strong>
+</div>
+
+<div style="font-size:12px;color:#666">
+Total Deduction:
+<strong id="withdrawTotalDeduction">0.00 Pi</strong>
+</div>
+
+<div style="font-size:12px;color:#666">
+Wallet Receive: 
+<strong id="withdrawReceive">0.00 Pi</strong>
+</div>
+    
+    <label>Wallet Address</label>
+    <input type="text" id="walletAddress">
+
+    <div class="btns">
+      <button class="btn primary" onclick="confirmWithdraw()">Confirm</button>
+      <button class="btn secondary" onclick="closeWithdraw()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAPITAL WITHDRAW MODAL -->
+<div class="modal" id="capitalModal">
+<div class="modal-box">
+
+<h3>Withdraw Capital</h3>
+
+<label>Amount</label>
+
+<input
+    type="number"
+    id="capitalWithdrawAmount"
+    min="0.01"
+    step="0.0000001">
+
+<small id="capitalAvailable"></small>
+
+<div style="font-size:12px;color:#666;margin-top:6px">
+Fee (1%): 
+<strong id="capitalWithdrawFee">0.00 Pi</strong>
+</div>
+
+<div style="font-size:12px;color:#666">
+Total Deduction:
+<strong id="capitalTotalDeduction">0.00 Pi</strong>
+</div>
+
+<div style="font-size:12px;color:#666">
+Wallet Receive: 
+<strong id="capitalWithdrawReceive">0.00 Pi</strong>
+</div>
+
+<label>Wallet Address</label>
+<input type="text" id="capitalWallet">
+
+<div class="btns">
+<button class="btn primary"
+onclick="confirmCapitalWithdraw()">
+Confirm
+</button>
+
+<button class="btn secondary"
+onclick="closeCapitalModal()">
+Cancel
+</button>
+</div>
+
+</div>
+</div>
+  
+<!-- 1. PI SDK -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<!-- 2. AUTH -->
+<script src="js/pi-auth.js"></script>
+
+<!-- 3. PAYMENT (NEW) -->
+<script src="js/pi-payment.js"></script>
+
+<!-- 4. INIT -->
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+  if(typeof initPi === "function"){
+    initPi();
+  }
+
+  if(typeof ensurePiAuth === "function"){
+    await ensurePiAuth();
+  }
+
+});
+</script>
+
+<!-- 5. OTHER FILES -->
+<script src="js/project-config.js"></script>
+<script src="js/unified-transactions.js"></script>
+<script src="js/albukhr-transaction-engine.js"></script>
+<script src="js/smart-liquidity-engine.js"></script>
+<script src="js/staking.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/core/environment-core.js"></script>
-<script src="js/core/supabase-core.js"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://qexmnghilahsvethlxem.supabase.co",
+  "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
+);
+</script>
+
+<script src="js/withdraw.js"></script>
+<!-- Custom App Alert -->
+<script src="js/app-alert.js"></script>
+
+<div id="appAlert" class="app-alert">
+
+  <div class="app-alert-box">
+
+    <h3 id="appAlertTitle">
+      Notice
+    </h3>
+
+    <p id="appAlertText"></p>
+
+    <button onclick="closeAppAlert()">
+      OK
+    </button>
+
+  </div>
+
+</div>
+
 <script src="js/project.js"></script>
+  
 </body>
 </html>
