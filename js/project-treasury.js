@@ -1,26 +1,121 @@
-/* ALBUKHR PROJECT TREASURY v5 — READ-ONLY APP boundary
-   Financial mutations belong to authorized API/Admin flows. */
+/* ALBUKHR PROJECT TREASURY v6 — API-authoritative read boundary */
 (function(window){
-"use strict";
-const T="project_treasury",TX="project_treasury_transactions";
-function sb(){return window.ALBUKHR_SUPABASE?.client||window.albukhrSupabase||null}
-function n(v,d=0){const x=Number(v);return Number.isFinite(x)?x:d}
-function row(r={}){return {...r,liquidity_balance:n(r.liquidity_balance),total_added:n(r.total_added),total_withdrawn:n(r.total_withdrawn),total_reward_funded:n(r.total_reward_funded)}}
-async function fetchProjectTreasuryRow(code){
- if(!code)return {error:"Project code is required"};const c=sb();if(!c)return {error:"Supabase Core is unavailable."};
- const {data,error}=await c.from(T).select("*").eq("project_code",code).maybeSingle();if(error)return {error:error.message};return {success:true,data:data?row(data):null}
-}
-async function getProjectTreasury(code){const r=await fetchProjectTreasuryRow(code);return r.error?r:r.data}
-async function getProjectLiquidity(code){const r=await fetchProjectTreasuryRow(code);return r.data?n(r.data.liquidity_balance):0}
-async function getProjectTreasuryHistory(code,limit=50){const c=sb();if(!c||!code)return [];const {data,error}=await c.from(TX).select("*").eq("project_code",code).order("created_at",{ascending:false}).limit(Math.max(1,n(limit,50)));if(error)return [];return data||[]}
-async function getProjectTreasurySnapshot(code,limit=20){const project=await window.getProjectMeta?.(code);if(!project)return {error:"Project not found"};const t=await fetchProjectTreasuryRow(code);if(t.error)return t;return {success:true,project,treasury:t.data,history:await getProjectTreasuryHistory(code,limit)}}
-async function getAllProjectTreasuries(){const c=sb();if(!c)return [];const {data,error}=await c.from(T).select("*").order("project_name");return error?[]:(data||[]).map(row)}
-async function getProjectTreasuriesByType(type){return (await getAllProjectTreasuries()).filter(x=>String(x.project_type||"").toLowerCase()===String(type||"").toLowerCase())}
-const blocked=async()=>({error:"Treasury mutation is not available in the App. Use the authorized Mainnet API/Admin flow."});
-window.fetchProjectTreasuryRow=fetchProjectTreasuryRow;window.getProjectTreasury=getProjectTreasury;window.getProjectLiquidity=getProjectLiquidity;window.getProjectTreasuryHistory=getProjectTreasuryHistory;window.getProjectTreasurySnapshot=getProjectTreasurySnapshot;window.getAllProjectTreasuries=getAllProjectTreasuries;window.getProjectTreasuriesByType=getProjectTreasuriesByType;
-window.getCoreProjectTreasuries=()=>getProjectTreasuriesByType("core");window.getInternalProjectTreasuries=()=>getProjectTreasuriesByType("internal");window.getExternalProjectTreasuries=()=>getProjectTreasuriesByType("external");
-window.createProjectTreasury=blocked;window.ensureProjectTreasury=async code=>{const r=await fetchProjectTreasuryRow(code);return r.data?r:{error:r.error||"Treasury does not exist."}};
-window.addProjectLiquidity=blocked;window.projectInternalWithdraw=blocked;window.fundRewardFromTreasury=blocked;window.insertTreasuryTransaction=blocked;window.updateTreasuryRow=blocked;
-window.getAllTreasurySnapshots=async()=> (await getAllProjectTreasuries()).map(row);
-window.getTreasuryEngineSummary=async code=>{const r=await fetchProjectTreasuryRow(code);return r.data||{project_code:code,error:r.error||"Treasury not found"}};
+  "use strict";
+  if(window.AlbukhrProjectTreasury) return;
+
+  const MAINNET="mainnet";
+
+  function clean(v){return String(v==null?"":v).trim();}
+  function network(){return clean(window.ALBukhrEnvironment?.getNetwork?.()).toLowerCase();}
+  function mainnet(){return network()===MAINNET;}
+
+  function api(){
+    if(!window.AlbukhrApi || typeof window.AlbukhrApi.get!=="function"){
+      throw new Error("ALBUKHR API Core is unavailable.");
+    }
+    return window.AlbukhrApi;
+  }
+
+  function code(value){
+    const v=clean(value);
+    if(!v) throw new Error("Project code is required.");
+    return v;
+  }
+
+  function numeric(v){
+    const n=Number(v);
+    return Number.isFinite(n)?n:0;
+  }
+
+  async function getProjectTreasury(projectCode){
+    if(!mainnet()) return {success:false,network:network(),configured:false,treasury:null,error:"Treasury is available only on Mainnet."};
+    const result=await api().get(`/api/project-treasury?project_code=${encodeURIComponent(code(projectCode))}`);
+    if(!result || result.success!==true) throw new Error(result?.error||"Unable to load project treasury.");
+    const t=result.data?.treasury||null;
+    return {
+      success:true,
+      network:MAINNET,
+      configured:Boolean(result.data?.configured),
+      project_id:result.data?.project_id||null,
+      project_code:result.data?.project_code||code(projectCode),
+      project_status:result.data?.project_status||null,
+      core_slot:result.data?.core_slot??null,
+      treasury:t?{
+        id:t.id||null,
+        project_id:t.project_id||null,
+        network:t.network||MAINNET,
+        treasury_wallet:clean(t.treasury_wallet),
+        required_liquidity:numeric(t.required_liquidity),
+        verified_liquidity:numeric(t.verified_liquidity),
+        status:clean(t.status).toLowerCase(),
+        created_at:t.created_at||null,
+        updated_at:t.updated_at||null
+      }:null
+    };
+  }
+
+  async function getProjectLiquidity(projectCode){
+    const result=await getProjectTreasury(projectCode);
+    return numeric(result.treasury?.verified_liquidity);
+  }
+
+  async function getProjectTreasuryHistory(projectCode,limit=50){
+    if(!mainnet()) return [];
+    const safeLimit=Math.min(Math.max(Number(limit)||50,1),100);
+    const result=await api().get(
+      `/api/project-treasury-history?project_code=${encodeURIComponent(code(projectCode))}&limit=${safeLimit}`
+    );
+    if(!result || result.success!==true) throw new Error(result?.error||"Unable to load project treasury history.");
+    return Array.isArray(result.data)?result.data:[];
+  }
+
+  async function getProjectTreasurySnapshot(projectCode,limit=20){
+    const treasury=await getProjectTreasury(projectCode);
+    const history=await getProjectTreasuryHistory(projectCode,limit);
+    return {success:true,project_code:treasury.project_code,treasury,history};
+  }
+
+  async function getAllProjectTreasuries(){
+    /* No cross-project treasury listing is exposed to the App. */
+    return [];
+  }
+
+  async function getProjectTreasuriesByType(){
+    return [];
+  }
+
+  const blocked=async()=>({error:"Treasury mutation is not available in the App. Use the authorized Mainnet API/Admin flow."});
+
+  window.fetchProjectTreasuryRow=getProjectTreasury;
+  window.getProjectTreasury=getProjectTreasury;
+  window.getProjectLiquidity=getProjectLiquidity;
+  window.getProjectTreasuryHistory=getProjectTreasuryHistory;
+  window.getProjectTreasurySnapshot=getProjectTreasurySnapshot;
+  window.getAllProjectTreasuries=getAllProjectTreasuries;
+  window.getProjectTreasuriesByType=getProjectTreasuriesByType;
+  window.getCoreProjectTreasuries=()=>[];
+  window.getInternalProjectTreasuries=()=>[];
+  window.getExternalProjectTreasuries=()=>[];
+  window.createProjectTreasury=blocked;
+  window.ensureProjectTreasury=async function(projectCode){
+    const result=await getProjectTreasury(projectCode);
+    return result.configured?result:{error:"Treasury is not configured."};
+  };
+  window.addProjectLiquidity=blocked;
+  window.projectInternalWithdraw=blocked;
+  window.fundRewardFromTreasury=blocked;
+  window.insertTreasuryTransaction=blocked;
+  window.updateTreasuryRow=blocked;
+  window.getAllTreasurySnapshots=async()=>[];
+  window.getTreasuryEngineSummary=async function(projectCode){
+    const result=await getProjectTreasury(projectCode);
+    return result.treasury||{project_code:result.project_code,configured:false};
+  };
+
+  window.AlbukhrProjectTreasury=Object.freeze({
+    getProjectTreasury,
+    getProjectLiquidity,
+    getProjectTreasuryHistory,
+    getProjectTreasurySnapshot
+  });
 })(window);
