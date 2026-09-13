@@ -216,49 +216,21 @@ Cancel
 </div>
 </div>
   
-<!-- 1. PI SDK -->
+<!-- ALBUKHR RUNTIME -->
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-<!-- 2. AUTH -->
-<script src="js/pi-auth.js"></script>
-
-<!-- 3. PAYMENT (NEW) -->
-<script src="js/pi-payment.js"></script>
-
-<!-- 4. INIT -->
-<script>
-document.addEventListener("DOMContentLoaded", async () => {
-
-  if(typeof initPi === "function"){
-    initPi();
-  }
-
-  if(typeof ensurePiAuth === "function"){
-    await ensurePiAuth();
-  }
-
-});
-</script>
-
-<!-- 5. OTHER FILES -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/core/page-auth-guard.js"></script>
+<script src="js/core/albukhr-api-core.js"></script>
 <script src="js/project-config.js"></script>
+<script src="js/staking.js"></script>
 <script src="js/unified-transactions.js"></script>
 <script src="js/albukhr-transaction-engine.js"></script>
-<script src="js/smart-liquidity-engine.js"></script>
-<script src="js/staking.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const supabase = window.supabase.createClient(
-  "https://qexmnghilahsvethlxem.supabase.co",
-  "sb_publishable_mSbWlhVKdmSjasKJC50QYw_5wzgRMe2"
-);
-</script>
-
-<script src="js/withdraw.js"></script>
-<!-- Custom App Alert -->
+<script src="js/project-treasury.js"></script>
 <script src="js/app-alert.js"></script>
+<script src="js/project.js"></script>
 
 <div id="appAlert" class="app-alert">
 
@@ -278,7 +250,5 @@ const supabase = window.supabase.createClient(
 
 </div>
 
-<script src="js/project.js"></script>
-  
 </body>
 </html>
