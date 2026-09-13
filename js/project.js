@@ -216,15 +216,36 @@
       const project = await resolveProject();
       applyProjectUI(project);
 
-      if ($("aStake")) $("aStake").innerText = "0.00 Pi";
-      if ($("aReward")) $("aReward").innerText = "0.00 Pi";
+      const totals = typeof window.getProjectTotals === "function"
+        ? await window.getProjectTotals(requestedProject)
+        : {stake:0,reward:0};
+
+      if ($("aStake")) $("aStake").innerText = `${(Number(totals.stake)||0).toFixed(2)} Pi`;
+      if ($("aReward")) $("aReward").innerText = `${(Number(totals.reward)||0).toFixed(2)} Pi`;
 
       if ($("projectHistory")) {
-        $("projectHistory").innerHTML =
-          `<div style="text-align:center;padding:20px;color:#777">` +
-          `${clean(project.title || project.name) || "ALBUKHR Project"}<br><br>` +
-          `No authoritative user transactions available yet` +
-          `</div>`;
+        const rows = typeof window.getProjectStakes === "function"
+          ? await window.getProjectStakes(requestedProject)
+          : [];
+        if (!rows.length) {
+          $("projectHistory").innerHTML =
+            `<div style="text-align:center;padding:20px;color:#777">` +
+            `${clean(project.title || project.name) || "ALBUKHR Project"}<br><br>` +
+            `No investment transactions yet` +
+            `</div>`;
+        } else {
+          $("projectHistory").innerHTML = rows.map(row => {
+            const amount = (Number(row.amount)||0).toFixed(2);
+            const reward = (Number(row.reward_amount)||0).toFixed(2);
+            const status = clean(row.status).toUpperCase();
+            const unlock = row.unlock_at ? new Date(row.unlock_at).toLocaleDateString() : "—";
+            return `<div style="padding:12px;border-bottom:1px solid #eee">` +
+              `<strong>${amount} Pi</strong> • ${Number(row.duration_days)||0} Days<br>` +
+              `<span>Reward: ${reward} Pi • ${status}</span><br>` +
+              `<small>Unlock: ${unlock}</small>` +
+              `</div>`;
+          }).join("");
+        }
       }
     } catch (e) {
       console.warn("ALBUKHR Project load:", e);
