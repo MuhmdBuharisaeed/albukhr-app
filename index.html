@@ -693,7 +693,9 @@ async function loadHome(){
       await getAllStakesMerged();
 
     const globalStakes=
-      await getGlobalStakes();
+  typeof getGlobalStakes==="function"
+    ? await getGlobalStakes()
+    : [];
 
     if(!Array.isArray(stakes))
       stakes=[];
@@ -848,99 +850,68 @@ async function loadHome(){
 
 function renderPopular(globalMap){
 
-  if(typeof PROJECT_CONFIG==="undefined")
-    return;
+  if(typeof PROJECT_CONFIG==="undefined") return;
 
-  const container=
-    document.getElementById(
-      "popularProjects"
-    );
-
-  if(!container)
-    return;
+  const container=document.getElementById("popularProjects");
+  if(!container) return;
 
   container.innerHTML="";
 
   /*
-    Use every registered project as the base list.
+    PROJECT_CONFIG = registered frontend projects.
+    globalMap = optional live staking statistics.
 
-    globalMap is only an overlay for statistics.
-    This prevents projects with zero staking
-    from disappearing from Popular Projects.
+    A project must not disappear simply because
+    it currently has no staking data.
   */
-  const projectCodes=
-    Object.keys(PROJECT_CONFIG);
-
-  const entries=
-    projectCodes.map(project=>[
-      project,
-      (globalMap&&globalMap[project])||{
-        total:0,
-        investors:0
-      }
-    ]);
-
-  /*
-    If a live project exists in globalMap but is not
-    currently present in PROJECT_CONFIG, do not invent
-    a UI card for it. PROJECT_CONFIG remains the
-    authoritative frontend catalog.
-  */
+  const entries=Object.keys(PROJECT_CONFIG).map(project=>[
+    project,
+    (globalMap&&globalMap[project])||{
+      total:0,
+      investors:0
+    }
+  ]);
 
   entries
-    .sort((a,b)=>{
-
-      const aTotal=
-        Number(a[1]?.total)||0;
-
-      const bTotal=
-        Number(b[1]?.total)||0;
-
-      return bTotal-aTotal;
-
-    })
+    .sort((a,b)=>
+      (Number(b[1]?.total)||0)-
+      (Number(a[1]?.total)||0)
+    )
     .slice(0,10)
-    .forEach(
-      ([project,data],index)=>{
+    .forEach(([project,data],index)=>{
 
-        const config=
-          PROJECT_CONFIG[project];
+      const config=PROJECT_CONFIG[project];
 
-        if(!config)
-          return;
+      if(!config) return;
 
-        const div=
-          document.createElement("div");
+      const div=document.createElement("div");
 
-        div.className=
-          "popular-card";
+      div.className="popular-card";
 
-        div.setAttribute(
-          "data-rank",
-          "#"+(index+1)
-        );
+      div.setAttribute(
+        "data-rank",
+        "#"+(index+1)
+      );
 
-        div.onclick=()=>
-          location.href=
-            "project.html?project="+
-            encodeURIComponent(project);
+      div.onclick=()=>
+        location.href=
+          "project.html?project="+
+          encodeURIComponent(project);
 
-        div.innerHTML=
-          '<div class="popular-icon">'+
-          (config.icon||"")+
-          '</div>'+
-          '<div class="popular-name">'+
-          config.title+
-          '</div>'+
-          '<div class="popular-amount">'+
-          Number(data.total||0).toFixed(2)+
-          ' Pi</div>';
+      div.innerHTML=
+        '<div class="popular-icon">'+
+        (config.icon||"")+
+        '</div>'+
+        '<div class="popular-name">'+
+        config.title+
+        '</div>'+
+        '<div class="popular-amount">'+
+        Number(data.total||0).toFixed(2)+
+        ' Pi</div>';
 
-        container.appendChild(div);
-
-      }
-    );
-}
+      container.appendChild(div);
+    });
+        }
 
 /* =======================================================
    ASSETS
