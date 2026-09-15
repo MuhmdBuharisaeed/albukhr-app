@@ -179,7 +179,9 @@ let resolvedProjectKey = "";
     if ($("amountInput")) $("amountInput").value = "";
 
     const min = typeof window.getMinStake === "function"
-      ? Number(window.getMinStake(requestedProject))
+      ? Number(window.getMinStake(
+  resolvedProjectKey || requestedProject
+))
       : 0;
 
     if ($("minHint")) {
