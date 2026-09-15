@@ -83,3 +83,19 @@
 .asset-status.inactive{
     color:#b6b6b6;
 }
+
+/* =======================================================
+   ALBUKHR PROJECT LOGO — ASSET CARD SIZE FIX
+   Keeps official project logos inside the existing
+   48x48 asset icon container.
+======================================================= */
+
+.asset-icon img.project-logo{
+    width:42px;
+    height:42px;
+    max-width:42px;
+    max-height:42px;
+    object-fit:contain;
+    display:block;
+    margin:0 auto;
+}
