@@ -909,11 +909,16 @@ function renderPopular(globalMap){
         "#"+(index+1)
       );
 
-      div.onclick=()=>
-        location.href=
-          "project.html?project="+
-          encodeURIComponent(project);
+      div.onclick=function(){
+  const projectKey =
+    PROJECT_CONFIG[project]?.slug ||
+    PROJECT_CONFIG[project]?.project_code ||
+    project;
 
+  window.location.href =
+    "project.html?project="+
+    encodeURIComponent(projectKey);
+};
       div.innerHTML=
         '<div class="popular-icon">'+
         (config.icon||"")+
@@ -1014,12 +1019,16 @@ function renderAssets(userMap,globalMap){
     div.className=
       "asset-item";
 
-    div.onclick=()=>
-      location.href=
-        "project.html?project="+
-        encodeURIComponent(
-          item.name
-        );
+    div.onclick=function(){
+  const projectKey =
+    item.config?.slug ||
+    item.config?.project_code ||
+    item.name;
+
+  window.location.href =
+    "project.html?project="+
+    encodeURIComponent(projectKey);
+};
 
     div.innerHTML=
       '<div class="asset-icon">'+
