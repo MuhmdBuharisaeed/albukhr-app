@@ -56,7 +56,6 @@ let resolvedProjectKey = "";
   }
 
    async function resolveProjectKey(){
-  await loadRegistry();
 
   if(typeof window.getProjectConfig !== "function"){
     return "";
@@ -68,12 +67,21 @@ let resolvedProjectKey = "";
     return "";
   }
 
+  /*
+   * Resolve from the local project catalog FIRST.
+   *
+   * This prevents a slow/failed registry request from
+   * preventing an already-known project such as Raheem
+   * from opening.
+   */
   const configs = window.PROJECT_CONFIG;
 
   if(configs && typeof configs === "object"){
+
     const wanted = value.toLowerCase();
 
     for(const key of Object.keys(configs)){
+
       const cfg = configs[key] || {};
 
       if(
@@ -83,17 +91,22 @@ let resolvedProjectKey = "";
         clean(cfg.slug).toLowerCase() === wanted ||
         clean(cfg.title).toLowerCase() === wanted
       ){
+
         return key;
+
       }
+
     }
+
   }
 
-  const cfg = window.getProjectConfig(value);
-
   /*
-   * getProjectConfig() returns a fallback object for an
-   * unknown project. Do not accept that fallback as valid.
+   * getProjectConfig() also supports project code,
+   * slug and title matching.
    */
+  const cfg =
+    window.getProjectConfig(value);
+
   if(
     cfg &&
     (
@@ -102,49 +115,102 @@ let resolvedProjectKey = "";
       cfg.slug
     )
   ){
+
     return cfg.key || value;
+
   }
 
   return "";
    }
 
   async function resolveProject(){
-  await loadRegistry();
 
-  resolvedProjectKey = await resolveProjectKey();
+  /*
+   * Resolve the project immediately from the catalog.
+   * Do NOT block project-page rendering on the registry RPC.
+   */
+  resolvedProjectKey =
+    await resolveProjectKey();
 
   if(!resolvedProjectKey){
+
     throw new Error(
       "Project could not be identified from the page URL."
     );
+
   }
 
-  const cfg = projectConfig();
+  const cfg =
+    projectConfig();
 
   if(!cfg){
+
     throw new Error(
       "Project configuration is unavailable."
     );
+
   }
-    if (!cfg) throw new Error("Project configuration is unavailable.");
 
-    let project = cfg;
+  let project = {
+    ...cfg
+  };
 
-    if (typeof window.getProjectMeta === "function") {
-      try {
-        const meta = await window.getProjectMeta(
-          cfg.project_code || requestedProject
+  /*
+   * Registry enrichment is optional.
+   *
+   * If the authoritative registry is available,
+   * merge its metadata.
+   *
+   * If it fails, the known project configuration
+   * remains usable and the page still renders.
+   */
+  try{
+
+    await loadRegistry();
+
+    if(typeof window.getProjectMeta === "function"){
+
+      const meta =
+        await window.getProjectMeta(
+          cfg.project_code ||
+          requestedProject
         );
-        if (meta) project = {...cfg, ...meta};
-      } catch (_) {}
+
+      if(meta){
+
+        project = {
+          ...cfg,
+          ...meta
+        };
+
+      }
+
     }
 
-    return {
-      ...project,
-      network: clean(project.network || network()).toLowerCase(),
-      status: clean(project.status).toLowerCase()
-    };
+  }catch(_){
+
+    /*
+     * Do not prevent a known registered/catalog project
+     * from rendering because of a registry/network error.
+     */
+
   }
+
+  return {
+    ...project,
+
+    network:
+      clean(
+        project.network ||
+        network()
+      ).toLowerCase(),
+
+    status:
+      clean(
+        project.status
+      ).toLowerCase()
+  };
+      }
 
   function applyProjectUI(project){
     const title = clean(project.title || project.name) || "ALBUKHR Project";
