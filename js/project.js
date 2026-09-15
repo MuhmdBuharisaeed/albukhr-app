@@ -16,7 +16,15 @@
   if (window.AlbukhrProjectPage) return;
 
   const params = new URLSearchParams(window.location.search);
-  const requestedProject = (params.get("project") || "").trim();
+  const requestedProject = (
+  params.get("project") ||
+  params.get("slug") ||
+  params.get("project_code") ||
+  params.get("project_id") ||
+  ""
+).trim();
+
+let resolvedProjectKey = "";
 
   const $ = id => document.getElementById(id);
 
@@ -35,8 +43,11 @@
   }
 
   function projectConfig(){
-    if (typeof window.getProjectConfig !== "function") return null;
-    return window.getProjectConfig(requestedProject);
+  if(typeof window.getProjectConfig !== "function") return null;
+
+  return window.getProjectConfig(
+    resolvedProjectKey || requestedProject
+  );
   }
 
   async function loadRegistry(){
@@ -44,9 +55,77 @@
     return window.loadProjectRegistry();
   }
 
+   async function resolveProjectKey(){
+  await loadRegistry();
+
+  if(typeof window.getProjectConfig !== "function"){
+    return "";
+  }
+
+  const value = clean(requestedProject);
+
+  if(!value){
+    return "";
+  }
+
+  const configs = window.PROJECT_CONFIG;
+
+  if(configs && typeof configs === "object"){
+    const wanted = value.toLowerCase();
+
+    for(const key of Object.keys(configs)){
+      const cfg = configs[key] || {};
+
+      if(
+        String(key).toLowerCase() === wanted ||
+        clean(cfg.project_id).toLowerCase() === wanted ||
+        clean(cfg.project_code).toLowerCase() === wanted ||
+        clean(cfg.slug).toLowerCase() === wanted ||
+        clean(cfg.title).toLowerCase() === wanted
+      ){
+        return key;
+      }
+    }
+  }
+
+  const cfg = window.getProjectConfig(value);
+
+  /*
+   * getProjectConfig() returns a fallback object for an
+   * unknown project. Do not accept that fallback as valid.
+   */
+  if(
+    cfg &&
+    (
+      cfg.project_code ||
+      cfg.project_id ||
+      cfg.slug
+    )
+  ){
+    return cfg.key || value;
+  }
+
+  return "";
+   }
+
   async function resolveProject(){
-    const registry = await loadRegistry();
-    const cfg = projectConfig();
+  await loadRegistry();
+
+  resolvedProjectKey = await resolveProjectKey();
+
+  if(!resolvedProjectKey){
+    throw new Error(
+      "Project could not be identified from the page URL."
+    );
+  }
+
+  const cfg = projectConfig();
+
+  if(!cfg){
+    throw new Error(
+      "Project configuration is unavailable."
+    );
+  }
     if (!cfg) throw new Error("Project configuration is unavailable.");
 
     let project = cfg;
@@ -170,7 +249,7 @@
 
     try {
       const result = await window.addStake({
-        project: requestedProject,
+        project: resolvedProjectKey,
         amount,
         duration
       });
@@ -217,7 +296,9 @@
       applyProjectUI(project);
 
       const totals = typeof window.getProjectTotals === "function"
-        ? await window.getProjectTotals(requestedProject)
+        ? await window.getProjectTotals(
+  resolvedProjectKey || requestedProject
+)
         : {stake:0,reward:0};
 
       if ($("aStake")) $("aStake").innerText = `${(Number(totals.stake)||0).toFixed(2)} Pi`;
@@ -225,7 +306,9 @@
 
       if ($("projectHistory")) {
         const rows = typeof window.getProjectStakes === "function"
-          ? await window.getProjectStakes(requestedProject)
+          ? await window.getProjectStakes(
+  resolvedProjectKey || requestedProject
+)
           : [];
         if (!rows.length) {
           $("projectHistory").innerHTML =
