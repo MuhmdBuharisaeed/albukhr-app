@@ -3,9 +3,10 @@
    File: js/project-navigation.js
 
    Purpose:
-   - Preserve project identity from Home cards to project.html.
-   - Resolves project by slug, project_code, project_id or catalog key.
-   - Does not change card HTML, CSS, Dock Navigation, or UX.
+   - Preserve project identity from Marketplace cards to project.html.
+   - Resolves project by stable project_code, slug, project_id or catalog key.
+   - Supports .project-card without changing the Dock Navigation.
+   - Does not interfere with buttons, links, or form controls.
    - Mainnet/Testnet remains controlled by existing environment core.
 ========================================================= */
 (function (window, document) {
@@ -30,7 +31,8 @@
         cfg.project_code,
         cfg.project_id,
         cfg.id,
-        cfg.title
+        cfg.title,
+        cfg.name
       ].map(clean).filter(Boolean);
 
       if (values.some(v => v.toLowerCase() === wanted)) {
@@ -50,13 +52,9 @@
 
     const cfg = resolved.config;
 
-    /*
-     * Prefer the stable public project_code when available.
-     * slug remains the next stable identifier.
-     * Both are already supported by project.js.
-     */
     return clean(cfg.project_code) ||
            clean(cfg.slug) ||
+           clean(cfg.project_id) ||
            clean(resolved.key);
   }
 
@@ -76,29 +74,22 @@
     window.location.assign(url);
   }
 
-  /*
-   * Public bridge for existing renderers.
-   */
   window.AlbukhrProjectNavigation = Object.freeze({
     resolveKey,
     buildProjectUrl,
     navigate
   });
 
-  /*
-   * Defensive click bridge:
-   * existing cards remain visually and structurally unchanged.
-   * It only intervenes when a project card is clicked.
-   */
   document.addEventListener("click", function (event) {
     const card = event.target.closest(
-      ".popular-card, .asset-item"
+      ".popular-card, .asset-item, .project-card"
     );
 
     if (!card) return;
 
     /*
-     * Do not interfere with a real anchor/button inside a card.
+     * Preserve existing actions such as Invest Now, View Project,
+     * links, and form controls.
      */
     if (
       event.target.closest("a, button, input, textarea, select")
@@ -106,6 +97,10 @@
       return;
     }
 
+    /*
+     * Prefer stable identifiers supplied by the renderer.
+     * This is more reliable than resolving a visible project name.
+     */
     let key =
       card.getAttribute("data-project-key") ||
       card.getAttribute("data-project-code") ||
@@ -113,12 +108,11 @@
       card.getAttribute("data-project-slug");
 
     /*
-     * Existing index.html does not currently expose a
-     * data-project-* attribute, so resolve from the visible title.
+     * Backward-compatible fallback for older cards.
      */
     if (!key) {
       const titleNode = card.querySelector(
-        ".popular-name, .asset-name"
+        ".popular-name, .asset-name, .project-title"
       );
 
       key = titleNode ? clean(titleNode.textContent) : "";
