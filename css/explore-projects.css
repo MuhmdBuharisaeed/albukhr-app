@@ -1,45 +1,468 @@
 /* =========================================================
    ALBUKHR — EXPLORE PROJECTS
-   Surgical additions for registry-driven project cards.
-   Existing layout/styles remain intact.
+   User-side project discovery UI
+   ---------------------------------------------------------
+   Design target:
+   - Clean ALBUKHR green/white ecosystem
+   - Large, readable project cards
+   - Official project logos displayed consistently
+   - Mobile-first layout matching the current user-side UI
+   - Works with registry-driven .project-card markup
+   - No project emoji/icon styling
+   - Does not modify Dock Navigation
 ========================================================= */
 
-.project-card {
-  cursor: pointer;
+:root {
+  --albukhr-green: #0f7a3d;
+  --albukhr-green-dark: #0b6632;
+  --albukhr-green-soft: #e8f6ee;
+  --albukhr-page: #f4f7f5;
+  --albukhr-card: #ffffff;
+  --albukhr-text: #171b18;
+  --albukhr-muted: #69716c;
+  --albukhr-border: #e6ece8;
+  --albukhr-shadow: 0 4px 18px rgba(15, 122, 61, 0.07);
 }
 
-.project-logo-wrap {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  max-width: 44px;
-  max-height: 44px;
-  flex: 0 0 44px;
+/* =========================================================
+   PAGE
+========================================================= */
+
+body[data-page="projects"] {
+  background: var(--albukhr-page);
+  color: var(--albukhr-text);
+}
+
+body[data-page="projects"] .section {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 22px 18px 100px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+body[data-page="projects"] .search-box {
+  width: 100%;
+  min-height: 64px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid rgba(15, 122, 61, 0.04);
+  border-radius: 20px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 2px 0 24px;
+  box-shadow: var(--albukhr-shadow);
+}
+
+body[data-page="projects"] .search-box > span {
+  flex: 0 0 auto;
+  font-size: 25px;
+  line-height: 1;
+  opacity: 0.78;
+}
+
+body[data-page="projects"] .search-box input {
+  width: 100%;
+  min-width: 0;
+  height: 62px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--albukhr-text);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+body[data-page="projects"] .search-box input::placeholder {
+  color: #8a918d;
+  opacity: 1;
+}
+
+body[data-page="projects"] .search-box:focus-within {
+  border-color: rgba(15, 122, 61, 0.22);
+  box-shadow: 0 5px 20px rgba(15, 122, 61, 0.10);
+}
+
+/* =========================================================
+   SECTION TITLES
+========================================================= */
+
+body[data-page="projects"] .section-title {
+  margin: 0 0 12px;
+  padding: 0;
+  color: var(--albukhr-green);
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+body[data-page="projects"] .section-title:not(:first-of-type) {
+  margin-top: 28px;
+}
+
+/* =========================================================
+   PROJECT CARD
+========================================================= */
+
+body[data-page="projects"] .project-card {
+  width: 100%;
+  min-height: 146px;
+  box-sizing: border-box;
+  position: relative;
+
+  background: var(--albukhr-card);
+  border: 1px solid rgba(15, 122, 61, 0.035);
+  border-radius: 22px;
+
+  padding: 20px 18px;
+  margin: 0 0 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  box-shadow: var(--albukhr-shadow);
+
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body[data-page="projects"] .project-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(15, 122, 61, 0.10);
+  box-shadow: 0 7px 24px rgba(15, 122, 61, 0.10);
+}
+
+body[data-page="projects"] .project-card:active {
+  transform: scale(0.992);
+}
+
+/* =========================================================
+   PROJECT LOGO
+   Standardized for every registered project.
+========================================================= */
+
+body[data-page="projects"] .project-icon,
+body[data-page="projects"] .project-logo-wrap {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  max-width: 56px;
+  max-height: 56px;
+
+  flex: 0 0 56px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border-radius: 50%;
   overflow: hidden;
+
+  background: var(--albukhr-green-soft);
 }
 
-.project-logo-wrap img.project-logo {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  max-width: 44px;
-  max-height: 44px;
+body[data-page="projects"] img.project-logo {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  max-width: 56px;
+  max-height: 56px;
+
+  display: block;
+  margin: 0;
+  padding: 0;
+
+  object-fit: contain;
+  object-position: center;
+  border: 0;
+  border-radius: 50%;
+
+  background: var(--albukhr-green-soft);
+}
+
+/*
+ * Some older renderer versions may put the image directly
+ * inside .project-icon. Keep the same sizing.
+ */
+body[data-page="projects"] .project-icon img {
+  width: 56px;
+  height: 56px;
+  max-width: 56px;
+  max-height: 56px;
   object-fit: contain;
   object-position: center;
   display: block;
+  margin: 0;
 }
 
-.project-logo-missing {
-  border: 1px solid #dfe8e2;
-  border-radius: 10px;
-  background: #f5faf7;
-  color: #0f7a3d;
+/* Missing logo state */
+body[data-page="projects"] .project-logo-missing {
+  border: 1px solid #dce9e1;
+  background: #f0f8f3;
+  color: var(--albukhr-green);
+  border-radius: 50%;
   font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+/* =========================================================
+   PROJECT CONTENT
+========================================================= */
+
+body[data-page="projects"] .project-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+}
+
+body[data-page="projects"] .project-title {
+  margin: 0;
+  color: var(--albukhr-text);
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.15px;
+
+  overflow-wrap: anywhere;
+}
+
+body[data-page="projects"] .project-desc {
+  margin: 4px 0 0;
+  color: var(--albukhr-muted);
+  font-size: 14px;
+  line-height: 1.32;
+  font-weight: 400;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+body[data-page="projects"] .project-meta {
+  margin: 7px 0 0;
+  color: var(--albukhr-green);
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+/* =========================================================
+   PROJECT TAG
+========================================================= */
+
+body[data-page="projects"] .project-tag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+
+  margin: 8px 0 0;
+  padding: 5px 11px;
+
+  border-radius: 999px;
+  background: var(--albukhr-green-soft);
+  color: var(--albukhr-green);
+
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+body[data-page="projects"] .project-tag.external {
+  background: #fff5d9;
+  color: #856404;
+}
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+body[data-page="projects"] .project-action {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-left: auto;
+}
+
+body[data-page="projects"] .project-action a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 34px;
+  padding: 0 10px;
+
+  border-radius: 10px;
+
+  color: var(--albukhr-green);
+  background: transparent;
+
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+body[data-page="projects"] .project-action a:hover {
+  background: var(--albukhr-green-soft);
+}
+
+/* =========================================================
+   EMPTY / ERROR
+========================================================= */
+
+body[data-page="projects"] .empty {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 22px 16px;
+  margin: 0 0 14px;
+
+  border: 1px dashed #d8e4dc;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.72);
+  color: #737b76;
+
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  body[data-page="projects"] .section {
+    padding: 18px 14px 96px;
+  }
+
+  body[data-page="projects"] .search-box {
+    min-height: 60px;
+    margin-bottom: 22px;
+    padding: 0 16px;
+    border-radius: 19px;
+  }
+
+  body[data-page="projects"] .search-box input {
+    height: 58px;
+    font-size: 16px;
+  }
+
+  body[data-page="projects"] .section-title {
+    font-size: 17px;
+    margin-bottom: 11px;
+  }
+
+  body[data-page="projects"] .project-card {
+    min-height: 142px;
+    padding: 18px 16px;
+    gap: 14px;
+    border-radius: 21px;
+  }
+
+  body[data-page="projects"] .project-icon,
+  body[data-page="projects"] .project-logo-wrap {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    max-width: 52px;
+    max-height: 52px;
+    flex-basis: 52px;
+  }
+
+  body[data-page="projects"] img.project-logo,
+  body[data-page="projects"] .project-icon img {
+    width: 52px;
+    height: 52px;
+    max-width: 52px;
+    max-height: 52px;
+  }
+
+  body[data-page="projects"] .project-title {
+    font-size: 16px;
+  }
+
+  body[data-page="projects"] .project-desc {
+    font-size: 13px;
+  }
+
+  body[data-page="projects"] .project-meta {
+    font-size: 12px;
+  }
+
+  body[data-page="projects"] .project-action a {
+    min-height: 30px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   VERY NARROW DEVICES
+========================================================= */
+
+@media (max-width: 360px) {
+  body[data-page="projects"] .project-card {
+    gap: 11px;
+    padding: 16px 13px;
+  }
+
+  body[data-page="projects"] .project-icon,
+  body[data-page="projects"] .project-logo-wrap {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    max-width: 48px;
+    max-height: 48px;
+    flex-basis: 48px;
+  }
+
+  body[data-page="projects"] img.project-logo,
+  body[data-page="projects"] .project-icon img {
+    width: 48px;
+    height: 48px;
+    max-width: 48px;
+    max-height: 48px;
+  }
+
+  body[data-page="projects"] .project-action {
+    display: none;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-page="projects"] .project-card {
+    transition: none;
+  }
 }
