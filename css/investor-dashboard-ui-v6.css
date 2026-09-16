@@ -1,0 +1,95 @@
+/* =========================================================
+   ALBUKHR — INVESTOR DASHBOARD V6 UI POLISH
+   Scope: investor dashboard only
+   Does not style or alter Dock Navigation.
+========================================================= */
+
+/* Section heading: create clear separation after quick actions. */
+.section-title{
+    margin:30px 16px 12px;
+    padding:0;
+    font-size:18px;
+    line-height:1.25;
+    font-weight:800;
+    color:#151515;
+}
+
+/* Empty state: remove browser-default button appearance and
+   make the state look like the rest of the dashboard. */
+.empty-investments{
+    margin-top:0;
+    text-align:left;
+}
+
+.empty-investments h3{
+    margin:0;
+    font-size:20px;
+    line-height:1.2;
+    font-weight:800;
+    color:#111;
+}
+
+.empty-investments p{
+    margin:7px 0 16px;
+    font-size:14px;
+    line-height:1.45;
+    color:#666;
+}
+
+.empty-investments .wallet-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:44px;
+    padding:11px 16px;
+    border:0;
+    border-radius:14px;
+    background:linear-gradient(135deg,#0f7a3d,#18a558);
+    color:#fff;
+    font-size:14px;
+    line-height:1;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(15,122,61,.20);
+    -webkit-appearance:none;
+    appearance:none;
+    transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+
+.empty-investments .wallet-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 22px rgba(15,122,61,.24);
+    filter:brightness(1.02);
+}
+
+.empty-investments .wallet-btn:active{
+    transform:scale(.98);
+}
+
+/* Prevent long usernames from visually colliding with the
+   portfolio area on narrow screens. */
+#heroUserName{
+    max-width:100%;
+    overflow-wrap:anywhere;
+}
+
+/* Keep the hero readable on narrow phones. */
+@media(max-width:380px){
+    .section-title{
+        margin:26px 12px 10px;
+        font-size:17px;
+    }
+
+    .empty-investments{
+        margin-left:12px;
+        margin-right:12px;
+    }
+
+    .empty-investments h3{
+        font-size:19px;
+    }
+
+    .empty-investments p{
+        font-size:13px;
+    }
+}
