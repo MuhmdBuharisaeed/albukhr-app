@@ -123,3 +123,5 @@ button,input,select{font:inherit}
   .market-controls select{width:100%}
   .featured-stats{gap:7px}
             }
+
+.project-card{cursor:pointer}.project-card:focus-visible{outline:3px solid rgba(15,122,61,.25);outline-offset:2px}.project-view-btn{width:100%;margin-top:10px;padding:13px 15px;border:1px solid #d8e4dc;border-radius:16px;background:#f7faf8;color:#0f7a3d;font-size:14px;font-weight:750;cursor:pointer}.project-view-btn:hover{background:#eef8f1;border-color:#a9cbb6}.project-view-btn:active{transform:scale(.98)}
