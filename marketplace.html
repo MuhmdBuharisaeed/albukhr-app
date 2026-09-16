@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#0f7a3d">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="assets/logo.png">
-
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/albukhr-ui.css">
 <link rel="stylesheet" href="css/global-header.css">
@@ -21,12 +20,10 @@
 <link rel="stylesheet" href="css/marketplace-app-alert.css">
 </head>
 <body>
-
 <header class="header">
   <div class="header-left"><span class="brand">ALBUKHR</span></div>
   <div class="header-right">
-    <button type="button" class="header-btn notification-btn"
-      aria-label="Notifications"
+    <button type="button" class="header-btn notification-btn" aria-label="Notifications"
       onclick="window.openNotifications?.()">
       <svg class="header-icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
@@ -43,16 +40,14 @@
     <svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>
     </svg>
-    <input type="search" id="projectSearch"
-      placeholder="Search projects..." autocomplete="off"
-      aria-label="Search projects">
+    <input type="search" id="projectSearch" placeholder="Search projects..."
+      autocomplete="off" aria-label="Search projects">
   </label>
-
   <select id="sortProjects" aria-label="Sort projects">
     <option value="">Sort</option>
     <option value="roi">Highest ROI</option>
     <option value="liquidity">Highest Liquidity</option>
-    <option value="risk">Lowest Risk</option>
+    <option value="investors">Most Investors</option>
   </select>
 </section>
 
@@ -65,38 +60,46 @@
 <section class="marketplace" id="projectList" aria-live="polite"></section>
 </main>
 
-<div id="investModal" class="app-alert" role="dialog" aria-modal="true">
+<div id="investModal" class="app-alert" role="dialog" aria-modal="true" aria-labelledby="investProjectName">
   <div class="app-alert-box">
     <div class="app-alert-header">
       <h3>Invest in Project</h3>
-      <button type="button" class="app-alert-close"
-        onclick="closeInvestModal()" aria-label="Close">
+      <button type="button" class="app-alert-close" onclick="closeInvestModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M6 6l12 12M18 6 6 18"/>
         </svg>
       </button>
     </div>
     <p id="investProjectName"></p>
+
     <label class="modal-field-label" for="investAmount">Investment amount</label>
     <div class="amount-input-wrap">
       <input type="number" id="investAmount" placeholder="Enter amount"
         min="0" step="0.01" inputmode="decimal">
       <span>Pi</span>
     </div>
+
+    <label class="modal-field-label" for="investDuration">Investment duration</label>
+    <div class="amount-input-wrap">
+      <select id="investDuration" aria-label="Investment duration"
+        style="width:100%;padding:13px;border:0;outline:0;background:transparent;"></select>
+    </div>
+
+    <p id="investPreview" style="font-size:12px;color:#666;margin:0 0 14px;"></p>
+
     <div class="app-alert-actions">
-      <button type="button" class="app-alert-btn" onclick="confirmInvestment()">
+      <button type="button" id="investConfirmButton" class="app-alert-btn" onclick="confirmInvestment()">
         Invest Now
       </button>
     </div>
   </div>
 </div>
 
-<div id="appAlert" class="app-alert" role="alertdialog" aria-modal="true">
+<div id="appAlert" class="app-alert" role="alertdialog" aria-modal="true" aria-labelledby="appAlertTitle">
   <div class="app-alert-box">
     <div class="app-alert-header">
       <h3 id="appAlertTitle">Notice</h3>
-      <button type="button" class="app-alert-close"
-        onclick="window.closeAppAlert?.()" aria-label="Close">
+      <button type="button" class="app-alert-close" onclick="window.closeAppAlert?.()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M6 6l12 12M18 6 6 18"/>
         </svg>
@@ -105,19 +108,21 @@
     <div id="appAlertIcon" class="app-alert-icon" aria-hidden="true"></div>
     <p id="appAlertText">Message...</p>
     <div class="app-alert-actions">
-      <button type="button" id="appAlertButton"
-        class="app-alert-btn" onclick="window.closeAppAlert?.()">OK</button>
+      <button type="button" id="appAlertButton" class="app-alert-btn"
+        onclick="window.closeAppAlert?.()">OK</button>
     </div>
   </div>
 </div>
 
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-core.js"></script>
-<script src="js/pi-auth.js"></script>
-<script src="js/pi-payment.js"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/core/albukhr-api-core.js"></script>
+<script src="js/project-config.js"></script>
 <script src="js/staking.js"></script>
-<script src="js/ecosystem-engine.js"></script>
-<script src="js/app-alert.js"></script>
+<script src="js/marketplace/marketplace-engine.js"></script>
 <script src="js/marketplace/marketplace-dashboard.js"></script>
 </body>
 </html>
