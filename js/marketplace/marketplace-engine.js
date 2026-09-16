@@ -1,15 +1,4 @@
-/* =========================================================
-   ALBUKHR MARKETPLACE ENGINE — SERVER AUTHORITATIVE
-   Destination: /js/marketplace/marketplace-engine.js
-
-   Public project data is obtained only through the controlled
-   get_public_project_registry RPC. No direct public.projects
-   table reads. Network is supplied by Environment Core.
-
-   Lifecycle:
-   - APPROVED: visible/read-only
-   - ACTIVE: visible and eligible for investment delegation
-========================================================= */
+/* ALBUKHR MARKETPLACE ENGINE — SERVER AUTHORITATIVE */
 "use strict";
 (() => {
   const norm = v => String(v ?? "").trim().toLowerCase();
@@ -62,15 +51,11 @@
     const q = norm(code);
     if (!q) return null;
     return (await getProjects()).find(p =>
-      norm(p.project_code) === q ||
-      norm(p.slug) === q ||
-      norm(p.id) === q
+      norm(p.project_code) === q || norm(p.slug) === q || norm(p.id) === q
     ) || null;
   }
 
-  async function getProjectMetrics(code) {
-    const p = await getProject(code);
-    if (!p) return null;
+  function metrics(p) {
     return {
       ...p,
       code: p.project_code,
@@ -79,23 +64,18 @@
       liquidity: Number(p.liquidity || 0),
       investors: Number(p.investors || 0),
       roi: Number(p.roi || 0),
-      riskScore: 0,
+      riskScore: null,
       riskLevel: "UNKNOWN"
     };
   }
 
+  async function getProjectMetrics(code) {
+    const p = await getProject(code);
+    return p ? metrics(p) : null;
+  }
+
   async function getMarketMetrics() {
-    return (await getProjects()).map(p => ({
-      ...p,
-      code: p.project_code,
-      title: p.name,
-      type: p.project_type,
-      liquidity: Number(p.liquidity || 0),
-      investors: Number(p.investors || 0),
-      roi: Number(p.roi || 0),
-      riskScore: 0,
-      riskLevel: "UNKNOWN"
-    }));
+    return (await getProjects()).map(metrics);
   }
 
   async function getMarketLeaderboard(sort = "default") {
@@ -151,15 +131,14 @@
       throw new Error("Network mismatch.");
     }
 
-    if (!window.AlbukhrEcosystem || typeof window.AlbukhrEcosystem.invest !== "function") {
-      throw new Error("ALBUKHR investment engine is unavailable.");
+    if (!window.AlbukhrStaking || typeof window.AlbukhrStaking.addStake !== "function") {
+      throw new Error("ALBUKHR staking engine is unavailable.");
     }
 
-    return window.AlbukhrEcosystem.invest({
-      ...payload,
+    return window.AlbukhrStaking.addStake({
       project: p.project_code,
       amount,
-      network: currentNetwork
+      duration: Number(payload.duration)
     });
   }
 
