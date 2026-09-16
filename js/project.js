@@ -1,10 +1,11 @@
 /* =========================================================
-   ALBUKHR PROJECT PAGE ENGINE v4
+   ALBUKHR PROJECT PAGE ENGINE v5
    Mainnet/Testnet-aware integration boundary
    ---------------------------------------------------------
    - Uses Environment Core / Supabase Core / Pi Auth Core
    - Uses authoritative Project Registry metadata
    - APPROVED is read-only; ACTIVE is investable
+   - Withdrawals remain disabled until authoritative payout contract exists
    - No LocalStorage
    - No browser-authoritative financial ledger
    - No guessed Supabase tables/RPCs
@@ -17,14 +18,15 @@
 
   const params = new URLSearchParams(window.location.search);
   const requestedProject = (
-  params.get("project") ||
-  params.get("slug") ||
-  params.get("project_code") ||
-  params.get("project_id") ||
-  ""
-).trim();
+    params.get("project") ||
+    params.get("slug") ||
+    params.get("project_code") ||
+    params.get("project_id") ||
+    ""
+  ).trim();
 
-let resolvedProjectKey = "";
+  let resolvedProjectKey = "";
+  let currentProject = null;
 
   const $ = id => document.getElementById(id);
 
@@ -43,11 +45,8 @@ let resolvedProjectKey = "";
   }
 
   function projectConfig(){
-  if(typeof window.getProjectConfig !== "function") return null;
-
-  return window.getProjectConfig(
-    resolvedProjectKey || requestedProject
-  );
+    if(typeof window.getProjectConfig !== "function") return null;
+    return window.getProjectConfig(resolvedProjectKey || requestedProject);
   }
 
   async function loadRegistry(){
@@ -55,167 +54,81 @@ let resolvedProjectKey = "";
     return window.loadProjectRegistry();
   }
 
-   async function resolveProjectKey(){
+  async function resolveProjectKey(){
+    if(typeof window.getProjectConfig !== "function") return "";
 
-  if(typeof window.getProjectConfig !== "function"){
-    return "";
-  }
+    const value = clean(requestedProject);
+    if(!value) return "";
 
-  const value = clean(requestedProject);
-
-  if(!value){
-    return "";
-  }
-
-  /*
-   * Resolve from the local project catalog FIRST.
-   *
-   * This prevents a slow/failed registry request from
-   * preventing an already-known project such as Raheem
-   * from opening.
-   */
-  const configs = window.PROJECT_CONFIG;
-
-  if(configs && typeof configs === "object"){
-
-    const wanted = value.toLowerCase();
-
-    for(const key of Object.keys(configs)){
-
-      const cfg = configs[key] || {};
-
-      if(
-        String(key).toLowerCase() === wanted ||
-        clean(cfg.project_id).toLowerCase() === wanted ||
-        clean(cfg.project_code).toLowerCase() === wanted ||
-        clean(cfg.slug).toLowerCase() === wanted ||
-        clean(cfg.title).toLowerCase() === wanted
-      ){
-
-        return key;
-
+    const configs = window.PROJECT_CONFIG;
+    if(configs && typeof configs === "object"){
+      const wanted = value.toLowerCase();
+      for(const key of Object.keys(configs)){
+        const cfg = configs[key] || {};
+        if(
+          String(key).toLowerCase() === wanted ||
+          clean(cfg.project_id).toLowerCase() === wanted ||
+          clean(cfg.project_code).toLowerCase() === wanted ||
+          clean(cfg.slug).toLowerCase() === wanted ||
+          clean(cfg.title).toLowerCase() === wanted
+        ) return key;
       }
-
     }
 
+    const cfg = window.getProjectConfig(value);
+    if(cfg && (cfg.project_code || cfg.project_id || cfg.slug)){
+      return cfg.key || value;
+    }
+    return "";
   }
-
-  /*
-   * getProjectConfig() also supports project code,
-   * slug and title matching.
-   */
-  const cfg =
-    window.getProjectConfig(value);
-
-  if(
-    cfg &&
-    (
-      cfg.project_code ||
-      cfg.project_id ||
-      cfg.slug
-    )
-  ){
-
-    return cfg.key || value;
-
-  }
-
-  return "";
-   }
 
   async function resolveProject(){
-
-  /*
-   * Resolve the project immediately from the catalog.
-   * Do NOT block project-page rendering on the registry RPC.
-   */
-  resolvedProjectKey =
-    await resolveProjectKey();
-
-  if(!resolvedProjectKey){
-
-    throw new Error(
-      "Project could not be identified from the page URL."
-    );
-
-  }
-
-  const cfg =
-    projectConfig();
-
-  if(!cfg){
-
-    throw new Error(
-      "Project configuration is unavailable."
-    );
-
-  }
-
-  let project = {
-    ...cfg
-  };
-
-  /*
-   * Registry enrichment is optional.
-   *
-   * If the authoritative registry is available,
-   * merge its metadata.
-   *
-   * If it fails, the known project configuration
-   * remains usable and the page still renders.
-   */
-  try{
-
-    await loadRegistry();
-
-    if(typeof window.getProjectMeta === "function"){
-
-      const meta =
-        await window.getProjectMeta(
-          cfg.project_code ||
-          requestedProject
-        );
-
-      if(meta){
-
-        project = {
-          ...cfg,
-          ...meta
-        };
-
-      }
-
+    resolvedProjectKey = await resolveProjectKey();
+    if(!resolvedProjectKey){
+      throw new Error("Project could not be identified from the page URL.");
     }
 
-  }catch(_){
+    const cfg = projectConfig();
+    if(!cfg){
+      throw new Error("Project configuration is unavailable.");
+    }
 
-    /*
-     * Do not prevent a known registered/catalog project
-     * from rendering because of a registry/network error.
-     */
+    let project = { ...cfg };
 
+    try{
+      await loadRegistry();
+      if(typeof window.getProjectMeta === "function"){
+        const meta = await window.getProjectMeta(cfg.project_code || requestedProject);
+        if(meta) project = { ...cfg, ...meta };
+      }
+    }catch(_){
+      /* Known catalog project remains usable if registry enrichment fails. */
+    }
+
+    currentProject = {
+      ...project,
+      network: clean(project.network || network()).toLowerCase(),
+      status: clean(project.status).toLowerCase()
+    };
+
+    return currentProject;
   }
 
-  return {
-    ...project,
-
-    network:
-      clean(
-        project.network ||
-        network()
-      ).toLowerCase(),
-
-    status:
-      clean(
-        project.status
-      ).toLowerCase()
-  };
-      }
+  function setButtonState(button, enabled, text, title){
+    if(!button) return;
+    button.disabled = !enabled;
+    button.setAttribute("aria-disabled", enabled ? "false" : "true");
+    if(title) button.title = title;
+    if(text) button.innerText = text;
+    button.style.opacity = enabled ? "1" : "0.55";
+    button.style.cursor = enabled ? "pointer" : "not-allowed";
+  }
 
   function applyProjectUI(project){
     const title = clean(project.title || project.name) || "ALBUKHR Project";
     const desc = clean(project.desc);
     const info = clean(project.info);
+    const status = clean(project.status).toLowerCase();
 
     if ($("txTitle")) $("txTitle").innerText = `${title} Transactions`;
     document.title = `${title} • ALBUKHR`;
@@ -225,29 +138,70 @@ let resolvedProjectKey = "";
     if ($("infoText")) $("infoText").innerText = info;
     if ($("stakeTitle")) $("stakeTitle").innerText = `Stake in ${title}`;
 
-    const status = clean(project.status).toUpperCase();
     const statusText = $("stakeStatus");
     if (statusText) {
-      if (status === "ACTIVE") {
+      if (status === "active" && isMainnet()) {
         statusText.innerText = "Investment available.";
-      } else if (status === "APPROVED") {
+      } else if (status === "approved") {
         statusText.innerText = "Approved project — investment is not active yet.";
+      } else if (status === "active" && !isMainnet()) {
+        statusText.innerText = "Investment is available only on ALBUKHR Mainnet.";
       } else if (status) {
-        statusText.innerText = `Investment unavailable: ${status}.`;
+        statusText.innerText = `Investment unavailable: ${status.toUpperCase()}.`;
       } else {
         statusText.innerText = "Project investment status is unavailable.";
       }
     }
+
+    const stakeButton = document.querySelector(".btns .btn.primary");
+    const stakeEnabled = isMainnet() && status === "active";
+    setButtonState(
+      stakeButton,
+      stakeEnabled,
+      "Stake",
+      stakeEnabled ? "Invest in this active project" : "Investment is not currently available"
+    );
+
+    const withdrawButton = document.querySelector(".btns .btn.secondary");
+    setButtonState(
+      withdrawButton,
+      false,
+      "💸 Withdraw Rewards",
+      "Reward withdrawals are not currently enabled"
+    );
+
+    const capitalButton = document.querySelector(".capital-wrapper .capital-btn");
+    setButtonState(
+      capitalButton,
+      false,
+      "🏦 Withdraw Capital",
+      "Capital withdrawals are not currently enabled"
+    );
   }
 
-  function openModal(){
+  async function openModal(){
+    const project = currentProject || await resolveProject();
+    const status = clean(project.status).toLowerCase();
+
+    if(!isMainnet()){
+      alertUser("Mainnet Only", "Investment is available only on ALBUKHR Mainnet.");
+      return;
+    }
+    if(status !== "active"){
+      alertUser(
+        "Investment Unavailable",
+        status === "approved"
+          ? "This project is approved but not active for investment yet."
+          : "This project is not currently available for investment."
+      );
+      return;
+    }
+
     const cfg = projectConfig() || {};
     if ($("amountInput")) $("amountInput").value = "";
 
     const min = typeof window.getMinStake === "function"
-      ? Number(window.getMinStake(
-  resolvedProjectKey || requestedProject
-))
+      ? Number(window.getMinStake(resolvedProjectKey || requestedProject))
       : 0;
 
     if ($("minHint")) {
@@ -266,24 +220,34 @@ let resolvedProjectKey = "";
       });
     }
 
-    $("stakeModal") && ($("stakeModal").style.display = "flex");
+    if ($("stakeModal")) $("stakeModal").style.display = "flex";
   }
 
   function closeModal(){ if ($("stakeModal")) $("stakeModal").style.display = "none"; }
   function closeSuccess(){ if ($("successModal")) $("successModal").style.display = "none"; }
   function openInfo(){ if ($("infoModal")) $("infoModal").style.display = "flex"; }
   function closeInfo(){ if ($("infoModal")) $("infoModal").style.display = "none"; }
-  function closeWithdraw(){ if ($("withdrawModal")) $("withdrawModal").style.display = "none"; }
-  function openCapitalModal(){ if ($("capitalModal")) $("capitalModal").style.display = "flex"; }
-  function closeCapitalModal(){ if ($("capitalModal")) $("capitalModal").style.display = "none"; }
 
   async function openWithdrawModal(){
-    if ($("availableBalance")) $("availableBalance").innerText = "Available: 0.00 Pi";
-    if ($("withdrawModal")) $("withdrawModal").style.display = "flex";
+    alertUser(
+      "Withdrawal Unavailable",
+      "Reward withdrawals are not enabled until the authoritative rewards/withdrawal contract is deployed."
+    );
   }
 
+  function closeWithdraw(){ if ($("withdrawModal")) $("withdrawModal").style.display = "none"; }
+
+  async function openCapitalModal(){
+    alertUser(
+      "Capital Withdrawal Unavailable",
+      "Capital withdrawals are not enabled until the authoritative withdrawal contract is deployed."
+    );
+  }
+
+  function closeCapitalModal(){ if ($("capitalModal")) $("capitalModal").style.display = "none"; }
+
   async function confirmStake(){
-    const project = await resolveProject();
+    const project = currentProject || await resolveProject();
     const status = clean(project.status).toLowerCase();
 
     if (!isMainnet()) {
@@ -364,9 +328,7 @@ let resolvedProjectKey = "";
       applyProjectUI(project);
 
       const totals = typeof window.getProjectTotals === "function"
-        ? await window.getProjectTotals(
-  resolvedProjectKey || requestedProject
-)
+        ? await window.getProjectTotals(resolvedProjectKey || requestedProject)
         : {stake:0,reward:0};
 
       if ($("aStake")) $("aStake").innerText = `${(Number(totals.stake)||0).toFixed(2)} Pi`;
@@ -374,9 +336,7 @@ let resolvedProjectKey = "";
 
       if ($("projectHistory")) {
         const rows = typeof window.getProjectStakes === "function"
-          ? await window.getProjectStakes(
-  resolvedProjectKey || requestedProject
-)
+          ? await window.getProjectStakes(resolvedProjectKey || requestedProject)
           : [];
         if (!rows.length) {
           $("projectHistory").innerHTML =
