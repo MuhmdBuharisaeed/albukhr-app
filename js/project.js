@@ -54,32 +54,71 @@
     return window.loadProjectRegistry();
   }
 
+  function configHasIdentity(cfg){
+    return !!(
+      cfg &&
+      (
+        clean(cfg.project_code) ||
+        clean(cfg.project_id) ||
+        clean(cfg.slug)
+      )
+    );
+  }
+
   async function resolveProjectKey(){
     if(typeof window.getProjectConfig !== "function") return "";
 
     const value = clean(requestedProject);
     if(!value) return "";
 
-    const configs = window.PROJECT_CONFIG;
-    if(configs && typeof configs === "object"){
-      const wanted = value.toLowerCase();
-      for(const key of Object.keys(configs)){
-        const cfg = configs[key] || {};
-        if(
-          String(key).toLowerCase() === wanted ||
-          clean(cfg.project_id).toLowerCase() === wanted ||
-          clean(cfg.project_code).toLowerCase() === wanted ||
-          clean(cfg.slug).toLowerCase() === wanted ||
-          clean(cfg.title).toLowerCase() === wanted
-        ) return key;
+    function findInConfig(){
+      const configs = window.PROJECT_CONFIG;
+
+      if(configs && typeof configs === "object"){
+        const wanted = value.toLowerCase();
+
+        for(const key of Object.keys(configs)){
+          const cfg = configs[key] || {};
+
+          if(
+            String(key).toLowerCase() === wanted ||
+            clean(cfg.project_id).toLowerCase() === wanted ||
+            clean(cfg.project_code).toLowerCase() === wanted ||
+            clean(cfg.slug).toLowerCase() === wanted ||
+            clean(cfg.title).toLowerCase() === wanted ||
+            clean(cfg.name).toLowerCase() === wanted
+          ){
+            return key;
+          }
+        }
       }
+
+      const cfg = window.getProjectConfig(value);
+      return configHasIdentity(cfg) ? (cfg.key || value) : "";
     }
 
-    const cfg = window.getProjectConfig(value);
-    if(cfg && (cfg.project_code || cfg.project_id || cfg.slug)){
-      return cfg.key || value;
+    /*
+     * First resolve known catalog projects immediately.
+     */
+    let key = findInConfig();
+    if(key) return key;
+
+    /*
+     * Critical registry bridge:
+     * Marketplace can contain future registered Core/Internal/External
+     * projects that are not hard-coded in project-config.js.
+     *
+     * Load the authoritative network-specific registry, then retry
+     * resolution after project-config.js has merged the registry rows.
+     */
+    try{
+      await loadRegistry();
+    }catch(_){
+      /* Preserve the existing error path below. */
     }
-    return "";
+
+    key = findInConfig();
+    return key;
   }
 
   async function resolveProject(){
@@ -338,6 +377,7 @@
         const rows = typeof window.getProjectStakes === "function"
           ? await window.getProjectStakes(resolvedProjectKey || requestedProject)
           : [];
+
         if (!rows.length) {
           $("projectHistory").innerHTML =
             `<div style="text-align:center;padding:20px;color:#777">` +
@@ -350,6 +390,7 @@
             const reward = (Number(row.reward_amount)||0).toFixed(2);
             const status = clean(row.status).toUpperCase();
             const unlock = row.unlock_at ? new Date(row.unlock_at).toLocaleDateString() : "—";
+
             return `<div style="padding:12px;border-bottom:1px solid #eee">` +
               `<strong>${amount} Pi</strong> • ${Number(row.duration_days)||0} Days<br>` +
               `<span>Reward: ${reward} Pi • ${status}</span><br>` +
