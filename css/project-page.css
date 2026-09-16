@@ -1,0 +1,57 @@
+/* ALBUKHR Project Page Header — scoped to project.html */
+.project-page-header{
+  width:100%;
+  min-width:0;
+  height:60px;
+  padding:0 16px;
+  overflow:hidden;
+}
+
+.project-header-left{
+  min-width:0;
+  max-width:calc(100% - 54px);
+  flex:1 1 auto;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+}
+
+.project-header-title{
+  display:block;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:0;
+  color:#fff;
+  font-size:20px;
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-align:left;
+}
+
+.project-page-header .project-header-title::before,
+.project-page-header .project-header-title::after{
+  content:none !important;
+  display:none !important;
+}
+
+.project-header-right{
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
+  margin-left:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+@media(max-width:380px){
+  .project-page-header{padding:0 12px}
+  .project-header-title{font-size:18px}
+  .project-header-right{margin-left:6px}
+}
