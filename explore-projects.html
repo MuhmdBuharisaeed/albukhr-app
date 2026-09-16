@@ -7,42 +7,45 @@
 
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/global-header.css">
-
-<link rel="stylesheet" href="css/explore-projects.css" />
+<link rel="stylesheet" href="css/explore-projects.css">
 
 </head>
 
 <body data-page="projects">
 
 <header class="header">
-
   <div class="header-left">
-  <span class="brand">ALBUKHR</span>
+    <span class="brand">ALBUKHR</span>
   </div>
-  
 </header>
 
 <section class="section">
 
   <div class="search-box">
-    🔍
-    <input id="searchInput" placeholder="Search projects...">
+    <span aria-hidden="true">🔍</span>
+    <input
+      id="searchInput"
+      type="search"
+      autocomplete="off"
+      placeholder="Search projects..."
+      aria-label="Search projects"
+    >
   </div>
 
   <div class="section-title">Albukhr Core Projects</div>
-  <div id="internalList"></div>
+  <div id="internalList" aria-live="polite"></div>
 
   <div class="section-title">Verified External Projects</div>
-  <div id="externalList"></div>
+  <div id="externalList" aria-live="polite"></div>
 
 </section>
 
+<!-- ALBUKHR runtime: same environment + Supabase Core used by the current app -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
 <script src="js/project-config.js"></script>
-<script src="js/staking.js"></script>
-<script src="staking-external.js"></script>
-<script src="js/core/albukhr-core.js"></script>
-<script src="js/external/external-engine.js"></script>
-
+<script src="js/project-navigation.js"></script>
 <script src="js/explore-projects.js"></script>
 
 </body>
