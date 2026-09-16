@@ -100,8 +100,10 @@
       const active = String(p.status || "").toLowerCase() === "active";
       const statusClass = active ? "roi-badge" : "liquidity-badge";
       const code = p.project_code || p.slug || p.id;
+
       return `
-        <article class="project-card">
+        <article class="project-card"
+          data-project-code="${esc(String(code))}">
           <div class="project-header">
             <div class="project-icon">${logoHTML(p)}</div>
             <div style="min-width:0;flex:1">
