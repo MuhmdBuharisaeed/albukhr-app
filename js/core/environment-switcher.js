@@ -1,129 +1,57 @@
 /* =========================================================
    ALBUKHR ENVIRONMENT SWITCHER
-   File:
-   js/core/environment-switcher.js
+   Mainnet/Testnet navigation with secure Testnet handoff.
 
-   Depends on:
-   js/core/environment-core.js
-
-   Purpose:
-   - Control MAINNET / TESTNET switching
-   - Use ALBukhrEnvironment as the single source
-   - Switch only between official ALBUKHR environments
-   - Keep UI placement controlled by the existing HTML
-   - Do not modify Dock Navigation
-   - Do not store environment in LocalStorage
+   IMPORTANT:
+   - Mainnet -> Testnet MUST pass through Mainnet Pi login.
+   - Testnet -> Mainnet may navigate directly to Mainnet.
+   - No LocalStorage is used.
+   - Dock Navigation is not modified.
 ========================================================= */
 
 (function (window) {
 
   "use strict";
 
-
-  /* =======================================================
-     CORE DEPENDENCY CHECK
-  ======================================================= */
-
   if (!window.ALBukhrEnvironment) {
-
-    console.error(
-      "❌ ALBUKHR Environment Core is missing."
-    );
-
+    console.error("❌ ALBUKHR Environment Core is missing.");
     return;
-
   }
 
-
-  const Environment =
-    window.ALBukhrEnvironment;
-
-
-  /* =======================================================
-     ELEMENT REFERENCES
-  ======================================================= */
+  const Environment = window.ALBukhrEnvironment;
 
   function getSwitcher() {
-
-    return document.getElementById(
-      "environmentSwitcher"
-    );
-
+    return document.getElementById("environmentSwitcher");
   }
-
 
   function getLabel() {
-
-    return document.getElementById(
-      "environmentLabel"
-    );
-
+    return document.getElementById("environmentLabel");
   }
-
 
   function getDot() {
-
-    return document.getElementById(
-      "environmentDot"
-    );
-
+    return document.getElementById("environmentDot");
   }
-
-
-  /* =======================================================
-     UPDATE SWITCHER UI
-  ======================================================= */
 
   function updateUI() {
 
-    const switcher =
-      getSwitcher();
-
-    const label =
-      getLabel();
-
-    const dot =
-      getDot();
-
+    const switcher = getSwitcher();
+    const label = getLabel();
 
     if (!switcher) {
-
-      console.warn(
-        "⚠️ ALBUKHR environment switcher element not found."
-      );
-
+      console.warn("⚠️ ALBUKHR environment switcher element not found.");
       return;
-
     }
 
+    const key = Environment.getKey();
 
-    const key =
-      Environment.getKey();
-
-
-    /* Remove previous state */
-
-    switcher.classList.remove(
-      "mainnet",
-      "testnet"
-    );
-
-
-    /* =====================================================
-       MAINNET
-    ===================================================== */
+    switcher.classList.remove("mainnet", "testnet");
 
     if (key === "mainnet") {
 
-      switcher.classList.add(
-        "mainnet"
-      );
+      switcher.classList.add("mainnet");
 
       if (label) {
-
-        label.textContent =
-          "MAINNET";
-
+        label.textContent = "MAINNET";
       }
 
       switcher.setAttribute(
@@ -137,25 +65,14 @@
       );
 
       return;
-
     }
-
-
-    /* =====================================================
-       TESTNET
-    ===================================================== */
 
     if (key === "testnet") {
 
-      switcher.classList.add(
-        "testnet"
-      );
+      switcher.classList.add("testnet");
 
       if (label) {
-
-        label.textContent =
-          "TESTNET";
-
+        label.textContent = "TESTNET";
       }
 
       switcher.setAttribute(
@@ -169,19 +86,10 @@
       );
 
       return;
-
     }
 
-
-    /* =====================================================
-       UNKNOWN ENVIRONMENT
-    ===================================================== */
-
     if (label) {
-
-      label.textContent =
-        "UNKNOWN";
-
+      label.textContent = "UNKNOWN";
     }
 
     switcher.disabled = true;
@@ -190,162 +98,114 @@
       "aria-label",
       "Environment unavailable"
     );
-
   }
-
-
-  /* =======================================================
-     GET TARGET ENVIRONMENT
-  ======================================================= */
 
   function getTargetEnvironment() {
 
     if (Environment.isMainnet()) {
-
       return Environment.environments.testnet;
-
     }
-
 
     if (Environment.isTestnet()) {
-
       return Environment.environments.mainnet;
-
     }
 
-
     return null;
-
   }
 
+  function buildTestnetEntryUrl() {
 
-  /* =======================================================
-     SWITCH ENVIRONMENT
-  ======================================================= */
+    /*
+      The Testnet application requires a short-lived,
+      one-time access code.
+
+      Therefore Mainnet cannot send the browser directly
+      to test.albukhr.com. It must first authenticate the
+      Pi user on Mainnet, then Mainnet login.js invokes
+      mainnet-testnet-handoff.js.
+    */
+
+    return (
+      Environment.environments.mainnet.appUrl +
+      "/login.html?returnTo=testnet"
+    );
+  }
 
   function switchEnvironment() {
 
-    const target =
-      getTargetEnvironment();
+    if (Environment.isMainnet()) {
 
+      console.info(
+        "🔄 ALBUKHR environment switch: MAINNET → TESTNET AUTH GATE"
+      );
 
-    if (!target) {
-
-      console.error(
-        "❌ Cannot switch environment."
+      window.location.assign(
+        buildTestnetEntryUrl()
       );
 
       return;
-
     }
 
+    if (Environment.isTestnet()) {
 
-    const current =
-      Environment.getKey();
+      const target = Environment.environments.mainnet;
 
+      console.info(
+        "🔄 ALBUKHR environment switch: TESTNET → MAINNET"
+      );
 
-    console.info(
-      "🔄 ALBUKHR environment switch:",
-      current,
-      "→",
-      target.key
+      window.location.assign(
+        target.appUrl
+      );
+
+      return;
+    }
+
+    console.error(
+      "❌ Cannot switch environment from an unknown environment."
     );
-
-
-    /* =====================================================
-       IMPORTANT
-
-       No LocalStorage is used here.
-
-       The destination environment is determined
-       exclusively by the official environment
-       configuration.
-    ===================================================== */
-
-    window.location.assign(
-      target.appUrl
-    );
-
   }
-
-
-  /* =======================================================
-     INITIALIZE SWITCHER
-  ======================================================= */
 
   function init() {
 
-    const switcher =
-      getSwitcher();
-
+    const switcher = getSwitcher();
 
     if (!switcher) {
-
       return;
-
     }
 
-
-    /* Update current state */
-
     updateUI();
-
-
-    /* Prevent duplicate listeners */
 
     if (
       switcher.dataset.environmentBound ===
       "true"
     ) {
-
       return;
-
     }
-
 
     switcher.addEventListener(
       "click",
       function () {
 
         if (switcher.disabled) {
-
           return;
-
         }
 
         switchEnvironment();
-
       }
     );
 
-
-    switcher.dataset.environmentBound =
-      "true";
-
+    switcher.dataset.environmentBound = "true";
   }
 
+  window.ALBukhrEnvironmentSwitcher = Object.freeze({
 
-  /* =======================================================
-     PUBLIC API
-  ======================================================= */
-
-  window.ALBukhrEnvironmentSwitcher =
-    Object.freeze({
-
-      init,
-
-      updateUI,
-
-      switchEnvironment,
-
-      getTargetEnvironment
-
-    });
-
-
-  /* =======================================================
-     DOM READY
-  ======================================================= */
+    init,
+    updateUI,
+    switchEnvironment,
+    getTargetEnvironment,
+    buildTestnetEntryUrl
+  });
 
   if (
     document.readyState ===
@@ -355,9 +215,7 @@
     document.addEventListener(
       "DOMContentLoaded",
       init,
-      {
-        once: true
-      }
+      { once: true }
     );
 
   } else {
@@ -365,6 +223,5 @@
     init();
 
   }
-
 
 })(window);
