@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR Contributor Onboarding</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/contributor-onboarding.css">
+</head>
+<body>
+<main class="contributor-onboarding">
+  <header class="onboarding-header">
+    <div class="brand-mark">ALBUKHR</div>
+    <span class="program-badge">Contributor Program</span>
+  </header>
+
+  <section class="onboarding-card" id="onboardingCard">
+    <div class="step-indicator"><span class="step active">1</span><span class="line"></span><span class="step">2</span><span class="line"></span><span class="step">3</span></div>
+    <h1>Join the ALBUKHR Contributor Program</h1>
+    <p class="lead">Review the current Contributor Policy and Privacy Notice, provide your required electronic acceptance, and complete your invitation.</p>
+
+    <div id="identityPanel" class="info-panel hidden"></div>
+
+    <div class="policy-panel">
+      <div class="panel-head">
+        <div><h2>Current policy</h2><p id="policyVersion">Loading current version…</p></div>
+        <a class="secondary-btn" href="contributor-policy.html" target="_blank" rel="noopener">Read full policy</a>
+      </div>
+      <div class="policy-summary">
+        <p><strong>Contributor status:</strong> governed participation status that may be active, suspended, or revoked.</p>
+        <p><strong>Internal Project entitlement:</strong> the Contributor Program provides one governed Internal Project route; project creation is subject to the applicable registration and review process.</p>
+        <p><strong>Community access:</strong> active Contributors may receive access to the private Contributor Telegram group through an authenticated ALBUKHR access flow.</p>
+        <p><strong>No automatic approval:</strong> Contributor status and project entitlement do not by themselves mean a project is approved, active, funded, investable, profitable, or guaranteed.</p>
+      </div>
+    </div>
+
+    <form id="consentForm" novalidate>
+      <label class="consent-row"><input id="consentPolicy" type="checkbox"> <span>I have read the current <a href="contributor-policy.html" target="_blank" rel="noopener">ALBUKHR Contributor Program Policy</a>.</span></label>
+      <label class="consent-row"><input id="consentPrivacy" type="checkbox"> <span>I have read the current Contributor Privacy Notice included in the policy document.</span></label>
+      <label class="consent-row"><input id="consentRules" type="checkbox"> <span>I understand and agree to comply with the Contributor Program rules, confidentiality requirements, and Code of Conduct.</span></label>
+      <label class="consent-row"><input id="consentProject" type="checkbox"> <span>I understand that my Contributor entitlement is for one Internal Project and that the project remains subject to ALBUKHR review and governance.</span></label>
+
+      <button id="acceptButton" class="primary-btn" type="submit" disabled>Accept &amp; Join Contributor Program</button>
+      <p id="status" class="status" aria-live="polite"></p>
+    </form>
+
+    <section id="communityPanel" class="community-panel hidden">
+      <div class="community-icon">TG</div>
+      <div><h2>Contributor Community</h2><p id="communityText">Your private Contributor community access is being prepared.</p></div>
+      <a id="telegramButton" class="primary-btn hidden" href="#" target="_blank" rel="noopener">Join Private Group</a>
+    </section>
+
+    <div id="successPanel" class="success-panel hidden">
+      <div class="success-mark">✓</div>
+      <h2>Contributor activation completed</h2>
+      <p>Your policy acceptance and Contributor registration were recorded by ALBUKHR.</p>
+      <a class="primary-btn" href="contributor.html">Open Contributor Workspace</a>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/contributor/contributor-onboarding.js"></script>
+</body>
+</html>
