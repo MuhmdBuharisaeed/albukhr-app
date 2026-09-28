@@ -3,6 +3,7 @@
    - Mainnet contributor workspace
    - No LocalStorage / sessionStorage
    - Authenticated identity from Pi Auth + Page Auth Guard
+   - Contributor registration profile
    - Server-side Contributor entitlement and project authority
    ========================================================= */
 (function(window){
@@ -11,6 +12,7 @@
   let currentUser = null;
   let workspace = null;
   let project = null;
+  let contributorProfile = null;
 
   const $ = (id) => document.getElementById(id);
 
@@ -24,6 +26,13 @@
     if (!el) return;
     el.textContent = String(message || "");
     el.className = `status${kind === "error" ? " error" : ""}`;
+  }
+
+  function setProfileStatus(message, kind="info"){
+    const el = $("profileStatus");
+    if (!el) return;
+    el.textContent = String(message || "");
+    el.className = `contributor-status-text${kind === "error" ? " error" : ""}`;
   }
 
   function setInlineStatus(message, kind="info"){
@@ -46,6 +55,13 @@
 
   function normalizeError(error, fallback){
     return error?.message || fallback || "Request failed.";
+  }
+
+  function maskValue(value, start=4, end=4){
+    const text = String(value || "").trim();
+    if (!text) return "—";
+    if (text.length <= start + end + 3) return "••••••";
+    return `${text.slice(0,start)}••••••${text.slice(-end)}`;
   }
 
   function getCore(){
@@ -76,6 +92,59 @@
     preview.textContent = (project?.name || "A").slice(0,1).toUpperCase();
   }
 
+  function renderContributorProfile(data){
+    const identity = data?.identity || {};
+    const profile = data?.profile || null;
+    contributorProfile = profile;
+
+    setText("profilePiUsername", identity.username || currentUser?.username || "—");
+    setText("profilePiUid", maskValue(identity.pi_uid || currentUser?.pi_uid, 5, 4));
+    setText("profileWallet", maskValue(identity.wallet_address || currentUser?.wallet_address, 6, 4));
+    setText("profileEmail", identity.email || "—");
+
+    const complete = data?.profile_complete === true;
+    const badge = $("profileStatusBadge");
+    if (badge){
+      badge.textContent = complete ? "COMPLETED" : "INCOMPLETE";
+      badge.classList.toggle("success", complete);
+      badge.classList.toggle("warning", !complete);
+    }
+
+    const fields = {
+      profileFullName: profile?.full_name || "",
+      profileCountryCode: profile?.country_code || "",
+      profilePhone: profile?.phone || "",
+      profileOccupation: profile?.occupation || "",
+      profileExpertise: profile?.primary_expertise || "",
+      profileExperience: profile?.experience_summary || "",
+      profileAreas: Array.isArray(profile?.contribution_areas) ? profile.contribution_areas.join(", ") : "",
+      profileStatement: profile?.contribution_statement || ""
+    };
+
+    Object.entries(fields).forEach(([id,value])=>{
+      const el = $(id);
+      if (el && document.activeElement !== el) el.value = value;
+    });
+
+    const confirm = $("profileConfirm");
+    if (confirm && complete) confirm.checked = true;
+
+    const button = $("saveProfileButton");
+    if (button) button.textContent = complete ? "Update Contributor Profile" : "Save & Complete Contributor Profile";
+
+    setProfileStatus(complete
+      ? "Your Contributor registration profile is complete. You may update it at any time."
+      : "Complete this profile before creating your one Internal Project."
+    );
+  }
+
+  async function loadContributorProfile(){
+    const data = await rpc("get_my_contributor_profile");
+    if (!data?.success) throw new Error(data?.message || "Contributor profile is unavailable.");
+    renderContributorProfile(data);
+    return data;
+  }
+
   function renderWorkspace(data){
     workspace = data || null;
     if (!data?.success || !data?.contributor) {
@@ -99,19 +168,29 @@
     setText("entitlementStatus", String(entitlement.status || "unknown").toUpperCase());
     setText("statusBadge", String(contributor.status || "unknown").toUpperCase());
     setText("contributorId", contributor.id);
+    setText("workspaceContributorId", contributor.id);
+    setText("workspaceContributorStatus", String(contributor.status || "unknown").toUpperCase());
     setText("registeredAt", formatDate(contributor.registered_at));
     setText("networkValue", "MAINNET");
     setText("entitlementValue", entitlement.status === "claimed" ? "CLAIMED · 1 / 1" : "AVAILABLE · 0 / 1");
+
+    const profileComplete = data.profile_complete === true;
 
     if (project){
       renderProject(project);
       show("createPanel", false);
     } else {
       show("projectPanel", false);
-      show("createPanel", contributor.status === "active" && entitlement.can_create === true);
+      show("createPanel", contributor.status === "active" && entitlement.can_create === true && profileComplete);
+
       if (contributor.status !== "active") {
         setText("accessDeniedText", "Your Contributor record is not active. Project creation is unavailable until the Contributor status is active.");
         show("accessDeniedPanel", true);
+      } else if (!profileComplete) {
+        setText("accessDeniedText", "Complete your Contributor Registration Profile before creating your Internal Project.");
+        show("accessDeniedPanel", true);
+      } else {
+        show("accessDeniedPanel", false);
       }
     }
 
@@ -208,6 +287,63 @@
     } else {
       setText("communityText", "The private Contributor community link will appear here once the official resource is configured by ALBUKHR administration.");
       show("communityResource", false);
+    }
+  }
+
+  async function saveContributorProfile(event){
+    event.preventDefault();
+    const button = $("saveProfileButton");
+    if (!button) return;
+
+    const fullName = $("profileFullName")?.value.trim() || "";
+    const countryCode = $("profileCountryCode")?.value.trim().toUpperCase() || "";
+    const phone = $("profilePhone")?.value.trim() || "";
+    const occupation = $("profileOccupation")?.value.trim() || "";
+    const expertise = $("profileExpertise")?.value.trim() || "";
+    const experience = $("profileExperience")?.value.trim() || "";
+    const areas = ($("profileAreas")?.value || "")
+      .split(",")
+      .map(value => value.trim().toLowerCase())
+      .filter(Boolean)
+      .filter((value,index,array)=>array.indexOf(value) === index);
+    const statement = $("profileStatement")?.value.trim() || "";
+    const confirmed = $("profileConfirm")?.checked === true;
+
+    if (!fullName || countryCode.length !== 2 || !occupation || !expertise || experience.length < 20 || statement.length < 20 || areas.length < 1 || !confirmed){
+      setProfileStatus("Complete all required fields, provide at least one contribution area, and confirm the information is accurate.", "error");
+      return;
+    }
+
+    try {
+      button.disabled = true;
+      button.textContent = "Saving…";
+      setProfileStatus("Saving your Contributor registration profile…");
+
+      const data = await rpc("save_my_contributor_profile", {
+        p_full_name: fullName,
+        p_country_code: countryCode,
+        p_phone: phone,
+        p_occupation: occupation,
+        p_primary_expertise: expertise,
+        p_experience_summary: experience,
+        p_contribution_areas: areas,
+        p_contribution_statement: statement,
+        p_confirm_information: confirmed
+      });
+
+      if (!data?.success) throw new Error(data?.message || "Contributor profile could not be saved.");
+
+      renderContributorProfile(data);
+      await loadWorkspace();
+      setProfileStatus("Contributor profile completed successfully. Your Internal Project creation route is now available when the entitlement is available.");
+      setStatus("Contributor profile saved.");
+    } catch (error){
+      console.error("[ALBUKHR CONTRIBUTOR PROFILE]", error);
+      setProfileStatus(normalizeError(error, "Contributor profile could not be saved."), "error");
+    } finally {
+      button.disabled = false;
+      const complete = contributorProfile?.profile_status === "completed";
+      button.textContent = complete ? "Update Contributor Profile" : "Save & Complete Contributor Profile";
     }
   }
 
@@ -394,6 +530,7 @@
   }
 
   async function init(){
+    $("contributorProfileForm")?.addEventListener("submit", saveContributorProfile);
     $("createProjectForm")?.addEventListener("submit", createProject);
     $("editProjectForm")?.addEventListener("submit", saveProject);
     $("uploadLogoButton")?.addEventListener("click", uploadLogo);
@@ -408,7 +545,13 @@
       setText("userHandle", currentUser.username || "Contributor");
       setText("securityState", "SECURE · MAINNET");
       setText("authorization", "AUTHENTICATED");
+
+      const profileData = await loadContributorProfile();
       await loadWorkspace();
+
+      if (profileData?.profile_complete !== true) {
+        setProfileStatus("Complete your Contributor registration profile before creating your one Internal Project.");
+      }
     } catch (error){
       console.error("[ALBUKHR CONTRIBUTOR WORKSPACE]", error);
       setStatus(normalizeError(error,"Contributor workspace could not be loaded."), "error");
