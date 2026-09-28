@@ -65,6 +65,68 @@
     <div class="info-row"><span>Project Entitlement</span><strong id="entitlementValue">—</strong></div>
   </div>
 </section>
+
+<section id="profilePanel" class="profile-card">
+  <div class="card-title">
+    <i class="fa-solid fa-address-card"></i>
+    <span>Contributor Registration Profile</span>
+    <span id="profileStatusBadge" class="status-badge success contributor-inline-badge">INCOMPLETE</span>
+  </div>
+
+  <div class="contributor-highlight">
+    <i class="fa-solid fa-shield-halved"></i>
+    <div>
+      <strong>Verified ALBUKHR identity</strong>
+      <span>Pi identity is supplied by the authenticated ALBUKHR account. Do not enter your Pi UID, wallet address, password, or private keys here.</span>
+    </div>
+  </div>
+
+  <div class="profile-info-list contributor-identity-list">
+    <div class="info-row"><span>Pi Username</span><strong id="profilePiUsername">—</strong></div>
+    <div class="info-row"><span>Pi UID</span><strong id="profilePiUid">—</strong></div>
+    <div class="info-row"><span>Wallet Address</span><strong id="profileWallet">—</strong></div>
+    <div class="info-row"><span>Email</span><strong id="profileEmail">—</strong></div>
+  </div>
+
+  <form id="contributorProfileForm" class="contributor-profile-form" novalidate>
+    <label class="contributor-field">Full Name
+      <input id="profileFullName" maxlength="120" autocomplete="name" required>
+    </label>
+    <label class="contributor-field">Country Code
+      <input id="profileCountryCode" maxlength="2" minlength="2" autocomplete="country" placeholder="NG" required>
+    </label>
+    <label class="contributor-field">Phone <span class="field-optional">(optional)</span>
+      <input id="profilePhone" maxlength="32" autocomplete="tel">
+    </label>
+    <label class="contributor-field">Occupation / Business Role
+      <input id="profileOccupation" maxlength="120" autocomplete="organization-title" required>
+    </label>
+    <label class="contributor-field">Primary Expertise
+      <input id="profileExpertise" maxlength="120" placeholder="e.g. Pharmacy, Agriculture, Finance" required>
+    </label>
+    <label class="contributor-field">Relevant Experience
+      <textarea id="profileExperience" maxlength="1000" rows="5" placeholder="Briefly describe your relevant experience, skills, or professional background." required></textarea>
+    </label>
+    <label class="contributor-field">Contribution Areas
+      <input id="profileAreas" maxlength="400" placeholder="e.g. project management, operations, agriculture" required>
+    </label>
+    <label class="contributor-field">Contribution Statement
+      <textarea id="profileStatement" maxlength="1000" rows="5" placeholder="Explain how you intend to contribute to the ALBUKHR ecosystem." required></textarea>
+    </label>
+
+    <label class="contributor-confirm-row">
+      <input id="profileConfirm" type="checkbox" required>
+      <span>I confirm that the information I have provided is accurate and belongs to me. I understand that ALBUKHR may use it for Contributor governance, registration, verification and project administration.</span>
+    </label>
+
+    <button id="saveProfileButton" class="primary-contributor-button" type="submit">
+      Save &amp; Complete Contributor Profile
+    </button>
+  </form>
+
+  <p id="profileStatus" class="contributor-status-text" aria-live="polite"></p>
+</section>
+
 <section id="createPanel" class="profile-card hidden">
   <div class="card-title"><i class="fa-solid fa-plus"></i><span>Create Your Internal Project</span></div>
   <div class="contributor-highlight"><i class="fa-solid fa-1"></i><div><strong>One Internal Project</strong><span>Your Contributor entitlement provides one governed Internal Project route.</span></div></div>
