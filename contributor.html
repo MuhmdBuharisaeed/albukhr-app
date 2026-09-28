@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#087a3e">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f7a3d">
 <meta name="robots" content="noindex,nofollow">
-<title>ALBUKHR — Contributor Workspace</title>
+<title>ALBUKHR Contributor Program</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/user-profile.css">
 <link rel="stylesheet" href="css/contributor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="js/core/environment-core.js" defer></script>
 <script src="js/core/supabase-core.js" defer></script>
@@ -16,164 +19,113 @@
 <script src="js/contributor/contributor-workspace.js" defer></script>
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="index.html" aria-label="Return to ALBUKHR">
-    <span class="brand-mark">A</span>
-    <span><b>ALBUKHR</b><small>CONTRIBUTOR PROGRAM</small></span>
-  </a>
-  <div class="actions">
-    <span class="network-pill">MAINNET</span>
-    <span id="userHandle" class="user-handle">—</span>
-    <button id="signOutButton" type="button">Sign out</button>
-  </div>
+<div class="profile-page contributor-page">
+<header class="profile-header contributor-header">
+  <button class="back-btn" type="button" onclick="history.back()" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button>
+  <h2>Contributor Program</h2>
+  <button class="close-btn" type="button" onclick="location.href='index.html'" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
 </header>
-
-<main>
-  <nav class="back"><a href="index.html">← ALBUKHR</a></nav>
-
-  <section class="hero">
-    <div>
-      <small>ALBUKHR CONTRIBUTOR PROGRAM</small>
-      <h1>Contributor Workspace</h1>
-      <p>Manage your Contributor status and your single Internal Project route through the ALBUKHR Mainnet governance workflow.</p>
-    </div>
-    <strong id="securityState">Verifying security...</strong>
-  </section>
-
-  <div id="pageStatus" class="status" aria-live="polite"></div>
-
-  <section class="summary" aria-label="Contributor summary">
-    <article><span>Authorization</span><b id="authorization">CHECKING</b></article>
-    <article><span>Contributor status</span><b id="contributorStatus">CHECKING</b></article>
-    <article><span>Project entitlement</span><b id="entitlementStatus">CHECKING</b></article>
-  </section>
-
-  <section id="accessDeniedPanel" class="panel hidden">
-    <h2>Contributor access required</h2>
-    <p id="accessDeniedText">This workspace is available to active ALBUKHR Contributors.</p>
-  </section>
-
-  <section id="workspacePanel" class="hidden">
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <h2>Your Contributor Status</h2>
-          <p>Your Contributor identity and entitlement are determined by the ALBUKHR security layer.</p>
-        </div>
-        <span id="statusBadge" class="badge">CHECKING</span>
-      </div>
-      <div class="detail-grid">
-        <div><span>Contributor ID</span><strong id="contributorId">—</strong></div>
-        <div><span>Registered</span><strong id="registeredAt">—</strong></div>
-        <div><span>Network</span><strong id="networkValue">MAINNET</strong></div>
-        <div><span>Project entitlement</span><strong id="entitlementValue">—</strong></div>
-      </div>
-    </section>
-
-    <section id="createPanel" class="panel hidden">
-      <div class="panel-head">
-        <div>
-          <h2>Create Your Internal Project</h2>
-          <p>Your Contributor entitlement provides one Internal Project route. The project starts as a draft and must pass ALBUKHR review before it can enter the registry.</p>
-        </div>
-        <span class="badge">1 PROJECT</span>
-      </div>
-      <form id="createProjectForm" novalidate>
-        <div class="grid">
-          <label>Project Code
-            <input id="createProjectCode" maxlength="80" autocomplete="off" placeholder="RAHEEM-25" required>
-          </label>
-          <label>Project Slug
-            <input id="createProjectSlug" maxlength="160" autocomplete="off" placeholder="raheem-pharmacy" required>
-          </label>
-        </div>
-        <label>Project Name
-          <input id="createProjectName" maxlength="160" autocomplete="organization" placeholder="Raheem Pharmacy" required>
-        </label>
-        <label>Description
-          <textarea id="createProjectDescription" maxlength="5000" rows="6" placeholder="Describe the project, its purpose, and the business activity."></textarea>
-        </label>
-        <button id="createProjectButton" class="primary" type="submit">Create Internal Project Draft</button>
-      </form>
-    </section>
-
-    <section id="projectPanel" class="panel hidden">
-      <div class="panel-head">
-        <div>
-          <h2 id="projectTitle">Your Internal Project</h2>
-          <p id="projectSubtitle">—</p>
-        </div>
-        <span id="projectStatusBadge" class="badge">DRAFT</span>
-      </div>
-
-      <div class="project-overview">
-        <div class="project-identity">
-          <div id="projectLogoPreview" class="logo-preview" aria-label="Project logo preview">A</div>
-          <div>
-            <strong id="projectCode">—</strong>
-            <span id="internalNumber">—</span>
-            <span id="projectNetwork">MAINNET</span>
-          </div>
-        </div>
-        <div class="ownership-note"><b>Owner</b><span>Your authenticated ALBUKHR account</span></div>
-      </div>
-
-      <div id="editPanel" class="edit-panel hidden">
-        <div class="panel-subhead"><h3>Project details</h3><span class="muted">Editable while DRAFT</span></div>
-        <form id="editProjectForm" novalidate>
-          <label>Project Slug
-            <input id="editProjectSlug" maxlength="160" required>
-          </label>
-          <label>Project Name
-            <input id="editProjectName" maxlength="160" required>
-          </label>
-          <label>Description
-            <textarea id="editProjectDescription" maxlength="5000" rows="6"></textarea>
-          </label>
-          <button id="saveProjectButton" class="secondary-button" type="submit">Save Project Details</button>
-        </form>
-      </div>
-
-      <div id="logoPanel" class="upload-panel hidden">
-        <div class="panel-subhead"><h3>Project logo</h3><span class="muted">Required for submission</span></div>
-        <p>PNG or JPG/JPEG only · minimum 400 × 400 px · maximum 1 MB · one logo per project.</p>
-        <input id="logoFile" type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg">
-        <button id="uploadLogoButton" class="secondary-button" type="button">Upload Project Logo</button>
-        <div id="logoStatus" class="inline-status" aria-live="polite"></div>
-      </div>
-
-      <div id="submissionPanel" class="submission-panel">
-        <div>
-          <h3>Review status</h3>
-          <p id="submissionText">Complete your project details and logo, then submit for ALBUKHR review.</p>
-        </div>
-        <button id="submitProjectButton" class="primary" type="button">Submit for Review</button>
-      </div>
-
-      <div id="reviewPanel" class="review-panel hidden">
-        <div class="panel-subhead"><h3>Review history</h3><span class="muted">Server recorded</span></div>
-        <div id="reviewList" class="records"></div>
-        <div id="reviewEmpty" class="empty hidden"><b>No review decisions yet.</b><span>Your project has not received a recorded review decision.</span></div>
-      </div>
-    </section>
-
-    <section id="communityPanel" class="panel">
-      <div class="panel-head">
-        <div>
-          <h2>Contributor Community</h2>
-          <p id="communityText">Checking official community access...</p>
-        </div>
-        <span class="badge">PRIVATE</span>
-      </div>
-      <div id="communityResource" class="community-resource hidden">
-        <div class="community-icon">TG</div>
-        <div><strong id="communityName">Private Contributor Group</strong><span>Official ALBUKHR Contributor community</span></div>
-        <a id="communityButton" class="secondary-button" href="#" target="_blank" rel="noopener">Open Telegram</a>
-      </div>
-    </section>
-  </section>
-
-  <section class="notice"><b>Security boundary</b><span>Supabase Auth, Pi authentication, MFA/AAL2, database constraints, storage policies and SECURITY DEFINER RPCs remain the authority. This page stores no persistent Contributor state in LocalStorage or sessionStorage.</span></section>
-</main>
+<section class="profile-hero contributor-hero">
+  <div class="avatar-wrapper contributor-avatar"><img id="contributorLogo" src="images/albukhr-logo.png" alt="ALBUKHR"></div>
+  <div class="hero-details">
+    <h2>Contributor Program</h2>
+    <div id="statusBadge" class="verified-badge contributor-status-badge"><i class="fa-solid fa-circle-check"></i><span>Checking status...</span></div>
+    <p id="userHandle">Loading Contributor account...</p>
+    <div class="contributor-id"><span>Contributor ID</span><strong id="contributorId">Loading...</strong></div>
+  </div>
+</section>
+<section class="hero-actions contributor-actions">
+  <button class="edit-profile-btn" type="button" onclick="location.href='contributor-policy.html'"><i class="fa-solid fa-file-shield"></i><span>Program Policy</span></button>
+  <button class="share-profile-btn" type="button" onclick="location.href='help.html'"><i class="fa-solid fa-circle-question"></i><span>Help</span></button>
+</section>
+<section class="profile-card contributor-security-strip">
+  <div class="card-title"><i class="fa-solid fa-shield-halved"></i><span id="securityState">Checking security</span></div>
+  <p id="pageStatus" class="contributor-status-text" aria-live="polite"></p>
+</section>
+<section class="profile-card">
+  <div class="card-title"><i class="fa-solid fa-id-card"></i><span>Contributor Overview</span></div>
+  <div class="wallet-grid contributor-overview-grid">
+    <div class="wallet-item"><span class="wallet-label">Authorization</span><h2 id="authorization">CHECKING</h2></div>
+    <div class="wallet-item"><span class="wallet-label">Status</span><h2 id="contributorStatus">CHECKING</h2></div>
+    <div class="wallet-item"><span class="wallet-label">Project Entitlement</span><h2 id="entitlementStatus">CHECKING</h2></div>
+    <div class="wallet-item"><span class="wallet-label">Network</span><h2 id="networkValue">MAINNET</h2></div>
+  </div>
+</section>
+<section id="accessDeniedPanel" class="profile-card hidden">
+  <div class="card-title"><i class="fa-solid fa-lock"></i><span>Contributor Access Required</span></div>
+  <p id="accessDeniedText" class="contributor-copy">This workspace is available to active ALBUKHR Contributors.</p>
+</section>
+<section id="workspacePanel" class="hidden">
+<section class="profile-card">
+  <div class="card-title"><i class="fa-solid fa-user-check"></i><span>Your Contributor Status</span></div>
+  <div class="profile-info-list">
+    <div class="info-row"><span>Contributor ID</span><strong id="workspaceContributorId">—</strong></div>
+    <div class="info-row"><span>Registered</span><strong id="registeredAt">—</strong></div>
+    <div class="info-row"><span>Contributor Status</span><strong id="workspaceContributorStatus">—</strong></div>
+    <div class="info-row"><span>Project Entitlement</span><strong id="entitlementValue">—</strong></div>
+  </div>
+</section>
+<section id="createPanel" class="profile-card hidden">
+  <div class="card-title"><i class="fa-solid fa-plus"></i><span>Create Your Internal Project</span></div>
+  <div class="contributor-highlight"><i class="fa-solid fa-1"></i><div><strong>One Internal Project</strong><span>Your Contributor entitlement provides one governed Internal Project route.</span></div></div>
+  <form id="createProjectForm" novalidate>
+    <label class="contributor-field">Project Code<input id="createProjectCode" maxlength="80" autocomplete="off" placeholder="RAHEEM-25" required></label>
+    <label class="contributor-field">Project Slug<input id="createProjectSlug" maxlength="160" autocomplete="off" placeholder="raheem-pharmacy" required></label>
+    <label class="contributor-field">Project Name<input id="createProjectName" maxlength="160" autocomplete="organization" placeholder="Raheem Pharmacy" required></label>
+    <label class="contributor-field">Description<textarea id="createProjectDescription" maxlength="5000" rows="6" placeholder="Describe the project, its purpose, and the business activity."></textarea></label>
+    <button id="createProjectButton" class="primary-contributor-button" type="submit">Create Internal Project Draft</button>
+  </form>
+</section>
+<section id="projectPanel" class="profile-card hidden">
+  <div class="card-title"><i class="fa-solid fa-building"></i><span id="projectTitle">Your Internal Project</span><span id="projectStatusBadge" class="status-badge success contributor-inline-badge">DRAFT</span></div>
+  <div class="project-overview contributor-project-overview">
+    <div class="project-identity contributor-project-identity"><div id="projectLogoPreview" class="logo-preview">A</div><div><strong id="projectCode">—</strong><span id="internalNumber">—</span><span id="projectNetwork">MAINNET</span></div></div>
+    <div class="ownership-note contributor-owner-note"><b>Owner</b><span>Your authenticated ALBUKHR account</span></div>
+  </div>
+  <div id="editPanel" class="edit-panel hidden">
+    <div class="card-title compact-title"><i class="fa-solid fa-pen"></i><span>Project Details</span></div>
+    <form id="editProjectForm" novalidate>
+      <label class="contributor-field">Project Slug<input id="editProjectSlug" maxlength="160" required></label>
+      <label class="contributor-field">Project Name<input id="editProjectName" maxlength="160" required></label>
+      <label class="contributor-field">Description<textarea id="editProjectDescription" maxlength="5000" rows="6"></textarea></label>
+      <button id="saveProjectButton" class="share-profile-btn contributor-full-button" type="submit"><i class="fa-solid fa-floppy-disk"></i>Save Project Details</button>
+    </form>
+  </div>
+  <div id="logoPanel" class="upload-panel contributor-upload-panel hidden">
+    <div class="card-title compact-title"><i class="fa-solid fa-image"></i><span>Project Logo</span></div>
+    <p class="contributor-copy">PNG or JPG/JPEG only · minimum 400 × 400 px · maximum 1 MB · one logo per project.</p>
+    <input id="logoFile" type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg">
+    <button id="uploadLogoButton" class="share-profile-btn contributor-full-button" type="button"><i class="fa-solid fa-cloud-arrow-up"></i>Upload Project Logo</button>
+    <div id="logoStatus" class="contributor-status-text" aria-live="polite"></div>
+  </div>
+  <div id="submissionPanel" class="submission-panel contributor-submission-panel">
+    <div><div class="card-title compact-title"><i class="fa-solid fa-paper-plane"></i><span>Review Status</span></div><p id="submissionText" class="contributor-copy">Complete your project details and logo, then submit for ALBUKHR review.</p></div>
+    <button id="submitProjectButton" class="primary-contributor-button" type="button">Submit for Review</button>
+  </div>
+  <div id="reviewPanel" class="review-panel contributor-review-panel hidden">
+    <div class="card-title compact-title"><i class="fa-solid fa-clock-rotate-left"></i><span>Review History</span></div>
+    <div id="reviewList" class="records"></div>
+    <div id="reviewEmpty" class="empty hidden"><b>No review decisions yet.</b><span>Your project has not received a recorded review decision.</span></div>
+  </div>
+</section>
+<section id="communityPanel" class="profile-card">
+  <div class="card-title"><i class="fa-solid fa-user-group"></i><span>Contributor Community</span></div>
+  <p id="communityText" class="contributor-copy">Checking official community access...</p>
+  <div id="communityResource" class="community-resource contributor-community hidden"><div class="community-icon"><i class="fa-brands fa-telegram"></i></div><div><strong id="communityName">Private Contributor Group</strong><span>Official ALBUKHR Contributor community</span></div><a id="communityButton" class="share-profile-btn" href="#" target="_blank" rel="noopener">Open Telegram</a></div>
+</section>
+</section>
+<section class="profile-card contributor-notice">
+  <div class="card-title"><i class="fa-solid fa-circle-info"></i><span>Program Boundary</span></div>
+  <p class="contributor-copy">Contributor status and project entitlements are controlled by ALBUKHR authentication, database authorization, governance review and project-registration rules. This page does not grant administrative privileges.</p>
+</section>
+<section class="logout-section"><button id="signOutButton" class="logout-button" type="button"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button></section>
+<footer class="profile-footer"><img src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" class="footer-logo" alt="ALBUKHR Logo"><h4>ALBUKHR Investment Limited</h4><p>Community Investment Platform<br>Powered by Pi Network</p><small>© 2024 ALBUKHR Investment Limited. All Rights Reserved.</small></footer>
+</div>
+<div class="dock-nav">
+  <a href="index.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Home</span></a>
+  <a href="investor-dashboard.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M16 11c1.66 0 3-1.34 3-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/><path d="M8 11c1.66 0 3-1.34 3-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3z"/><path d="M2 20v-1c0-2.21 3.58-4 6-4s6 1.79 6 4v1z"/><path d="M14 20v-1c0-1.5 1.5-2.8 3.5-3.5 2 .7 3.5 2 3.5 3.5v1z"/></svg><span>Investors</span></a>
+  <a href="transparency.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M8 11h8"/><path d="M8 14h8"/><ellipse cx="12" cy="18" rx="4" ry="2"/><circle cx="12" cy="18" r=".8"/></svg><span>Transparency</span></a>
+  <a href="services.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1 1 0 000-6l-2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2L4 7l-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/></svg><span>Services</span></a>
+</div>
 </body>
 </html>
