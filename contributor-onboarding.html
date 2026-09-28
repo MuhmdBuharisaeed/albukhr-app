@@ -2,68 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f7a3d">
 <title>ALBUKHR Contributor Onboarding</title>
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/user-profile.css">
 <link rel="stylesheet" href="css/contributor-onboarding.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="js/core/environment-core.js" defer></script>
+<script src="js/core/supabase-core.js" defer></script>
+<script src="https://sdk.minepi.com/pi-sdk.js" defer></script>
+<script src="js/core/pi-auth-core.js" defer></script>
+<script src="js/core/page-auth-guard.js" defer></script>
+<script src="js/contributor/contributor-onboarding.js" defer></script>
 </head>
 <body>
-<main class="contributor-onboarding">
-  <header class="onboarding-header">
-    <div class="brand-mark">ALBUKHR</div>
-    <span class="program-badge">Contributor Program</span>
-  </header>
-
-  <section class="onboarding-card" id="onboardingCard">
-    <div class="step-indicator"><span class="step active">1</span><span class="line"></span><span class="step">2</span><span class="line"></span><span class="step">3</span></div>
-    <h1>Join the ALBUKHR Contributor Program</h1>
-    <p class="lead">Review the current Contributor Policy and Privacy Notice, provide your required electronic acceptance, and complete your invitation.</p>
-
-    <div id="identityPanel" class="info-panel hidden"></div>
-
-    <div class="policy-panel">
-      <div class="panel-head">
-        <div><h2>Current policy</h2><p id="policyVersion">Loading current version…</p></div>
-        <a class="secondary-btn" href="contributor-policy.html" target="_blank" rel="noopener">Read full policy</a>
-      </div>
-      <div class="policy-summary">
-        <p><strong>Contributor status:</strong> governed participation status that may be active, suspended, or revoked.</p>
-        <p><strong>Internal Project entitlement:</strong> the Contributor Program provides one governed Internal Project route; project creation is subject to the applicable registration and review process.</p>
-        <p><strong>Community access:</strong> active Contributors may receive access to the private Contributor Telegram group through an authenticated ALBUKHR access flow.</p>
-        <p><strong>No automatic approval:</strong> Contributor status and project entitlement do not by themselves mean a project is approved, active, funded, investable, profitable, or guaranteed.</p>
-      </div>
-    </div>
-
-    <form id="consentForm" novalidate>
-      <label class="consent-row"><input id="consentPolicy" type="checkbox"> <span>I have read the current <a href="contributor-policy.html" target="_blank" rel="noopener">ALBUKHR Contributor Program Policy</a>.</span></label>
-      <label class="consent-row"><input id="consentPrivacy" type="checkbox"> <span>I have read the current Contributor Privacy Notice included in the policy document.</span></label>
-      <label class="consent-row"><input id="consentRules" type="checkbox"> <span>I understand and agree to comply with the Contributor Program rules, confidentiality requirements, and Code of Conduct.</span></label>
-      <label class="consent-row"><input id="consentProject" type="checkbox"> <span>I understand that my Contributor entitlement is for one Internal Project and that the project remains subject to ALBUKHR review and governance.</span></label>
-
-      <button id="acceptButton" class="primary-btn" type="submit" disabled>Accept &amp; Join Contributor Program</button>
-      <p id="status" class="status" aria-live="polite"></p>
-    </form>
-
-    <section id="communityPanel" class="community-panel hidden">
-      <div class="community-icon">TG</div>
-      <div><h2>Contributor Community</h2><p id="communityText">Your private Contributor community access is being prepared.</p></div>
-      <a id="telegramButton" class="primary-btn hidden" href="#" target="_blank" rel="noopener">Join Private Group</a>
-    </section>
-
-    <div id="successPanel" class="success-panel hidden">
-      <div class="success-mark">✓</div>
-      <h2>Contributor activation completed</h2>
-      <p>Your policy acceptance and Contributor registration were recorded by ALBUKHR.</p>
-      <a class="primary-btn" href="index.html">Continue to ALBUKHR</a>
-    </div>
-  </section>
-</main>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/core/environment-core.js"></script>
-<script src="js/core/supabase-core.js"></script>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script src="js/core/pi-auth-core.js"></script>
-<script src="js/contributor/contributor-onboarding.js"></script>
+<div class="profile-page contributor-onboarding-page">
+<header class="profile-header contributor-header">
+  <button class="back-btn" type="button" onclick="history.back()" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button>
+  <h2>Contributor Program</h2>
+  <button class="close-btn" type="button" onclick="location.href='index.html'" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+</header>
+<section class="profile-hero onboarding-hero">
+  <div class="avatar-wrapper contributor-avatar"><img src="images/albukhr-logo.png" alt="ALBUKHR"></div>
+  <div class="hero-details"><h2>Join the Contributor Program</h2><div class="verified-badge onboarding-badge"><i class="fa-solid fa-user-plus"></i>Contributor Onboarding</div><p>Review the policy, privacy notice and program rules before accepting your invitation.</p></div>
+</section>
+<section class="profile-card contributor-steps-card"><div class="onboarding-steps"><div class="onboarding-step active"><span>1</span><small>Review</small></div><div class="onboarding-step-line"></div><div class="onboarding-step"><span>2</span><small>Consent</small></div><div class="onboarding-step-line"></div><div class="onboarding-step"><span>3</span><small>Activate</small></div></div></section>
+<section id="identityPanel" class="profile-card hidden"></section>
+<section class="profile-card"><div class="card-title"><i class="fa-solid fa-file-shield"></i><span>Current Contributor Policy</span></div><div class="policy-meta-row"><div><span>Current version</span><strong id="policyVersion">Loading...</strong></div><a class="share-profile-btn" href="contributor-policy.html" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Read Full Policy</a></div><div class="contributor-info-box"><p><strong>Contributor status:</strong> governed participation status that may be active, suspended, or revoked.</p><p><strong>Internal Project entitlement:</strong> one governed Internal Project route, subject to registration and review.</p><p><strong>Community access:</strong> active Contributors may receive private community access through authenticated ALBUKHR controls.</p><p><strong>No automatic approval:</strong> Contributor status does not mean a project is approved, active, funded, investable, profitable or guaranteed.</p></div></section>
+<form id="consentForm" class="profile-card contributor-consent-card" novalidate><div class="card-title"><i class="fa-solid fa-square-check"></i><span>Required Acceptance</span></div><label class="consent-row"><input id="consentPolicy" type="checkbox"><span>I have read the current <a href="contributor-policy.html" target="_blank" rel="noopener">ALBUKHR Contributor Program Policy</a>.</span></label><label class="consent-row"><input id="consentPrivacy" type="checkbox"><span>I have read the current Contributor Privacy Notice included in the policy document.</span></label><label class="consent-row"><input id="consentRules" type="checkbox"><span>I understand and agree to comply with the Contributor Program rules, confidentiality requirements and Code of Conduct.</span></label><label class="consent-row"><input id="consentProject" type="checkbox"><span>I understand that my Contributor entitlement is for one Internal Project and that the project remains subject to ALBUKHR review and governance.</span></label><button id="acceptButton" class="primary-contributor-button" type="submit" disabled><i class="fa-solid fa-check"></i>Accept &amp; Join Contributor Program</button><p id="status" class="contributor-status-text" aria-live="polite"></p></form>
+<section id="communityPanel" class="profile-card community-panel hidden"><div class="card-title"><i class="fa-solid fa-user-group"></i><span>Contributor Community</span></div><p id="communityText" class="contributor-copy">Your private Contributor community access is being prepared.</p><a id="telegramButton" class="primary-contributor-button hidden" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i>Join Private Group</a></section>
+<section id="successPanel" class="profile-card success-panel hidden"><div class="success-mark">✓</div><h2>Contributor Activation Completed</h2><p>Your policy acceptance and Contributor registration were recorded by ALBUKHR.</p><a class="primary-contributor-button" href="index.html">Continue to ALBUKHR</a></section>
+<section class="profile-card contributor-notice"><div class="card-title"><i class="fa-solid fa-shield-halved"></i><span>Program Security</span></div><p class="contributor-copy">Contributor activation is controlled by authenticated ALBUKHR workflows and server-side policy checks.</p></section>
+<footer class="profile-footer"><img src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" class="footer-logo" alt="ALBUKHR Logo"><h4>ALBUKHR Investment Limited</h4><p>Community Investment Platform<br>Powered by Pi Network</p><small>© 2024 ALBUKHR Investment Limited. All Rights Reserved.</small></footer>
+</div>
+<div class="dock-nav"><a href="index.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Home</span></a><a href="investor-dashboard.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M16 11c1.66 0 3-1.34 3-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/><path d="M8 11c1.66 0 3-1.34 3-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3z"/><path d="M2 20v-1c0-2.21 3.58-4 6-4s6 1.79 6 4v1z"/><path d="M14 20v-1c0-1.5 1.5-2.8 3.5-3.5 2 .7 3.5 2 3.5 3.5v1z"/></svg><span>Investors</span></a><a href="transparency.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M8 11h8"/><path d="M8 14h8"/><ellipse cx="12" cy="18" rx="4" ry="2"/><circle cx="12" cy="18" r=".8"/></svg><span>Transparency</span></a><a href="services.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1 1 0 000-6l-2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2L4 7l-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/></svg><span>Services</span></a></div>
 </body>
 </html>
