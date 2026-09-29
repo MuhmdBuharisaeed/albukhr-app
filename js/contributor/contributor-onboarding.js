@@ -46,11 +46,17 @@
   }
 
   async function rpc(name, params){
-    const response = await getSupabase().rpc(name, params || {});
-    if (response?.error) {
-      throw new Error(response.error.message || `RPC ${name} failed.`);
-    }
-    return response?.data;
+  const client = getSupabase().getClient();
+
+  const response = await client
+    .schema("albukhr_security")
+    .rpc(name, params || {});
+
+  if (response?.error) {
+    throw new Error(response.error.message || `RPC ${name} failed.`);
+  }
+
+  return response?.data;
   }
 
   function setOnboardingStep(step){
