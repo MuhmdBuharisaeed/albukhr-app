@@ -73,9 +73,19 @@
   }
 
   async function rpc(name, params={}){
-    const response = await getCore().rpc(name, params);
-    if (response?.error) throw new Error(response.error.message || `RPC ${name} failed.`);
-    return response?.data;
+  const core = getCore();
+
+  const response = await core.client
+    .schema("albukhr_security")
+    .rpc(name, params);
+
+  if (response?.error) {
+    throw new Error(
+      response.error.message || `RPC ${name} failed.`
+    );
+  }
+
+  return response?.data;
   }
 
   function renderLogo(url){
