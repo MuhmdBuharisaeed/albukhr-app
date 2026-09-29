@@ -5,13 +5,17 @@
    Security model:
    - Invitation token is memory-only.
    - No LocalStorage or sessionStorage.
-   - Supabase Core is the only database client.
-   - Current policy/version comes from server RPC.
-   - Consent is recorded server-side.
-   - Contributor activation is separately verified server-side.
+   - Pi identity is authenticated by ALBUKHR Pi Auth Core.
+   - Contributor onboarding RPCs are NOT called directly from the browser.
+   - Mainnet Contributor onboarding uses the ALBUKHR API Gateway.
+   - The API verifies the Pi access token server-side and calls the
+     service-role-only Supabase gateway RPCs.
+   - The browser never supplies the authoritative Pi UID.
 ========================================================= */
 (function(window){
   "use strict";
+
+  const AUTH_TIMEOUT_MS = 20000;
 
   let invitationToken = null;
   let currentPolicy = null;
@@ -37,26 +41,38 @@
     return token ? token.trim() : null;
   }
 
-  function getSupabase(){
-    const core = window.ALBUKHR_SUPABASE;
-    if (!core || typeof core.rpc !== "function") {
-      throw new Error("ALBUKHR Supabase Core is unavailable.");
+  function getApi(){
+    const api = window.AlbukhrApi;
+
+    if (!api || typeof api.post !== "function") {
+      throw new Error("ALBUKHR API Core is unavailable.");
     }
-    return core;
+
+    return api;
   }
 
-  async function rpc(name, params){
-  const client = getSupabase().getClient();
+  async function apiPost(path, payload){
+    const response = await getApi().post(path, payload || {});
 
-  const response = await client
-    .schema("albukhr_security")
-    .rpc(name, params || {});
+    if (!response || response.success !== true) {
+      throw new Error(response?.message || response?.error || "ALBUKHR onboarding request failed.");
+    }
 
-  if (response?.error) {
-    throw new Error(response.error.message || `RPC ${name} failed.`);
+    return response;
   }
 
-  return response?.data;
+  function withTimeout(promise, timeoutMs, message){
+    let timer = null;
+
+    const timeout = new Promise((_, reject) => {
+      timer = window.setTimeout(() => {
+        reject(new Error(message));
+      }, timeoutMs);
+    });
+
+    return Promise.race([promise, timeout]).finally(() => {
+      if (timer !== null) window.clearTimeout(timer);
+    });
   }
 
   function setOnboardingStep(step){
@@ -132,7 +148,14 @@
       throw new Error("ALBUKHR Pi Auth Core is unavailable.");
     }
 
-    authenticatedUser = await window.AlbukhrPiAuth.ensurePiAuth();
+    setStatus("Verifying your Pi identity…");
+
+    authenticatedUser = await withTimeout(
+      window.AlbukhrPiAuth.ensurePiAuth(),
+      AUTH_TIMEOUT_MS,
+      "Pi authentication did not complete. Open ALBUKHR inside Pi Browser and try again."
+    );
+
     if (!authenticatedUser?.id || !authenticatedUser?.pi_uid || !authenticatedUser?.username) {
       throw new Error("Authenticated ALBUKHR identity is unavailable.");
     }
@@ -143,36 +166,31 @@
   async function loadInitialState(){
     if (!invitationToken) throw new Error("Missing Contributor invitation token.");
 
-    setStatus("Verifying your Pi identity…");
     await ensureAuthenticatedUser();
 
     setStatus("Verifying your Contributor invitation and current policy…");
-    const results = await Promise.all([
-      rpc("validate_contributor_invitation", { p_invitation_token: invitationToken }),
-      rpc("get_current_contributor_policy")
-    ]);
 
-    const invitationResponse = results[0];
-    const policyResponse = results[1];
+    const response = await apiPost("/api/contributor/bootstrap", {
+      invitation_token: invitationToken
+    });
 
-    if (!invitationResponse || invitationResponse.valid !== true) {
-      throw new Error(invitationResponse?.message || "Contributor invitation is not valid.");
+    if (!response.invitation || !response.policy) {
+      throw new Error("Contributor onboarding data is incomplete.");
     }
 
-    if (!policyResponse || policyResponse.success !== true) {
-      throw new Error(policyResponse?.message || "Current Contributor policy is unavailable.");
-    }
-
-    renderInvitation(invitationResponse);
-    renderPolicy(policyResponse);
+    renderInvitation(response.invitation);
+    renderPolicy(response.policy);
     setOnboardingStep(2);
     setStatus("Everything is ready. Review the policy and complete the required acknowledgements.", "success");
   }
 
-  async function loadCommunityAccess(){
-    const response = await rpc("get_contributor_community_resources", { p_network: "mainnet" });
-    const resources = Array.isArray(response?.resources) ? response.resources : [];
-    const telegram = resources.find((item) => item && item.resource_type === "telegram_private_group" && item.invite_url);
+  function loadCommunityAccess(resources){
+    const list = Array.isArray(resources) ? resources : [];
+    const telegram = list.find((item) =>
+      item &&
+      item.resource_type === "telegram_private_group" &&
+      item.invite_url
+    );
 
     const panel = $("communityPanel");
     const text = $("communityText");
@@ -205,36 +223,32 @@
       setOnboardingStep(2);
       setStatus("Recording your policy and privacy acceptance…");
 
-      const consent = await rpc("record_contributor_policy_consent", {
-        p_invitation_token: invitationToken,
-        p_policy_version: currentPolicy.policy_version,
-        p_privacy_version: currentPolicy.privacy_version
+      const consent = await apiPost("/api/contributor/consent", {
+        invitation_token: invitationToken,
+        policy_version: currentPolicy.policy_version,
+        privacy_version: currentPolicy.privacy_version
       });
 
-      if (!consent || consent.success !== true) {
-        throw new Error(consent?.message || "Policy acceptance could not be recorded.");
+      if (!consent.consent_id) {
+        throw new Error("Policy acceptance could not be confirmed by the server.");
       }
 
       setOnboardingStep(3);
       setStatus("Acceptance recorded. Completing Contributor activation…", "success");
 
-      const activation = await rpc("accept_contributor_invitation", {
-        p_invitation_token: invitationToken
+      const activation = await apiPost("/api/contributor/accept", {
+        invitation_token: invitationToken
       });
 
-      if (!activation || activation.success !== true) {
-        throw new Error(activation?.message || "Contributor activation could not be completed.");
+      if (!activation.contributor_id) {
+        throw new Error("Contributor activation could not be confirmed by the server.");
       }
 
       show($("consentForm"), false);
       show($("successPanel"), true);
       setStatus("");
 
-      try{
-        await loadCommunityAccess();
-      }catch (communityError){
-        console.warn("Contributor community access is not available yet:", communityError);
-      }
+      loadCommunityAccess(activation.community_resources);
     }catch(error){
       console.error("[ALBUKHR CONTRIBUTOR ONBOARDING]", error);
       setStatus(error?.message || "Contributor onboarding failed.", "error");
@@ -249,6 +263,7 @@
       $(id)?.addEventListener("change", updateAcceptButton);
     });
     $("consentForm")?.addEventListener("submit", handleAccept);
+    updateAcceptButton();
 
     try{
       invitationToken = getToken();
