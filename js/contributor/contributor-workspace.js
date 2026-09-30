@@ -35,11 +35,11 @@
    *   GET    /api/contributor/profile
    *   POST   /api/contributor/profile
    *   GET    /api/contributor/community?network=mainnet
-   *   POST   /api/contributor/projects
-   *   PATCH  /api/contributor/projects/:projectId
-   *   POST   /api/contributor/projects/:projectId/logo
-   *   POST   /api/contributor/projects/:projectId/submit
-   *   GET    /api/contributor/projects/:projectId/reviews
+   *   POST   /api/contributor/project
+   *   POST   /api/contributor/project/update
+   *   POST   /api/contributor/project/logo?project_id=:projectId
+   *   POST   /api/contributor/project/submit
+   *   GET    /api/contributor/project/reviews?project_id=:projectId
    *
    * The gateway derives the Pi identity from the Bearer token.
    * This file intentionally never sends p_pi_uid from the browser.
@@ -719,7 +719,7 @@
       );
 
       const data = await gatewayJson(
-        "/api/contributor/projects",
+        "/api/contributor/project",
         "POST",
         {
           project_code:
@@ -782,6 +782,8 @@
         `/api/contributor/projects/${encodeURIComponent(project.id)}`,
         "PATCH",
         {
+          project_id: project.id,
+
           slug:
             $("editProjectSlug")?.value.trim() || "",
 
@@ -850,8 +852,7 @@
   async function uploadLogo(){
     if (!project) return;
 
-    const file =
-      $("logoFile")?.files?.[0];
+    const file = $("logoFile")?.files?.[0];
 
     if (!file){
       setInlineStatus(
@@ -861,37 +862,26 @@
       return;
     }
 
-    const uploadButton =
-      $("uploadLogoButton");
+    const uploadButton = $("uploadLogoButton");
 
     try {
       setInlineStatus("Validating logo…");
 
-      if (
-        !["image/png", "image/jpeg"]
-          .includes(file.type)
-      ){
+      if (!["image/png", "image/jpeg"].includes(file.type)){
         throw new Error(
           "Project logo must be PNG or JPG/JPEG."
         );
       }
 
-      if (
-        file.size <= 0 ||
-        file.size > 1048576
-      ){
+      if (file.size <= 0 || file.size > 1048576){
         throw new Error(
           "Project logo must be no larger than 1 MB."
         );
       }
 
-      const dimensions =
-        await inspectImage(file);
+      const dimensions = await inspectImage(file);
 
-      if (
-        dimensions.width < 400 ||
-        dimensions.height < 400
-      ){
+      if (dimensions.width < 400 || dimensions.height < 400){
         throw new Error(
           "Project logo must be at least 400 × 400 pixels."
         );
@@ -903,24 +893,25 @@
       }
 
       /*
-       * The file is sent to the trusted ALBUKHR API gateway.
-       * The gateway performs the Supabase Storage upload using
-       * its service-role connection and then records the logo
-       * metadata through the protected Contributor RPC.
+       * Deployed gateway contract:
+       * POST /api/contributor/project/logo?project_id=<id>
+       * Content-Type: image/png | image/jpeg
        *
-       * Browser never receives or uses a Supabase Storage client
-       * for this operation.
+       * The gateway verifies the Pi token, validates the image,
+       * uploads it to Supabase Storage with service role, and
+       * records authoritative logo metadata through the DB RPC.
        */
-      const formData = new FormData();
+      const path =
+        `/api/contributor/project/logo?project_id=${encodeURIComponent(project.id)}`;
 
-      formData.append("logo", file);
-      formData.append("width", String(dimensions.width));
-      formData.append("height", String(dimensions.height));
-
-      const data = await gatewayMultipart(
-        `/api/contributor/projects/${encodeURIComponent(project.id)}/logo`,
-        formData
-      );
+      const data = await gatewayRequest(path, {
+        method: "POST",
+        body: file,
+        headers: {
+          "Content-Type": file.type,
+          "Accept": "application/json"
+        }
+      });
 
       if (!data?.success){
         throw new Error(
