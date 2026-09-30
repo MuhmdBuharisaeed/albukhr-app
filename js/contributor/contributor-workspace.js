@@ -85,6 +85,69 @@
     if (el) el.classList.toggle("hidden", !visible);
   }
 
+  /*
+   * Visible operational diagnostic. This is created dynamically so the
+   * existing Contributor HTML/UI does not need a redesign. It displays
+   * only method, endpoint path, sanitized error text and time.
+   * No credentials or private identity data are ever rendered.
+   */
+  function showGatewayDiagnostic(path, method, message){
+    let panel = $("contributorGatewayDiagnostic");
+
+    if (!panel){
+      panel = document.createElement("section");
+      panel.id = "contributorGatewayDiagnostic";
+      panel.className = "profile-card";
+      panel.setAttribute("role", "alert");
+      panel.setAttribute("aria-live", "assertive");
+
+      const title = document.createElement("div");
+      title.className = "card-title";
+      title.textContent = "Contributor Access Diagnostic";
+
+      const body = document.createElement("div");
+      body.id = "contributorGatewayDiagnosticBody";
+      body.className = "contributor-copy";
+
+      panel.append(title, body);
+
+      const anchor =
+        $("pageStatus")?.closest(".profile-card") ||
+        document.querySelector(".contributor-page");
+
+      if (anchor?.parentNode){
+        anchor.parentNode.insertBefore(panel, anchor.nextSibling);
+      } else if (document.body){
+        document.body.prepend(panel);
+      }
+    }
+
+    const body = $("contributorGatewayDiagnosticBody");
+    if (!body) return;
+
+    body.replaceChildren();
+
+    const safeMessage = String(message || "Unknown request failure.")
+      .replace(/Bearer\s+[A-Za-z0-9._~+\/=-]+/gi, "Bearer [redacted]")
+      .replace(/(?:token|access_token|invitation_token)[=:][^\s,;]+/gi, "$1=[redacted]");
+
+    [
+      `Operation: ${String(method || "GET").toUpperCase()}`,
+      `Endpoint: ${String(path || "—")}`,
+      `Problem: ${safeMessage}`,
+      `Time: ${new Date().toLocaleString()}`
+    ].forEach((line)=>{
+      const row = document.createElement("div");
+      row.textContent = line;
+      body.appendChild(row);
+    });
+
+    panel.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+
   function formatDate(value){
     if (!value) return "—";
 
@@ -153,39 +216,16 @@
     }
   }
 
-  function unwrapGatewayPayload(response){
-    /*
-     * ALBUKHR API Core returns the HTTP response's `data` field.
-     *
-     * Example after AlbukhrApi.request():
-     * {
-     *   success: true,
-     *   network: "mainnet",
-     *   data: {
-     *     success: true,
-     *     contributor: {...}
-     *   }
-     * }
-     *
-     * The actual Contributor payload is therefore response.data.
-     *
-     * Keep this tolerant so the frontend also works if a future API
-     * Core version already unwraps the inner envelope.
-     */
-    if (
-      response &&
-      typeof response === "object" &&
-      !Array.isArray(response) &&
-      response.data &&
-      typeof response.data === "object" &&
-      !Array.isArray(response.data) &&
-      response.success === true
-    ){
-      return response.data;
-    }
-
-    return response;
-  }
+  /*
+   * IMPORTANT RESPONSE CONTRACT
+   *
+   * The API gateway returns:
+   *   { success:true, network:"mainnet", data:<RPC result> }
+   *
+   * ALBUKHR API Core already returns response.data. Therefore this
+   * workspace receives the RPC result directly. There is NO second
+   * data envelope to unwrap here.
+   */
 
   async function gatewayRequest(path, options={}){
     assertMainnet();
@@ -193,8 +233,11 @@
     const api = getApi();
 
     try {
-      const response = await api.request(path, options);
-      const data = unwrapGatewayPayload(response);
+      /*
+       * API Core has already unwrapped the gateway HTTP `data` field.
+       * Do not unwrap another layer here.
+       */
+      const data = await api.request(path, options);
 
       if (data?.success === false){
         throw new Error(
@@ -206,12 +249,30 @@
 
       return data;
     } catch (error){
-      throw new Error(
-        normalizeError(
-          error,
-          "Contributor gateway request failed."
-        )
+      const message = normalizeError(
+        error,
+        "Contributor gateway request failed."
       );
+
+      /*
+       * Safe diagnostic logging only. Never log Pi access tokens,
+       * invitation tokens, Pi UID, wallet address, request bodies,
+       * or API response bodies.
+       */
+      console.error("[ALBUKHR CONTRIBUTOR GATEWAY]", {
+        method: String(options?.method || "GET").toUpperCase(),
+        path,
+        message,
+        time: new Date().toISOString()
+      });
+
+      showGatewayDiagnostic(
+        path,
+        options?.method || "GET",
+        message
+      );
+
+      throw new Error(message);
     }
   }
 
@@ -587,7 +648,7 @@
 
         setText(
           "communityText",
-          "Official Contributor community access is not currently configured."
+          `Contributor community access could not be loaded: ${normalizeError(error, "Unknown community access error.")}`
         );
 
         show(
@@ -785,6 +846,29 @@
           "[ALBUKHR CONTRIBUTOR REVIEWS]",
           error
         );
+
+        const list = $("reviewList");
+        if (list){
+          list.replaceChildren();
+
+          const row = document.createElement("div");
+          row.className = "record";
+
+          const content = document.createElement("div");
+          const title = document.createElement("b");
+          title.textContent = "REVIEW HISTORY UNAVAILABLE";
+
+          const detail = document.createElement("span");
+          detail.textContent = normalizeError(
+            error,
+            "Project review history could not be loaded."
+          );
+
+          content.append(title, detail);
+          row.appendChild(content);
+          list.appendChild(row);
+          show("reviewEmpty", false);
+        }
       }
     );
   }
@@ -1637,6 +1721,7 @@
       }
 
       assertMainnet();
+      getApi();
 
       setText(
         "userHandle",
