@@ -18,31 +18,33 @@
   let contributorProfile = null;
 
   /*
-   * The browser must never call protected Supabase RPCs directly.
+   * API Gateway contract:
    *
-   * Request flow:
+   * GET    /api/contributor/workspace
+   * GET    /api/contributor/profile
+   * POST   /api/contributor/profile
+   * GET    /api/contributor/community?network=mainnet
+   * POST   /api/contributor/project
+   * POST   /api/contributor/project/update
+   * POST   /api/contributor/project/logo?project_id=:projectId
+   * POST   /api/contributor/project/submit
+   * GET    /api/contributor/project/reviews?project_id=:projectId
    *
-   * Pi Auth
-   *   -> Pi access token in memory
-   *   -> ALBUKHR API Gateway
-   *   -> Pi /v2/me verification
-   *   -> verified pi_uid
-   *   -> service-role gateway RPC
-   *   -> Mainnet Contributor data
+   * The browser never sends p_pi_uid. The gateway derives the Pi UID
+   * from the verified Pi access token.
    *
-   * Expected gateway endpoints:
-   *   GET    /api/contributor/workspace
-   *   GET    /api/contributor/profile
-   *   POST   /api/contributor/profile
-   *   GET    /api/contributor/community?network=mainnet
-   *   POST   /api/contributor/project
-   *   POST   /api/contributor/project/update
-   *   POST   /api/contributor/project/logo?project_id=:projectId
-   *   POST   /api/contributor/project/submit
-   *   GET    /api/contributor/project/reviews?project_id=:projectId
+   * IMPORTANT RESPONSE CONTRACT:
+   * ALBUKHR API Core returns the gateway HTTP response's `data` field.
+   * Contributor gateway routes then return:
    *
-   * The gateway derives the Pi identity from the Bearer token.
-   * This file intentionally never sends p_pi_uid from the browser.
+   * {
+   *   success: true,
+   *   network: "mainnet",
+   *   data: { ...authoritative contributor payload... }
+   * }
+   *
+   * gatewayRequest() below unwraps that second `data` envelope so the
+   * rest of this file works with the actual Contributor payload.
    */
 
   const $ = (id) => document.getElementById(id);
@@ -55,6 +57,7 @@
   function setStatus(message, kind="info"){
     const el = $("pageStatus");
     if (!el) return;
+
     el.textContent = String(message || "");
     el.className = `status${kind === "error" ? " error" : ""}`;
   }
@@ -62,15 +65,19 @@
   function setProfileStatus(message, kind="info"){
     const el = $("profileStatus");
     if (!el) return;
+
     el.textContent = String(message || "");
-    el.className = `contributor-status-text${kind === "error" ? " error" : ""}`;
+    el.className =
+      `contributor-status-text${kind === "error" ? " error" : ""}`;
   }
 
   function setInlineStatus(message, kind="info"){
     const el = $("logoStatus");
     if (!el) return;
+
     el.textContent = String(message || "");
-    el.className = `inline-status${kind === "error" ? " error" : ""}`;
+    el.className =
+      `inline-status${kind === "error" ? " error" : ""}`;
   }
 
   function show(id, visible=true){
@@ -80,12 +87,18 @@
 
   function formatDate(value){
     if (!value) return "—";
+
     const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString();
+
+    return Number.isNaN(d.getTime())
+      ? "—"
+      : d.toLocaleString();
   }
 
   function normalizeError(error, fallback){
-    if (error instanceof Error && error.message) return error.message;
+    if (error instanceof Error && error.message){
+      return error.message;
+    }
 
     const message =
       error?.message ||
@@ -95,15 +108,22 @@
 
     if (message) return String(message);
 
-    if (typeof error === "string" && error.trim()) return error.trim();
+    if (typeof error === "string" && error.trim()){
+      return error.trim();
+    }
 
     return fallback || "Request failed.";
   }
 
   function maskValue(value, start=4, end=4){
     const text = String(value || "").trim();
+
     if (!text) return "—";
-    if (text.length <= start + end + 3) return "••••••";
+
+    if (text.length <= start + end + 3){
+      return "••••••";
+    }
+
     return `${text.slice(0,start)}••••••${text.slice(-end)}`;
   }
 
@@ -133,25 +153,49 @@
     }
   }
 
+  function unwrapGatewayPayload(response){
+    /*
+     * ALBUKHR API Core returns the HTTP response's `data` field.
+     *
+     * Example after AlbukhrApi.request():
+     * {
+     *   success: true,
+     *   network: "mainnet",
+     *   data: {
+     *     success: true,
+     *     contributor: {...}
+     *   }
+     * }
+     *
+     * The actual Contributor payload is therefore response.data.
+     *
+     * Keep this tolerant so the frontend also works if a future API
+     * Core version already unwraps the inner envelope.
+     */
+    if (
+      response &&
+      typeof response === "object" &&
+      !Array.isArray(response) &&
+      response.data &&
+      typeof response.data === "object" &&
+      !Array.isArray(response.data) &&
+      response.success === true
+    ){
+      return response.data;
+    }
+
+    return response;
+  }
+
   async function gatewayRequest(path, options={}){
     assertMainnet();
 
     const api = getApi();
 
     try {
-      /*
-       * AlbukhrApi automatically attaches:
-       * Authorization: Bearer <Pi access token>
-       *
-       * It also enforces Mainnet at the API-Core layer.
-       */
-      const data = await api.request(path, options);
+      const response = await api.request(path, options);
+      const data = unwrapGatewayPayload(response);
 
-      /*
-       * The API Core returns the response's `data` envelope.
-       * Contributor gateway functions themselves return the normal
-       * { success: true, ... } application payload.
-       */
       if (data?.success === false){
         throw new Error(
           data?.message ||
@@ -163,30 +207,24 @@
       return data;
     } catch (error){
       throw new Error(
-        normalizeError(error, "Contributor gateway request failed.")
+        normalizeError(
+          error,
+          "Contributor gateway request failed."
+        )
       );
     }
   }
 
   async function gatewayGet(path){
-    return gatewayRequest(path, { method: "GET" });
+    return gatewayRequest(path, {
+      method: "GET"
+    });
   }
 
   async function gatewayJson(path, method, body){
     return gatewayRequest(path, {
       method,
       body: JSON.stringify(body || {})
-    });
-  }
-
-  async function gatewayMultipart(path, formData){
-    /*
-     * Do not set Content-Type manually.
-     * The browser must generate the multipart boundary.
-     */
-    return gatewayRequest(path, {
-      method: "POST",
-      body: formData
     });
   }
 
@@ -198,14 +236,17 @@
 
     if (url){
       const img = document.createElement("img");
+
       img.src = url;
       img.alt = "Project logo";
       img.loading = "lazy";
+
       preview.appendChild(img);
       return;
     }
 
-    preview.textContent = (project?.name || "A").slice(0,1).toUpperCase();
+    preview.textContent =
+      (project?.name || "A").slice(0,1).toUpperCase();
   }
 
   function renderContributorProfile(data){
@@ -216,64 +257,115 @@
 
     setText(
       "profilePiUsername",
-      identity.username || currentUser?.username || "—"
+      identity.username ||
+      currentUser?.username ||
+      "—"
     );
 
     setText(
       "profilePiUid",
-      maskValue(identity.pi_uid || currentUser?.pi_uid, 5, 4)
+      maskValue(
+        identity.pi_uid ||
+        currentUser?.pi_uid,
+        5,
+        4
+      )
     );
 
     setText(
       "profileWallet",
       maskValue(
-        identity.wallet_address || currentUser?.wallet_address,
+        identity.wallet_address ||
+        currentUser?.wallet_address,
         6,
         4
       )
     );
 
-    setText("profileEmail", identity.email || "—");
+    setText(
+      "profileEmail",
+      identity.email || "—"
+    );
 
-    const complete = data?.profile_complete === true;
+    const complete =
+      data?.profile_complete === true;
 
-    const badge = $("profileStatusBadge");
+    const badge =
+      $("profileStatusBadge");
+
     if (badge){
-      badge.textContent = complete ? "COMPLETED" : "INCOMPLETE";
-      badge.classList.toggle("success", complete);
-      badge.classList.toggle("warning", !complete);
+      badge.textContent =
+        complete
+          ? "COMPLETED"
+          : "INCOMPLETE";
+
+      badge.classList.toggle(
+        "success",
+        complete
+      );
+
+      badge.classList.toggle(
+        "warning",
+        !complete
+      );
     }
 
     const fields = {
-      profileFullName: profile?.full_name || "",
-      profileCountryCode: profile?.country_code || "",
-      profilePhone: profile?.phone || "",
-      profileOccupation: profile?.occupation || "",
-      profileExpertise: profile?.primary_expertise || "",
-      profileExperience: profile?.experience_summary || "",
-      profileAreas: Array.isArray(profile?.contribution_areas)
-        ? profile.contribution_areas.join(", ")
-        : "",
-      profileStatement: profile?.contribution_statement || ""
+      profileFullName:
+        profile?.full_name || "",
+
+      profileCountryCode:
+        profile?.country_code || "",
+
+      profilePhone:
+        profile?.phone || "",
+
+      profileOccupation:
+        profile?.occupation || "",
+
+      profileExpertise:
+        profile?.primary_expertise || "",
+
+      profileExperience:
+        profile?.experience_summary || "",
+
+      profileAreas:
+        Array.isArray(profile?.contribution_areas)
+          ? profile.contribution_areas.join(", ")
+          : "",
+
+      profileStatement:
+        profile?.contribution_statement || ""
     };
 
-    Object.entries(fields).forEach(([id, value])=>{
-      const el = $(id);
-      if (el && document.activeElement !== el){
-        el.value = value;
-      }
-    });
+    Object.entries(fields).forEach(
+      ([id,value])=>{
+        const el = $(id);
 
-    const confirm = $("profileConfirm");
+        if (
+          el &&
+          document.activeElement !== el
+        ){
+          el.value = value;
+        }
+      }
+    );
+
+    const confirm =
+      $("profileConfirm");
+
     if (confirm && complete){
       confirm.checked = true;
     }
 
-    const button = $("saveProfileButton");
+    const button =
+      $("saveProfileButton");
+
     if (button){
-      button.textContent = complete
-        ? "Update Contributor Profile"
-        : "Save & Complete Contributor Profile";
+      button.textContent =
+        complete
+          ? "Update Contributor Profile"
+          : "Save & Complete Contributor Profile";
     }
 
     setProfileStatus(
@@ -284,61 +376,128 @@
   }
 
   async function loadContributorProfile(){
-    const data = await gatewayGet("/api/contributor/profile");
+    const data =
+      await gatewayGet(
+        "/api/contributor/profile"
+      );
 
     if (!data?.success){
       throw new Error(
-        data?.message || "Contributor profile is unavailable."
+        data?.message ||
+        "Contributor profile is unavailable."
       );
     }
 
     renderContributorProfile(data);
+
     return data;
   }
 
   function renderWorkspace(data){
     workspace = data || null;
 
-    if (!data?.success || !data?.contributor){
+    if (
+      !data?.success ||
+      !data?.contributor
+    ){
       show("workspacePanel", false);
       show("accessDeniedPanel", true);
 
-      setText("authorization", "DENIED");
-      setText("contributorStatus", "—");
-      setText("entitlementStatus", "—");
+      setText(
+        "authorization",
+        "DENIED"
+      );
+
+      setText(
+        "contributorStatus",
+        "—"
+      );
+
+      setText(
+        "entitlementStatus",
+        "—"
+      );
 
       return;
     }
 
-    show("workspacePanel", true);
-    show("accessDeniedPanel", false);
+    show(
+      "workspacePanel",
+      true
+    );
 
-    const contributor = data.contributor;
-    const entitlement = data.project_entitlement || {};
+    show(
+      "accessDeniedPanel",
+      false
+    );
 
-    project = data.project || null;
+    const contributor =
+      data.contributor;
 
-    setText("authorization", "AUTHORIZED");
+    const entitlement =
+      data.project_entitlement || {};
+
+    project =
+      data.project || null;
+
+    setText(
+      "authorization",
+      "AUTHORIZED"
+    );
+
     setText(
       "contributorStatus",
-      String(contributor.status || "unknown").toUpperCase()
+      String(
+        contributor.status ||
+        "unknown"
+      ).toUpperCase()
     );
+
     setText(
       "entitlementStatus",
-      String(entitlement.status || "unknown").toUpperCase()
+      String(
+        entitlement.status ||
+        "unknown"
+      ).toUpperCase()
     );
+
     setText(
       "statusBadge",
-      String(contributor.status || "unknown").toUpperCase()
+      String(
+        contributor.status ||
+        "unknown"
+      ).toUpperCase()
     );
-    setText("contributorId", contributor.id);
-    setText("workspaceContributorId", contributor.id);
+
+    setText(
+      "contributorId",
+      contributor.id
+    );
+
+    setText(
+      "workspaceContributorId",
+      contributor.id
+    );
+
     setText(
       "workspaceContributorStatus",
-      String(contributor.status || "unknown").toUpperCase()
+      String(
+        contributor.status ||
+        "unknown"
+      ).toUpperCase()
     );
-    setText("registeredAt", formatDate(contributor.registered_at));
-    setText("networkValue", "MAINNET");
+
+    setText(
+      "registeredAt",
+      formatDate(
+        contributor.registered_at
+      )
+    );
+
+    setText(
+      "networkValue",
+      "MAINNET"
+    );
 
     setText(
       "entitlementValue",
@@ -347,143 +506,251 @@
         : "AVAILABLE · 0 / 1"
     );
 
-    const profileComplete = data.profile_complete === true;
+    const profileComplete =
+      data.profile_complete === true;
 
     if (project){
       renderProject(project);
-      show("createPanel", false);
-      show("accessDeniedPanel", false);
+
+      show(
+        "createPanel",
+        false
+      );
+
+      show(
+        "accessDeniedPanel",
+        false
+      );
     } else {
-      show("projectPanel", false);
+      show(
+        "projectPanel",
+        false
+      );
 
       const canCreate =
         contributor.status === "active" &&
         entitlement.can_create === true &&
         profileComplete;
 
-      show("createPanel", canCreate);
+      show(
+        "createPanel",
+        canCreate
+      );
 
-      if (contributor.status !== "active"){
+      if (
+        contributor.status !==
+        "active"
+      ){
         setText(
           "accessDeniedText",
           "Your Contributor record is not active. Project creation is unavailable until the Contributor status is active."
         );
-        show("accessDeniedPanel", true);
+
+        show(
+          "accessDeniedPanel",
+          true
+        );
       } else if (!profileComplete){
         setText(
           "accessDeniedText",
           "Complete your Contributor Registration Profile before creating your Internal Project."
         );
-        show("accessDeniedPanel", true);
+
+        show(
+          "accessDeniedPanel",
+          true
+        );
       } else if (!canCreate){
         setText(
           "accessDeniedText",
           "Your one-project Contributor entitlement is not currently available for a new Internal Project."
         );
-        show("accessDeniedPanel", true);
+
+        show(
+          "accessDeniedPanel",
+          true
+        );
       } else {
-        show("accessDeniedPanel", false);
+        show(
+          "accessDeniedPanel",
+          false
+        );
       }
     }
 
-    loadCommunity().catch((error)=>{
-      console.warn(
-        "[ALBUKHR CONTRIBUTOR COMMUNITY]",
-        error
-      );
+    loadCommunity().catch(
+      (error)=>{
+        console.warn(
+          "[ALBUKHR CONTRIBUTOR COMMUNITY]",
+          error
+        );
 
-      setText(
-        "communityText",
-        "Official Contributor community access is not currently configured."
-      );
+        setText(
+          "communityText",
+          "Official Contributor community access is not currently configured."
+        );
 
-      show("communityResource", false);
-    });
+        show(
+          "communityResource",
+          false
+        );
+      }
+    );
   }
 
   function renderProject(p){
     project = p;
 
-    show("projectPanel", true);
-    show("createPanel", false);
+    show(
+      "projectPanel",
+      true
+    );
+
+    show(
+      "createPanel",
+      false
+    );
 
     setText(
       "projectTitle",
-      p.name || "Your Internal Project"
+      p.name ||
+      "Your Internal Project"
     );
 
     setText(
       "projectSubtitle",
-      `${String(p.status || "unknown").toUpperCase()} · Contributor-owned Internal Project`
+      `${String(
+        p.status ||
+        "unknown"
+      ).toUpperCase()} · Contributor-owned Internal Project`
     );
 
     setText(
       "projectStatusBadge",
-      String(p.status || "unknown").toUpperCase()
+      String(
+        p.status ||
+        "unknown"
+      ).toUpperCase()
     );
 
-    setText("projectCode", p.project_code);
+    setText(
+      "projectCode",
+      p.project_code
+    );
+
     setText(
       "internalNumber",
-      p.internal_number || "Internal number pending"
+      p.internal_number ||
+      "Internal number pending"
     );
 
     setText(
       "projectNetwork",
-      String(p.network || "mainnet").toUpperCase()
+      String(
+        p.network ||
+        "mainnet"
+      ).toUpperCase()
     );
 
-    const status = String(p.status || "").toLowerCase();
-    const editable = status === "draft";
+    const status =
+      String(
+        p.status || ""
+      ).toLowerCase();
 
-    /*
-     * Logo URLs are returned by the trusted API gateway.
-     * The browser does not query Supabase Storage directly.
-     */
-    const logoUrl = p.logo_url || null;
+    const editable =
+      status === "draft";
+
+    const logoUrl =
+      p.logo_url || null;
+
     renderLogo(logoUrl);
 
-    show("editPanel", editable);
-    show("logoPanel", editable);
-    show("reviewPanel", status !== "draft");
-
-    if (editable){
-      const slug = $("editProjectSlug");
-      const name = $("editProjectName");
-      const description = $("editProjectDescription");
-
-      if (slug) slug.value = p.slug || "";
-      if (name) name.value = p.name || "";
-      if (description) description.value = p.description || "";
-    }
-
-    const logoFormat = String(
-      p.logo_format || ""
-    ).toLowerCase();
-
-    const ready = Boolean(
-      String(p.description || "").trim() &&
-      p.logo_url &&
-      Number(p.logo_width) >= 400 &&
-      Number(p.logo_height) >= 400 &&
-      Number(p.logo_size_bytes) > 0 &&
-      Number(p.logo_size_bytes) <= 1048576 &&
-      ["png", "jpg", "jpeg", "image/png", "image/jpeg"]
-        .includes(logoFormat)
+    show(
+      "editPanel",
+      editable
     );
 
-    const submit = $("submitProjectButton");
+    show(
+      "logoPanel",
+      editable
+    );
+
+    show(
+      "reviewPanel",
+      status !== "draft"
+    );
+
+    if (editable){
+      const slug =
+        $("editProjectSlug");
+
+      const name =
+        $("editProjectName");
+
+      const description =
+        $("editProjectDescription");
+
+      if (slug){
+        slug.value =
+          p.slug || "";
+      }
+
+      if (name){
+        name.value =
+          p.name || "";
+      }
+
+      if (description){
+        description.value =
+          p.description || "";
+      }
+    }
+
+    const logoFormat =
+      String(
+        p.logo_format || ""
+      ).toLowerCase();
+
+    const ready =
+      Boolean(
+        String(
+          p.description || ""
+        ).trim() &&
+
+        p.logo_url &&
+
+        Number(p.logo_width) >= 400 &&
+
+        Number(p.logo_height) >= 400 &&
+
+        Number(p.logo_size_bytes) > 0 &&
+
+        Number(p.logo_size_bytes) <= 1048576 &&
+
+        [
+          "png",
+          "jpg",
+          "jpeg",
+          "image/png",
+          "image/jpeg"
+        ].includes(logoFormat)
+      );
+
+    const submit =
+      $("submitProjectButton");
 
     if (submit){
-      submit.disabled = !editable || !ready;
+      submit.disabled =
+        !editable || !ready;
 
-      submit.textContent = editable
-        ? (
-            ready
-              ? "Submit for Review"
-              : "Complete Logo & Description First"
-          )
-        : "Submission Locked";
+      submit.textContent =
+        editable
+          ? (
+              ready
+                ? "Submit for Review"
+                : "Complete Logo & Description First"
+            )
+          : "Submission Locked";
     }
 
     if (status === "pending"){
@@ -510,45 +777,58 @@
       );
     }
 
-    loadReviews(p.id).catch((error)=>{
-      console.warn(
-        "[ALBUKHR CONTRIBUTOR REVIEWS]",
-        error
-      );
-    });
+    loadReviews(
+      p.id
+    ).catch(
+      (error)=>{
+        console.warn(
+          "[ALBUKHR CONTRIBUTOR REVIEWS]",
+          error
+        );
+      }
+    );
   }
 
   async function loadWorkspace(){
-    setStatus("Loading Contributor workspace…");
-
-    const data = await gatewayGet(
-      "/api/contributor/workspace"
+    setStatus(
+      "Loading Contributor workspace…"
     );
+
+    const data =
+      await gatewayGet(
+        "/api/contributor/workspace"
+      );
 
     if (!data?.success){
       throw new Error(
-        data?.message || "Contributor workspace is unavailable."
+        data?.message ||
+        "Contributor workspace is unavailable."
       );
     }
 
     renderWorkspace(data);
+
     setStatus("");
   }
 
   async function loadCommunity(){
-    const data = await gatewayGet(
-      "/api/contributor/community?network=mainnet"
-    );
+    const data =
+      await gatewayGet(
+        "/api/contributor/community?network=mainnet"
+      );
 
-    const resources = Array.isArray(data?.resources)
-      ? data.resources
-      : [];
+    const resources =
+      Array.isArray(data?.resources)
+        ? data.resources
+        : [];
 
-    const telegram = resources.find(
-      (r)=>
-        r?.resource_type === "telegram_private_group" &&
-        r?.invite_url
-    );
+    const telegram =
+      resources.find(
+        (r)=>
+          r?.resource_type ===
+            "telegram_private_group" &&
+          r?.invite_url
+      );
 
     if (telegram){
       setText(
@@ -558,66 +838,94 @@
 
       setText(
         "communityName",
-        telegram.resource_name || "Private Contributor Group"
+        telegram.resource_name ||
+        "Private Contributor Group"
       );
 
-      const button = $("communityButton");
+      const button =
+        $("communityButton");
 
       if (button){
-        button.href = telegram.invite_url;
-        button.target = "_blank";
-        button.rel = "noopener noreferrer";
+        button.href =
+          telegram.invite_url;
+
+        button.target =
+          "_blank";
+
+        button.rel =
+          "noopener noreferrer";
       }
 
-      show("communityResource", true);
+      show(
+        "communityResource",
+        true
+      );
     } else {
       setText(
         "communityText",
         "The private Contributor community link will appear here once the official resource is configured by ALBUKHR administration."
       );
 
-      show("communityResource", false);
+      show(
+        "communityResource",
+        false
+      );
     }
   }
 
   async function saveContributorProfile(event){
     event.preventDefault();
 
-    const button = $("saveProfileButton");
+    const button =
+      $("saveProfileButton");
+
     if (!button) return;
 
     const fullName =
-      $("profileFullName")?.value.trim() || "";
+      $("profileFullName")
+        ?.value.trim() || "";
 
     const countryCode =
-      $("profileCountryCode")?.value.trim().toUpperCase() || "";
+      $("profileCountryCode")
+        ?.value.trim()
+        .toUpperCase() || "";
 
     const phone =
-      $("profilePhone")?.value.trim() || "";
+      $("profilePhone")
+        ?.value.trim() || "";
 
     const occupation =
-      $("profileOccupation")?.value.trim() || "";
+      $("profileOccupation")
+        ?.value.trim() || "";
 
     const expertise =
-      $("profileExpertise")?.value.trim() || "";
+      $("profileExpertise")
+        ?.value.trim() || "";
 
     const experience =
-      $("profileExperience")?.value.trim() || "";
+      $("profileExperience")
+        ?.value.trim() || "";
 
-    const areas = ($("profileAreas")?.value || "")
-      .split(",")
-      .map(value => value.trim().toLowerCase())
-      .filter(Boolean)
-      .filter(
-        (value,index,array)=>
-          array.indexOf(value) === index
-      );
+    const areas =
+      ($("profileAreas")?.value || "")
+        .split(",")
+        .map(
+          value =>
+            value.trim().toLowerCase()
+        )
+        .filter(Boolean)
+        .filter(
+          (value,index,array)=>
+            array.indexOf(value) === index
+        );
 
     const statement =
-      $("profileStatement")?.value.trim() || "";
+      $("profileStatement")
+        ?.value.trim() || "";
 
     const confirmed =
-      $("profileConfirm")?.checked === true;
+      $("profileConfirm")
+        ?.checked === true;
 
     if (
       !fullName ||
@@ -633,6 +941,7 @@
         "Complete all required fields, provide at least one contribution area, and confirm the information is accurate.",
         "error"
       );
+
       return;
     }
 
@@ -644,21 +953,37 @@
         "Saving your Contributor registration profile…"
       );
 
-      const data = await gatewayJson(
-        "/api/contributor/profile",
-        "POST",
-        {
-          full_name: fullName,
-          country_code: countryCode,
-          phone,
-          occupation,
-          primary_expertise: expertise,
-          experience_summary: experience,
-          contribution_areas: areas,
-          contribution_statement: statement,
-          confirm_information: confirmed
-        }
-      );
+      const data =
+        await gatewayJson(
+          "/api/contributor/profile",
+          "POST",
+          {
+            full_name:
+              fullName,
+
+            country_code:
+              countryCode,
+
+            phone,
+
+            occupation,
+
+            primary_expertise:
+              expertise,
+
+            experience_summary:
+              experience,
+
+            contribution_areas:
+              areas,
+
+            contribution_statement:
+              statement,
+
+            confirm_information:
+              confirmed
+          }
+        );
 
       if (!data?.success){
         throw new Error(
@@ -667,10 +992,6 @@
         );
       }
 
-      /*
-       * Reload the authoritative profile and workspace rather than
-       * trusting client-side state after a mutation.
-       */
       await loadContributorProfile();
       await loadWorkspace();
 
@@ -678,7 +999,9 @@
         "Contributor profile completed successfully. Your Internal Project creation route is now available when the entitlement is available."
       );
 
-      setStatus("Contributor profile saved.");
+      setStatus(
+        "Contributor profile saved."
+      );
     } catch (error){
       console.error(
         "[ALBUKHR CONTRIBUTOR PROFILE]",
@@ -696,52 +1019,74 @@
       button.disabled = false;
 
       const complete =
-        contributorProfile?.profile_status === "completed";
+        contributorProfile?.profile_status ===
+        "completed";
 
-      button.textContent = complete
-        ? "Update Contributor Profile"
-        : "Save & Complete Contributor Profile";
+      button.textContent =
+        complete
+          ? "Update Contributor Profile"
+          : "Save & Complete Contributor Profile";
     }
   }
 
   async function createProject(event){
     event.preventDefault();
 
-    const button = $("createProjectButton");
+    const button =
+      $("createProjectButton");
+
     if (!button) return;
 
     try {
       button.disabled = true;
-      button.textContent = "Creating draft…";
+      button.textContent =
+        "Creating draft…";
 
       setStatus(
         "Creating your single Internal Project entitlement claim…"
       );
 
-      const data = await gatewayJson(
-        "/api/contributor/project",
-        "POST",
-        {
-          project_code:
-            $("createProjectCode")?.value.trim() || "",
+      /*
+       * The API route is:
+       * POST /api/contributor/project
+       *
+       * The browser supplies project fields only.
+       * The gateway supplies the verified Pi identity to the DB RPC.
+       */
+      const data =
+        await gatewayJson(
+          "/api/contributor/project",
+          "POST",
+          {
+            project_code:
+              $("createProjectCode")
+                ?.value.trim() || "",
 
-          slug:
-            $("createProjectSlug")?.value.trim() || "",
+            slug:
+              $("createProjectSlug")
+                ?.value.trim() || "",
 
-          name:
-            $("createProjectName")?.value.trim() || "",
+            name:
+              $("createProjectName")
+                ?.value.trim() || "",
 
-          description:
-            $("createProjectDescription")?.value.trim() || ""
-        }
-      );
+            description:
+              $("createProjectDescription")
+                ?.value.trim() || ""
+          }
+        );
 
       if (!data?.success){
         throw new Error(
-          data?.message || "Project creation failed."
+          data?.message ||
+          "Project creation failed."
         );
       }
 
+      /*
+       * Reload authoritative state.
+       * This must return the newly-created draft project.
+       */
       await loadWorkspace();
 
       setStatus(
@@ -754,10 +1099,17 @@
       );
 
       setStatus(
-        normalizeError(error, "Project creation failed."),
+        normalizeError(
+          error,
+          "Project creation failed."
+        ),
         "error"
       );
 
+      /*
+       * Keep the form visible after an error.
+       * Never silently return to the previous state.
+       */
       button.disabled = false;
       button.textContent =
         "Create Internal Project Draft";
@@ -769,41 +1121,56 @@
 
     if (!project) return;
 
-    const button = $("saveProjectButton");
+    const button =
+      $("saveProjectButton");
 
     try {
       if (button){
         button.disabled = true;
       }
 
-      setStatus("Saving project details…");
-
-      const data = await gatewayJson(
-        `/api/contributor/projects/${encodeURIComponent(project.id)}`,
-        "PATCH",
-        {
-          project_id: project.id,
-
-          slug:
-            $("editProjectSlug")?.value.trim() || "",
-
-          name:
-            $("editProjectName")?.value.trim() || "",
-
-          description:
-            $("editProjectDescription")?.value.trim() || ""
-        }
+      setStatus(
+        "Saving project details…"
       );
+
+      /*
+       * Actual gateway route:
+       * POST /api/contributor/project/update
+       */
+      const data =
+        await gatewayJson(
+          "/api/contributor/project/update",
+          "POST",
+          {
+            project_id:
+              project.id,
+
+            slug:
+              $("editProjectSlug")
+                ?.value.trim() || "",
+
+            name:
+              $("editProjectName")
+                ?.value.trim() || "",
+
+            description:
+              $("editProjectDescription")
+                ?.value.trim() || ""
+          }
+        );
 
       if (!data?.success){
         throw new Error(
-          data?.message || "Project update failed."
+          data?.message ||
+          "Project update failed."
         );
       }
 
       await loadWorkspace();
 
-      setStatus("Project details saved.");
+      setStatus(
+        "Project details saved."
+      );
     } catch (error){
       console.error(
         "[ALBUKHR UPDATE INTERNAL PROJECT]",
@@ -811,7 +1178,10 @@
       );
 
       setStatus(
-        normalizeError(error, "Project update failed."),
+        normalizeError(
+          error,
+          "Project update failed."
+        ),
         "error"
       );
     } finally {
@@ -822,96 +1192,138 @@
   }
 
   function inspectImage(file){
-    return new Promise((resolve,reject)=>{
-      const url = URL.createObjectURL(file);
-      const img = new Image();
+    return new Promise(
+      (resolve,reject)=>{
+        const url =
+          URL.createObjectURL(file);
 
-      img.onload = ()=>{
-        const out = {
-          width: img.naturalWidth,
-          height: img.naturalHeight
+        const img =
+          new Image();
+
+        img.onload = ()=>{
+          const out = {
+            width:
+              img.naturalWidth,
+
+            height:
+              img.naturalHeight
+          };
+
+          URL.revokeObjectURL(url);
+
+          resolve(out);
         };
 
-        URL.revokeObjectURL(url);
-        resolve(out);
-      };
+        img.onerror = ()=>{
+          URL.revokeObjectURL(url);
 
-      img.onerror = ()=>{
-        URL.revokeObjectURL(url);
-        reject(
-          new Error(
-            "The selected image could not be read."
-          )
-        );
-      };
+          reject(
+            new Error(
+              "The selected image could not be read."
+            )
+          );
+        };
 
-      img.src = url;
-    });
+        img.src = url;
+      }
+    );
   }
 
   async function uploadLogo(){
     if (!project) return;
 
-    const file = $("logoFile")?.files?.[0];
+    const file =
+      $("logoFile")
+        ?.files?.[0];
 
     if (!file){
       setInlineStatus(
         "Select a PNG or JPG/JPEG logo first.",
         "error"
       );
+
       return;
     }
 
-    const uploadButton = $("uploadLogoButton");
+    const uploadButton =
+      $("uploadLogoButton");
 
     try {
-      setInlineStatus("Validating logo…");
+      setInlineStatus(
+        "Validating logo…"
+      );
 
-      if (!["image/png", "image/jpeg"].includes(file.type)){
+      if (
+        ![
+          "image/png",
+          "image/jpeg"
+        ].includes(file.type)
+      ){
         throw new Error(
           "Project logo must be PNG or JPG/JPEG."
         );
       }
 
-      if (file.size <= 0 || file.size > 1048576){
+      if (
+        file.size <= 0 ||
+        file.size > 1048576
+      ){
         throw new Error(
           "Project logo must be no larger than 1 MB."
         );
       }
 
-      const dimensions = await inspectImage(file);
+      const dimensions =
+        await inspectImage(file);
 
-      if (dimensions.width < 400 || dimensions.height < 400){
+      if (
+        dimensions.width < 400 ||
+        dimensions.height < 400
+      ){
         throw new Error(
           "Project logo must be at least 400 × 400 pixels."
         );
       }
 
       if (uploadButton){
-        uploadButton.disabled = true;
-        uploadButton.textContent = "Uploading…";
+        uploadButton.disabled =
+          true;
+
+        uploadButton.textContent =
+          "Uploading…";
       }
 
       /*
-       * Deployed gateway contract:
+       * The deployed gateway expects RAW image bytes:
+       *
        * POST /api/contributor/project/logo?project_id=<id>
        * Content-Type: image/png | image/jpeg
        *
-       * The gateway verifies the Pi token, validates the image,
-       * uploads it to Supabase Storage with service role, and
-       * records authoritative logo metadata through the DB RPC.
+       * Do not use FormData here.
+       * The API gateway itself:
+       *   1. verifies Pi identity
+       *   2. validates the image
+       *   3. uploads to Supabase Storage
+       *   4. records authoritative logo metadata
        */
       const path =
         `/api/contributor/project/logo?project_id=${encodeURIComponent(project.id)}`;
 
-      const data = await gatewayRequest(path, {
-        method: "POST",
-        body: file,
-        headers: {
-          "Content-Type": file.type,
-          "Accept": "application/json"
-        }
-      });
+      const data =
+        await gatewayRequest(
+          path,
+          {
+            method: "POST",
+            body: file,
+            headers: {
+              "Content-Type":
+                file.type,
+
+              "Accept":
+                "application/json"
+            }
+          }
+        );
 
       if (!data?.success){
         throw new Error(
@@ -920,7 +1332,9 @@
         );
       }
 
-      const fileInput = $("logoFile");
+      const fileInput =
+        $("logoFile");
+
       if (fileInput){
         fileInput.value = "";
       }
@@ -931,7 +1345,9 @@
 
       await loadWorkspace();
 
-      setStatus("Project logo updated.");
+      setStatus(
+        "Project logo updated."
+      );
     } catch (error){
       console.error(
         "[ALBUKHR CONTRIBUTOR LOGO]",
@@ -947,7 +1363,9 @@
       );
     } finally {
       if (uploadButton){
-        uploadButton.disabled = false;
+        uploadButton.disabled =
+          false;
+
         uploadButton.textContent =
           "Upload Project Logo";
       }
@@ -960,21 +1378,37 @@
     const button =
       $("submitProjectButton");
 
-    if (!button || button.disabled) return;
+    if (
+      !button ||
+      button.disabled
+    ){
+      return;
+    }
 
     try {
-      button.disabled = true;
-      button.textContent = "Submitting…";
+      button.disabled =
+        true;
+
+      button.textContent =
+        "Submitting…";
 
       setStatus(
         "Submitting project for ALBUKHR review…"
       );
 
-      const data = await gatewayJson(
-        `/api/contributor/projects/${encodeURIComponent(project.id)}/submit`,
-        "POST",
-        {}
-      );
+      /*
+       * Actual gateway route:
+       * POST /api/contributor/project/submit
+       */
+      const data =
+        await gatewayJson(
+          "/api/contributor/project/submit",
+          "POST",
+          {
+            project_id:
+              project.id
+          }
+        );
 
       if (!data?.success){
         throw new Error(
@@ -1002,7 +1436,9 @@
         "error"
       );
 
-      button.disabled = false;
+      button.disabled =
+        false;
+
       button.textContent =
         "Submit for Review";
     }
@@ -1011,7 +1447,8 @@
   async function loadReviews(projectId){
     if (!projectId) return;
 
-    const panel = $("reviewPanel");
+    const panel =
+      $("reviewPanel");
 
     if (
       !panel ||
@@ -1020,15 +1457,30 @@
       return;
     }
 
-    const data = await gatewayGet(
-      `/api/contributor/projects/${encodeURIComponent(projectId)}/reviews`
-    );
+    /*
+     * Actual gateway route:
+     * GET /api/contributor/project/reviews?project_id=<id>
+     */
+    const data =
+      await gatewayGet(
+        `/api/contributor/project/reviews?project_id=${encodeURIComponent(projectId)}`
+      );
 
-    const records = Array.isArray(data?.records)
-      ? data.records
-      : [];
+    if (!data?.success){
+      throw new Error(
+        data?.message ||
+        "Project review history could not be loaded."
+      );
+    }
 
-    const list = $("reviewList");
+    const records =
+      Array.isArray(data?.records)
+        ? data.records
+        : [];
+
+    const list =
+      $("reviewList");
+
     if (!list) return;
 
     list.replaceChildren();
@@ -1038,62 +1490,95 @@
       records.length === 0
     );
 
-    records.forEach((record)=>{
-      const row =
-        document.createElement("div");
+    records.forEach(
+      (record)=>{
+        const row =
+          document.createElement(
+            "div"
+          );
 
-      row.className = "record";
+        row.className =
+          "record";
 
-      const icon =
-        document.createElement("div");
+        const icon =
+          document.createElement(
+            "div"
+          );
 
-      icon.className = "record-icon";
-      icon.textContent = "✓";
+        icon.className =
+          "record-icon";
 
-      const content =
-        document.createElement("div");
+        icon.textContent =
+          "✓";
 
-      const title =
-        document.createElement("b");
+        const content =
+          document.createElement(
+            "div"
+          );
 
-      title.textContent =
-        String(
-          record.decision || "review"
-        ).toUpperCase();
+        const title =
+          document.createElement(
+            "b"
+          );
 
-      const meta =
-        document.createElement("span");
+        title.textContent =
+          String(
+            record.decision ||
+            "review"
+          ).toUpperCase();
 
-      meta.textContent =
-        `${String(record.previous_status || "").toUpperCase()} → ${String(record.new_status || "").toUpperCase()} · ${formatDate(record.created_at)}`;
+        const meta =
+          document.createElement(
+            "span"
+          );
 
-      content.append(title, meta);
+        meta.textContent =
+          `${String(record.previous_status || "").toUpperCase()} → ${String(record.new_status || "").toUpperCase()} · ${formatDate(record.created_at)}`;
 
-      if (record.reason){
-        const reason =
-          document.createElement("span");
+        content.append(
+          title,
+          meta
+        );
 
-        reason.textContent =
-          `Reason: ${record.reason}`;
+        if (record.reason){
+          const reason =
+            document.createElement(
+              "span"
+            );
 
-        content.appendChild(reason);
+          reason.textContent =
+            `Reason: ${record.reason}`;
+
+          content.appendChild(
+            reason
+          );
+        }
+
+        row.append(
+          icon,
+          content
+        );
+
+        list.appendChild(
+          row
+        );
       }
-
-      row.append(icon, content);
-      list.appendChild(row);
-    });
+    );
   }
 
   function signOut(){
     try {
       if (
         window.AlbukhrPiAuth &&
-        typeof window.AlbukhrPiAuth.logout === "function"
+        typeof window.AlbukhrPiAuth.logout ===
+          "function"
       ){
         window.AlbukhrPiAuth.logout();
       }
     } finally {
-      window.location.replace("login.html");
+      window.location.replace(
+        "login.html"
+      );
     }
   }
 
@@ -1144,15 +1629,19 @@
       }
 
       currentUser =
-        await window.AlbukhrPageAuthGuard.waitForAuth();
+        await window.AlbukhrPageAuthGuard
+          .waitForAuth();
 
-      if (!currentUser) return;
+      if (!currentUser){
+        return;
+      }
 
       assertMainnet();
 
       setText(
         "userHandle",
-        currentUser.username || "Contributor"
+        currentUser.username ||
+        "Contributor"
       );
 
       setText(
@@ -1165,17 +1654,14 @@
         "AUTHENTICATED"
       );
 
-      /*
-       * Load authoritative server state.
-       * No protected Supabase RPC is called from this page.
-       */
       const profileData =
         await loadContributorProfile();
 
       await loadWorkspace();
 
       if (
-        profileData?.profile_complete !== true
+        profileData?.profile_complete !==
+        true
       ){
         setProfileStatus(
           "Complete your Contributor registration profile before creating your one Internal Project."
