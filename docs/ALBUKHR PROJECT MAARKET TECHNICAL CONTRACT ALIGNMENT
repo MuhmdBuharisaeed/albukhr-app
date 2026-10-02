@@ -1,0 +1,325 @@
+ALBUKHR Project Market Technical Contract Alignment Audit
+Version 1.0
+Document ID: ALB-PMF-TCA-001
+Version: 1.0
+Status: Controlled Technical Audit Draft
+Scope: Mainnet project/staking contract alignment
+Date: 2026-10-02
+1. Audit Objective
+This audit checks whether the current Mainnet database, API and frontend staking/withdrawal contracts are aligned with the ALBUKHR Project Market Framework v1.
+The audit is read-only. No project status, staking term, treasury row, stake row, or withdrawal record was modified by this audit.
+2. Executive Result
+The current system is not yet contract-aligned with the new Project Market Framework.
+The most important findings are:
+projects.project_code is the authoritative full project code in the current project registry, for example AZMAN-4080.
+project_staking_terms.project_code currently uses base codes for six Core projects (AZMAN, LABBAIKA, BARSH, URBAN, KHAIRAT, HAUWAL) while RAHEEM-25 is already an exact match.
+The current staking database contract requires an exact project-code match, so six current Core projects cannot satisfy the staking-term lookup after activation.
+The current frontend still contains legacy base-code configuration and hard-coded duration logic.
+The current database has zero stake rows, so there are currently no recorded Mainnet/Testnet stake positions that need term-preserving migration.
+The current withdrawal request contract is a legacy/simple contract: it uses a fixed 1% fee, requires maturity, and checks the stored stakes.reward_amount / stakes.amount directly. It does not yet implement the full new project-specific withdrawal policy model.
+Core liquidity settlement can auto-promote APPROVED -> ACTIVE when required liquidity is met and an exact staking term exists. This is compatible with the Core activation gate already hardened, but the broader Market Framework requires capability-specific readiness and should not remain dependent on legacy term structure.
+No Mainnet project_treasury rows currently exist for the listed projects, so Core projects are not presently treasury-ready.
+Conclusion: Do not migrate the current reward/term rows yet. First establish the canonical project/term contract and introduce the new versioned term model without breaking existing records.
+3. Authoritative Project Identity
+Current Mainnet project records include:
+Project
+Type
+Status
+Project Code
+Exact Active Terms
+Treasury
+Raheem Pharmacy
+Core
+Approved
+RAHEEM-25
+Yes
+No
+Azman Futures Makers Lab
+Core
+Approved
+AZMAN-4080
+No
+No
+Labbaika Bakery Center
+Core
+Approved
+LABBAIKA-3980
+No
+No
+Barsh Agro & Livestock
+Core
+Approved
+BARSH-1125
+No
+No
+Urban Mobility System
+Core
+Approved
+URBAN-5180
+No
+No
+Khairat Fertiliser
+Core
+Draft
+KHAIRAT-3132
+No
+No
+Hauwal Maize Processing
+Core
+Draft
+HAUWAL-6552
+No
+No
+Maitagogo Table Water
+Internal
+Approved
+MAITAGOGO-2457
+No
+No
+The database also enforces a unique project identity using the project code, including a normalized (project_code, network) uniqueness index.
+Required contract decision: staking terms must resolve to the authoritative projects.id/full project identity, not rely on an assumed base-code alias.
+4. Current project_staking_terms Contract
+Current schema:
+id uuid
+project_code text
+network text
+duration_days integer
+min_stake numeric
+reward_rate numeric
+active boolean
+timestamps
+Current constraints include:
+allowed durations: 30, 60, 90, 180, 365, 430
+min_stake > 0
+0 <= reward_rate <= 1
+unique (project_code, network, duration_days)
+Current Mainnet rows are 21 active terms across seven codes:
+AZMAN: 180/365/430
+BARSH: 30/60/90
+HAUWAL: 30/60/90
+KHAIRAT: 30/60/90
+LABBAIKA: 30/60/90
+RAHEEM-25: 30/60/90
+URBAN: 30/60/90
+All current terms use a minimum stake of 10 Pi.
+This is existing configuration. It is not being treated as the new universal ALBUKHR reward policy.
+5. Critical Staking Lookup Finding
+Current Mainnet public.create_stake_from_completed_payment(...) performs:
+project lookup by p_project_id
+requires Mainnet + Core + Core Slot 1..7
+requires projects.status = 'active'
+staking term lookup by exact:
+st.project_code = v_project.project_code
+st.network = 'mainnet'
+st.duration_days = p_duration_days
+st.active = true
+Therefore:
+AZMAN-4080 does not match AZMAN.
+LABBAIKA-3980 does not match LABBAIKA.
+BARSH-1125 does not match BARSH.
+URBAN-5180 does not match URBAN.
+KHAIRAT-3132 does not match KHAIRAT.
+HAUWAL-6552 does not match HAUWAL.
+RAHEEM-25 is the only current project whose project code and term code are already aligned.
+Activation consequence
+The hardened Core activation function also requires at least one active term for the exact project code. Thus the current mismatch intentionally blocks six of the Core projects from activation until the contract is aligned.
+This is the correct fail-closed behavior, but the underlying term identity still needs to be redesigned before new production terms are created.
+6. Current Frontend Contract
+js/staking.js
+Current behavior includes:
+Mainnet-only investment
+requires project.status === 'active'
+obtains project_code from getProjectConfig()
+hard-codes allowed duration values to [30, 60, 90, 180, 365, 430]
+uses a fallback minimum stake of 10 Pi if project config does not provide one
+delegates payment approval/completion to the Mainnet API
+does not load authoritative project-specific staking terms from the database before presenting the staking form
+js/project-config.js
+Current catalog contains legacy base codes for six Core projects:
+AZMAN
+LABBAIKA
+BARSH
+URBAN
+KHAIRAT
+HAUWAL
+RAHEEM-25 is already represented with its full code.
+The registry bridge is correctly capable of merging future Core/Internal/External projects from the authoritative registry and does not restrict project type at the registry layer.
+project.js / project.html
+Current page correctly prevents staking when a project is not active. However:
+reward withdrawal is disabled in the UI
+capital withdrawal is disabled in the UI
+the staking modal is not yet driven by the authoritative term/disclosure contract
+the HTML currently includes js/project.js twice, which should be cleaned during a later UI hardening pass without changing behavior unnecessarily.
+7. Current API Contract
+src/financial-gateway.js currently enforces:
+Payment approval
+Pi bearer authentication
+verified Pi identity
+exact project code lookup
+Mainnet network
+Core project type
+Core slot 1..7
+project must already be ACTIVE
+treasury exists and is active/locked
+Pi payment metadata matches amount/network/project code/duration
+recipient matches project treasury wallet
+Payment completion
+The same checks are performed before the authoritative create_stake_from_completed_payment RPC is invoked.
+This is appropriately server-authoritative, but it currently assumes the legacy term model and Core-only investment route.
+Important architectural implication
+The new Project Market Framework will eventually support project-specific terms and distinct Core/Internal/External business engines. The current payment route is therefore a Core-only legacy financial contract, not yet the final universal Project Market contract.
+It should not simply be generalized by removing the Core check.
+8. Current Stake Accounting Contract
+public.stakes currently stores:
+project_id
+project_code
+user_id
+pi_uid
+network
+amount
+duration_days
+reward_rate
+reward_amount
+status
+payment references
+start_at
+unlock_at
+This is useful for immutable position data because the reward rate and reward amount are stored on the position at creation time.
+That behavior is consistent with the new immutable-term principle.
+However, the table currently does not contain a direct term_id / term_version_id. This makes historical contract provenance weaker than the new framework requires.
+Future direction: a new stake position should reference the exact published term/version used to create it, while retaining the copied contractual values needed for settlement/audit.
+Do not add this field by rewriting existing stakes until a migration plan is approved.
+9. Current Withdrawal Contract
+There are two overloaded create_my_withdrawal_request(...) functions.
+Both are Mainnet-only.
+The current withdrawal logic:
+allows reward or capital
+requires positive amount
+requires matured stake (unlock_at <= now())
+blocks if another request for the same stake/type is pending or approved
+applies a fixed 1% fee
+checks requested amount plus fee against stakes.reward_amount or stakes.amount
+stores the request as pending
+The API also uses a fixed minimum withdrawal of 1 Pi.
+Important contract gaps relative to Framework v1
+The current implementation does not yet provide the complete project-specific policy layer for:
+maturity-only vs early withdrawal
+partial withdrawal rules
+reward forfeiture/recalculation
+project-specific withdrawal consequences
+term-version-driven withdrawal policy
+liquidity-aware withdrawal eligibility
+explicit contract snapshot/version linkage
+It also means the current 1% fee is a legacy implementation detail, not a universal ALBUKHR market rule.
+No fee migration is authorized by this audit.
+10. Current Withdrawal Settlement
+The API payout executor receives only the withdrawal request ID and reads the authoritative amount, UID and wallet from the database. It protects against duplicate in-process payout execution and recovers incomplete A2U payments.
+It requires the withdrawal request to be approved, validates the referenced stake and project context, completes the Pi A2U payout, and only then sets the withdrawal request to paid.
+This settlement ordering is compatible with the new fail-safe principle:
+Do not mark a payout successful before the underlying Pi payment is confirmed.
+However, the current executor is not yet a full treasury/liquidity-aware settlement engine. That work belongs to the implementation phase after the Liquidity and Staking frameworks are converted to authoritative data contracts.
+11. Current Liquidity Settlement Contract
+public.settle_project_liquidity_payment(...) currently:
+Requires a valid Mainnet Core project.
+Requires project status approved or active.
+Requires an active/locked Mainnet treasury.
+Verifies the recipient against the treasury wallet.
+Inserts a verified liquidity payment.
+Adds the payment amount to project_treasury.verified_liquidity.
+Writes a treasury transaction.
+If the project is approved, required liquidity is met, and an exact active project-code term exists, it can promote the project to active.
+This is compatible with the hardened Core activation gate, but it remains a specialized Core liquidity contract.
+The new Market Framework should preserve the safety invariant while eventually separating:
+treasury readiness
+liquidity readiness
+reward-capacity readiness
+activation authorization
+rather than allowing a single liquidity payment event to silently perform every market-readiness decision for every project type.
+12. Current Database State
+At the time of this audit:
+Mainnet stakes rows: 0
+Testnet stakes rows in the Mainnet database: 0
+Mainnet project_treasury rows for the audited projects: 0
+Mainnet project_staking_terms: 21 active rows
+Mainnet projects: 8 visible in the project table (7 Core + 1 Internal)
+Because the current stakes table is empty, the project currently has no recorded user stake positions that require historical term-version preservation during the upcoming term-model migration.
+This does not authorize deletion or rewriting of the existing term records; they remain configuration that should be retained until the migration strategy is approved.
+13. Contract Alignment Decision
+The preferred target model is:
+Project (projects.id) → Published Staking Term → Term Version → User Position
+with project_code retained as a human/registry identifier, but not treated as the sole foreign-key-like contract identity.
+Target conceptual structure:
+projects.id
+   ↓
+project_staking_terms.project_id
+   ↓
+project_staking_term_versions.id
+   ↓
+stakes.term_version_id
+The final names may differ after schema audit, but the relationship should be explicit.
+For an existing project position, the position must preserve the exact contractual parameters that were accepted at creation.
+14. What Must Not Be Done Yet
+Do not yet:
+rename AZMAN terms to AZMAN-4080
+rename LABBAIKA terms to LABBAIKA-3980
+rename BARSH terms to BARSH-1125
+rename URBAN terms to URBAN-5180
+rename KHAIRAT terms to KHAIRAT-3132
+rename HAUWAL terms to HAUWAL-6552
+change reward rates
+change durations
+change the current 1% withdrawal fee
+activate a project by direct status update
+generalize Core payment routes to Internal/External by removing the Core restriction
+delete legacy term rows
+Those are implementation actions that require the target contract to be approved first.
+15. Required Next Technical Migration
+The next implementation should be a Staking Contract Schema v2 design, not a reward-rate migration.
+It should establish:
+A. Project-specific identity
+Each staking term belongs to a specific projects.id and network.
+B. Term versions
+A term can be superseded without changing existing positions.
+C. Contract snapshot
+Each stake records the exact term/version and the immutable contractual values required for settlement.
+D. Capability-specific eligibility
+Investment eligibility should resolve from the project's activation scope and the exact published term, not from a frontend duration list.
+E. Withdrawal policy
+Withdrawal eligibility must resolve from the position's contract, not from a global fixed rule.
+F. Project-type boundary
+Core, Internal and External project investment routes must remain distinct unless the authoritative market contract explicitly defines a shared interface.
+16. Safety Assessment
+No production financial records were changed during this audit.
+The current strongest safety properties are:
+Mainnet-only financial route enforcement
+exact project/network validation in the Core investment contract
+server-side payment verification
+idempotent stake creation by payment record
+stake/payment uniqueness
+withdrawal request deduplication for the same stake/type
+payout completion before marking withdrawal paid
+fail-closed Core activation checks
+The main architectural risks are:
+legacy term identity mismatch
+frontend hard-coded term/duration assumptions
+no term-version reference from stake positions
+withdrawal policy not yet project/term driven
+treasury/liquidity controls not yet represented as a complete market-level capability contract
+17. Recommended Implementation Sequence
+Approve this technical contract-alignment decision.
+Design Staking Contract Schema v2.
+Add term/project/version relationships without touching existing positions.
+Add authoritative server-side term-read RPCs.
+Update Core payment/staking creation to consume the new term contract.
+Add Internal/External contract boundaries separately.
+Add withdrawal-policy resolution.
+Update frontend staking forms to consume authoritative terms rather than hard-coded terms.
+Run Testnet migration and regression tests.
+Migrate/republish existing configuration into the new model only after tests pass.
+Activate projects only through the readiness/activation standard.
+18. Final Audit Conclusion
+The current ALBUKHR financial system has a workable safety foundation, but its legacy staking-term identity is not yet aligned with the new Project Market Framework.
+The central issue is not the current reward percentages themselves. The central issue is contract identity and ownership of the staking terms.
+The target should therefore be:
+Project-specific + versioned + server-authoritative + immutable-per-position + liquidity/risk/disclosure aware.
+This audit authorizes no production data mutation. The next work item is the Staking Contract Schema v2 design and compatibility migration plan.
