@@ -1,0 +1,15 @@
+ALBUKHR Staking Contract V2 — Runtime Bridge
+Prepared for MuhmdBuharisaeed/albukhr-app.
+Files:
+staking.js → replace js/staking.js
+project.js → replace js/project.js
+Runtime behavior:
+Reads published Mainnet staking terms from public.get_public_core_staking_terms_v2.
+Requires the project to be ACTIVE.
+Enforces exact published duration/min/max values in the browser before Pi payment begins.
+Sends term_version_id and contract_version: v2 as payment metadata.
+Keeps the existing API-authoritative payment approval/completion path.
+Does not change the ALBUKHR 1% fee policy.
+Does not activate projects or publish terms automatically.
+Does not use LocalStorage.
+Important: The database create_stake_from_completed_payment() remains the final authority and independently selects the published V2 term.
