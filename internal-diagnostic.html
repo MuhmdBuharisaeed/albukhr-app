@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALBUKHR Internal Diagnostic</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f7f5;margin:0;padding:20px;color:#222}
+h2{color:#0f7a3d}
+.card{background:#fff;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #eee}
+.label{font-weight:600}.value{word-break:break-word;text-align:right}
+.ok{color:#0f7a3d;font-weight:700}.bad{color:#b00020;font-weight:700}.muted{color:#777}
+button{width:100%;padding:14px;border:0;border-radius:10px;background:#0f7a3d;color:#fff;font-size:16px;font-weight:700}
+pre{white-space:pre-wrap;word-break:break-word;background:#f1f1f1;padding:12px;border-radius:10px;font-size:12px}
+</style>
+</head>
+<body>
+<h2>ALBUKHR Internal Investment Diagnostic</h2>
+<div class="card">
+  <div class="row"><span class="label">Network</span><span id="network" class="value muted">Checking...</span></div>
+  <div class="row"><span class="label">Project</span><span id="project" class="value muted">Checking...</span></div>
+  <div class="row"><span class="label">Project ID</span><span id="projectId" class="value muted">Checking...</span></div>
+  <div class="row"><span class="label">Project Type</span><span id="projectType" class="value muted">Checking...</span></div>
+  <div class="row"><span class="label">Project Status</span><span id="status" class="value muted">Checking...</span></div>
+  <div class="row"><span class="label">Internal Contract RPC</span><span id="rpc" class="value muted">Checking...</span></div>
+  <div class="row"><span class="label">Published Terms</span><span id="terms" class="value muted">Checking...</span></div>
+</div>
+<div class="card"><button onclick="runDiagnostic()">Run Diagnostic Again</button></div>
+<div class="card"><div class="label">RPC response</div><pre id="output">Waiting...</pre></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/project-config.js"></script>
+<script>
+(function(){
+"use strict";
+const PROJECT_CODE="MAITAGOGO-2457";
+const PROJECT_ID="47883793-9d35-456f-a7d3-604a9de9db46";
+function set(id,value,ok){
+  const el=document.getElementById(id);
+  el.textContent=value;
+  el.className="value "+(ok===true?"ok":ok===false?"bad":"muted");
+}
+async function runDiagnostic(){
+  document.getElementById("output").textContent="Running read-only diagnostic...";
+  try{
+    const env=window.ALBukhrEnvironment;
+    const core=window.ALBUKHR_SUPABASE;
+    const network=String(env?.getNetwork?.()||"").toLowerCase();
+    set("network",network||"unavailable",network==="mainnet");
+    if(!core?.client) throw new Error("ALBUKHR Supabase Core is unavailable.");
+
+    const registry=await core.rpc("get_public_project_registry",{p_network:"mainnet"});
+    if(registry?.error) throw registry.error;
+    const rows=Array.isArray(registry.data)?registry.data:[];
+    const project=rows.find(row=>String(row?.project_code||"").toUpperCase()===PROJECT_CODE);
+    if(!project) throw new Error("MAITAGOGO-2457 was not returned by the Mainnet project registry.");
+
+    const id=String(project.id||"");
+    const type=String(project.project_type||"").toLowerCase();
+    const status=String(project.status||"").toLowerCase();
+    set("project",String(project.name||PROJECT_CODE),true);
+    set("projectId",id,id===PROJECT_ID);
+    set("projectType",type,type==="internal");
+    set("status",status,status==="approved");
+
+    const result=await core.client.schema("albukhr_security").rpc("get_internal_contract_terms_v2",{
+      p_project_id:PROJECT_ID,p_network:"mainnet"
+    });
+    if(result?.error){
+      set("rpc","FAILED",false);
+      set("terms","Unavailable",false);
+      throw result.error;
+    }
+    const data=result?.data;
+    const valid=Boolean(
+      data?.success===true &&
+      String(data?.network||"").toLowerCase()==="mainnet" &&
+      String(data?.project_id||"")===PROJECT_ID &&
+      String(data?.project_code||"").toUpperCase()===PROJECT_CODE &&
+      String(data?.project_type||"").toLowerCase()==="internal"
+    );
+    set("rpc",valid?"PASS":"INVALID RESPONSE",valid);
+    const terms=Array.isArray(data?.terms)?data.terms:[];
+    set("terms",String(terms.length),terms.length===0);
+    document.getElementById("output").textContent=JSON.stringify({
+      success:data?.success,network:data?.network,project_id:data?.project_id,
+      project_code:data?.project_code,project_type:data?.project_type,
+      status:data?.status,published_terms_count:terms.length,terms
+    },null,2);
+  }catch(error){
+    document.getElementById("output").textContent=JSON.stringify({error:error?.message||String(error)},null,2);
+  }
+}
+window.runDiagnostic=runDiagnostic;
+document.addEventListener("DOMContentLoaded",runDiagnostic);
+})();
+</script>
+</body>
+</html>
