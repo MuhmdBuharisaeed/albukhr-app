@@ -316,11 +316,20 @@
       `${LIQUIDITY_HISTORY_API}?project_code=${encodeURIComponent(project.project_code)}`
     );
 
-    if (!data?.success){
+    /*
+     * ALBUKHR API Core unwraps the API response and returns data directly.
+     * The history gateway therefore returns:
+     *   {
+     *     project_code,
+     *     network,
+     *     payments,
+     *     transactions
+     *   }
+     * rather than the outer { success, data } wrapper.
+     */
+    if (!data || typeof data !== "object"){
       throw new Error(
-        data?.message ||
-        data?.error ||
-        "Internal liquidity history could not be loaded."
+        "Internal liquidity history returned an invalid response."
       );
     }
 
