@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f7a3d">
+<meta name="robots" content="noindex,nofollow">
+<title>ALBUKHR Internal Project Dashboard</title>
+
+<link rel="stylesheet" href="css/global-core.css">
+<link rel="stylesheet" href="css/contributor-internal-dashboard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="js/core/environment-core.js" defer></script>
+<script src="js/core/supabase-core.js" defer></script>
+<script src="https://sdk.minepi.com/pi-sdk.js" defer></script>
+<script src="js/core/pi-auth-core.js" defer></script>
+<script src="js/core/page-auth-guard.js" defer></script>
+<script src="js/core/albukhr-api-core.js" defer></script>
+<script src="js/contributor/internal-dashboard.js" defer></script>
+</head>
+
+<body>
+<div class="internal-dashboard">
+
+  <header class="id-header">
+    <button id="backButton" class="icon-button" type="button" aria-label="Go back">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+
+    <div class="header-title">
+      <strong>Internal Project</strong>
+      <span>Contributor Dashboard</span>
+    </div>
+
+    <button id="closeButton" class="icon-button" type="button" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </header>
+
+  <main class="id-main">
+
+    <section class="project-hero">
+      <div class="project-logo-wrap">
+        <img id="projectLogo" src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" alt="ALBUKHR Project">
+      </div>
+
+      <div class="project-hero-copy">
+        <span class="eyebrow">CONTRIBUTOR INTERNAL</span>
+        <h1 id="projectName">Loading Internal Project…</h1>
+        <div class="project-meta">
+          <span id="projectCode">—</span>
+          <span id="projectStatus" class="status-pill">CHECKING</span>
+        </div>
+        <p id="userHandle">Checking authenticated Contributor…</p>
+      </div>
+    </section>
+
+    <section class="security-strip">
+      <div class="security-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <div>
+        <strong id="securityState">SECURITY CHECK</strong>
+        <span id="pageStatus">Waiting for Mainnet authentication and Contributor authorization.</span>
+      </div>
+    </section>
+
+    <section id="errorPanel" class="panel error-panel hidden" role="alert" aria-live="assertive">
+      <div class="panel-title"><i class="fa-solid fa-circle-exclamation"></i><span>Dashboard Status</span></div>
+      <p id="errorText">—</p>
+      <button id="errorRefresh" class="outline-button" type="button">Retry</button>
+    </section>
+
+    <section class="metric-grid">
+      <article class="metric-card">
+        <span>Required Liquidity</span>
+        <strong id="requiredLiquidity">0.000 Pi</strong>
+        <small>Server-defined threshold</small>
+      </article>
+
+      <article class="metric-card">
+        <span>Verified Liquidity</span>
+        <strong id="verifiedLiquidity">0.000 Pi</strong>
+        <small>Settled by ALBUKHR</small>
+      </article>
+
+      <article class="metric-card">
+        <span>Liquidity Gap</span>
+        <strong id="liquidityGap">0.000 Pi</strong>
+        <small>Amount still required</small>
+      </article>
+
+      <article class="metric-card">
+        <span>Readiness</span>
+        <strong id="liquidityReady">NOT READY</strong>
+        <small>Investment remains gated</small>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <i class="fa-solid fa-building-columns"></i>
+        <span>Internal Treasury</span>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-row">
+          <span>Network</span>
+          <strong id="networkValue">MAINNET</strong>
+        </div>
+        <div class="detail-row">
+          <span>Treasury Status</span>
+          <strong id="treasuryStatus">NOT CONFIGURED</strong>
+        </div>
+        <div class="detail-row">
+          <span>Treasury Wallet</span>
+          <strong id="treasuryWallet">Not configured</strong>
+        </div>
+      </div>
+
+      <div id="treasuryWarning" class="notice warning hidden">
+        <i class="fa-solid fa-lock"></i>
+        <div>
+          <strong>Treasury configuration required</strong>
+          <span>The Contributor cannot add liquidity until ALBUKHR administration configures an active Mainnet Internal Project treasury wallet.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <i class="fa-solid fa-droplet"></i>
+        <span>Add Liquidity</span>
+      </div>
+
+      <p class="panel-copy">
+        Add liquidity to your Contributor Internal Project treasury. The Pi payment is verified by the ALBUKHR Mainnet API before the treasury balance is updated.
+      </p>
+
+      <form id="liquidityForm" class="liquidity-form" novalidate>
+        <label for="liquidityAmount">Amount to Add (Pi)</label>
+        <div class="amount-wrap">
+          <input
+            id="liquidityAmount"
+            type="number"
+            min="0.001"
+            step="0.001"
+            inputmode="decimal"
+            placeholder="0.000"
+            autocomplete="off"
+            required
+          >
+          <span>PI</span>
+        </div>
+
+        <small id="amountHint" class="field-hint">Enter the amount you want verified as Internal Project liquidity.</small>
+
+        <button id="addLiquidityButton" class="primary-button" type="submit" disabled>
+          <i class="fa-solid fa-plus"></i>
+          <span>Add Liquidity</span>
+        </button>
+      </form>
+
+      <div id="paymentState" class="payment-state hidden" aria-live="polite"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <i class="fa-solid fa-lock"></i>
+        <span>Investment Access</span>
+      </div>
+
+      <div class="gate-card">
+        <strong id="investmentGateTitle">Investment is currently gated</strong>
+        <span id="investmentGateText">
+          Internal investment requires verified liquidity readiness plus the remaining project activation, published contract, and engine requirements.
+        </span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title panel-title-with-action">
+        <div>
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Liquidity History</span>
+        </div>
+        <button id="refreshButton" class="small-button" type="button">
+          <i class="fa-solid fa-rotate"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      <div id="historyList" class="history-list"></div>
+
+      <div id="historyEmpty" class="empty-state hidden">
+        <i class="fa-regular fa-folder-open"></i>
+        <strong>No liquidity settlements yet</strong>
+        <span>Your verified Internal liquidity transactions will appear here.</span>
+      </div>
+
+      <div id="historyError" class="inline-error hidden"></div>
+    </section>
+
+    <section class="action-grid">
+      <a class="outline-button" href="contributor.html">
+        <i class="fa-solid fa-user-check"></i>
+        Contributor Program
+      </a>
+
+      <button id="refreshBottomButton" class="outline-button" type="button">
+        <i class="fa-solid fa-rotate"></i>
+        Refresh Dashboard
+      </button>
+    </section>
+
+    <footer class="dashboard-footer">
+      <img src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" alt="ALBUKHR">
+      <strong>ALBUKHR Investment Limited</strong>
+      <span>Contributor Internal Financial Workspace · Mainnet</span>
+    </footer>
+
+  </main>
+</div>
+</body>
+</html>
