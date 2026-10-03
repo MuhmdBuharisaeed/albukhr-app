@@ -7,6 +7,7 @@
 
   const DURATIONS=[30,60,90,180,365,430];
   const TERMS_RPC="get_public_internal_staking_terms_v2";
+  const SECURITY_TERMS_RPC="get_internal_contract_terms_v2";
   const API_APPROVE="/api/internal-payment-approve";
   const API_COMPLETE="/api/internal-payment-complete";
   const cache=new Map();
@@ -37,6 +38,12 @@
     if(!c||!c.client||typeof c.rpc!=="function") throw new Error("ALBUKHR Supabase Core is not loaded.");
     if(clean(c.network).toLowerCase()!=="mainnet") throw new Error("Mainnet Internal investment is unavailable on Testnet.");
     return c;
+  }
+
+  function securityRpc(functionName,params={}){
+    const core=client();
+    if(typeof core.client?.schema!=="function") throw new Error("Supabase schema client is unavailable.");
+    return core.client.schema("albukhr_security").rpc(functionName,params);
   }
 
   function api(){
@@ -95,7 +102,7 @@
     if(!force&&pending.has(key)) return pending.get(key);
 
     const promise=(async()=>{
-      const result=await client().rpc(TERMS_RPC,{p_project_id:id,p_network:"mainnet"});
+      const result=await securityRpc(SECURITY_TERMS_RPC,{p_project_id:id,p_network:"mainnet"});
       if(result?.error) throw result.error;
       const data=result?.data;
       if(!data||data.success!==true) throw new Error("Published Internal investment contract is unavailable.");
