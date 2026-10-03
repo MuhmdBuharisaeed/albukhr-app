@@ -1,0 +1,39 @@
+ALBUKHR Contributor Internal Dashboard V1
+
+FILES
+- contributor-internal-dashboard.html
+- js/contributor/internal-dashboard.js
+- css/contributor-internal-dashboard.css
+
+DEPLOY ORDER
+1. Deploy the API patch:
+   albukhr-api-internal-liquidity-v1.zip
+
+2. In albukhr-app, place:
+   - contributor-internal-dashboard.html at repository root
+   - js/contributor/internal-dashboard.js under js/contributor/
+   - css/contributor-internal-dashboard.css under css/
+
+3. Open:
+   https://app.albukhr.com/contributor-internal-dashboard.html
+
+CURRENT SCOPE
+- Mainnet-only.
+- Uses existing Pi Auth Core, Page Auth Guard and ALBUKHR API Core.
+- Contributor ownership is checked by the server.
+- Add Liquidity uses:
+  /api/internal-liquidity-approve
+  /api/internal-liquidity-complete
+- Treasury/readiness uses:
+  /api/internal-liquidity-workspace
+- History uses:
+  /api/internal-liquidity-history
+- No LocalStorage/sessionStorage.
+- No direct browser financial table access.
+- No changes to Core staking or Core financial gateway.
+- No Dock Navigation changes.
+
+IMPORTANT CURRENT STATE
+Maitagogo is approved, but its Mainnet Internal treasury is currently not configured.
+The dashboard will intentionally show Add Liquidity as locked until the treasury is configured.
+Do not manually activate the project or mark the Internal runtime ready.
