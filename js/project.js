@@ -34,18 +34,28 @@
     if (typeof window.showAlert === "function") window.showAlert(title, text);
     else window.alert(`${title}\n\n${text}`);
   }
+  function projectConfigGetter(){
+    if(typeof window.getProjectConfig === "function") return window.getProjectConfig;
+    const registry=window.ALBukhrProjectConfig;
+    return registry&&typeof registry.get === "function"
+      ? registry.get.bind(registry)
+      : null;
+  }
   function projectConfig(){
-    if(typeof window.getProjectConfig !== "function") return null;
-    return window.getProjectConfig(resolvedProjectKey || requestedProject);
+    const getter=projectConfigGetter();
+    return getter ? getter(resolvedProjectKey || requestedProject) : null;
   }
   async function loadRegistry(){
-    if (typeof window.loadProjectRegistry !== "function") return null;
-    return window.loadProjectRegistry();
+    if(typeof window.loadProjectRegistry === "function") return window.loadProjectRegistry();
+    const registry=window.ALBukhrProjectConfig;
+    if(registry&&typeof registry.loadRegistry === "function") return registry.loadRegistry();
+    return null;
   }
   function configHasIdentity(cfg){ return !!(cfg && (clean(cfg.project_code)||clean(cfg.project_id)||clean(cfg.slug))); }
 
   async function resolveProjectKey(){
-    if(typeof window.getProjectConfig !== "function") return "";
+    const getter=projectConfigGetter();
+    if(!getter) return "";
     const value=clean(requestedProject); if(!value) return "";
     function findInConfig(){
       const configs=window.PROJECT_CONFIG;
@@ -56,7 +66,7 @@
           if(String(key).toLowerCase()===wanted||clean(cfg.project_id).toLowerCase()===wanted||clean(cfg.project_code).toLowerCase()===wanted||clean(cfg.slug).toLowerCase()===wanted||clean(cfg.title).toLowerCase()===wanted||clean(cfg.name).toLowerCase()===wanted) return key;
         }
       }
-      const cfg=window.getProjectConfig(value);
+      const cfg=getter(value);
       return configHasIdentity(cfg)?(cfg.key||value):"";
     }
     let key=findInConfig(); if(key) return key;
