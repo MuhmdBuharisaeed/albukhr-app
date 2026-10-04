@@ -23,46 +23,26 @@
 
 <body>
 <div class="internal-dashboard">
-
   <header class="id-header">
-    <button id="backButton" class="icon-button" type="button" aria-label="Go back">
-      <i class="fa-solid fa-arrow-left"></i>
-    </button>
-
-    <div class="header-title">
-      <strong>Internal Project</strong>
-      <span>Contributor Dashboard</span>
-    </div>
-
-    <button id="closeButton" class="icon-button" type="button" aria-label="Close">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+    <button id="backButton" class="icon-button" type="button" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="header-title"><strong>Internal Project</strong><span>Contributor Dashboard</span></div>
+    <button id="closeButton" class="icon-button" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
   </header>
 
   <main class="id-main">
-
     <section class="project-hero">
-      <div class="project-logo-wrap">
-        <img id="projectLogo" src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" alt="ALBUKHR Project">
-      </div>
-
+      <div class="project-logo-wrap"><img id="projectLogo" src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" alt="ALBUKHR Project"></div>
       <div class="project-hero-copy">
         <span class="eyebrow">CONTRIBUTOR INTERNAL</span>
         <h1 id="projectName">Loading Internal Project…</h1>
-        <div class="project-meta">
-          <span id="projectCode">—</span>
-          <span id="projectStatus" class="status-pill">CHECKING</span>
-        </div>
+        <div class="project-meta"><span id="projectCode">—</span><span id="projectStatus" class="status-pill">CHECKING</span></div>
         <p id="userHandle">Checking authenticated Contributor…</p>
       </div>
     </section>
 
     <section class="security-strip">
       <div class="security-icon"><i class="fa-solid fa-shield-halved"></i></div>
-      <div>
-        <strong id="securityState">SECURITY CHECK</strong>
-        <span id="pageStatus">Waiting for Mainnet authentication and Contributor authorization.</span>
-      </div>
+      <div><strong id="securityState">SECURITY CHECK</strong><span id="pageStatus">Waiting for Mainnet authentication and Contributor authorization.</span></div>
     </section>
 
     <section id="errorPanel" class="panel error-panel hidden" role="alert" aria-live="assertive">
@@ -72,153 +52,94 @@
     </section>
 
     <section class="metric-grid">
-      <article class="metric-card">
-        <span>Required Liquidity</span>
-        <strong id="requiredLiquidity">0.000 Pi</strong>
-        <small>Server-defined threshold</small>
-      </article>
-
-      <article class="metric-card">
-        <span>Verified Liquidity</span>
-        <strong id="verifiedLiquidity">0.000 Pi</strong>
-        <small>Settled by ALBUKHR</small>
-      </article>
-
-      <article class="metric-card">
-        <span>Liquidity Gap</span>
-        <strong id="liquidityGap">0.000 Pi</strong>
-        <small>Amount still required</small>
-      </article>
-
-      <article class="metric-card">
-        <span>Readiness</span>
-        <strong id="liquidityReady">NOT READY</strong>
-        <small>Investment remains gated</small>
-      </article>
+      <article class="metric-card"><span>Required Liquidity</span><strong id="requiredLiquidity">0.000 Pi</strong><small>Server-defined threshold</small></article>
+      <article class="metric-card"><span>Verified Liquidity</span><strong id="verifiedLiquidity">0.000 Pi</strong><small>Settled by ALBUKHR</small></article>
+      <article class="metric-card"><span>Liquidity Gap</span><strong id="liquidityGap">0.000 Pi</strong><small>Remaining amount required</small></article>
+      <article class="metric-card"><span>Readiness</span><strong id="liquidityReady">NOT READY</strong><small>Investment remains gated</small></article>
     </section>
 
     <section class="panel">
-      <div class="panel-title">
-        <i class="fa-solid fa-building-columns"></i>
-        <span>Internal Treasury</span>
-      </div>
+      <div class="panel-title"><i class="fa-solid fa-file-invoice-dollar"></i><span>Project Funding Plan</span></div>
+      <p class="panel-copy">Describe what the project actually needs to spend. ALBUKHR calculates the authoritative capital requirement from the itemized plan. Contributor-entered liquidity is context only; it is not approved liquidity.</p>
 
-      <div class="detail-grid">
-        <div class="detail-row">
-          <span>Network</span>
-          <strong id="networkValue">MAINNET</strong>
-        </div>
-        <div class="detail-row">
-          <span>Treasury Status</span>
-          <strong id="treasuryStatus">NOT CONFIGURED</strong>
-        </div>
-        <div class="detail-row">
-          <span>Treasury Wallet</span>
-          <strong id="treasuryWallet">Not configured</strong>
-        </div>
-      </div>
+      <div id="fundingPlanNotice" class="notice info hidden"><i class="fa-solid fa-circle-info"></i><div><strong id="fundingPlanNoticeTitle">Funding Plan Status</strong><span id="fundingPlanNoticeText">—</span></div></div>
 
-      <div id="treasuryWarning" class="notice warning hidden">
-        <i class="fa-solid fa-lock"></i>
-        <div>
-          <strong>Treasury configuration required</strong>
-          <span>The Contributor cannot add liquidity until ALBUKHR administration configures an active Mainnet Internal Project treasury wallet.</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="panel-title">
-        <i class="fa-solid fa-droplet"></i>
-        <span>Add Liquidity</span>
-      </div>
-
-      <p class="panel-copy">
-        Add liquidity to your Contributor Internal Project treasury. The Pi payment is verified by the ALBUKHR Mainnet API before the treasury balance is updated.
-      </p>
-
-      <form id="liquidityForm" class="liquidity-form" novalidate>
-        <label for="liquidityAmount">Amount to Add (Pi)</label>
-        <div class="amount-wrap">
-          <input
-            id="liquidityAmount"
-            type="number"
-            min="0.001"
-            step="0.001"
-            inputmode="decimal"
-            placeholder="0.000"
-            autocomplete="off"
-            required
-          >
-          <span>PI</span>
+      <form id="fundingPlanForm" class="funding-form" novalidate>
+        <div class="funding-grid">
+          <div class="field"><label for="businessStage">Business Stage</label><input id="businessStage" type="text" maxlength="50" placeholder="e.g. operating" required></div>
+          <div class="field"><label for="fundingPurpose">Funding Purpose</label><input id="fundingPurpose" type="text" maxlength="100" placeholder="e.g. expansion of production" required></div>
+          <div class="field"><label for="fundingMode">Funding Mode</label><select id="fundingMode" required><option value="">Select mode</option><option value="startup">Startup</option><option value="expansion">Expansion</option><option value="working_capital">Working Capital</option><option value="replacement">Replacement</option><option value="mixed">Mixed</option></select></div>
+          <div class="field"><label for="existingAssetBase">Existing Asset Base (Pi value)</label><input id="existingAssetBase" type="number" min="0" step="0.001" inputmode="decimal" placeholder="0.000"></div>
+          <div class="field"><label for="declaredExistingLiquidity">Declared Existing Liquidity (Pi)</label><input id="declaredExistingLiquidity" type="number" min="0" step="0.001" inputmode="decimal" placeholder="0.000"><small class="field-hint">Contributor declaration only. The system keeps verified liquidity at zero until authoritative evidence is available.</small></div>
+          <div class="field"><label for="declaredCapitalRequirement">Declared Incremental Capital (Pi)</label><input id="declaredCapitalRequirement" type="number" min="0" step="0.001" inputmode="decimal" placeholder="0.000"><small class="field-hint">Reference estimate only. The database recalculates this from the itemized costs plus reserves.</small></div>
+          <div class="field"><label for="fundingWindowStart">Funding Window Start</label><input id="fundingWindowStart" type="datetime-local"></div>
+          <div class="field"><label for="fundingWindowEnd">Funding Window End</label><input id="fundingWindowEnd" type="datetime-local"></div>
+          <div class="field"><label for="operatingCycleDays">Operating Cycle (days)</label><input id="operatingCycleDays" type="number" min="1" max="3650" step="1" inputmode="numeric" placeholder="e.g. 30"></div>
+          <div class="field"><label for="expectedCapitalCycleDays">Expected Capital Cycle (days)</label><input id="expectedCapitalCycleDays" type="number" min="1" max="3650" step="1" inputmode="numeric" placeholder="e.g. 60"></div>
+          <div class="field"><label for="requiredReserve">Required Reserve (Pi)</label><input id="requiredReserve" type="number" min="0" step="0.001" inputmode="decimal" placeholder="0.000"></div>
+          <div class="field"><label for="contingencyReserve">Contingency Reserve (Pi)</label><input id="contingencyReserve" type="number" min="0" step="0.001" inputmode="decimal" placeholder="0.000"></div>
         </div>
 
-        <small id="amountHint" class="field-hint">Enter the amount you want verified as Internal Project liquidity.</small>
+        <div class="funding-items-head"><div><strong>Itemized Funding Requirements</strong><span>One or more cost lines are required.</span></div><strong id="fundingItemsTotal">0.000 Pi</strong></div>
+        <div id="fundingItems" class="funding-items"></div>
+        <button id="addFundingItem" class="small-button" type="button"><i class="fa-solid fa-plus"></i><span>Add cost line</span></button>
 
-        <button id="addLiquidityButton" class="primary-button" type="submit" disabled>
-          <i class="fa-solid fa-plus"></i>
-          <span>Add Liquidity</span>
-        </button>
+        <div class="field full"><label for="fundingNotes">Notes</label><textarea id="fundingNotes" maxlength="5000" rows="4" placeholder="Explain why the funding is needed, what already exists, and how the requested capital will be deployed."></textarea></div>
+
+        <div class="funding-actions">
+          <button id="saveFundingPlanButton" class="outline-button" type="button"><i class="fa-solid fa-floppy-disk"></i><span>Save Draft</span></button>
+          <button id="submitFundingPlanButton" class="primary-button" type="button"><i class="fa-solid fa-paper-plane"></i><span>Submit for Assessment</span></button>
+        </div>
       </form>
 
+      <div id="fundingState" class="payment-state hidden" aria-live="polite"></div>
+
+      <div class="assessment-card">
+        <div class="assessment-row"><span>Plan Status</span><strong id="fundingPlanStatus">NOT SUBMITTED</strong></div>
+        <div class="assessment-row"><span>Capital Requirement</span><strong id="capitalRequirement">0.000 Pi</strong></div>
+        <div class="assessment-row"><span>System Liquidity Recommendation</span><strong id="systemLiquidityRecommendation">Pending</strong></div>
+        <div class="assessment-row"><span>Assessment Status</span><strong id="assessmentStatus">NOT ASSESSED</strong></div>
+        <div class="assessment-row"><span>Readiness Status</span><strong id="assessmentReadiness">NOT READY</strong></div>
+        <div id="assessmentReasons" class="assessment-reasons hidden"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title"><i class="fa-solid fa-building-columns"></i><span>Internal Treasury</span></div>
+      <div class="detail-grid">
+        <div class="detail-row"><span>Network</span><strong id="networkValue">MAINNET</strong></div>
+        <div class="detail-row"><span>Treasury Status</span><strong id="treasuryStatus">NOT CONFIGURED</strong></div>
+        <div class="detail-row"><span>Treasury Wallet</span><strong id="treasuryWallet">Not configured</strong></div>
+      </div>
+      <div id="treasuryWarning" class="notice warning hidden"><i class="fa-solid fa-lock"></i><div><strong>Treasury configuration required</strong><span>ALBUKHR administration must configure the Mainnet Internal treasury before liquidity can be settled.</span></div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title"><i class="fa-solid fa-droplet"></i><span>Settle Approved Liquidity</span></div>
+      <p class="panel-copy">The Contributor cannot choose an arbitrary liquidity amount. When the server has approved the treasury requirement and a gap remains, this button uses the current server-computed remaining gap for the Pi payment.</p>
+      <div class="approved-amount-card"><span>Current server-computed amount</span><strong id="approvedLiquidityAmount">0.000 Pi</strong><small id="approvedLiquidityHint">No payable liquidity gap is currently available.</small></div>
+      <button id="addLiquidityButton" class="primary-button" type="button" disabled><i class="fa-solid fa-lock"></i><span>Liquidity Settlement Unavailable</span></button>
       <div id="paymentState" class="payment-state hidden" aria-live="polite"></div>
     </section>
 
     <section class="panel">
-      <div class="panel-title">
-        <i class="fa-solid fa-lock"></i>
-        <span>Investment Access</span>
-      </div>
-
-      <div class="gate-card">
-        <strong id="investmentGateTitle">Investment is currently gated</strong>
-        <span id="investmentGateText">
-          Internal investment requires verified liquidity readiness plus the remaining project activation, published contract, and engine requirements.
-        </span>
-      </div>
+      <div class="panel-title"><i class="fa-solid fa-lock"></i><span>Investment Access</span></div>
+      <div class="gate-card"><strong id="investmentGateTitle">Investment is currently gated</strong><span id="investmentGateText">Internal investment requires verified liquidity readiness plus the remaining project activation, published contract, and engine requirements.</span></div>
     </section>
 
     <section class="panel">
-      <div class="panel-title panel-title-with-action">
-        <div>
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          <span>Liquidity History</span>
-        </div>
-        <button id="refreshButton" class="small-button" type="button">
-          <i class="fa-solid fa-rotate"></i>
-          <span>Refresh</span>
-        </button>
-      </div>
-
+      <div class="panel-title panel-title-with-action"><div><i class="fa-solid fa-clock-rotate-left"></i><span>Liquidity History</span></div><button id="refreshButton" class="small-button" type="button"><i class="fa-solid fa-rotate"></i><span>Refresh</span></button></div>
       <div id="historyList" class="history-list"></div>
-
-      <div id="historyEmpty" class="empty-state hidden">
-        <i class="fa-regular fa-folder-open"></i>
-        <strong>No liquidity settlements yet</strong>
-        <span>Your verified Internal liquidity transactions will appear here.</span>
-      </div>
-
+      <div id="historyEmpty" class="empty-state hidden"><i class="fa-regular fa-folder-open"></i><strong>No liquidity settlements yet</strong><span>Your verified Internal liquidity transactions will appear here.</span></div>
       <div id="historyError" class="inline-error hidden"></div>
     </section>
 
     <section class="action-grid">
-      <a class="outline-button" href="contributor.html">
-        <i class="fa-solid fa-user-check"></i>
-        Contributor Program
-      </a>
-
-      <button id="refreshBottomButton" class="outline-button" type="button">
-        <i class="fa-solid fa-rotate"></i>
-        Refresh Dashboard
-      </button>
+      <a class="outline-button" href="contributor.html"><i class="fa-solid fa-user-check"></i>Contributor Program</a>
+      <button id="refreshBottomButton" class="outline-button" type="button"><i class="fa-solid fa-rotate"></i>Refresh Dashboard</button>
     </section>
 
-    <footer class="dashboard-footer">
-      <img src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" alt="ALBUKHR">
-      <strong>ALBUKHR Investment Limited</strong>
-      <span>Contributor Internal Financial Workspace · Mainnet</span>
-    </footer>
-
+    <footer class="dashboard-footer"><img src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" alt="ALBUKHR"><strong>ALBUKHR Investment Limited</strong><span>Contributor Internal Financial Workspace · Mainnet</span></footer>
   </main>
 </div>
 </body>
