@@ -161,10 +161,51 @@
     <button id="uploadLogoButton" class="share-profile-btn contributor-full-button" type="button"><i class="fa-solid fa-cloud-arrow-up"></i>Upload Project Logo</button>
     <div id="logoStatus" class="contributor-status-text" aria-live="polite"></div>
   </div>
+
   <div id="submissionPanel" class="submission-panel contributor-submission-panel">
-    <div><div class="card-title compact-title"><i class="fa-solid fa-paper-plane"></i><span>Review Status</span></div><p id="submissionText" class="contributor-copy">Complete your project details and logo, then submit for ALBUKHR review.</p></div>
-    <button id="submitProjectButton" class="primary-contributor-button" type="button">Submit for Review</button>
+  <div>
+    <div class="card-title compact-title">
+      <i class="fa-solid fa-paper-plane"></i>
+      <span>Review Status</span>
+    </div>
+
+    <p id="submissionText" class="contributor-copy">
+      Complete your project details and logo, then submit for ALBUKHR review.
+    </p>
   </div>
+
+  <button
+    id="submitProjectButton"
+    class="primary-contributor-button"
+    type="button"
+  >
+    Submit for Review
+  </button>
+
+  <!--
+    CONTRIBUTOR INTERNAL FUNDING HANDOFF
+
+    This button is intentionally hidden by default.
+    contributor-workspace.js will display it only when the
+    authenticated Contributor project is APPROVED or ACTIVE.
+
+    No project_id, Pi UID, wallet address, or other identity
+    information is placed in the URL.
+
+    contributor-internal-dashboard.html derives the project
+    from the authenticated Contributor workspace.
+  -->
+  <a
+    id="fundingPlanButton"
+    class="share-profile-btn contributor-full-button hidden"
+    href="contributor-internal-dashboard.html"
+    aria-label="Open Funding and Capital Requirements"
+  >
+    <i class="fa-solid fa-file-invoice-dollar"></i>
+    <span>Funding &amp; Capital Requirements</span>
+  </a>
+  </div>
+
   <div id="reviewPanel" class="review-panel contributor-review-panel hidden">
     <div class="card-title compact-title"><i class="fa-solid fa-clock-rotate-left"></i><span>Review History</span></div>
     <div id="reviewList" class="records"></div>
