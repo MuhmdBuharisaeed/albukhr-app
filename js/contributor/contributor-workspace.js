@@ -129,7 +129,10 @@
 
     const safeMessage = String(message || "Unknown request failure.")
       .replace(/Bearer\s+[A-Za-z0-9._~+\/=-]+/gi, "Bearer [redacted]")
-      .replace(/(?:token|access_token|invitation_token)[=:][^\s,;]+/gi, "$1=[redacted]");
+      .replace(
+        /(?:token|access_token|invitation_token)[=:][^\s,;]+/gi,
+        "$1=[redacted]"
+      );
 
     [
       `Operation: ${String(method || "GET").toUpperCase()}`,
@@ -721,6 +724,43 @@
     const editable =
       status === "draft";
 
+    /* =======================================================
+       FUNDING HANDOFF START
+       -------------------------------------------------------
+       The Funding & Capital Requirements button is controlled
+       entirely by the authoritative project status.
+
+       It is visible only for:
+         - APPROVED
+         - ACTIVE
+
+       It remains hidden for:
+         - DRAFT
+         - PENDING
+         - ARCHIVED
+         - any unknown status
+
+       No project ID, Pi UID, or wallet address is added to
+       the URL. The funding dashboard resolves the authenticated
+       Contributor project itself.
+       ======================================================= */
+    const fundingPlanButton =
+      $("fundingPlanButton");
+
+    const fundingEligible =
+      status === "approved" ||
+      status === "active";
+
+    if (fundingPlanButton){
+      fundingPlanButton.classList.toggle(
+        "hidden",
+        !fundingEligible
+      );
+    }
+    /* =======================================================
+       FUNDING HANDOFF END
+       ======================================================= */
+
     const logoUrl =
       p.logo_url || null;
 
@@ -822,7 +862,12 @@
     } else if (status === "approved"){
       setText(
         "submissionText",
-        "Your project has been approved into the governed project registry. Further activation and financial configuration remain separate governance steps."
+        "Your project has been approved into the governed project registry. Continue to Funding & Capital Requirements to submit the project's itemized funding needs for financial assessment."
+      );
+    } else if (status === "active"){
+      setText(
+        "submissionText",
+        "Your Internal Project is active. Continue to Funding & Capital Requirements to submit or update the project's itemized funding needs for financial assessment."
       );
     } else if (status === "archived"){
       setText(
