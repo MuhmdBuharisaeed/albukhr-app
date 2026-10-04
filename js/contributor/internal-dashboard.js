@@ -87,19 +87,39 @@
   function setInput(id,value){ const el=$(id); if(el) el.value=value==null?"":String(value); }
 
   function fundingPayloadSource(){
-    const raw=fundingWorkspace?.funding_plan || fundingWorkspace || {};
-    return raw?.funding_plan || raw;
+  const raw=fundingWorkspace?.funding_plan || fundingWorkspace || {};
+
+  return raw?.plan
+    || raw?.funding_plan?.plan
+    || raw;
+}
+
+function assessmentSource(){
+  const raw=fundingWorkspace?.funding_plan || fundingWorkspace || {};
+
+  return raw?.assessment
+    || raw?.funding_plan?.assessment
+    || fundingWorkspace?.assessment
+    || null;
+}
+
+function fundingItemsSource(){
+  const raw=fundingWorkspace?.funding_plan || fundingWorkspace || {};
+
+  if(Array.isArray(raw?.items)){
+    return raw.items;
   }
 
-  function assessmentSource(){
-    const raw=fundingWorkspace?.funding_plan || fundingWorkspace || {};
-    return raw?.assessment || fundingWorkspace?.assessment || null;
+  if(Array.isArray(raw?.funding_plan?.items)){
+    return raw.funding_plan.items;
   }
 
-  function fundingItemsSource(){
-    const raw=fundingWorkspace?.funding_plan || fundingWorkspace || {};
-    return Array.isArray(raw?.items) ? raw.items : (Array.isArray(fundingWorkspace?.items) ? fundingWorkspace.items : []);
+  if(Array.isArray(fundingWorkspace?.items)){
+    return fundingWorkspace.items;
   }
+
+  return [];
+}
 
   function clearFundingItems(){ const el=$("fundingItems"); if(el) el.replaceChildren(); }
 
