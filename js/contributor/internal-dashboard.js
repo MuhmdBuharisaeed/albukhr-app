@@ -1726,69 +1726,81 @@ async function saveFundingPlan() {
    * SUBMIT FUNDING PLAN
    * --------------------------------------------------------- */
 
-  async function submitFundingPlan() {
-    assertMainnet();
+async function submitFundingPlan() {
+  assertMainnet();
+
+  /*
+   * Always save the current browser form first.
+   * The server recalculates authoritative values.
+   */
+  await saveFundingPlan();
+
+  setFundingBusy(true);
+
+  show(
+    "fundingState",
+    true
+  );
+
+  setStateMessage(
+    "fundingState",
+    "Submitting funding plan for server assessment…",
+    "active"
+  );
+
+  try {
+    /*
+     * The submit endpoint returns the submission/assessment
+     * result, not necessarily the complete funding workspace.
+     *
+     * Therefore its response is NOT used as the canonical
+     * browser fundingWorkspace.
+     */
+    await api().post(
+      FUNDING_SUBMIT_API,
+      {
+        project_code:
+          project.project_code
+      }
+    );
 
     /*
-     * Always save the current browser form first.
-     * The server recalculates authoritative values.
+     * Reload the authoritative workspace from the GET
+     * endpoint after submission.
+     *
+     * This restores the complete server state:
+     *
+     *   - funding plan
+     *   - itemized funding lines
+     *   - latest assessment
+     *   - submitted status
+     *   - authoritative capital values
      */
-    await saveFundingPlan();
-
-    setFundingBusy(true);
-
-    show(
-      "fundingState",
-      true
-    );
+    const canonicalWorkspace =
+      await loadFundingPlan();
 
     setStateMessage(
       "fundingState",
-      "Submitting funding plan for server assessment…",
-      "active"
+      "Funding plan submitted. Liquidity recommendation remains controlled by the server assessment and administrator approval workflow.",
+      "success"
     );
 
-    try {
-      const response =
-        await api().post(
-          FUNDING_SUBMIT_API,
-          {
-            project_code:
-              project.project_code
-          }
-        );
+    return canonicalWorkspace;
+  } catch (error) {
+    setStateMessage(
+      "fundingState",
+      errorMessage(
+        error,
+        "Funding plan could not be submitted."
+      ),
+      "error"
+    );
 
-      fundingWorkspace =
-        normalizeFundingResponse(
-          response
-        );
-
-      renderAssessment(
-        fundingWorkspace
-      );
-
-      setStateMessage(
-        "fundingState",
-        "Funding plan submitted. Liquidity recommendation remains controlled by the server assessment and administrator approval workflow.",
-        "success"
-      );
-
-      return response;
-    } catch (error) {
-      setStateMessage(
-        "fundingState",
-        errorMessage(
-          error,
-          "Funding plan could not be submitted."
-        ),
-        "error"
-      );
-
-      throw error;
-    } finally {
-      setFundingBusy(false);
-    }
+    throw error;
+  } finally {
+    setFundingBusy(false);
   }
+       }
 
   /* -----------------------------------------------------------
    * TREASURY RENDER
