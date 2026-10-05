@@ -1656,63 +1656,71 @@
    * SAVE FUNDING PLAN
    * --------------------------------------------------------- */
 
-  async function saveFundingPlan() {
-    assertMainnet();
+async function saveFundingPlan() {
+  assertMainnet();
 
-    const payload =
-      collectFundingPayload();
+  const payload =
+    collectFundingPayload();
 
-    setFundingBusy(true);
+  setFundingBusy(true);
 
-    show(
-      "fundingState",
-      true
+  show(
+    "fundingState",
+    true
+  );
+
+  setStateMessage(
+    "fundingState",
+    "Saving funding plan draft…",
+    "active"
+  );
+
+  try {
+    /*
+     * The POST response is intentionally not used as the
+     * canonical funding workspace.
+     *
+     * The server save endpoint may return only a summary.
+     * The GET endpoint is the canonical source for the
+     * complete saved plan, including:
+     *
+     *   - plan
+     *   - itemized funding lines
+     *   - latest assessment
+     *
+     * Therefore, after a successful save, reload the
+     * authoritative workspace before rendering the form.
+     */
+    await api().post(
+      FUNDING_PLAN_API,
+      payload
     );
+
+    const canonicalWorkspace =
+      await loadFundingPlan();
 
     setStateMessage(
       "fundingState",
-      "Saving funding plan draft…",
-      "active"
+      "Funding plan draft saved. The authoritative incremental capital requirement has been recalculated from the submitted cost lines.",
+      "success"
     );
 
-    try {
-      const response =
-        await api().post(
-          FUNDING_PLAN_API,
-          payload
-        );
+    return canonicalWorkspace;
+  } catch (error) {
+    setStateMessage(
+      "fundingState",
+      errorMessage(
+        error,
+        "Funding plan could not be saved."
+      ),
+      "error"
+    );
 
-      fundingWorkspace =
-        normalizeFundingResponse(
-          response
-        );
-
-      renderAssessment(
-        fundingWorkspace
-      );
-
-      setStateMessage(
-        "fundingState",
-        "Funding plan draft saved. The authoritative incremental capital requirement has been recalculated from the submitted cost lines.",
-        "success"
-      );
-
-      return response;
-    } catch (error) {
-      setStateMessage(
-        "fundingState",
-        errorMessage(
-          error,
-          "Funding plan could not be saved."
-        ),
-        "error"
-      );
-
-      throw error;
-    } finally {
-      setFundingBusy(false);
-    }
+    throw error;
+  } finally {
+    setFundingBusy(false);
   }
+        }
 
   /* -----------------------------------------------------------
    * SUBMIT FUNDING PLAN
