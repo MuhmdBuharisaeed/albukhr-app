@@ -1,651 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#087a3e">
-
   <title>ALBUKHR External Project</title>
-
-  <!-- =========================================
-       GLOBAL ALBUKHR UI
-  ========================================== -->
 
   <link rel="stylesheet" href="css/albukhr-ui.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/global-header.css">
   <link rel="stylesheet" href="css/global-buttons.css">
+  <link rel="stylesheet" href="css/external-project-detail.css">
 
-  <!-- =========================================
-       PAGE UI
-  ========================================== -->
-
-  <link
-    rel="stylesheet"
-    href="css/external-project-detail.css"
-  >
-
+  <style>
+    .team-editor,
+    .document-uploader { margin-top: 16px; padding: 16px; border: 1px solid rgba(15,122,61,.15); border-radius: 14px; }
+    .team-editor-list { display: grid; gap: 12px; }
+    .team-editor-row { padding: 14px; border: 1px solid rgba(15,122,61,.12); border-radius: 12px; }
+    .team-editor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .team-editor-grid label { display: grid; gap: 6px; font-weight: 600; }
+    .team-editor-grid input, .team-editor-grid textarea, .document-uploader select, .document-uploader input[type=file] { width: 100%; box-sizing: border-box; }
+    .team-editor-wide, .team-primary { grid-column: 1 / -1; }
+    .team-primary { display: flex !important; align-items: center; gap: 8px; }
+    .team-primary input { width: auto; }
+    .team-editor-actions, .document-uploader-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .team-remove-button { margin-top: 10px; }
+    .document-uploader-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr); gap: 12px; }
+    .document-uploader label { display: grid; gap: 6px; font-weight: 600; }
+    .document-uploader-note { margin: 8px 0 0; font-size: .92rem; opacity: .8; }
+    @media (max-width: 720px) {
+      .team-editor-grid, .document-uploader-grid { grid-template-columns: 1fr; }
+      .team-editor-wide, .team-primary { grid-column: auto; }
+    }
+  </style>
 </head>
 
-
 <body data-page="external-project-detail">
-
-
-  <!-- =========================================
-       HEADER
-  ========================================== -->
-
   <header class="header">
-  <div class="header-left">
-    <span class="brand">ALBUKHR</span>
-  </div>
-
-    <div class="header-right">
-
-      <span
-        class="network-indicator"
-        id="networkIndicator"
-      >
-        NETWORK
-      </span>
-
-    </div>
-
+    <div class="header-left"><span class="brand">ALBUKHR</span></div>
+    <div class="header-right"><span class="network-indicator" id="networkIndicator">NETWORK</span></div>
   </header>
 
-
-
-  <!-- =========================================
-       PAGE
-  ========================================== -->
-
   <main class="detail-page">
-
-
-    <!-- =========================================
-         AUTH STRIP
-    ========================================== -->
-
-    <section
-      class="detail-auth-strip"
-      aria-live="polite"
-    >
-
-      <div
-        class="detail-auth-avatar"
-        id="authAvatar"
-      >
-        A
-      </div>
-
-
+    <section class="detail-auth-strip" aria-live="polite">
+      <div class="detail-auth-avatar" id="authAvatar">A</div>
       <div class="detail-auth-details">
-
-        <strong id="authUsername">
-          Checking authentication...
-        </strong>
-
-
-        <span id="authNetwork">
-          Secure Pi authentication required
-        </span>
-
+        <strong id="authUsername">Checking authentication...</strong>
+        <span id="authNetwork">Secure Pi authentication required</span>
       </div>
-
-
-      <div class="detail-security">
-
-        <span class="detail-security-dot"></span>
-
-        <span>
-          Secure
-        </span>
-
-      </div>
-
+      <div class="detail-security"><span class="detail-security-dot"></span><span>Secure</span></div>
     </section>
 
+    <div id="detailStatus" class="detail-status-message" aria-live="polite">Initializing secure application access...</div>
 
-
-    <!-- =========================================
-         STATUS MESSAGE
-    ========================================== -->
-
-    <div
-      id="detailStatus"
-      class="detail-status-message"
-      aria-live="polite"
-    >
-      Initializing secure application access...
-    </div>
-
-
-
-    <!-- =========================================
-         ERROR
-    ========================================== -->
-
-    <section
-      id="detailError"
-      class="detail-error"
-      hidden
-    >
-
-      <h2>
-        Unable to Load Application
-      </h2>
-
-
-      <p id="detailErrorMessage">
-        An unexpected error occurred.
-      </p>
-
-
-      <button
-        id="retryButton"
-        class="primary-action"
-        type="button"
-      >
-        Try Again
-      </button>
-
+    <section id="detailError" class="detail-error" hidden>
+      <h2>Unable to Load Application</h2>
+      <p id="detailErrorMessage">An unexpected error occurred.</p>
+      <button id="retryButton" class="primary-action" type="button">Try Again</button>
     </section>
 
-
-
-    <!-- =========================================
-         LOADING
-    ========================================== -->
-
-    <section
-      id="detailLoading"
-      class="detail-loading"
-    >
-
+    <section id="detailLoading" class="detail-loading">
       <div class="detail-spinner"></div>
-
-
-      <strong>
-        Loading External Project...
-      </strong>
-
-
-      <span>
-        Retrieving your application securely.
-      </span>
-
+      <strong>Loading External Project...</strong>
+      <span>Retrieving your application securely.</span>
     </section>
 
-
-
-    <!-- =========================================
-         APPLICATION CONTENT
-    ========================================== -->
-
-    <section
-      id="detailContent"
-      hidden
-    >
-
-
-      <!-- =====================================
-           HERO
-      ====================================== -->
-
+    <section id="detailContent" hidden>
       <section class="detail-hero">
-
-
-        <div class="detail-eyebrow">
-          EXTERNAL PROJECT APPLICATION
-        </div>
-
-
+        <div class="detail-eyebrow">EXTERNAL PROJECT APPLICATION</div>
         <div class="detail-title-row">
-
           <div>
-
-            <h1 id="projectName">
-              External Project
-            </h1>
-
-
-            <p
-              class="detail-code"
-              id="applicationCode"
-            >
-              —
-            </p>
-
+            <h1 id="projectName">External Project</h1>
+            <p class="detail-code" id="applicationCode">—</p>
           </div>
-
-
-          <span
-            class="detail-status"
-            id="applicationStatus"
-          >
-            DRAFT
-          </span>
-
+          <span class="detail-status" id="applicationStatus">DRAFT</span>
         </div>
-
-
         <div class="detail-meta">
-
-
-          <div class="detail-meta-item">
-
-            <span>
-              NETWORK
-            </span>
-
-            <strong id="applicationNetwork">
-              —
-            </strong>
-
-          </div>
-
-
-          <div class="detail-meta-item">
-
-            <span>
-              PROJECT CODE
-            </span>
-
-            <strong id="projectCode">
-              —
-            </strong>
-
-          </div>
-
-
-          <div class="detail-meta-item">
-
-            <span>
-              APPLICATION ID
-            </span>
-
-            <strong
-              id="applicationIdDisplay"
-              class="detail-id"
-            >
-              —
-            </strong>
-
-          </div>
-
-
+          <div class="detail-meta-item"><span>NETWORK</span><strong id="applicationNetwork">—</strong></div>
+          <div class="detail-meta-item"><span>PROJECT CODE</span><strong id="projectCode">—</strong></div>
+          <div class="detail-meta-item"><span>APPLICATION ID</span><strong id="applicationIdDisplay" class="detail-id">—</strong></div>
         </div>
-
-
       </section>
-
-
-
-      <!-- =====================================
-           REVIEW STATUS
-      ====================================== -->
 
       <section class="detail-section">
-
-        <div class="detail-section-heading">
-
-          <div>
-
-            <h2>
-              Review Status
-            </h2>
-
-            <p>
-              Current position of your application
-              in the ALBUKHR review framework.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="reviewStatusBox"
-          class="review-status-box"
-        >
-
-          <strong id="reviewStatusTitle">
-            Application Status
-          </strong>
-
-
-          <p id="reviewStatusText">
-            —
-          </p>
-
-        </div>
-
-
+        <div class="detail-section-heading"><div><h2>Review Status</h2><p>Current position of your application in the ALBUKHR review framework.</p></div></div>
+        <div id="reviewStatusBox" class="review-status-box"><strong id="reviewStatusTitle">Application Status</strong><p id="reviewStatusText">—</p></div>
       </section>
-
-
-
-      <!-- =====================================
-           PROJECT INFORMATION
-      ====================================== -->
 
       <section class="detail-section">
-
-        <div class="detail-section-heading">
-
-          <div>
-
-            <h2>
-              Project Information
-            </h2>
-
-            <p>
-              Core information about your proposed project.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="projectInformation"
-          class="detail-grid"
-        >
-        </div>
-
-
-        <div class="detail-description-box">
-
-          <span>
-            PROJECT DESCRIPTION
-          </span>
-
-
-          <p
-            id="projectDescription"
-            class="detail-description"
-          >
-            —
-          </p>
-
-        </div>
-
-
+        <div class="detail-section-heading"><div><h2>Project Information</h2><p>Core information about your proposed project.</p></div></div>
+        <div id="projectInformation" class="detail-grid"></div>
+        <div class="detail-description-box"><span>PROJECT DESCRIPTION</span><p id="projectDescription" class="detail-description">—</p></div>
       </section>
-
-
-
-      <!-- =====================================
-           BUSINESS INFORMATION
-      ====================================== -->
 
       <section class="detail-section">
-
-        <div class="detail-section-heading">
-
-          <div>
-
-            <h2>
-              Business & Contact
-            </h2>
-
-            <p>
-              Registered business and communication details.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="businessInformation"
-          class="detail-grid"
-        >
-        </div>
-
-
+        <div class="detail-section-heading"><div><h2>Business & Contact</h2><p>Registered business and communication details.</p></div></div>
+        <div id="businessInformation" class="detail-grid"></div>
       </section>
-
-
-
-      <!-- =====================================
-           INVESTMENT REQUEST
-      ====================================== -->
 
       <section class="detail-section">
-
-        <div class="detail-section-heading">
-
-          <div>
-
-            <h2>
-              Investment Request
-            </h2>
-
-            <p>
-              Funding and investment information submitted
-              with this application.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="fundingInformation"
-          class="detail-grid"
-        >
-        </div>
-
-
+        <div class="detail-section-heading"><div><h2>Investment Request</h2><p>Funding and investment information submitted with this application.</p></div></div>
+        <div id="fundingInformation" class="detail-grid"></div>
       </section>
-
-
-
-      <!-- =====================================
-           PROJECT TEAM
-      ====================================== -->
 
       <section class="detail-section">
+        <div class="detail-section-heading"><div><h2>Project Team</h2><p>Team members associated with this application.</p></div></div>
+        <div id="projectTeam" class="detail-list"></div>
 
-        <div class="detail-section-heading">
-
-          <div>
-
-            <h2>
-              Project Team
-            </h2>
-
-            <p>
-              Team members associated with this application.
-            </p>
-
+        <div id="teamEditor" class="team-editor" hidden>
+          <div class="detail-section-heading"><div><h3>Manage Team</h3><p>At least one team member is required before submission.</p></div></div>
+          <div id="teamEditorList" class="team-editor-list"></div>
+          <div class="team-editor-actions">
+            <button id="addTeamMemberButton" class="secondary-action" type="button">Add Team Member</button>
+            <button id="saveTeamButton" class="primary-action" type="button">Save Team</button>
           </div>
-
+          <div id="teamEditorStatus" class="form-status" aria-live="polite"></div>
         </div>
-
-
-        <div
-          id="projectTeam"
-          class="detail-list"
-        >
-        </div>
-
-
       </section>
-
-
-
-      <!-- =====================================
-           DOCUMENTS
-      ====================================== -->
 
       <section class="detail-section">
+        <div class="detail-section-heading"><div><h2>Documents</h2><p>Supporting documents registered with the application.</p></div></div>
+        <div id="projectDocuments" class="detail-list"></div>
 
-        <div class="detail-section-heading">
-
-          <div>
-
-            <h2>
-              Documents
-            </h2>
-
-            <p>
-              Supporting documents registered with the project.
-            </p>
-
-          </div>
-
+        <div id="documentUploader" class="document-uploader">
+          <div class="detail-section-heading"><div><h3>Upload Supporting Document</h3><p>Documents are stored privately and registered through the secure applicant workflow.</p></div></div>
+          <form id="externalProjectDocumentForm">
+            <div class="document-uploader-grid">
+              <label>Document Type
+                <select id="externalProjectDocumentType" required>
+                  <option value="business_registration">Business Registration</option>
+                  <option value="project_proposal">Project Proposal</option>
+                  <option value="business_plan">Business Plan</option>
+                  <option value="financial_statement">Financial Statement</option>
+                  <option value="identity_document">Identity Document</option>
+                  <option value="ownership_document">Ownership Document</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+              <label>Document File
+                <input id="externalProjectDocumentUpload" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" required>
+              </label>
+            </div>
+            <p class="document-uploader-note">Accepted formats: PDF, PNG, JPG/JPEG and WEBP. Maximum size: 10 MB.</p>
+            <div class="document-uploader-actions"><button id="externalProjectDocumentSubmitButton" class="primary-action" type="submit">Upload Document</button></div>
+            <div id="externalProjectDocumentStatus" class="form-status" aria-live="polite"></div>
+          </form>
+          <p id="externalProjectDocumentReadonlyNote" class="document-uploader-note" hidden>Documents are locked after the application leaves the draft/revision state.</p>
         </div>
-
-
-        <div
-          id="projectDocuments"
-          class="detail-list"
-        >
-        </div>
-
-
       </section>
-
-
-
-      <!-- =====================================
-           REVIEW HISTORY
-      ====================================== -->
 
       <section class="detail-section">
-
-        <div class="detail-section-heading">
-
-          <div>
-
-            <h2>
-              Review History
-            </h2>
-
-            <p>
-              Review and approval activity recorded
-              for this application.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="reviewHistory"
-          class="detail-list detail-history"
-        >
-        </div>
-
-
+        <div class="detail-section-heading"><div><h2>Review History</h2><p>Review and approval activity recorded for this application.</p></div></div>
+        <div id="reviewHistory" class="detail-list detail-history"></div>
       </section>
-
-
-
-      <!-- =====================================
-           APPLICATION ACTIONS
-      ====================================== -->
 
       <section class="detail-actions">
-
-
-        <button
-          id="editApplicationButton"
-          class="secondary-action"
-          type="button"
-          hidden
-        >
-          Continue Editing
-        </button>
-
-
-        <button
-          id="submitApplicationButton"
-          class="primary-action"
-          type="button"
-          hidden
-        >
-          Submit Application
-        </button>
-
-
-        <button
-          id="dashboardButton"
-          class="ghost-action"
-          type="button"
-        >
-          Back to Dashboard
-        </button>
-
-
+        <button id="editApplicationButton" class="secondary-action" type="button" hidden>Continue Editing</button>
+        <button id="submitApplicationButton" class="primary-action" type="button" hidden>Submit Application</button>
+        <button id="dashboardButton" class="ghost-action" type="button">Back to Dashboard</button>
       </section>
-
-
     </section>
-
-
   </main>
 
-
-
-  <!-- =========================================
-       PI SDK
-  ========================================== -->
-
-  <script
-    src="https://sdk.minepi.com/pi-sdk.js"
-  ></script>
-
-
-
-  <!-- =========================================
-       SUPABASE
-  ========================================== -->
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
-
-
-
-  <!-- =========================================
-       ALBUKHR CORE
-  ========================================== -->
-
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/core/environment-core.js"></script>
-
   <script src="js/core/supabase-core.js"></script>
-
   <script src="js/core/pi-auth-core.js"></script>
-
   <script src="js/core/page-auth-guard.js"></script>
-
   <script src="js/core/environment-switcher.js"></script>
-
-
-
-  <!-- =========================================
-       PAGE ENGINE
-  ========================================== -->
-
-  <script
-    src="js/external-project-detail.js"
-  ></script>
-
-
+  <script src="js/external-project-detail.js"></script>
+  <script src="js/external-project-detail-document-integration.js"></script>
 </body>
-
 </html>
