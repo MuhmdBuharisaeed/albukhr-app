@@ -1,2323 +1,555 @@
 /* =========================================================
-ALBUKHR EXTERNAL PROJECT DETAIL ENGINE
-File: js/external-project-detail.js
+   ALBUKHR EXTERNAL PROJECT DETAIL ENGINE
+   Corrected applicant detail workflow.
 
-Architecture:
-
-- Shared Environment Core
-- Shared Supabase Core
-- Shared Pi Auth Core
-- No LocalStorage authentication
-- No LocalStorage application state
-- Network-isolated RPC access
-- Owner-protected application access
-
-Required RPC Functions:
-
-- get_my_external_project_detail
-- get_my_external_project_team
-- get_my_external_project_documents
-- get_my_external_project_reviews
-- get_my_external_project_review_history
-- get_my_external_project_audit_log
-- submit_my_external_project_application
-  ========================================================= */
+   - Current HTML IDs are authoritative.
+   - Canonical revision status: needs_revision.
+   - Team edits use applicant RPCs only.
+   - Documents are handled by the dedicated secure integration.
+   - No LocalStorage / sessionStorage.
+   - Submit response must be boolean true.
+========================================================= */
 
 (function (window, document) {
-"use strict";
-
-/* =========================================================
-STATE
-========================================================= */
-
-const state = {
-applicationId: null,
-user: null,
-network: null,
-application: null,
-loading: false,
-submitting: false
-};
-
-/* =========================================================
-DOM
-========================================================= */
-
-function $(id) {
-return document.getElementById(id);
-}
-
-const elements = {
-
-back: $("back"),
-
-name: $("name"),
-
-code: $("code"),
-
-network: $("network"),
-
-status: $("status"),
-
-message: $("msg"),
-
-content: $("content"),
-
-loading: $("loading"),
-
-statusText: $("statusText"),
-
-project: $("project"),
-
-business: $("business"),
-
-funding: $("funding"),
-
-team: $("team"),
-
-docs: $("docs"),
-
-history: $("history"),
-
-edit: $("edit"),
-
-submit: $("submit"),
-
-dashboard: $("dash")
-
-};
-
-/* =========================================================
-DEPENDENCY VALIDATION
-========================================================= */
-
-function checkDependencies() {
-
-if (!window.ALBukhrEnvironment) {
-
-  throw new Error(
-    "ALBUKHR Environment Core is unavailable."
-  );
-
-}
-
-
-if (!window.ALBUKHR_SUPABASE) {
-
-  throw new Error(
-    "ALBUKHR Supabase Core is unavailable."
-  );
-
-}
-
-
-if (!window.AlbukhrPiAuth) {
-
-  throw new Error(
-    "ALBUKHR Pi Auth Core is unavailable."
-  );
-
-}
-
-}
-
-/* =========================================================
-HELPERS
-========================================================= */
-
-function normalizeText(value) {
-
-if (
-  value === null ||
-  value === undefined ||
-  value === ""
-) {
-
-  return "—";
-
-}
-
-
-return String(value);
-
-}
-
-function escapeHTML(value) {
-
-return String(
-  value === null ||
-  value === undefined
-    ? ""
-    : value
-)
-
-  .replace(/&/g, "&amp;")
-
-  .replace(/</g, "&lt;")
-
-  .replace(/>/g, "&gt;")
-
-  .replace(/"/g, "&quot;")
-
-  .replace(/'/g, "&#039;");
-
-}
-
-function getApplicationIdFromURL() {
-
-const parameters =
-  new URLSearchParams(
-    window.location.search
-  );
-
-
-const applicationId =
-  parameters.get("application_id");
-
-
-if (
-  !applicationId ||
-  !String(applicationId).trim()
-) {
-
-  throw new Error(
-    "Application ID is missing."
-  );
-
-}
-
-
-return String(applicationId).trim();
-
-}
-
-function getCurrentNetwork() {
-
-const environment =
-  window.ALBukhrEnvironment;
-
-
-if (
-  !environment ||
-  typeof environment.isKnown !== "function" ||
-  typeof environment.getNetwork !== "function"
-) {
-
-  throw new Error(
-    "ALBUKHR environment is unavailable."
-  );
-
-}
-
-
-if (!environment.isKnown()) {
-
-  throw new Error(
-    "ALBUKHR environment is not recognized."
-  );
-
-}
-
-
-const network =
-  String(
-    environment.getNetwork() || ""
-  )
-
-    .trim()
-
-    .toLowerCase();
-
-
-if (
-  network !== "mainnet" &&
-  network !== "testnet"
-) {
-
-  throw new Error(
-    "Invalid ALBUKHR network."
-  );
-
-}
-
-
-return network;
-
-}
-
-function getPiUID(user) {
-
-if (!user) return null;
-
-
-const candidates = [
-
-  user.pi_uid,
-
-  user.piUid,
-
-  user.uid,
-
-  user.user_uid,
-
-  user.userUid,
-
-  user.id
-
-];
-
-
-for (
-  let index = 0;
-  index < candidates.length;
-  index += 1
-) {
-
-  const value =
-    candidates[index];
-
-
-  if (
-    value !== null &&
-    value !== undefined &&
-    String(value).trim()
-  ) {
-
-    return String(value).trim();
-
+  "use strict";
+
+  const state = {
+    applicationId: null,
+    user: null,
+    network: null,
+    application: null,
+    team: [],
+    loading: false,
+    submitting: false,
+    savingTeam: false,
+    teamLoadFailed: false
+  };
+
+  const elements = {
+    name: document.getElementById("projectName"),
+    code: document.getElementById("applicationCode"),
+    network: document.getElementById("applicationNetwork"),
+    projectCode: document.getElementById("projectCode"),
+    status: document.getElementById("applicationStatus"),
+    message: document.getElementById("detailStatus"),
+    content: document.getElementById("detailContent"),
+    loading: document.getElementById("detailLoading"),
+    statusText: document.getElementById("reviewStatusText"),
+    reviewStatusTitle: document.getElementById("reviewStatusTitle"),
+    project: document.getElementById("projectInformation"),
+    business: document.getElementById("businessInformation"),
+    funding: document.getElementById("fundingInformation"),
+    projectDescription: document.getElementById("projectDescription"),
+    team: document.getElementById("projectTeam"),
+    teamEditor: document.getElementById("teamEditor"),
+    teamEditorList: document.getElementById("teamEditorList"),
+    teamStatus: document.getElementById("teamEditorStatus"),
+    docs: document.getElementById("projectDocuments"),
+    history: document.getElementById("reviewHistory"),
+    edit: document.getElementById("editApplicationButton"),
+    submit: document.getElementById("submitApplicationButton"),
+    dashboard: document.getElementById("dashboardButton"),
+    back: document.getElementById("backButton"),
+    retry: document.getElementById("retryButton"),
+    error: document.getElementById("detailError"),
+    errorMessage: document.getElementById("detailErrorMessage"),
+    applicationIdDisplay: document.getElementById("applicationIdDisplay"),
+    authAvatar: document.getElementById("authAvatar"),
+    authUsername: document.getElementById("authUsername"),
+    authNetwork: document.getElementById("authNetwork"),
+    networkIndicator: document.getElementById("networkIndicator"),
+    addTeamMember: document.getElementById("addTeamMemberButton"),
+    saveTeam: document.getElementById("saveTeamButton")
+  };
+
+  function checkDependencies() {
+    if (!window.ALBukhrEnvironment) throw new Error("ALBUKHR Environment Core is unavailable.");
+    if (!window.ALBUKHR_SUPABASE) throw new Error("ALBUKHR Supabase Core is unavailable.");
+    if (!window.AlbukhrPiAuth) throw new Error("ALBUKHR Pi Auth Core is unavailable.");
+    if (!window.ALBukhrPageAuthGuard) throw new Error("ALBUKHR Page Auth Guard is unavailable.");
   }
 
-}
-
-
-return null;
-
-}
-
-function formatStatus(status) {
-
-return String(
-  status || "draft"
-)
-
-  .replace(/_/g, " ")
-
-  .replace(/\b\w/g, function (letter) {
-
-    return letter.toUpperCase();
-
-  });
-
-}
-
-function normalizeStatus(status) {
-
-return String(
-  status || "draft"
-)
-
-  .trim()
-
-  .toLowerCase();
-
-}
-
-function formatDate(value) {
-
-if (!value) return "—";
-
-
-try {
-
-  const date =
-    new Date(value);
-
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-
-    return normalizeText(value);
-
+  function normalizeStatus(status) {
+    return String(status || "draft").trim().toLowerCase().replace(/\s+/g, "_");
   }
 
-
-  return date.toLocaleString();
-
-}
-
-catch (error) {
-
-  return normalizeText(value);
-
-}
-
-}
-
-function formatNumber(value) {
-
-if (
-  value === null ||
-  value === undefined ||
-  value === ""
-) {
-
-  return "—";
-
-}
-
-
-const number =
-  Number(value);
-
-
-if (
-  Number.isNaN(number)
-) {
-
-  return String(value);
-
-}
-
-
-return number.toLocaleString();
-
-}
-
-function formatFunding(
-amount,
-asset
-) {
-
-if (
-  amount === null ||
-  amount === undefined ||
-  amount === ""
-) {
-
-  return "—";
-
-}
-
-
-const formattedAmount =
-  formatNumber(amount);
-
-
-const formattedAsset =
-  String(
-    asset || "PI"
-  )
-
-    .trim()
-
-    .toUpperCase();
-
-
-return (
-  formattedAmount +
-  " " +
-  formattedAsset
-);
-
-}
-
-function safeArray(value) {
-
-return Array.isArray(value)
-  ? value
-  : [];
-
-}
-
-/* =========================================================
-MESSAGE
-========================================================= */
-
-function clearMessage() {
-
-if (!elements.message) return;
-
-
-elements.message.textContent = "";
-
-elements.message.hidden = true;
-
-}
-
-function showMessage(
-message,
-type
-) {
-
-if (!elements.message) return;
-
-
-const safeType =
-  type || "info";
-
-
-elements.message.hidden = false;
-
-elements.message.textContent =
-  message;
-
-
-elements.message.dataset.type =
-  safeType;
-
-}
-
-function showError(error) {
-
-const message =
-  error &&
-  error.message
-    ? error.message
-    : "Unable to load the external project application.";
-
-
-showMessage(
-  "❌ " + message,
-  "error"
-);
-
-}
-
-/* =========================================================
-LOADING
-========================================================= */
-
-function setLoading(
-loading,
-message
-) {
-
-state.loading = Boolean(loading);
-
-
-if (elements.loading) {
-
-  elements.loading.hidden =
-    !state.loading;
-
-
-  if (
-    state.loading &&
-    message
-  ) {
-
-    elements.loading.textContent =
-      message;
-
+  function isEditableStatus(status) {
+    return ["draft", "needs_revision"].includes(normalizeStatus(status));
   }
 
-}
-
-
-if (elements.content) {
-
-  elements.content.hidden =
-    state.loading;
-
-}
-
-}
-
-/* =========================================================
-RPC
-========================================================= */
-
-async function callRPC(
-functionName,
-parameters
-) {
-
-const supabase =
-  window.ALBUKHR_SUPABASE;
-
-
-if (
-  !supabase ||
-  typeof supabase.rpc !== "function"
-) {
-
-  throw new Error(
-    "ALBUKHR Supabase RPC is unavailable."
-  );
-
-}
-
-
-const response =
-  await supabase.rpc(
-    functionName,
-    parameters
-  );
-
-
-if (response.error) {
-
-  throw response.error;
-
-}
-
-
-return response.data;
-
-}
-
-/* =========================================================
-AUTHENTICATION
-========================================================= */
-
-async function requireAuthentication() {
-
-const auth =
-  window.AlbukhrPiAuth;
-
-
-if (
-  !auth ||
-  typeof auth.requireAuth !== "function"
-) {
-
-  throw new Error(
-    "ALBUKHR Pi authentication is unavailable."
-  );
-
-}
-
-
-const user =
-  await auth.requireAuth(
-    "login.html"
-  );
-
-
-if (!user) {
-
-  return null;
-
-}
-
-
-return user;
-
-}
-
-/* =========================================================
-RPC PARAMETERS
-========================================================= */
-
-function buildOwnerParameters() {
-
-const piUID =
-  getPiUID(
-    state.user
-  );
-
-
-if (!piUID) {
-
-  throw new Error(
-    "Authenticated Pi user identity is unavailable."
-  );
-
-}
-
-
-return {
-
-  p_application_id:
-    state.applicationId,
-
-  p_pi_uid:
-    piUID,
-
-  p_network:
-    state.network
-
-};
-
-}
-
-/* =========================================================
-APPLICATION DETAIL
-========================================================= */
-
-async function loadApplicationDetail() {
-
-const parameters =
-  buildOwnerParameters();
-
-
-const data =
-  await callRPC(
-    "get_my_external_project_detail",
-    parameters
-  );
-
-
-const rows =
-  safeArray(data);
-
-
-if (!rows.length) {
-
-  throw new Error(
-    "Application was not found or access is denied."
-  );
-
-}
-
-
-const application =
-  rows[0];
-
-
-if (
-  application.network &&
-  String(application.network)
-    .trim()
-    .toLowerCase() !==
-    state.network
-) {
-
-  throw new Error(
-    "Network isolation check failed."
-  );
-
-}
-
-
-return application;
-
-}
-
-/* =========================================================
-TEAM
-========================================================= */
-
-async function loadTeam() {
-
-return await callRPC(
-  "get_my_external_project_team",
-  buildOwnerParameters()
-);
-
-}
-
-/* =========================================================
-DOCUMENTS
-========================================================= */
-
-async function loadDocuments() {
-
-return await callRPC(
-  "get_my_external_project_documents",
-  buildOwnerParameters()
-);
-
-}
-
-/* =========================================================
-REVIEWS
-========================================================= */
-
-async function loadReviews() {
-
-return await callRPC(
-  "get_my_external_project_reviews",
-  buildOwnerParameters()
-);
-
-}
-
-/* =========================================================
-REVIEW HISTORY
-========================================================= */
-
-async function loadReviewHistory() {
-
-return await callRPC(
-  "get_my_external_project_review_history",
-  buildOwnerParameters()
-);
-
-}
-
-/* =========================================================
-AUDIT LOG
-========================================================= */
-
-async function loadAuditLog() {
-
-return await callRPC(
-  "get_my_external_project_audit_log",
-  buildOwnerParameters()
-);
-
-}
-
-/* =========================================================
-STATUS TEXT
-========================================================= */
-
-function getStatusDescription(status) {
-
-const normalized =
-  normalizeStatus(status);
-
-
-const descriptions = {
-
-  draft:
-    "This application is still a draft. You can continue editing it before submission.",
-
-
-  submitted:
-    "This application has been submitted and is awaiting ALBUKHR review.",
-
-
-  under_review:
-    "This application is currently under administrative review.",
-
-
-  revision_requested:
-    "ALBUKHR has requested changes. You can continue editing the application.",
-
-
-  approved:
-    "This application has been approved through the ALBUKHR review framework.",
-
-
-  rejected:
-    "This application was not approved. Review history may contain the decision information.",
-
-
-  converted:
-    "This application has been converted into an ALBUKHR project record."
-
-};
-
-
-return (
-
-  descriptions[normalized] ||
-
-  "Application status is managed by the ALBUKHR backend."
-
-);
-
-}
-
-/* =========================================================
-RENDER HEADER
-========================================================= */
-
-function renderHeader() {
-
-const application =
-  state.application;
-
-
-if (!application) return;
-
-
-const status =
-  normalizeStatus(
-    application.status
-  );
-
-
-if (elements.name) {
-
-  elements.name.textContent =
-
-    application.project_name ||
-
-    application.business_name ||
-
-    "External Project";
-
-}
-
-
-if (elements.code) {
-
-  elements.code.textContent =
-
-    application.application_code ||
-
-    application.project_code ||
-
-    state.applicationId;
-
-}
-
-
-if (elements.network) {
-
-  elements.network.textContent =
-
-    String(
-      application.network ||
-      state.network
-    )
-
-      .toUpperCase();
-
-}
-
-
-if (elements.status) {
-
-  elements.status.textContent =
-    formatStatus(status);
-
-
-  elements.status.className =
-    "status-" + status;
-
-}
-
-
-if (elements.statusText) {
-
-  elements.statusText.textContent =
-    getStatusDescription(status);
-
-}
-
-}
-
-/* =========================================================
-RENDER FIELD GRID
-========================================================= */
-
-function renderGrid(
-container,
-fields
-) {
-
-if (!container) return;
-
-
-container.innerHTML = "";
-
-
-const list =
-  safeArray(fields);
-
-
-if (!list.length) {
-
-  container.innerHTML =
-    '<div class="detail-empty">' +
-    "No information available." +
-    "</div>";
-
-  return;
-
-}
-
-
-const fragment =
-  document.createDocumentFragment();
-
-
-list.forEach(function (field) {
-
-  const wrapper =
-    document.createElement("div");
-
-
-  wrapper.className =
-    "detail-field";
-
-
-  const label =
-    document.createElement("span");
-
-
-  label.textContent =
-    field.label;
-
-
-  const value =
-    document.createElement("strong");
-
-
-  value.textContent =
-    normalizeText(
-      field.value
-    );
-
-
-  wrapper.appendChild(label);
-
-  wrapper.appendChild(value);
-
-  fragment.appendChild(wrapper);
-
-});
-
-
-container.appendChild(fragment);
-
-}
-
-/* =========================================================
-RENDER PROJECT
-========================================================= */
-
-function renderProjectInformation() {
-
-const application =
-  state.application;
-
-
-renderGrid(
-  elements.project,
-  [
-
-    {
-      label: "Project Name",
-
-      value:
-        application.project_name
-    },
-
-
-    {
-      label: "Application Code",
-
-      value:
-        application.application_code
-    },
-
-
-    {
-      label: "Project Code",
-
-      value:
-        application.project_code
-    },
-
-
-    {
-      label: "Project Slug",
-
-      value:
-        application.project_slug
-    },
-
-
-    {
-      label: "Industry",
-
-      value:
-        application.industry
-    },
-
-
-    {
-      label: "Category",
-
-      value:
-        application.category
-    },
-
-
-    {
-      label: "Project Duration",
-
-      value:
-
-        application.project_duration_days
-
-          ? (
-              application.project_duration_days +
-              " days"
-            )
-
-          : null
-    },
-
-
-    {
-      label: "Created",
-
-      value:
-        formatDate(
-          application.created_at
-        )
+  function getApplicationIdFromURL() {
+    const id = new URLSearchParams(window.location.search).get("application_id");
+    if (!id || !String(id).trim()) throw new Error("Application ID is missing.");
+    return String(id).trim();
+  }
+
+  function getCurrentNetwork() {
+    if (!window.ALBukhrEnvironment.isKnown()) throw new Error("ALBUKHR environment is not recognized.");
+    const network = String(window.ALBukhrEnvironment.getNetwork() || "").trim().toLowerCase();
+    if (!['mainnet', 'testnet'].includes(network)) throw new Error("Invalid ALBUKHR network.");
+    return network;
+  }
+
+  function getPiUID() {
+    const fromGuard = typeof window.AlbukhrPageAuthGuard.getPiUid === "function"
+      ? window.AlbukhrPageAuthGuard.getPiUid() : null;
+    const piUid = fromGuard || state.user?.pi_uid || state.user?.piUid || state.user?.uid || null;
+    if (!piUid) throw new Error("Authenticated Pi user identity is unavailable.");
+    return String(piUid).trim();
+  }
+
+  function safeArray(value) {
+    return Array.isArray(value) ? value : [];
+  }
+
+  function normalizeText(value) {
+    if (value === null || value === undefined || value === "") return "—";
+    return String(value);
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatStatus(status) {
+    return String(status || "draft")
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, letter => letter.toUpperCase());
+  }
+
+  function formatDate(value) {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+    return date.toLocaleString();
+  }
+
+  function formatFunding(amount, asset) {
+    const number = Number(amount);
+    if (!Number.isFinite(number)) return "—";
+    return new Intl.NumberFormat("en", { maximumFractionDigits: 7 }).format(number) + " " +
+      String(asset || "PI").trim().toUpperCase();
+  }
+
+  function clearMessage() {
+    if (!elements.message) return;
+    elements.message.textContent = "";
+    elements.message.hidden = true;
+  }
+
+  function showMessage(message, type) {
+    if (!elements.message) return;
+    elements.message.hidden = false;
+    elements.message.textContent = String(message || "");
+    elements.message.dataset.type = type || "info";
+  }
+
+  function showError(error) {
+    const message = error?.message || "Unable to load the external project application.";
+    if (elements.error) elements.error.hidden = false;
+    if (elements.errorMessage) elements.errorMessage.textContent = message;
+    if (elements.loading) elements.loading.hidden = true;
+    if (elements.content) elements.content.hidden = true;
+  }
+
+  function setLoading(loading, message) {
+    state.loading = Boolean(loading);
+    if (elements.loading) {
+      elements.loading.hidden = !state.loading;
+      if (state.loading && message) elements.loading.querySelector("strong")?.replaceChildren(document.createTextNode(message));
     }
+    if (elements.content && state.loading) elements.content.hidden = true;
+  }
 
-  ]
-);
+  async function callRPC(functionName, parameters) {
+    const response = await window.ALBUKHR_SUPABASE.rpc(functionName, parameters);
+    if (response.error) throw response.error;
+    return response.data;
+  }
 
+  function buildOwnerParameters() {
+    return {
+      p_application_id: state.applicationId,
+      p_pi_uid: getPiUID(),
+      p_network: state.network
+    };
+  }
 
-if (
-  application.project_description
-) {
+  async function requireAuthentication() {
+    const user = await window.AlbukhrPiAuth.requireAuth("login.html");
+    if (!user) return null;
+    return user;
+  }
 
-  const description =
-    document.createElement("div");
-
-
-  description.className =
-    "detail-description";
-
-
-  description.textContent =
-    application.project_description;
-
-
-  elements.project.appendChild(
-    description
-  );
-
-}
-
-}
-
-/* =========================================================
-RENDER BUSINESS
-========================================================= */
-
-function renderBusinessInformation() {
-
-const application =
-  state.application;
-
-
-renderGrid(
-  elements.business,
-  [
-
-    {
-      label: "Business Name",
-
-      value:
-        application.business_name
-    },
-
-
-    {
-      label:
-        "Registration Number",
-
-      value:
-        application.business_registration_number
-    },
-
-
-    {
-      label: "Country",
-
-      value:
-        application.country
-    },
-
-
-    {
-      label: "State",
-
-      value:
-        application.state
-    },
-
-
-    {
-      label: "City",
-
-      value:
-        application.city
-    },
-
-
-    {
-      label: "Business Address",
-
-      value:
-        application.business_address
-    },
-
-
-    {
-      label: "Website",
-
-      value:
-        application.website
-    },
-
-
-    {
-      label: "Contact Email",
-
-      value:
-        application.contact_email
-    },
-
-
-    {
-      label: "Contact Phone",
-
-      value:
-        application.contact_phone
-    },
-
-
-    {
-      label: "Pi Wallet",
-
-      value:
-        application.pi_wallet
+  async function loadApplicationDetail() {
+    const data = await callRPC("get_my_external_project_detail", buildOwnerParameters());
+    const rows = safeArray(data);
+    if (!rows.length) throw new Error("Application was not found or access is denied.");
+    const application = rows[0];
+    if (String(application.network || "").trim().toLowerCase() !== state.network) {
+      throw new Error("Network isolation check failed.");
     }
+    return application;
+  }
 
-  ]
-);
+  async function loadTeam() {
+    return safeArray(await callRPC("get_my_external_project_team", buildOwnerParameters()));
+  }
 
-}
+  async function loadDocuments() {
+    return safeArray(await callRPC("get_my_external_project_documents", buildOwnerParameters()));
+  }
 
-/* =========================================================
-RENDER FUNDING
-========================================================= */
+  async function loadReviews() {
+    return safeArray(await callRPC("get_my_external_project_reviews", buildOwnerParameters()));
+  }
 
-function renderFundingInformation() {
+  async function loadReviewHistory() {
+    return safeArray(await callRPC("get_my_external_project_review_history", buildOwnerParameters()));
+  }
 
-const application =
-  state.application;
+  async function loadAuditLog() {
+    return safeArray(await callRPC("get_my_external_project_audit_log", buildOwnerParameters()));
+  }
 
+  function getStatusDescription(status) {
+    const descriptions = {
+      draft: "This application is still a draft. Continue building it before submission.",
+      needs_revision: "ALBUKHR requested changes. Update the application, then review your team and documents before resubmitting.",
+      submitted: "This application has been submitted and is awaiting ALBUKHR review.",
+      under_review: "This application is currently under administrative review.",
+      approved: "This application has been approved through the ALBUKHR review framework.",
+      rejected: "This application was not approved. Review history may contain the decision information."
+    };
+    return descriptions[normalizeStatus(status)] || "Application status is managed by the ALBUKHR backend.";
+  }
 
-renderGrid(
-  elements.funding,
-  [
+  function renderHeader() {
+    const app = state.application;
+    if (!app) return;
 
-    {
-      label: "Funding Required",
-
-      value:
-
-        formatFunding(
-          application.funding_required,
-          application.funding_asset
-        )
-    },
-
-
-    {
-      label: "Funding Asset",
-
-      value:
-        application.funding_asset
-    },
-
-
-    {
-      label: "Investment Model",
-
-      value:
-        application.investment_model
-    },
-
-
-    {
-      label: "Project Duration",
-
-      value:
-
-        application.project_duration_days
-
-          ? (
-              application.project_duration_days +
-              " days"
-            )
-
-          : null
+    const status = normalizeStatus(app.status);
+    if (elements.name) elements.name.textContent = app.project_name || app.business_name || "External Project";
+    if (elements.code) elements.code.textContent = app.application_code || "—";
+    if (elements.projectCode) elements.projectCode.textContent = app.project_code || "—";
+    if (elements.network) elements.network.textContent = String(app.network || state.network).toUpperCase();
+    if (elements.status) {
+      elements.status.textContent = formatStatus(status);
+      elements.status.className = "detail-status status-" + status;
     }
-
-  ]
-);
-
-}
-
-/* =========================================================
-EMPTY LIST
-========================================================= */
-
-function renderEmptyList(
-container,
-message
-) {
-
-if (!container) return;
-
-
-container.innerHTML =
-  '<div class="detail-empty">' +
-  escapeHTML(message) +
-  "</div>";
-
-}
-
-/* =========================================================
-TEAM
-========================================================= */
-
-function renderTeam(
-team
-) {
-
-if (!elements.team) return;
-
-
-const members =
-  safeArray(team);
-
-
-if (!members.length) {
-
-  renderEmptyList(
-    elements.team,
-    "No team members registered."
-  );
-
-  return;
-
-}
-
-
-elements.team.innerHTML =
-  members.map(function (member) {
-
-    const primary =
-      member.is_primary_contact
-        ? "Primary Contact"
-        : "";
-
-
-    return (
-
-      '<div class="detail-row">' +
-
-        "<strong>" +
-
-          escapeHTML(
-            member.full_name
-          ) +
-
-        "</strong>" +
-
-
-        "<span>" +
-
-          escapeHTML(
-            member.role
-          ) +
-
-          (
-
-            member.title
-
-              ? (
-                  " • " +
-                  escapeHTML(
-                    member.title
-                  )
-                )
-
-              : ""
-
-          ) +
-
-        "</span>" +
-
-
-        (
-
-          member.email
-
-            ? (
-                "<p>" +
-
-                escapeHTML(
-                  member.email
-                ) +
-
-                "</p>"
-              )
-
-            : ""
-
-        ) +
-
-
-        (
-
-          primary
-
-            ? (
-                "<p>" +
-                escapeHTML(primary) +
-                "</p>"
-              )
-
-            : ""
-
-        ) +
-
-
-        (
-
-          member.bio
-
-            ? (
-                "<p>" +
-
-                escapeHTML(
-                  member.bio
-                ) +
-
-                "</p>"
-              )
-
-            : ""
-
-        ) +
-
-      "</div>"
-
-    );
-
-  })
-
-  .join("");
-
-}
-
-/* =========================================================
-DOCUMENTS
-========================================================= */
-
-function renderDocuments(
-documents
-) {
-
-if (!elements.docs) return;
-
-
-const list =
-  safeArray(documents);
-
-
-if (!list.length) {
-
-  renderEmptyList(
-    elements.docs,
-    "No documents registered."
-  );
-
-  return;
-
-}
-
-
-elements.docs.innerHTML =
-  list.map(function (documentItem) {
-
-    let link = "";
-
-
-    if (
-      documentItem.document_url
-    ) {
-
-      const url =
-        escapeHTML(
-          documentItem.document_url
-        );
-
-
-      link =
-
-        '<p><a ' +
-
-        'href="' + url + '" ' +
-
-        'target="_blank" ' +
-
-        'rel="noopener noreferrer">' +
-
-        "Open Document" +
-
-        "</a></p>";
-
+    if (elements.statusText) elements.statusText.textContent = getStatusDescription(status);
+    if (elements.reviewStatusTitle) elements.reviewStatusTitle.textContent = formatStatus(status);
+    if (elements.applicationIdDisplay) elements.applicationIdDisplay.textContent = state.applicationId;
+
+    const username = state.user?.username || "ALBUKHR User";
+    if (elements.authUsername) elements.authUsername.textContent = username;
+    if (elements.authAvatar) elements.authAvatar.textContent = username.charAt(0).toUpperCase();
+    if (elements.authNetwork) elements.authNetwork.textContent = "Authenticated with Pi • " + state.network.toUpperCase();
+    if (elements.networkIndicator) elements.networkIndicator.textContent = state.network.toUpperCase();
+  }
+
+  function renderGrid(container, fields) {
+    if (!container) return;
+    container.innerHTML = "";
+    const list = fields.filter(field => field);
+    if (!list.length) {
+      container.innerHTML = '<div class="detail-empty">No information available.</div>';
+      return;
     }
-
-
-    return (
-
-      '<div class="detail-row">' +
-
-        "<strong>" +
-
-          escapeHTML(
-
-            documentItem.document_name ||
-
-            documentItem.document_type ||
-
-            "Document"
-
-          ) +
-
-        "</strong>" +
-
-
-        "<span>" +
-
-          escapeHTML(
-            documentItem.document_type
-          ) +
-
-        "</span>" +
-
-
-        (
-
-          documentItem.verification_status
-
-            ? (
-                "<p>" +
-
-                "Verification: " +
-
-                escapeHTML(
-                  formatStatus(
-                    documentItem.verification_status
-                  )
-                ) +
-
-                "</p>"
-              )
-
-            : ""
-
-        ) +
-
-
-        link +
-
-      "</div>"
-
-    );
-
-  })
-
-  .join("");
-
-}
-
-/* =========================================================
-HISTORY
-========================================================= */
-
-function renderHistory(
-reviews,
-reviewHistory,
-auditLog
-) {
-
-if (!elements.history) return;
-
-
-const events = [];
-
-
-safeArray(reviews).forEach(
-  function (review) {
-
-    events.push({
-
-      type:
-        "Review",
-
-
-      title:
-
-        review.decision ||
-
-        review.review_type ||
-
-        "Review Activity",
-
-
-      message:
-
-        review.comments ||
-
-        "",
-
-
-      created_at:
-        review.created_at
-
+    list.forEach(field => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "detail-field";
+      const label = document.createElement("span");
+      label.textContent = field.label;
+      const value = document.createElement("strong");
+      value.textContent = normalizeText(field.value);
+      wrapper.append(label, value);
+      container.appendChild(wrapper);
     });
-
-  }
-);
-
-
-safeArray(reviewHistory).forEach(
-  function (historyItem) {
-
-    events.push({
-
-      type:
-
-        historyItem.event_type ||
-
-        "Review History",
-
-
-      title:
-
-        historyItem.decision ||
-
-        "Review Activity",
-
-
-      message:
-
-        historyItem.comments ||
-
-        "",
-
-
-      created_at:
-        historyItem.created_at
-
-    });
-
-  }
-);
-
-
-safeArray(auditLog).forEach(
-  function (audit) {
-
-    let details = "";
-
-
-    if (audit.details) {
-
-      try {
-
-        details =
-          typeof audit.details === "string"
-
-            ? audit.details
-
-            : JSON.stringify(
-                audit.details
-              );
-
-      }
-
-      catch (error) {
-
-        details = "";
-
-      }
-
-    }
-
-
-    events.push({
-
-      type: "System",
-
-      title:
-
-        audit.action ||
-
-        "Application Activity",
-
-
-      message:
-
-        details,
-
-
-      created_at:
-        audit.created_at
-
-    });
-
-  }
-);
-
-
-events.sort(
-  function (first, second) {
-
-    const firstTime =
-      new Date(
-        first.created_at || 0
-      ).getTime();
-
-
-    const secondTime =
-      new Date(
-        second.created_at || 0
-      ).getTime();
-
-
-    return secondTime - firstTime;
-
-  }
-);
-
-
-if (!events.length) {
-
-  renderEmptyList(
-    elements.history,
-    "No review activity yet."
-  );
-
-  return;
-
-}
-
-
-elements.history.innerHTML =
-  events.map(function (event) {
-
-    return (
-
-      '<div class="detail-row">' +
-
-        "<strong>" +
-
-          escapeHTML(
-            formatStatus(
-              event.title
-            )
-          ) +
-
-        "</strong>" +
-
-
-        "<span>" +
-
-          escapeHTML(
-            event.type
-          ) +
-
-          " • " +
-
-          escapeHTML(
-            formatDate(
-              event.created_at
-            )
-          ) +
-
-        "</span>" +
-
-
-        (
-
-          event.message
-
-            ? (
-                "<p>" +
-
-                escapeHTML(
-                  event.message
-                ) +
-
-                "</p>"
-              )
-
-            : ""
-
-        ) +
-
-      "</div>"
-
-    );
-
-  })
-
-  .join("");
-
-}
-
-/* =========================================================
-ACTION VISIBILITY
-========================================================= */
-
-function updateActionButtons() {
-
-if (!state.application) return;
-
-
-const status =
-  normalizeStatus(
-    state.application.status
-  );
-
-
-const editable =
-  status === "draft" ||
-  status === "revision_requested";
-
-
-if (elements.edit) {
-
-  elements.edit.hidden =
-    !editable;
-
-}
-
-
-if (elements.submit) {
-
-  elements.submit.hidden =
-    status !== "draft";
-
-}
-
-}
-
-/* =========================================================
-EDIT
-========================================================= */
-
-function openEditor() {
-
-if (!state.applicationId) return;
-
-
-window.location.assign(
-
-  "external-create.html?application_id=" +
-
-  encodeURIComponent(
-    state.applicationId
-  )
-
-);
-
-}
-
-/* =========================================================
-DASHBOARD
-========================================================= */
-
-function openDashboard() {
-
-window.location.assign(
-  "external-project-dashboard.html"
-);
-
-}
-
-/* =========================================================
-BACK
-========================================================= */
-
-function goBack() {
-
-if (
-  window.history &&
-  window.history.length > 1
-) {
-
-  window.history.back();
-
-  return;
-
-}
-
-
-openDashboard();
-
-}
-
-/* =========================================================
-SUBMIT APPLICATION
-========================================================= */
-
-async function submitApplication() {
-
-if (state.submitting) return;
-
-
-if (!state.applicationId) {
-
-  showMessage(
-    "❌ Application ID is unavailable.",
-    "error"
-  );
-
-  return;
-
-}
-
-
-const confirmed =
-  window.confirm(
-
-    "Submit this external project application for ALBUKHR review?"
-
-  );
-
-
-if (!confirmed) return;
-
-
-state.submitting = true;
-
-
-if (elements.submit) {
-
-  elements.submit.disabled = true;
-
-  elements.submit.textContent =
-    "Submitting...";
-
-}
-
-
-clearMessage();
-
-
-try {
-
-  const piUID =
-    getPiUID(
-      state.user
-    );
-
-
-  if (!piUID) {
-
-    throw new Error(
-      "Authenticated Pi user identity is unavailable."
-    );
-
   }
 
+  function renderApplicationInfo() {
+    const app = state.application;
+    renderGrid(elements.project, [
+      { label: "Project Name", value: app.project_name },
+      { label: "Application Code", value: app.application_code },
+      { label: "Project Code", value: app.project_code },
+      { label: "Project Slug", value: app.project_slug },
+      { label: "Industry", value: app.industry },
+      { label: "Category", value: app.category },
+      { label: "Project Duration", value: app.project_duration_days ? app.project_duration_days + " days" : null },
+      { label: "Created", value: formatDate(app.created_at) }
+    ]);
+    if (elements.projectDescription) elements.projectDescription.textContent = app.project_description || "No project description provided.";
 
-  const result =
-    await callRPC(
-      "submit_my_external_project_application",
-      {
-
-        p_application_id:
-          state.applicationId,
-
-        p_pi_uid:
-          piUID,
-
-        p_network:
-          state.network
-
-      }
-    );
-
-
-  if (result !== true) {
-
-    console.info(
-      "ALBUKHR submission response:",
-      result
-    );
-
-  }
-
-
-  showMessage(
-    "Application submitted successfully.",
-    "success"
-  );
-
-
-  await loadPageData();
-
-
-}
-
-catch (error) {
-
-  console.error(
-    "External project submission failed:",
-    error
-  );
-
-
-  showMessage(
-
-    "❌ " +
-
-    (
-      error.message ||
-      "Unable to submit the application."
-    ),
-
-    "error"
-
-  );
-
-}
-
-finally {
-
-  state.submitting = false;
-
-
-  if (elements.submit) {
-
-    elements.submit.disabled =
-      false;
-
-    elements.submit.textContent =
-      "Submit Application";
-
-  }
-
-}
-
-}
-
-/* =========================================================
-RENDER ALL
-========================================================= */
-
-function renderApplication() {
-
-renderHeader();
-
-renderProjectInformation();
-
-renderBusinessInformation();
-
-renderFundingInformation();
-
-updateActionButtons();
-
-}
-
-/* =========================================================
-LOAD PAGE DATA
-========================================================= */
-
-async function loadPageData() {
-
-setLoading(
-  true,
-  "Loading application..."
-);
-
-
-clearMessage();
-
-
-try {
-
-  const application =
-    await loadApplicationDetail();
-
-
-  state.application =
-    application;
-
-
-  renderApplication();
-
-
-  const results =
-    await Promise.allSettled([
-
-      loadTeam(),
-
-      loadDocuments(),
-
-      loadReviews(),
-
-      loadReviewHistory(),
-
-      loadAuditLog()
-
+    renderGrid(elements.business, [
+      { label: "Business Name", value: app.business_name },
+      { label: "Registration Number", value: app.business_registration_number },
+      { label: "Country", value: app.country },
+      { label: "State", value: app.state },
+      { label: "City", value: app.city },
+      { label: "Business Address", value: app.business_address },
+      { label: "Website", value: app.website },
+      { label: "Contact Email", value: app.contact_email },
+      { label: "Contact Phone", value: app.contact_phone },
+      { label: "Pi Wallet", value: app.pi_wallet }
     ]);
 
+    renderGrid(elements.funding, [
+      { label: "Funding Required", value: formatFunding(app.funding_required, app.funding_asset) },
+      { label: "Funding Asset", value: app.funding_asset },
+      { label: "Investment Model", value: app.investment_model },
+      { label: "Project Duration", value: app.project_duration_days ? app.project_duration_days + " days" : null }
+    ]);
+  }
 
-  const team =
-
-    results[0].status === "fulfilled"
-
-      ? results[0].value
-
-      : [];
-
-
-  const documents =
-
-    results[1].status === "fulfilled"
-
-      ? results[1].value
-
-      : [];
-
-
-  const reviews =
-
-    results[2].status === "fulfilled"
-
-      ? results[2].value
-
-      : [];
-
-
-  const reviewHistory =
-
-    results[3].status === "fulfilled"
-
-      ? results[3].value
-
-      : [];
-
-
-  const auditLog =
-
-    results[4].status === "fulfilled"
-
-      ? results[4].value
-
-      : [];
-
-
-  results.forEach(
-    function (result) {
-
-      if (
-        result.status === "rejected"
-      ) {
-
-        console.warn(
-          "External project supplementary data failed:",
-          result.reason
-        );
-
-      }
-
+  function renderTeam(team) {
+    if (!elements.team) return;
+    if (!team.length) {
+      elements.team.innerHTML = '<div class="detail-empty">No team members registered.</div>';
+    } else {
+      elements.team.innerHTML = team.map(member => `
+        <div class="detail-row">
+          <strong>${escapeHTML(member.full_name)}</strong>
+          <span>${escapeHTML(member.role)}${member.title ? " • " + escapeHTML(member.title) : ""}</span>
+          ${member.email ? `<p>${escapeHTML(member.email)}</p>` : ""}
+          ${member.is_primary_contact ? `<p>Primary Contact</p>` : ""}
+          ${member.bio ? `<p>${escapeHTML(member.bio)}</p>` : ""}
+        </div>
+      `).join("");
     }
-  );
-
-
-  renderTeam(team);
-
-  renderDocuments(documents);
-
-  renderHistory(
-    reviews,
-    reviewHistory,
-    auditLog
-  );
-
-
-  setLoading(false);
-
-
-  if (elements.content) {
-
-    elements.content.hidden =
-      false;
-
+    renderTeamEditor(team);
   }
 
+  function renderTeamEditor(team) {
+    if (!elements.teamEditor || !elements.teamEditorList) return;
+    const editable = isEditableStatus(state.application?.status) && !state.teamLoadFailed;
+    elements.teamEditor.hidden = !editable;
+    if (!editable) return;
 
-  console.info(
-    "ALBUKHR External Project Detail loaded.",
-    {
+    const source = team.length ? team : [{ full_name: "", email: "", role: "", title: "", bio: "", is_primary_contact: true }];
+    elements.teamEditorList.innerHTML = "";
+    source.forEach(member => addTeamEditorRow(member));
+  }
 
-      application_id:
-        state.applicationId,
+  function addTeamEditorRow(member = {}) {
+    const row = document.createElement("div");
+    row.className = "team-editor-row";
+    row.innerHTML = `
+      <div class="team-editor-grid">
+        <label>Full Name<input data-field="full_name" value="${escapeHTML(member.full_name || "")}" required></label>
+        <label>Role<input data-field="role" value="${escapeHTML(member.role || "")}" required></label>
+        <label>Title<input data-field="title" value="${escapeHTML(member.title || "")}"></label>
+        <label>Email<input data-field="email" type="email" value="${escapeHTML(member.email || "")}"></label>
+        <label class="team-editor-wide">Bio<textarea data-field="bio" rows="3">${escapeHTML(member.bio || "")}</textarea></label>
+        <label class="team-primary"><input data-field="is_primary_contact" type="checkbox" ${member.is_primary_contact ? "checked" : ""}> Primary contact</label>
+      </div>
+      <button type="button" class="ghost-action team-remove-button">Remove</button>
+    `;
+    row.querySelector(".team-remove-button")?.addEventListener("click", () => row.remove());
+    elements.teamEditorList.appendChild(row);
+  }
 
-      network:
-        state.network,
+  async function saveTeam() {
+    if (state.savingTeam || !isEditableStatus(state.application?.status)) return;
+    state.savingTeam = true;
+    const rows = Array.from(elements.teamEditorList?.querySelectorAll(".team-editor-row") || []);
+    const team = rows.map(row => ({
+      full_name: row.querySelector('[data-field="full_name"]')?.value.trim() || "",
+      email: row.querySelector('[data-field="email"]')?.value.trim() || "",
+      role: row.querySelector('[data-field="role"]')?.value.trim() || "",
+      title: row.querySelector('[data-field="title"]')?.value.trim() || "",
+      bio: row.querySelector('[data-field="bio"]')?.value.trim() || "",
+      is_primary_contact: Boolean(row.querySelector('[data-field="is_primary_contact"]')?.checked)
+    }));
 
-      project:
-        state.application.project_name
+    try {
+      if (!team.length) throw new Error("Add at least one team member.");
+      if (team.some(member => !member.full_name || !member.role)) throw new Error("Each team member must have a full name and role.");
+      if (team.filter(member => member.is_primary_contact).length > 1) throw new Error("Only one primary contact is allowed.");
+      if (elements.saveTeam) { elements.saveTeam.disabled = true; elements.saveTeam.textContent = "Saving..."; }
+      if (elements.teamStatus) elements.teamStatus.textContent = "Saving team...";
 
+      const result = await callRPC("replace_my_external_project_team", {
+        p_application_id: state.applicationId,
+        p_pi_uid: getPiUID(),
+        p_network: state.network,
+        p_team: team
+      });
+
+      if (result !== true) throw new Error("Team update was not accepted.");
+      if (elements.teamStatus) elements.teamStatus.textContent = "Team saved successfully.";
+      await loadPageData();
+    } catch (error) {
+      console.error("External team update failed:", error);
+      if (elements.teamStatus) elements.teamStatus.textContent = error?.message || "Unable to save team.";
+    } finally {
+      state.savingTeam = false;
+      if (elements.saveTeam) { elements.saveTeam.disabled = false; elements.saveTeam.textContent = "Save Team"; }
     }
-  );
-
-}
-
-catch (error) {
-
-  console.error(
-    "External Project Detail load failed:",
-    error
-  );
-
-
-  setLoading(false);
-
-  showError(error);
-
-}
-
-}
-
-/* =========================================================
-EVENT BINDING
-========================================================= */
-
-function bindEvents() {
-
-if (elements.back) {
-
-  elements.back.addEventListener(
-    "click",
-    goBack
-  );
-
-}
-
-
-if (elements.edit) {
-
-  elements.edit.addEventListener(
-    "click",
-    openEditor
-  );
-
-}
-
-
-if (elements.submit) {
-
-  elements.submit.addEventListener(
-    "click",
-    submitApplication
-  );
-
-}
-
-
-if (elements.dashboard) {
-
-  elements.dashboard.addEventListener(
-    "click",
-    openDashboard
-  );
-
-}
-
-}
-
-/* =========================================================
-INITIALIZATION
-========================================================= */
-
-async function initialize() {
-
-try {
-
-  checkDependencies();
-
-
-  state.applicationId =
-    getApplicationIdFromURL();
-
-
-  state.network =
-    getCurrentNetwork();
-
-
-  state.user =
-    await requireAuthentication();
-
-
-  if (!state.user) {
-
-    return;
-
   }
 
-
-  bindEvents();
-
-
-  await loadPageData();
-
-
-}
-
-catch (error) {
-
-  console.error(
-    "ALBUKHR External Project Detail initialization failed:",
-    error
-  );
-
-
-  if (elements.loading) {
-
-    elements.loading.hidden =
-      true;
-
+  function renderDocuments(documents) {
+    if (!elements.docs) return;
+    const list = safeArray(documents);
+    if (!list.length) {
+      elements.docs.innerHTML = '<div class="detail-empty">No supporting documents registered.</div>';
+      return;
+    }
+    elements.docs.innerHTML = list.map(item => `
+      <div class="detail-row">
+        <strong>${escapeHTML(item.document_name || item.document_type || "Document")}</strong>
+        <span>${escapeHTML(formatStatus(item.document_type || "other"))}</span>
+        <p>Verification: ${escapeHTML(formatStatus(item.verification_status || "pending"))}</p>
+        <p>Private storage document — available to authorized ALBUKHR workflows.</p>
+      </div>
+    `).join("");
   }
 
-
-  if (elements.content) {
-
-    elements.content.hidden =
-      true;
-
+  function renderHistory(reviews, reviewHistory, auditLog) {
+    if (!elements.history) return;
+    const events = [];
+    safeArray(reviews).forEach(item => events.push({ type: "Review", title: item.decision || item.review_type || "Review Activity", message: item.comments || "", created_at: item.created_at }));
+    safeArray(reviewHistory).forEach(item => events.push({ type: item.event_type || "Review History", title: item.decision || "Review Activity", message: item.comments || "", created_at: item.created_at }));
+    safeArray(auditLog).forEach(item => events.push({ type: "System", title: item.action || "Application Activity", message: typeof item.details === "string" ? item.details : (item.details ? JSON.stringify(item.details) : ""), created_at: item.created_at }));
+    events.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+    if (!events.length) {
+      elements.history.innerHTML = '<div class="detail-empty">No review activity yet.</div>';
+      return;
+    }
+    elements.history.innerHTML = events.map(event => `
+      <div class="detail-row">
+        <strong>${escapeHTML(formatStatus(event.title))}</strong>
+        <span>${escapeHTML(event.type)} • ${escapeHTML(formatDate(event.created_at))}</span>
+        ${event.message ? `<p>${escapeHTML(event.message)}</p>` : ""}
+      </div>
+    `).join("");
   }
 
+  function updateActionButtons() {
+    if (!state.application) return;
+    const editable = isEditableStatus(state.application.status);
+    const status = normalizeStatus(state.application.status);
+    if (elements.edit) elements.edit.hidden = !editable;
+    if (elements.submit) elements.submit.hidden = !editable;
+    if (elements.teamEditor) elements.teamEditor.hidden = !editable;
+    if (elements.addTeamMember) elements.addTeamMember.disabled = !editable;
+    if (elements.saveTeam) elements.saveTeam.disabled = !editable;
+    if (elements.submit) elements.submit.dataset.status = status;
+  }
 
-  showError(error);
+  function openEditor() {
+    window.location.assign("external-create.html?application_id=" + encodeURIComponent(state.applicationId));
+  }
 
-}
+  function openDashboard() {
+    window.location.assign("external-project-dashboard.html");
+  }
 
-}
+  async function submitApplication() {
+    if (state.submitting) return;
+    if (!state.applicationId) return showMessage("Application ID is unavailable.", "error");
+    if (!isEditableStatus(state.application?.status)) return showMessage("This application cannot be submitted in its current status.", "error");
+    if (!window.confirm("Submit this external project application for ALBUKHR review?")) return;
 
-/* =========================================================
-START
-========================================================= */
+    state.submitting = true;
+    if (elements.submit) { elements.submit.disabled = true; elements.submit.textContent = "Submitting..."; }
+    clearMessage();
 
-if (
-document.readyState ===
-"loading"
-) {
+    try {
+      const result = await callRPC("submit_my_external_project_application", buildOwnerParameters());
+      if (result !== true) throw new Error("Application submission was not accepted.");
+      showMessage("Application submitted successfully.", "success");
+      await loadPageData();
+    } catch (error) {
+      console.error("External project submission failed:", error);
+      showMessage("❌ " + (error?.message || "Unable to submit the application."), "error");
+    } finally {
+      state.submitting = false;
+      if (elements.submit) { elements.submit.disabled = false; elements.submit.textContent = "Submit Application"; }
+      updateActionButtons();
+    }
+  }
 
-document.addEventListener(
+  function renderApplication() {
+    renderHeader();
+    renderApplicationInfo();
+    renderTeam(state.team);
+    updateActionButtons();
+  }
 
-  "DOMContentLoaded",
+  async function loadPageData() {
+    setLoading(true, "Loading application...");
+    clearMessage();
 
-  initialize,
+    try {
+      state.application = await loadApplicationDetail();
+      const results = await Promise.allSettled([loadTeam(), loadDocuments(), loadReviews(), loadReviewHistory(), loadAuditLog()]);
+      state.teamLoadFailed = results[0].status !== "fulfilled";
+      state.team = results[0].status === "fulfilled" ? results[0].value : [];
+      const documents = results[1].status === "fulfilled" ? results[1].value : [];
+      const reviews = results[2].status === "fulfilled" ? results[2].value : [];
+      const reviewHistory = results[3].status === "fulfilled" ? results[3].value : [];
+      const auditLog = results[4].status === "fulfilled" ? results[4].value : [];
 
-  { once: true }
+      results.forEach(result => {
+        if (result.status === "rejected") console.warn("External project supplementary data failed:", result.reason);
+      });
 
-);
+      renderApplication();
+      renderDocuments(documents);
+      renderHistory(reviews, reviewHistory, auditLog);
+      setLoading(false);
+      if (elements.content) elements.content.hidden = false;
 
-}
+      window.dispatchEvent(new CustomEvent("albukhr:external-project-detail-ready", {
+        detail: { application: state.application, applicationId: state.applicationId, network: state.network }
+      }));
+    } catch (error) {
+      setLoading(false);
+      showError(error);
+      throw error;
+    }
+  }
 
-else {
+  function bindEvents() {
+    elements.edit?.addEventListener("click", openEditor);
+    elements.submit?.addEventListener("click", submitApplication);
+    elements.dashboard?.addEventListener("click", openDashboard);
+    elements.back?.addEventListener("click", () => window.history.back());
+    elements.retry?.addEventListener("click", () => loadPageData().catch(() => {}));
+    elements.addTeamMember?.addEventListener("click", () => addTeamEditorRow());
+    elements.saveTeam?.addEventListener("click", saveTeam);
+  }
 
-initialize();
+  async function initialize() {
+    try {
+      checkDependencies();
+      state.applicationId = getApplicationIdFromURL();
+      state.network = getCurrentNetwork();
+      state.user = await requireAuthentication();
+      if (!state.user) return;
+      bindEvents();
+      await loadPageData();
+    } catch (error) {
+      console.error("ALBUKHR External Project Detail initialization failed:", error);
+      showError(error);
+    }
+  }
 
-}
+  window.ALBukhrExternalProjectDetail = Object.freeze({
+    getState: () => Object.freeze({ ...state }),
+    reload: () => loadPageData()
+  });
 
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  } else {
+    initialize();
+  }
 })(window, document);
