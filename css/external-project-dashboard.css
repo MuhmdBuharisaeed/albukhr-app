@@ -1347,3 +1347,14 @@ button:disabled {
   }
 
    }
+
+/* =========================================================
+   ALBUKHR HIDDEN STATE FIX
+   ---------------------------------------------------------
+   The HTML hidden attribute must always override component
+   display rules such as display:grid.
+========================================================= */
+
+[hidden] {
+  display: none !important;
+}
