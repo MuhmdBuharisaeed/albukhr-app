@@ -108,6 +108,19 @@
         grid-column: auto;
       }
     }
+    /* =========================================================
+   ALBUKHR HIDDEN STATE FIX
+   ---------------------------------------------------------
+   Ensure the native HTML [hidden] attribute always wins
+   over component display rules such as display:flex.
+   
+   This prevents the detail loading state from remaining
+   visible after the application has loaded.
+========================================================= */
+
+[hidden] {
+  display: none !important;
+}
   </style>
 </head>
 
