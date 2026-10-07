@@ -181,8 +181,18 @@
   }
 
   async function requireAuthentication() {
-    const user = await window.AlbukhrPiAuth.requireAuth("login.html");
-    if (!user) return null;
+    const guard = window.AlbukhrPageAuthGuard;
+
+    if (!guard || typeof guard.waitForAuth !== "function") {
+        throw new Error("ALBUKHR Page Auth Guard is unavailable.");
+    }
+
+    const user = await guard.waitForAuth();
+
+    if (!user) {
+        return null;
+    }
+
     return user;
   }
 
