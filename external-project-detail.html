@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/global-header.css">
 <link rel="stylesheet" href="css/global-buttons.css">
 <link rel="stylesheet" href="css/external-project-detail.css">
+<link rel="stylesheet" href="css/external-project-logo.css?v=20261008-logo-1">
 <style>
 .team-editor,.document-uploader{margin-top:16px;padding:16px;border:1px solid rgba(15,122,61,.15);border-radius:14px}
 .team-editor-list{display:grid;gap:12px}.team-editor-row{padding:14px;border:1px solid rgba(15,122,61,.12);border-radius:12px}
@@ -37,6 +38,26 @@
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Project Information</h2><p>Core information about your proposed project.</p></div></div><div id="projectInformation" class="detail-grid"></div><div class="detail-description-box"><span>PROJECT DESCRIPTION</span><p id="projectDescription" class="detail-description">—</p></div></section>
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Business & Contact</h2><p>Registered business and communication details.</p></div></div><div id="businessInformation" class="detail-grid"></div></section>
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Investment Request</h2><p>Funding and investment information submitted with this application.</p></div></div><div id="fundingInformation" class="detail-grid"></div></section>
+
+<section class="detail-section external-logo-detail-section">
+<div class="detail-section-heading"><div><h2>Project Logo</h2><p>Official project identity logo used during the ALBUKHR project lifecycle and public registry.</p></div></div>
+<div class="external-logo-detail" id="externalProjectLogoPanel">
+<div class="external-logo-detail-preview">
+<div class="external-logo-empty" id="externalProjectLogoEmpty">No project logo has been registered yet.</div>
+<img id="externalProjectLogoImage" alt="External Project logo" hidden>
+</div>
+<div class="external-logo-detail-controls">
+<form id="externalProjectLogoForm" novalidate>
+<label>Project Logo File<input id="externalProjectLogoFile" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg"></label>
+<p class="external-logo-note">Accepted: PNG or JPG/JPEG • Minimum 400 × 400 px • Maximum 1 MB.</p>
+<div class="external-logo-detail-actions"><button id="externalProjectLogoUploadButton" class="primary-action" type="submit">Upload / Replace Logo</button></div>
+<div id="externalProjectLogoStatus" class="form-status" aria-live="polite"></div>
+</form>
+<p id="externalProjectLogoReadonlyNote" class="external-logo-note" hidden>Project logo is locked after the application leaves the draft/revision state.</p>
+</div>
+</div>
+</section>
+
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Project Team</h2><p>Team members associated with this application.</p></div></div><div id="projectTeam" class="detail-list"></div><div id="teamEditor" class="team-editor" hidden><div class="detail-section-heading"><div><h3>Manage Team</h3><p>At least one team member is required before submission.</p></div></div><div id="teamEditorList" class="team-editor-list"></div><div class="team-editor-actions"><button id="addTeamMemberButton" class="secondary-action" type="button">Add Team Member</button><button id="saveTeamButton" class="primary-action" type="button">Save Team</button></div><div id="teamEditorStatus" class="form-status" aria-live="polite"></div></div></section>
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Documents</h2><p>Supporting documents registered with the application.</p></div></div><div id="projectDocuments" class="detail-list"></div><div id="documentUploader" class="document-uploader"><div class="detail-section-heading"><div><h3>Upload Supporting Document</h3><p>Documents are stored privately and registered through the secure applicant workflow.</p></div></div><form id="externalProjectDocumentForm"><div class="document-uploader-grid"><label>Document Type<select id="externalProjectDocumentType" required><option value="business_registration">Business Registration</option><option value="project_proposal">Project Proposal</option><option value="business_plan">Business Plan</option><option value="financial_statement">Financial Statement</option><option value="identity_document">Identity Document</option><option value="ownership_document">Ownership Document</option><option value="other">Other</option></select></label><label>Document File<input id="externalProjectDocumentUpload" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" required></label></div><p class="document-uploader-note">Accepted formats: PDF, PNG, JPG/JPEG and WEBP. Maximum size: 10 MB.</p><div class="document-uploader-actions"><button id="externalProjectDocumentSubmitButton" class="primary-action" type="submit">Upload Document</button></div><div id="externalProjectDocumentStatus" class="form-status" aria-live="polite"></div></form><p id="externalProjectDocumentReadonlyNote" class="document-uploader-note" hidden>Documents are locked after the application leaves the draft/revision state.</p></div></section>
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Review History</h2><p>Review and approval activity recorded for this application.</p></div></div><div id="reviewHistory" class="detail-list detail-history"></div></section>
@@ -49,11 +70,12 @@
 <script src="js/core/supabase-core.js"></script>
 <script src="js/core/pi-auth-core.js"></script>
 <script src="js/core/albukhr-api-core.js"></script>
-<script src="js/core/external-project-api.js"></script>
+<script src="js/core/external-project-api.js?v=20261008-logo-1"></script>
 <script src="js/core/page-auth-guard.js?v=20261007-2"></script>
 <script src="js/core/environment-switcher.js"></script>
 <script src="js/external-project-detail.js"></script>
 <script src="js/external-project-team-editor-visibility-fix.js?v=20261008-1"></script>
 <script src="js/external-project-detail-document-integration.js?v=20261008-3"></script>
+<script src="js/external-project-logo-integration.js?v=20261008-logo-1"></script>
 </body>
 </html>
