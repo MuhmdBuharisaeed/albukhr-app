@@ -2,523 +2,56 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#087a3e">
-
 <title>ALBUKHR External Projects</title>
-
 <link rel="stylesheet" href="css/albukhr-ui.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/global-header.css">
 <link rel="stylesheet" href="css/global-buttons.css">
-
-<link
-  rel="stylesheet"
-  href="css/external-project-dashboard.css"
->
-</head> 
-
+<link rel="stylesheet" href="css/external-project-dashboard.css">
+</head>
 <body data-page="external-project-dashboard">
-
 <header class="header">
-  <div class="header-left">
-    <span class="brand">ALBUKHR</span>
-  </div>
-
-  </div>
-
-  <div class="header-right">
-
-    <span
-      class="network-indicator"
-      id="networkIndicator"
-    >
-      NETWORK
-    </span>
-
-  </div>
-
+  <div class="header-left"><span class="brand">ALBUKHR</span></div>
+  <div class="header-right"><span class="network-indicator" id="networkIndicator">NETWORK</span></div>
 </header>
-
-
 <main class="external-dashboard-page">
-
-
-  <!-- =========================================
-       HERO
-  ========================================== -->
-
-  <section class="dashboard-hero">
-
-    <div class="hero-content">
-
-      <div class="eyebrow">
-        EXTERNAL PROJECT SERVICE
-      </div>
-
-      <h1>
-        My External Projects
-      </h1>
-
-      <p>
-        Create, manage and track your independent
-        business projects through the ALBUKHR
-        review framework.
-      </p>
-
-    </div>
-
-
-    <button
-      id="createProjectButton"
-      class="create-project-button"
-      type="button"
-    >
-      <span class="create-button-plus">
-        +
-      </span>
-
-      <span>
-        Create Project
-      </span>
-
-    </button>
-
-  </section>
-
-
-
-  <!-- =========================================
-       AUTHENTICATION
-  ========================================== -->
-
-  <section
-    class="auth-strip"
-    aria-live="polite"
-  >
-
-    <div
-      class="auth-avatar"
-      id="authAvatar"
-    >
-      A
-    </div>
-
-
-    <div class="auth-details">
-
-      <strong
-        id="authUsername"
-      >
-        Checking authentication...
-      </strong>
-
-
-      <span
-        id="authNetwork"
-      >
-        Secure Pi authentication required
-      </span>
-
-    </div>
-
-
-    <div class="auth-security">
-
-      <span class="security-dot"></span>
-
-      <span>
-        Secure
-      </span>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =========================================
-       SUMMARY
-  ========================================== -->
-
-  <section
-    class="summary-section"
-    aria-label="Application summary"
-  >
-
-
-    <div class="summary-card">
-
-      <span class="summary-label">
-        Total
-      </span>
-
-      <strong
-        class="summary-value"
-        id="totalApplications"
-      >
-        0
-      </strong>
-
-    </div>
-
-
-
-    <div class="summary-card">
-
-      <span class="summary-label">
-        Drafts
-      </span>
-
-      <strong
-        class="summary-value"
-        id="draftApplications"
-      >
-        0
-      </strong>
-
-    </div>
-
-
-
-    <div class="summary-card">
-
-      <span class="summary-label">
-        Under Review
-      </span>
-
-      <strong
-        class="summary-value"
-        id="reviewApplications"
-      >
-        0
-      </strong>
-
-    </div>
-
-
-
-    <div class="summary-card">
-
-      <span class="summary-label">
-        Approved
-      </span>
-
-      <strong
-        class="summary-value"
-        id="approvedApplications"
-      >
-        0
-      </strong>
-
-    </div>
-
-
-  </section>
-
-
-
-  <!-- =========================================
-       STATUS FILTERS
-  ========================================== -->
-
-  <section class="applications-toolbar">
-
-
-    <div class="toolbar-heading">
-
-      <div>
-
-        <h2>
-          Applications
-        </h2>
-
-        <p
-          id="applicationCountText"
-        >
-          Loading your applications...
-        </p>
-
-      </div>
-
-
-      <button
-        id="refreshApplicationsButton"
-        class="refresh-button"
-        type="button"
-        aria-label="Refresh applications"
-      >
-        Refresh
-      </button>
-
-    </div>
-
-
-
-    <div
-      class="status-filters"
-      id="statusFilters"
-      role="tablist"
-      aria-label="Application status filters"
-    >
-
-
-      <button
-        class="status-filter active"
-        type="button"
-        data-status="all"
-      >
-        All
-      </button>
-
-
-      <button
-        class="status-filter"
-        type="button"
-        data-status="draft"
-      >
-        Draft
-      </button>
-
-
-      <button
-        class="status-filter"
-        type="button"
-        data-status="submitted"
-      >
-        Submitted
-      </button>
-
-
-      <button
-        class="status-filter"
-        type="button"
-        data-status="under_review"
-      >
-        Review
-      </button>
-
-
-      <button
-        class="status-filter"
-        type="button"
-        data-status="revision_requested"
-      >
-        Revision
-      </button>
-
-
-      <button
-        class="status-filter"
-        type="button"
-        data-status="approved"
-      >
-        Approved
-      </button>
-
-
-      <button
-        class="status-filter"
-        type="button"
-        data-status="rejected"
-      >
-        Rejected
-      </button>
-
-
-      <button
-        class="status-filter"
-        type="button"
-        data-status="converted"
-      >
-        Converted
-      </button>
-
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =========================================
-       STATUS
-  ========================================== -->
-
-  <div
-    class="dashboard-status"
-    id="dashboardStatus"
-    aria-live="polite"
-  >
-    Initializing secure ALBUKHR project access...
-  </div>
-
-
-
-  <!-- =========================================
-       LOADING
-  ========================================== -->
-
-  <section
-    class="applications-loading"
-    id="applicationsLoading"
-  >
-
-    <div class="loading-spinner"></div>
-
-    <strong>
-      Loading applications...
-    </strong>
-
-    <span>
-      Please wait while your projects are loaded securely.
-    </span>
-
-  </section>
-
-
-
-  <!-- =========================================
-       EMPTY STATE
-  ========================================== -->
-
-  <section
-    class="empty-state"
-    id="emptyState"
-    hidden
-  >
-
-    <div class="empty-logo">
-
-      <span class="empty-logo-mark">
-        A
-      </span>
-
-    </div>
-
-
-    <h2>
-      No External Projects Yet
-    </h2>
-
-
-    <p>
-      You have not created an external project
-      application on this network.
-    </p>
-
-
-    <button
-      id="emptyCreateProjectButton"
-      class="primary-action"
-      type="button"
-    >
-      Create External Project
-    </button>
-
-  </section>
-
-
-
-  <!-- =========================================
-       APPLICATIONS LIST
-  ========================================== -->
-
-  <section
-    class="applications-list"
-    id="applicationsList"
-    hidden
-  >
-
-  </section>
-
-
-
-  <!-- =========================================
-       ERROR STATE
-  ========================================== -->
-
-  <section
-    class="dashboard-error"
-    id="dashboardError"
-    hidden
-  >
-
-    <h2>
-      Unable to Load Projects
-    </h2>
-
-
-    <p
-      id="dashboardErrorMessage"
-    >
-      An unexpected error occurred.
-    </p>
-
-
-    <button
-      id="retryApplicationsButton"
-      class="primary-action"
-      type="button"
-    >
-      Try Again
-    </button>
-
-  </section>
-
-
+<section class="dashboard-hero">
+<div class="hero-content"><div class="eyebrow">EXTERNAL PROJECT SERVICE</div><h1>My External Projects</h1><p>Create, manage and track your independent business projects through the ALBUKHR review framework.</p></div>
+<button id="createProjectButton" class="create-project-button" type="button"><span class="create-button-plus">+</span><span>Create Project</span></button>
+</section>
+<section class="auth-strip" aria-live="polite">
+<div class="auth-avatar" id="authAvatar">A</div><div class="auth-details"><strong id="authUsername">Checking authentication...</strong><span id="authNetwork">Secure Pi authentication required</span></div>
+<div class="auth-security"><span class="security-dot"></span><span>Secure</span></div>
+</section>
+<section class="summary-section" aria-label="Application summary">
+<div class="summary-card"><span class="summary-label">Total</span><strong class="summary-value" id="totalApplications">0</strong></div>
+<div class="summary-card"><span class="summary-label">Drafts</span><strong class="summary-value" id="draftApplications">0</strong></div>
+<div class="summary-card"><span class="summary-label">Under Review</span><strong class="summary-value" id="reviewApplications">0</strong></div>
+<div class="summary-card"><span class="summary-label">Approved</span><strong class="summary-value" id="approvedApplications">0</strong></div>
+</section>
+<section class="applications-toolbar">
+<div class="toolbar-heading"><div><h2>Applications</h2><p id="applicationCountText">Loading your applications...</p></div><button id="refreshApplicationsButton" class="refresh-button" type="button" aria-label="Refresh applications">Refresh</button></div>
+<div class="status-filters" id="statusFilters" role="tablist" aria-label="Application status filters">
+<button class="status-filter active" type="button" data-status="all">All</button><button class="status-filter" type="button" data-status="draft">Draft</button><button class="status-filter" type="button" data-status="submitted">Submitted</button><button class="status-filter" type="button" data-status="under_review">Review</button><button class="status-filter" type="button" data-status="revision_requested">Revision</button><button class="status-filter" type="button" data-status="approved">Approved</button><button class="status-filter" type="button" data-status="rejected">Rejected</button><button class="status-filter" type="button" data-status="converted">Converted</button>
+</div>
+</section>
+<div class="dashboard-status" id="dashboardStatus" aria-live="polite">Initializing secure ALBUKHR project access...</div>
+<section class="applications-loading" id="applicationsLoading"><div class="loading-spinner"></div><strong>Loading applications...</strong><span>Please wait while your projects are loaded securely.</span></section>
+<section class="empty-state" id="emptyState" hidden><div class="empty-logo"><span class="empty-logo-mark">A</span></div><h2>No External Projects Yet</h2><p>You have not created an external project application on this network.</p><button id="emptyCreateProjectButton" class="primary-action" type="button">Create External Project</button></section>
+<section class="applications-list" id="applicationsList" hidden></section>
+<section class="dashboard-error" id="dashboardError" hidden><h2>Unable to Load Projects</h2><p id="dashboardErrorMessage">An unexpected error occurred.</p><button id="retryApplicationsButton" class="primary-action" type="button">Try Again</button></section>
 </main>
-
-
-
-<!-- =========================================
-     PI SDK
-========================================= -->
-
-<script
-  src="https://sdk.minepi.com/pi-sdk.js"
-></script>
-
-
-<!-- =========================================
-     SUPABASE
-========================================= -->
-
-<script
-  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-></script>
-
-
-
-<!-- =========================================
-     ALBUKHR CORE
-========================================= -->
-
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/core/environment-core.js"></script>
-
 <script src="js/core/supabase-core.js"></script>
-
 <script src="js/core/pi-auth-core.js"></script>
-
+<script src="js/core/albukhr-api-core.js"></script>
+<script src="js/core/external-project-api.js"></script>
 <script src="js/core/page-auth-guard.js"></script>
-
 <script src="js/core/environment-switcher.js"></script>
-
-
-
-<!-- =========================================
-     PAGE ENGINE
-========================================= -->
-
-<script
-  src="js/external-project-dashboard.js"
-></script>
-
-
+<script src="js/external-project-dashboard.js"></script>
 </body>
-  </html>
+</html>
