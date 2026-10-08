@@ -58,6 +58,23 @@
     return output;
   }
 
+  function uploadMime(file) {
+    const type = String(file?.type || "").trim().toLowerCase();
+
+    if (type === "image/png" || type === "image/jpeg") {
+      return type;
+    }
+
+    const name = String(file?.name || "").trim().toLowerCase();
+
+    if (name.endsWith(".png")) return "image/png";
+    if (name.endsWith(".jpg") || name.endsWith(".jpeg")) {
+      return "image/jpeg";
+    }
+
+    throw new Error("Project logo must be PNG or JPG/JPEG.");
+  }
+
   const Api = Object.freeze({
     async listApplications() {
       requireMainnet();
@@ -92,6 +109,34 @@
       return requireApi().post(
         "/api/external-project/" + encodeURIComponent(id(applicationId)) + "/submit",
         {}
+      );
+    },
+
+    async getLogo(applicationId) {
+      requireMainnet();
+      return requireApi().get(
+        "/api/external-project/" + encodeURIComponent(id(applicationId)) + "/logo"
+      );
+    },
+
+    async uploadLogo(applicationId, file) {
+      requireMainnet();
+
+      if (!file) {
+        throw new Error("Project logo file is required.");
+      }
+
+      return requireApi().request(
+        "/api/external-project/" +
+          encodeURIComponent(id(applicationId)) +
+          "/logo",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": uploadMime(file)
+          },
+          body: file
+        }
       );
     },
 
