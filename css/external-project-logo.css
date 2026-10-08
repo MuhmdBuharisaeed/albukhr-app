@@ -1,0 +1,94 @@
+.external-logo-section,
+.external-logo-detail-section{
+  overflow:hidden;
+}
+
+.external-logo-editor,
+.external-logo-detail{
+  display:grid;
+  grid-template-columns:minmax(160px,220px) minmax(0,1fr);
+  gap:18px;
+  align-items:start;
+}
+
+.external-logo-preview,
+.external-logo-detail-preview{
+  min-height:180px;
+  border:1px dashed rgba(15,122,61,.28);
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  background:rgba(15,122,61,.03);
+  box-sizing:border-box;
+}
+
+.external-logo-preview img,
+.external-logo-detail-preview img{
+  display:block;
+  width:100%;
+  max-width:190px;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  border-radius:12px;
+}
+
+.external-logo-empty{
+  font-size:.92rem;
+  line-height:1.45;
+  text-align:center;
+  opacity:.72;
+}
+
+.external-logo-controls,
+.external-logo-detail-controls{
+  min-width:0;
+}
+
+.external-logo-controls label,
+.external-logo-detail-controls label{
+  display:grid;
+  gap:7px;
+  font-weight:600;
+}
+
+.external-logo-controls input[type=file],
+.external-logo-detail-controls input[type=file]{
+  width:100%;
+  box-sizing:border-box;
+}
+
+.external-logo-note{
+  margin:9px 0 0;
+  font-size:.92rem;
+  line-height:1.45;
+  opacity:.82;
+}
+
+.external-logo-detail-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.external-logo-detail-controls .form-status{
+  margin-top:12px;
+}
+
+#submitApplicationButton[data-logo-required="true"]{
+  opacity:.6;
+}
+
+@media(max-width:720px){
+  .external-logo-editor,
+  .external-logo-detail{
+    grid-template-columns:1fr;
+  }
+
+  .external-logo-preview,
+  .external-logo-detail-preview{
+    max-width:280px;
+  }
+}
