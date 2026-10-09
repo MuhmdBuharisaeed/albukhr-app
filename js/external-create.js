@@ -378,79 +378,110 @@
     return "";
   }
 
-  function inspectLogo(file) {
-    return new Promise((resolve, reject) => {
-      if (!file) {
-        reject(new Error("Select a project logo first."));
-        return;
-      }
 
-      if (file.size <= 0) {
-        reject(
-          new Error("The selected project logo is empty.")
-        );
-        return;
-      }
+function inspectLogo(file) {
+  return new Promise(async (resolve, reject) => {
+    if (!file) {
+      reject(new Error("Select a project logo first."));
+      return;
+    }
 
-      if (file.size > 1048576) {
-        reject(
-          new Error(
-            "Project logo must be no larger than 1 MB."
-          )
-        );
-        return;
-      }
+    if (file.size <= 0) {
+      reject(new Error("The selected project logo is empty."));
+      return;
+    }
 
-      const mime = allowedLogoMime(file);
+    if (file.size > 1048576) {
+      reject(
+        new Error("Project logo must be no larger than 1 MB.")
+      );
+      return;
+    }
 
-      if (!mime) {
-        reject(
-          new Error(
-            "Project logo must be PNG or JPG/JPEG only."
-          )
-        );
-        return;
-      }
+    const mime = allowedLogoMime(file);
 
-      const objectUrl = URL.createObjectURL(file);
-      const image = new Image();
+    if (!mime) {
+      reject(
+        new Error("Project logo must be PNG or JPG/JPEG only.")
+      );
+      return;
+    }
 
-      image.onload = () => {
-        const width = Number(
-          image.naturalWidth || image.width || 0
-        );
+    let bitmap = null;
+    let objectUrl = null;
 
-        const height = Number(
-          image.naturalHeight || image.height || 0
-        );
+    try {
+      let width = 0;
+      let height = 0;
 
-        URL.revokeObjectURL(objectUrl);
-
-        if (width < 400 || height < 400) {
-          reject(
-            new Error(
-              "Project logo must be at least 400 × 400 pixels."
-            )
+      /*
+       * Prefer decoding the selected File directly.
+       * Fall back to Image for browsers without createImageBitmap.
+       */
+      if (typeof window.createImageBitmap === "function") {
+        try {
+          bitmap = await window.createImageBitmap(file);
+          width = Number(bitmap.width || 0);
+          height = Number(bitmap.height || 0);
+        } catch (decodeError) {
+          console.warn(
+            "[ALBUKHR LOGO] Bitmap decoding unavailable; trying Image.",
+            decodeError
           );
-          return;
         }
+      }
 
-        resolve({ mime, width, height });
-      };
+      if (!width || !height) {
+        const image = new Image();
 
-      image.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
+        objectUrl = URL.createObjectURL(file);
 
+        await new Promise((resolveImage, rejectImage) => {
+          image.onload = () => resolveImage();
+
+          image.onerror = () => {
+            rejectImage(
+              new Error(
+                "The browser could not decode this logo file. Select the original PNG or JPG/JPEG image again."
+              )
+            );
+          };
+
+          image.src = objectUrl;
+        });
+
+        width = Number(image.naturalWidth || image.width || 0);
+        height = Number(image.naturalHeight || image.height || 0);
+      }
+
+      if (width < 400 || height < 400) {
         reject(
           new Error(
-            "The selected project logo could not be read as a valid image."
+            "Project logo must be at least 400 × 400 pixels."
           )
         );
-      };
+        return;
+      }
 
-      image.src = objectUrl;
-    });
-  }
+      resolve({ mime, width, height });
+    } catch (error) {
+      reject(
+        error instanceof Error
+          ? error
+          : new Error("Unable to validate the selected logo.")
+      );
+    } finally {
+      if (bitmap && typeof bitmap.close === "function") {
+        bitmap.close();
+      }
+
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
+  });
+}
+
 
   function previewLogo(file) {
     const image = $("externalCreateLogoImage");
