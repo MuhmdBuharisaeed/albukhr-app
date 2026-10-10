@@ -1,0 +1,105 @@
+ALBUKHR Pi dApp Launch Service — Phase 0 Audit
+Date: 10 October 2026
+Scope: Read-only inspection of app repository, admin repository search, and Mainnet/Testnet Supabase objects.
+Change status: No code, SQL, Storage, permission, or production changes made.
+1. Executive finding
+The repository contains the public entry point and UI for Pi dApp Launch Service, but the complete submission and request-history workflow is not present in the current main branch. Several scripts referenced by those pages return GitHub 404 NOT_FOUND. Supabase Mainnet and Testnet have no matching service-specific table or RPC names. Admin repository search found no dedicated dApp request workflow.
+Decision: Do not treat the service as implementation-ready based only on this branch. First verify the deployed production assets, then implement through an isolated branch and staged Testnet QA before Mainnet release.
+Important limitation: The live host could not be reached from the inspection environment, so the findings confirm the GitHub main branch and connected Supabase projects—not the exact assets currently served to users in production. Production may differ from the repository.
+2. App repository evidence
+Repository: MuhmdBuharisaeed/albukhr-app
+pi-dapp-service.html — SHA 541003f0084453b68727041b801bb7e2794e7349
+The submit button calls submitDappRequest().
+The page references js/pi-auth.js and js/pi-dapp-engine.js.
+It reads pi_user from localStorage and calls legacy initPi() / ensurePiAuth().
+It includes the Pi SDK and CDN Supabase SDK directly rather than loading the shared ALBUKHR core modules.
+The service menu shows fixed prices (₦35,000 and ₦500,000), while the fee notice describes the prices as flexible/lower or higher fees. These statements conflict.
+Bank and Pi receiving details are embedded statically in the HTML. The page asks for a transaction reference or image, but the visible form itself does not prove payment settlement.
+The consent checkbox is not marked required in HTML.
+my-dapp-requests.html — SHA 152244643d02ce6a26e545cb575976f3fd9b752b
+The page references js/supabase.js, js/pi-auth.js, and js/my-dapp-requests.js.
+Its visible state is only “Loading requests...” until the missing controller renders the list.
+pi-dapp-policy.html — SHA 91dd9469699792c3ce97a8b3bbe798fd3960b358
+Covers ownership, manual review, service fees and disclaimers.
+It does not set clear service-level timelines, revision limits, cancellation/refund handling, evidence-based payment confirmation, or post-launch support boundaries.
+services.html — SHA 004cd7b2c8f8ca5679d8e9a6792a814c0e63b8c4
+The parent Services page loads js/core/environment-core.js, js/core/supabase-core.js, js/core/pi-auth-core.js, and js/services.js.
+goDappService() opens pi-dapp-service.html, which does not load those same shared core modules. This is an architecture inconsistency.
+js/services.js — SHA 94ccb8183bee490c7e66bd82bba3bb7692f2073b
+Uses window.ALBukhrEnvironment, window.ALBUKHR_SUPABASE, and window.AlbukhrPiAuth for the Services page. The dApp pages currently do not follow that pattern.
+Missing referenced scripts in the inspected main branch
+Direct file retrieval returned 404 NOT_FOUND for each of these paths:
+js/pi-auth.js
+js/supabase.js
+js/pi-dapp-engine.js
+js/my-dapp-requests.js
+GitHub code search found the submitDappRequest() call only in pi-dapp-service.html, not a function implementation. Thus, on a deployment that serves exactly the inspected branch, the submission and request-history features are likely broken. This is not a claim that the live site was browser-tested.
+3. Supabase read-only findings
+Projects checked:
+Mainnet: ribpntyqdleytsyktdfb
+Testnet: vhvkwvngmrlgyzwemttt
+Read-only catalog queries searched public and albukhr_security for matching table names and function names containing terms such as dapp, service, launch, quote, agreement, deliverable, milestone, and receipt.
+Mainnet: no matching service-specific tables or RPC/function names found.
+Testnet: no matching service-specific tables or RPC/function names found.
+Storage: no dedicated dApp-service or receipt bucket found. The Mainnet query returned external-project-documents, a private External Projects bucket; do not reuse it for dApp receipts without a separate security and access-policy design. No matching bucket was found in Testnet.
+No SQL writes or migrations were run.
+4. Admin workflow
+Searches of MuhmdBuharisaeed/albukhr-admin for “Pi dApp service”, “dapp request”, and receiptRef returned no matching dedicated admin implementation. An admin review queue, receipt verification workflow, status transitions, and customer messaging therefore remain unverified/not present in the inspected admin code search.
+A new Admin workflow should follow existing ALBUKHR admin authentication/MFA and server-side authorization patterns. It should not create a parallel authentication system or reuse External Projects permissions by default.
+5. Risk register
+Priority
+Finding
+Consequence
+Blocker
+Form controller and history controller paths are missing from main
+Requests/history may not work on a deployment matching the branch
+Blocker
+No matching service tables/RPCs found in either Supabase project
+No verified persistence or server-side workflow for dApp requests
+High
+dApp pages use legacy localStorage auth instead of shared memory-only AlbukhrPiAuth
+Identity state can diverge from the current ALBUKHR architecture
+High
+No dedicated Admin queue found
+Manual review and customer status management lack a verified workflow
+High
+Prices shown in the selector conflict with flexible-fee language
+User disputes and inconsistent amount handling
+High
+Static receiving details and user-submitted receipt are not proof of settlement
+Payment status must remain unverified until server/Admin evidence confirms it
+Medium
+Consent checkbox is optional in the HTML
+The submission flow must enforce consent server-side and in UI
+Medium
+Image input accepts generic image/*
+Server-side MIME, byte-size, ownership and storage-path rules remain necessary
+Unknown
+Live deployed version was not reachable from this environment
+Production could differ from the inspected repository branch
+6. Next steps (no implementation yet)
+Verify the live production assets in Pi Browser or through the actual hosting/deployment console: confirm loaded HTML, script responses, and runtime errors for submit and request history.
+Decide the authoritative payment method(s) and amount policy before designing the payment record or confirmation workflow.
+Produce a server-first data contract: request lifecycle, user identity source, price/quote, payment evidence, Admin decisions, audit events, attachments, and notifications.
+Implement in a separate branch; use isolated Testnet data and storage for QA. Do not deploy to Mainnet until the critical test cases pass and changes are explicitly approved.
+7. Validation checklist before release
+[ ]
+Pi identity comes from the shared authentication core and is verified server-side.
+[ ]
+Submit action persists a request and returns a stable request ID.
+[ ]
+Users can see only their own requests, enforced server-side.
+[ ]
+Admin list and all review transitions require existing ALBUKHR Admin auth/MFA and server-side authorization.
+[ ]
+Payment status is distinct from request review status and cannot be self-asserted by the client.
+[ ]
+Receipt files have strict type/size rules, private storage and request-scoped paths.
+[ ]
+Mainnet and Testnet have isolated DB, Storage, payment configuration, and API behavior.
+[ ]
+Consent, price and service scope are recorded with the submitted request.
+[ ]
+Submission, payment proof, admin review, correction request, rejection, approval, delivery and closure are tested end-to-end.
+[ ]
+Production deployment is verified separately from GitHub source inspection.
