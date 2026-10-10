@@ -1,0 +1,254 @@
+ALBUKHR Pi dApp Launch Service
+Architecture Specification v1.0 — Hausa working draft
+Matsayi: Ƙa'idar ƙira kawai (design-only; ba a aiwatar da komai ba)
+Ranar: 10 Oktoba 2026
+Yanayi: Mainnet ga jama'a; Testnet na cikin gida domin QA
+Dokar canji: Babu code, migration, Storage, permission ko production change a wannan mataki.
+1. Manufa da abin da bincike ya tabbatar
+Wannan takarda ta bayyana yadda ALBUKHR Pi dApp Launch Service ya kamata ya yi aiki kafin a fara gyara ko gina shi.
+Binciken repo na albukhr-app ya nuna cewa akwai shafukan Services, Pi dApp Service, Policy da My dApp Requests, amma wasu scripts da shafukan suke kira ba su cikin reshen main da aka duba: js/pi-auth.js, js/supabase.js, js/pi-dapp-engine.js, da js/my-dapp-requests.js. Saboda haka, idan production yana amfani da wannan reshe kai tsaye, aika buƙata da lissafin buƙatun mai amfani na iya kasa aiki. Har yanzu ba a tabbatar da wannan ta live-browser test ba, kuma production na iya bambanta da main.
+Binciken Supabase na Mainnet da Testnet bai gano teburi, RPC ko Storage bucket da aka keɓe musamman ga wannan dApp service ba. Haka kuma, babu cikakken Admin workflow na wannan sabis da aka gano a Admin repo. Wannan yana nuna cewa ya kamata a ƙirƙiri ƙirar data da workflow da gangan maimakon dogaro da tsohon engine da ba a tabbatar da shi ba.
+Shawarar da aka amince da ita
+Mainnet: shi ne kawai hanyar da jama'a za su yi amfani da ita don neman sabis.
+Testnet: na cikin gida ne don gwajin UI, request lifecycle, fayiloli, Admin workflow da network isolation kafin fitar da sauye-sauye.
+Warewa: a yi amfani da Mainnet da Testnet Supabase projects daban, API configuration daban, Storage daban, da network field da server-side validation a matsayin kariya ta biyu.
+Babu canjin live environment: ba za a yi deployment ko migration ba sai bayan an amince da ƙira, an kammala implementation plan, kuma an ba da izini a fili.
+2. Abubuwan da wannan sabis zai yi
+Ya ƙunsa
+Nuna nau'in sabis da bayanansa.
+Ba authenticated Pi user damar fara buƙata, adana draft, cike bayanai, loda rasit/takardu idan an buƙata, sannan ya aika.
+Ba mai amfani damar ganin buƙatunsa da matsayin da ya kai.
+Ba Admin mai izini damar duba buƙata, tabbatar da bayanan biyan kuɗi, neman gyara, amincewa/ƙin karɓa, tsara aikin, da rubuta sakamakon/deliverables.
+Ajiye tarihin canje-canje domin audit trail.
+Gwada dukkan tsarin a Testnet ba tare da haɗa bayanan jama'a ba.
+Ba ya ƙunsa a wannan lokaci
+Ba ya ba da tabbacin cewa dApp zai samu amincewar Pi Network, kasuwa, masu amfani ko kuɗaɗen shiga.
+Ba ya ƙaddamar da app a Pi Developer Portal kai tsaye sai an ƙirƙiri irin wannan aikin dabam kuma an tabbatar da ikon samun damar yin hakan.
+Ba ya gudanar da investment, staking ko sarrafa kuɗin masu amfani.
+Ba ya ɗaukar cewa duk wani receipt upload yana nufin an biya kuɗi.
+Ba ya ƙirƙirar sabon hanyar Pi login; zai haɗu da tsarin ALBUKHR Pi auth na yanzu bayan an tabbatar da API contract ɗinsa.
+3. Muhimman abubuwan da har yanzu suke buƙatar shawarar mai aikin
+Kada a hard-code waɗannan abubuwa a cikin code har sai an yanke hukunci:
+Batu
+Abin da aka gani
+Shawarar ƙira / abin da za a tabbatar
+Farashi
+UI yana nuna ₦35,000 don Pi Studio Assistance da ₦500,000 don Developer-built dApp, amma wasu rubutu suna cewa farashi mai sassauci.
+Admin-managed service catalog ne zai zama authoritative; a tabbatar da farashi, currency, da ko ana iya canza quote kafin implementation.
+Hanyar biyan kuɗi
+Form yana da receipt reference da receipt image.
+A tabbatar ko ana karɓar bank transfer, Pi payment, ko hanyoyi biyu. Kada receipt ya zama payment_confirmed kai tsaye.
+Lokacin aiki
+Ba a tabbatar da SLA/timeline ba.
+A bayyana estimated turnaround, abin da zai iya jinkirta aikin, da lokacin da clock zai fara.
+Gyara da refund
+Policy ɗin da aka duba ba ta fayyace cikakken revision/refund/cancellation process ba.
+A amince da adadin gyare-gyare, cancellation, refund eligibility da yadda za a warware saɓani.
+Abin da ake miƙawa
+“Launch service” na iya nufin taimako, development ko launch support daban-daban.
+A rubuta deliverables da iyakokin kowanne service type.
+Mallaka da takardun sirri
+Policy tana tattauna ownership amma cikakkun retention/support details ba su cika ba.
+A fayyace ownership, confidentiality, data retention, support bayan delivery, da alhakin user na secrets/keys.
+Muhimmi: har sai an tabbatar, farashin da ke yanzu a UI ba za a ɗauke shi a matsayin ƙa'idar server ko tabbacin kuɗin da ake biya ba.
+4. Manyan sassan gine-gine
+4.1 User interface — App repo
+Shafuka da ake tsammanin za a gyara ko maye gurbin scripts ɗinsu:
+services.html / js/services.js — katalogi da hanyar shiga.
+pi-dapp-service.html — fom ɗin buƙata da consent.
+pi-dapp-policy.html — policy da sharuddan sabis.
+my-dapp-requests.html — tarihin buƙatun mai amfani da cikakken matsayi.
+Sabbin modules idan an buƙata, amma a fara da small, scoped change set.
+Shafuka su yi amfani da js/core/pi-auth-core.js, js/core/supabase-core.js da js/core/environment-core.js maimakon legacy scripts da ba su wanzu a reshen da aka duba. Kada a yi localStorage ko sessionStorage amfani wajen ajiyar login, Pi UID, session ko matsayin izini. Ajiya ta ɗan lokaci a UI ba za ta zama madogarar gaskiya ba; drafts da request records su kasance a database.
+4.2 Trusted API boundary
+Duk wani aiki mai tasiri — ƙirƙira/gyara request, ƙaddamarwa, loda/haɗa takarda, tabbatar da biyan kuɗi, canza matsayin Admin, da fitar da deliverable — ya bi trusted server endpoint ko RPC mai kariya.
+Kafin a zaɓi ainihin endpoint, a bincika ALBUKHR API gateway na yanzu da external-project gateway domin gano abin da za a iya sake amfani da shi ba tare da haɗa permissions ko lalata sauran ayyuka ba.
+API/server ya kamata:
+tabbatar da Pi access token ta hanyar Pi API (/v2/me) ko ingantaccen tsarin ALBUKHR server auth;
+ya samo verified user identity a server, ba daga pi_uid, user_id, network ko is_admin da browser ya aika ba;
+ya tabbatar da network ɗin request ya dace da server/project ɗin da aka kai;
+ya duba ownership, service type, price/quote version, files da halaccin canjin status;
+ya ƙirƙiri audit event ga muhimman canje-canje;
+ya guji ɗora server key, Supabase service-role key ko Pi Server API Key a browser.
+4.3 Database — Supabase
+A yi amfani da Supabase Core guda ɗaya ga browser, amma kada a ba browser damar canza abubuwan da ke buƙatar babban izini kai tsaye. Abubuwan da za a buƙaci su kasance server-controlled za su bi trusted API/RPC.
+Proposed logical tables (sunaye na ƙira ne; ba a ƙirƙira su ba):
+Tebur
+Aiki
+Muhimman filaye
+dapp_service_catalog
+Nau'ikan sabis da current version na bayanansu
+id, service_code, title, description, active, price_amount, price_currency, quote_version, network, timestamps
+dapp_service_requests
+Babban request record
+id, owner_user_id, verified Pi identity reference, service_code, quote_snapshot, status, payment_status, network, timestamps
+dapp_service_payments
+Ɗaya ko fiye payment attempts/proofs
+id, request_id, method, amount, currency, reference, status, verifier, verified timestamp, provider transaction id/idempotency key
+dapp_service_files
+Metadata na attachments ba tare da buɗe private files ga kowa ba
+id, request_id, file_role, bucket/path, mime type, size, checksum (idan ya dace), uploader, created_at
+dapp_service_events
+Append-only audit log na state changes
+id, request_id, actor id/role, action, from/to status, reason, metadata, created_at, network
+dapp_service_deliverables
+Abin da aka kammala/miƙa wa client
+id, request_id, description, private file reference, delivered_by, delivered_at, acceptance status
+dapp_service_reviews (idan workflow ya buƙata)
+Admin review notes da structured checklist
+id, request_id, reviewer, decision, reason, created_at
+Ka'idojin database
+A samu foreign keys, indexes kan owner_user_id, status, created_at, request_id, da fields da ake yawan bincika.
+A yi check constraints ko server-side validation kan enumerated values; kada a dogara da validation na HTML.
+quote_snapshot ya adana abin da aka nuna wa user lokacin submit, don canjin farashi na gaba kada ya canza tsohon request.
+A ware status da payment_status: buƙata na iya kasancewa under_review ba tare da an tabbatar da kuɗi ba.
+A saka network a records masu dacewa ko da an ware projects, a matsayin kariya ta biyu da audit metadata.
+Kada a kwafi production data zuwa Testnet. Yi synthetic/test users da fake/sandbox payment references.
+A tantance RLS da grants a kan kowane tebur kafin deploy. Idan an tsara duk write/read ta trusted service, kada a ƙara browser grants kawai domin sauƙaƙa UI. RLS/policies/SQL privileges su dace da ainihin hanyar samun bayanai.
+4.4 Storage
+A ƙirƙiri bucket na musamman ga dApp service a lokacin implementation kawai idan an amince. Ya kamata ya kasance private, tare da object path da ke ɗauke da request ID da network scope.
+A tabbatar da file type ta MIME da file signature, ba extension kawai ba.
+A sa iyakar file size, adadin attachments da accepted file types a configuration.
+A hana public listing da anonymous access.
+A fitar da temporary signed URL bayan tabbatar da ownership/role kawai.
+A ware Mainnet bucket daga Testnet bucket ta project/configuration; kada Testnet URL ya taɓa Mainnet file.
+Rasit da takardun sirri kada su kasance a public bucket ko link marar expiration.
+Ba a amince da takamaiman size/type limits na dApp service ba tukuna; a yanke hukunci kafin implementation.
+5. Matsayin buƙata (Request lifecycle)
+An tsara waɗannan matsayin a matsayin baseline. A tabbatar da final business rules kafin a ƙirƙiri database enum/constraints.
+draft — an fara buƙata amma user bai aika ba.
+submitted — server ya tabbatar cewa required fields/consent sun cika.
+under_review — Admin yana duba bukatar da scope.
+needs_revision — an mayar wa user da dalili/abubuwan gyarawa.
+accepted — an yarda da scope; ba yana nufin an biya ba, ko an fara aiki ba.
+awaiting_payment — an ƙayyade quote/invoice kuma ana jiran hanyar biyan kuɗi da aka amince da ita.
+payment_under_review — an aika proof/transaction, ana tabbatarwa.
+payment_confirmed — trusted server/provider ko Admin mai izini ya tabbatar da kuɗi.
+queued — buƙata ta shirya kuma tana jiran fara aiki.
+in_progress — ana gudanar da aikin.
+delivered — an miƙa deliverables ga user.
+completed — an tabbatar da completion bisa policy.
+rejected / cancelled — buƙata ta ƙare ba tare da ci gaba ba; a rubuta dalili.
+refund_requested / refunded (idan refunds suna cikin scope) — a ware su daga cancellation status.
+Ka'idojin state transition
+Server ne kawai zai tabbatar da transition; kada a bar browser ya rubuta status kai tsaye.
+Kowane transition yana da allow-list na daga-wane-zuwa-wane, actor mai izini, dalili idan ya dace, da audit event.
+payment_confirmed ba zai fito daga karɓar receipt image kawai ba.
+accepted ba daidai yake da active, queued ko in_progress ba.
+Admin ba zai kammala aikin ba tare da rubuta deliverables/close-out metadata ba, idan aka amince da wannan requirement.
+A tanadi idempotency ga submit da payment confirmation, domin double-click/retry kada su haifar da duplicate request ko duplicate payment.
+6. Biyan kuɗi da quote
+A fara da tabbatar da business model. Akwai hanyoyi biyu masu bambanci:
+A. Manual/external transfer: user ya shigar da reference kuma ya ɗora receipt; status zai kasance payment_under_review har sai Admin/financial verifier ya tabbatar daga sahihin source. Receipt ba hujjar ƙarshe ba ce.
+B. Pi Platform payment: idan za a karɓi Pi ta SDK/API, dole a aiwatar da tsarin payment verification/complete server-side bisa takardun Pi na yanzu. Kada a dogara da callback na browser ko transaction hash da user ya shigar shi kaɗai. A ware payment attempt, server verification, completion/settlement da idempotency.
+Kada a haɗa waɗannan hanyoyin a matsayin hanya guda ba tare da rubuta takamaiman payment workflow ba. Hakanan, kada a nuna NGN farashi kamar Pi amount ne; amount da currency dole su kasance filaye dabam.
+7. Admin workflow da tsaro
+Binciken Admin repo bai gano dedicated Pi dApp service pages ko service-specific RPCs ba. Don haka a tsara workflow a Admin repo a matsayin module mai zaman kansa, ba a cikin admin-external-projects ba.
+Ƙa'idodi
+A sake amfani da tsarin Admin auth da MFA/AAL2 na yanzu (supabase-admin-auth.js, albukhr-mfa.js) inda ya dace; kada a ƙirƙiri login/MFA na biyu.
+A ayyana dedicated permission, misali dapp_service_admin da kuma payment-verifier role idan wajibi ne, ta hanyar tsarin permission da aka tabbatar a repo/database. Sunayen nan shawara ne, ba roles da aka ƙirƙira ba.
+Server-side RPC/endpoint ne zai enforce role da AAL2; duba role a frontend kaɗai bai isa ba.
+A bambanta permissions: request review, payment verification, service delivery, policy/catalog administration. A guji mutum ɗaya ya amince da duk abin da ke buƙatar separation of duties idan tsarin kasuwanci ya buƙata.
+Kada a canza Dock Navigation ko sauran Admin modules a cikin wannan aikin; ƙara hanyar shiga da ke da iyaka idan an amince.
+Admin Mainnet ba zai iya rubuta Testnet records ta hanyar canza network a request ba. Testnet QA na Admin yana buƙatar environment da izini da aka tsara a fili, ba amfani da production session wajen gwajin bayanai ba.
+8. Mainnet/Testnet isolation
+Layer
+Mainnet
+Testnet / QA
+Public access
+A buɗe wa masu amfani bayan go-live
+Ba ga jama'a ba; internal testing kawai
+Supabase
+ribpntyqdleytsyktdfb
+vhvkwvngmrlgyzwemttt
+Data
+Real requests da bayanan clients
+Synthetic/test data kawai
+Storage
+Private Mainnet bucket
+Private Testnet bucket dabam
+API
+Production configuration/secrets
+Test configuration/secrets dabam
+Payment
+Production method da aka amince
+Sandbox/fake payment only; kada a yi real charge
+Admin
+Existing production Admin authentication + MFA
+Separate controlled QA path/environment idan ana buƙatar Admin E2E test
+Deployment
+Production release da approval
+Test release kafin Mainnet
+Kariya mai mahimmanci: network da browser ya aika ba hujja ba ce. Server ya tantance target environment daga trusted configuration/host, ya duba DB context, kuma ya ƙi mismatch. Babu cross-project copy/sync na request records a wannan ƙirar.
+9. Audit trail, privacy da bayanan sirri
+A adana abubuwan da ake buƙata kaɗai; kada a rubuta access token, API key, password, Pi Server API Key ko cikakken sirrin mai amfani a logs.
+Audit events su ƙunshi actor, action, timestamp, record ID, state transition da reason; kada su zama hanyar adana duk takardun user.
+A bayyana privacy notice: nau'in bayanan da ake tattarawa, manufarsu, wanda ke iya gani, retention, da hanyar neman gyara ko sharewa idan policy ta yarda.
+A fayyace yadda ake sarrafa secrets/keys na dApp. A ƙa'ida, mai amfani bai kamata ya ɗora private key, seed phrase ko secret token ba; UI/policy su yi gargadi a sarari.
+A tsara retention/deletion policy kafin go-live; kada a bar rasit/takardu har abada ba tare da manufa ba.
+10. Acceptance criteria kafin Mainnet release
+Release bai kamata ya wuce ba sai duk abubuwan da suka dace sun tabbata:
+[ ]
+Dukkan legacy script references an cire su ko an tabbatar da cewa suna wanzuwa a production, kuma an yi browser test.
+[ ]
+Pi auth yana amfani da shared AlbukhrPiAuth; babu localStorage/sessionStorage a matsayin madogarar identity.
+[ ]
+Server ya tabbatar da user identity da request ownership.
+[ ]
+Database schema, constraints, RLS da SQL grants an duba su; babu direct browser writes da ke iya ƙetare business rules.
+[ ]
+Testnet request ba zai bayyana ko rubuta Mainnet ba, ko ta UI ko API/RPC.
+[ ]
+Mainnet request ba zai taɓa Testnet Storage/API ba.
+[ ]
+Unauthorized user ba zai karanta request/files na wani user ba.
+[ ]
+Unauthorized Admin ko session mara AAL2 ba zai gudanar da privileged action ba.
+[ ]
+Upload limits/type checks, private access, signed URL expiry da ownership checks suna aiki.
+[ ]
+Receipt upload ba ya tabbatar da payment ta atomatik.
+[ ]
+Payment verification idempotent ne; duplicate event/retry ba ya tabbatar da kuɗi sau biyu.
+[ ]
+Consent/Policy gate yana tilasta amincewa kafin submission; an adana version/time na consent.
+[ ]
+Draft, revision, rejection, cancellation da completion suna da gwaje-gwaje.
+[ ]
+Audit event ya bayyana ga muhimman state changes.
+[ ]
+Error states suna da saƙon da user zai fahimta; babu indefinite “Loading…” idan script/API ya kasa.
+[ ]
+Policy ta bayyana farashi/currency, scope, estimated timeline, revisions, cancellation/refund, delivery da support.
+[ ]
+Babu deployment har sai an kammala smoke test, Admin E2E test, network isolation test da sign-off.
+11. Matakan aiwatarwa da aka ba da shawara
+Phase 0 — tabbatar da halin yanzu
+Bincika live production shafukan da ake amfani da su (ba repo kaɗai ba).
+Tabbatar da legacy scripts da asset paths da production yake ɗauka.
+Duba API gateway contract, Pi auth result shape, existing payment APIs (idan suna nan), da Admin permission primitives.
+Yi rubutaccen service catalog da business decisions da aka jera a sashe na 3.
+Phase 1 — ƙira da contract
+Kammala request/payment state machine.
+Kammala schema + RLS/grants design da API request/response contract.
+Kammala policy/privacy/quote/refund wording.
+Bitar ƙirar security kafin code.
+Phase 2 — Testnet build
+Aiwatar da schema/functions/Storage a Testnet kawai bayan amincewa.
+Haɗa user form, My Requests, trusted API da Admin workflow.
+Yi automated tests da end-to-end tests ta synthetic users.
+Gwada negative cases: network mismatch, bad token, wrong owner, bad file, duplicate submit/payment, MFA missing, role missing, expired signed URL.
+Phase 3 — Mainnet release
+Review PR/diff; tabbatar da files da aka taɓa sun yi iyaka da abin da aka amince da shi.
+Yi backup/rollback plan da migration verification.
+Deploy zuwa Mainnet bayan Testnet pass da sign-off.
+Yi smoke test a kan test request mai iyaka; tabbatar da logging/monitoring ba ya fallasa sirri.
+12. Canje-canjen da ba a yarda a yi ba tare da sabon izini ba
+Ba za a gyara environment-core.js, supabase-core.js, page-auth-guard.js, ko Dock Navigation ba sai wani requirement ya tilasta kuma an bayyana dalili.
+Ba za a canza external-project workflow, tables ko policies ba domin su ɗauki dApp requests.
+Ba za a canza Mainnet Supabase schema, policies, grants, Storage ko Edge Functions a wannan design phase ba.
+Ba za a deploy, charge ainihin kuɗi, ko aika request zuwa production domin gwaji ba tare da takamaiman izini ba.
+Ba za a yi wa farashi, refunds, SLA ko deliverables hasashe a matsayin hukuma ba.
+13. Takaitaccen matsayi
+Shawara: a yi ƙira kamar sabis mai zaman kansa, a bar Mainnet ga jama'a kaɗai, kuma a yi Testnet a matsayin wurin gwaji. A fara da tabbatar da halin production da yanke shawarar farashi/payment workflow; bayan haka a gina MVP a Testnet, a duba tsaro da Admin process, sannan a nemi izinin Mainnet deployment.
+Ba a yi ba: babu repo edit, branch/commit/PR, SQL migration, Storage operation, Supabase write ko deployment a wannan mataki.
