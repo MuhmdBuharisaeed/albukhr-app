@@ -1,0 +1,138 @@
+ALBUKHR Ecosystem — Read-only Architecture Audit
+Ranar bincike: 11 Oktoba 2026
+Yanayi: Read-only source/database inspection. Ba a yi code change, SQL write/migration, Storage change, GitHub commit, ko deployment ba.
+Manufar: Fahimtar ainihin User Side, Admin Side, Mainnet API, Testnet API, Supabase Mainnet/Testnet, da Mainnet → Testnet authentication handoff kafin a ci gaba da Pi dApp Launch Service.
+1. Babban hukunci
+Kada a aiwatar da sabon Pi dApp Launch Service har sai an warware muhimman batutuwan architecture da identity da ke ƙasa. ALBUKHR ya riga ya ware User Side, Admin Side, Mainnet API, Testnet API, da Supabase Mainnet/Testnet. Sabon service ya kamata ya bi waɗannan iyakoki; ba zai ƙirƙiri sabon authentication system ko ya saka service routes cikin Testnet ba sai an amince da wannan a fili.
+Gyaran shawarar da aka bayar a baya
+An dakatar da shawarar da ta gabata ta gina Client Test Workspace a cikin ALBUKHR Testnet a matsayin wani ɓangare na dApp Launch Service. Wannan shawarar ta yi ƙarin zato fiye da abin da aka tabbatar. Bisa bayanin mai tsarin, Pi dApp Launch Service zai kasance Mainnet service, yayin da ALBUKHR Testnet ke kiyaye nasa gateway/handoff. Gwajin dApp na abokin ciniki a Pi Sandbox/Testnet ba daidai yake da ƙirƙirar sabon dApp-service workflow a ALBUKHR Testnet ba.
+Candidate v3 da aka yi a baya ba a aiwatar da shi a GitHub ko Supabase ba bisa binciken da ake da shi. Kada a ɗauke shi a matsayin implementation da aka amince da shi.
+2. Repo inventory da rawar kowanne
+Sashe
+Repo / branch
+Abin da aka tabbatar
+Muhimman fayiloli
+Mainnet User Side
+albukhr-app, main
+Canonical app environment ɗin da aka bincika yana ɗaure app.albukhr.com zuwa Mainnet Supabase, kuma yana amfani da shared Pi Auth Core da Page Auth Guard.
+environment-core.js · supabase-core.js · pi-auth-core.js · page-auth-guard.js
+Testnet User Side
+test-albukhr-app, main
+Testnet-only environment core; babu Mainnet fallback; auth login ya tura mai amfani zuwa Mainnet domin tabbatar da Pi identity.
+login.html · login.js · testnet-gateway-auth.js · supabase-core.js
+Admin Side
+albukhr-admin, main
+Admin environment da Supabase Auth suna Mainnet-only; Admin Auth na duba admin status, roles, MFA/AAL2 da context daga database.
+environment-core.js · supabase-core.js · supabase-admin-auth.js
+Mainnet API
+albukhr-api, main
+server.js v2.3.0 yana ɗora financial, contributor, internal funding/investment/liquidity da external-project gateways. Ba a ga dApp Launch Service gateway ba a cikin server.js/package.json da aka bincika.
+server.js · package.json · README.md
+Testnet API
+test-albukhr-api, main
+API daban ce mai Testnet Supabase service-role configuration, Testnet session validation, Testnet liquidity payment route da withdrawal/admin endpoints.
+server.js · testnet-liquidity-payment-router.js · package.json
+Development / duplicate app
+dev-albukhr-app, main
+index.html ɗin da aka duba yana da tsohon localStorage.getItem("pi_user") authentication gate, wanda ya bambanta da shared memory-only Auth Core na albukhr-app. Dole a tabbatar ko wannan shi ne abin da aka nufa don dev.albukhr.com ko tsohon copy ne.
+index.html
+Empty Test API repo
+albukhr-test-api
+Repository ɗin babu source files a halin da connector ya gani; kada a ɗauke shi a matsayin API ɗin Testnet da ake amfani da shi.
+Repo page kawai
+Source commits/SHA da aka karanta: Mainnet app environment b83134627facbf0e0e7db3b1f6e48e985e638a40; Supabase Core 5e115c06b0492c5f1a51b9e9f1d940645478952d; Pi Auth Core 19c5722054c61008c7b71efffd18d079048d62e5; Mainnet → Testnet handoff 9a2c3bb57d1eaa1829468e8a079ea346b6c54489; Mainnet API server.js 71dddffb6befa6f3e09ff60c75b7f75850b3c23f; Testnet API server.js 15e43f3115454faa6348f6630044c7d8ace7dbc4.
+3. Supabase inventory
+3.1 Mainnet — App Albukhr project
+Ref: ribpntyqdleytsyktdfb
+Region: eu-central-1
+Status: ACTIVE_HEALTHY
+Schema count: public 33 tables; albukhr_security 39 tables; jimillar ordinary tables 72.
+Migrations da aka gani: 129; mafi sabuwa a lissafin shi ne 20261009092538 — external_project_aal2_reviewer_document_read_v1.
+RLS: an kunna RLS a 71/72 tables; akwai table guda ɗaya da ba a kunna masa RLS ba; ba a tilasta FORCE RLS a tables ɗin da aka lissafa ba.
+Storage buckets: project-logos (public, iyakar 1 MiB; PNG/JPEG) da external-project-documents (private, iyakar 10 MiB; PDF/PNG/JPEG/WebP). Kada a sake amfani da bucket ɗin takardun External Projects a matsayin dApp service receipt/document bucket ba tare da izinin tsaro da policy dabam ba.
+dApp Launch Service: binciken schema da function names bai gano dApp-service tables, RPCs/functions ko bucket na musamman ba.
+Project counts: 6 approved da 2 draft a Mainnet public.projects; bayanan da aka ƙidaya duk suna da network='mainnet'.
+Users/Login Events counts: 3 user records duk mainnet; 1,805 successful login events duk mainnet a lokacin binciken. Waɗannan ƙididdiga ne kawai; ba a karanta bayanan PII na masu amfani ba.
+3.2 Testnet — Test Albukhr project
+Ref: vhvkwvngmrlgyzwemttt
+Region: eu-central-1
+Status: ACTIVE_HEALTHY
+Schema count: 17 tables a public; babu albukhr_security schema a cikin bayanan da aka lissafa.
+Migrations da aka gani: 14; mafi sabuwa 20261001095621 — allow_testnet_internal_project_registry.
+RLS: an kunna RLS a duk tables 17; ba a tilasta FORCE RLS a tables ɗin da aka lissafa ba.
+Storage buckets: babu bucket a storage.buckets a lokacin binciken.
+dApp Launch Service: babu dApp-service tables, RPCs/functions ko bucket na musamman da aka gano.
+Gateway tables: akwai testnet_access_codes, testnet_sessions, testnet_gateway_nonces, testnet_admin_access_codes da testnet_admin_sessions. Ana hana anon/authenticated yin direct access ga waɗannan ta RLS policies; gateway Edge Functions na amfani da service role.
+3.3 RLS / Storage caveat
+A Mainnet, albukhr_security.external_project_document_upload_tokens shi ne table ɗaya da RLS ba ya kunna a yanzu. Binciken privilege ya nuna anon da authenticated ba su da direct SELECT/INSERT privileges a wannan table, saboda haka wannan binciken bai tabbatar da data leak ba. Duk da haka, wannan ya kamata a sake dubawa a security review saboda table ɗin yana ɗauke da upload-token state kuma schema ɗin na cikin API surface na aikin.
+4. Ainihin Mainnet → Testnet User authentication flow
+Wannan flow ya fito daga source code da Edge Functions da aka karanta:
+Mai amfani ya fara daga Testnet Login (test.albukhr.com). js/login.js na Testnet ba ya authenticate Pi kai tsaye; yana tura mai amfani zuwa https://app.albukhr.com/login.html?returnTo=testnet.
+Mainnet login.js yana kiran window.AlbukhrPiAuth.ensurePiAuth(). Mainnet Pi Auth Core yana initialize Pi SDK tare da sandbox:false; access token yana cikin memory, ba a adana shi a LocalStorage/sessionStorage.
+js/mainnet-testnet-handoff.js yana aika token ɗin zuwa Mainnet Supabase Edge Function testnet-auth-issuer kawai. Wannan function ɗin yana tabbatar da token ta https://api.minepi.com/v2/me.
+Mainnet issuer yana ƙirƙirar HMAC-signed assertion mai iss=albukhr-mainnet, aud=test.albukhr.com, network=testnet, Pi UID, username, iat, exp (minti 2) da nonce. Ba a aika Pi access token ɗin zuwa Testnet.
+Assertion ɗin ya tafi zuwa Testnet Edge Function testnet-auth-gateway. Testnet gateway yana tabbatar da signature, issuer, audience, network, lokaci da nonce; nonce hash yana hana replay. Yana ƙirƙirar one-time access code, hash ɗinsa kaɗai ake adanawa, kuma code yana ƙarewa cikin kusan daƙiƙa 60.
+Mai amfani ya koma test.albukhr.com da access_code. Testnet gateway auth module yana redeem code ɗin ta hanyar conditional update (used_at IS NULL) don hana amfani sau biyu. Gateway ya samar da Testnet session mai expiry na minti 30 da network='testnet'.
+Browser yana ajiye Testnet session ɗin wucin gadi a sessionStorage (ba Pi access token ba). test-albukhr-api yana hash token ɗin ya bincika testnet_sessions, kuma yana duba network='testnet', expiry da revocation.
+Wannan tsarin handoff ne da ya kamata a kiyaye; kada a maye gurbinsa da browser-side network parameter, wani token na daban, ko sabon login.
+Policy question da ba a warware ba
+Mainnet issuer yana tabbatar da cewa Pi access token ingantacce ne ta Pi API, amma code ɗin da aka karanta bai duba public.users/successful record_pi_login ko wani per-user Testnet grant kafin ya ba da Testnet access code. Don haka, UI yana tilasta wucewa ta Mainnet login, amma issuer ɗin server-side yana tabbatar da Pi identity ne—ba a tabbatar da cewa an gama duk Mainnet ALBUKHR account workflow ba. Dole a fayyace ko manufar ita ce duk mai ingantaccen Mainnet Pi token ya iya shiga Testnet, ko sai ya zama Mainnet ALBUKHR user da aka tabbatar. Kada a ɗauka ba tare da shawarar mai tsarin ba.
+5. Ainihin Admin → Testnet access da project-registry mirror
+Admin Auth na albukhr-admin Mainnet-only ne. get_my_admin_context() yana gina context daga admin_users, role assignments, MFA/AAL2 da testnet_access_grants.
+Mainnet Edge Function testnet-admin-issuer yana tabbatar da Supabase Admin access token, admin status active, mfa_verified=true, da testnet_access=true kafin ya ƙirƙiri assertion na Testnet Admin.
+A yayin wannan flow, Mainnet issuer yana karanta approved/active Mainnet project registry tare da logo metadata, sannan ya aika da metadata zuwa Testnet gateway.
+Testnet testnet-admin-gateway yana duba signature/issuer/audience/network/expiry/nonce; yana samar da one-time Admin code/session. Registry mirror yana sauya network na project metadata da aka amince da shi kaɗai zuwa testnet kuma yana sanya registration_source='mainnet-approved-mirror'.
+Wannan shi ne one-way mirror na approved project registry da aka nuna a source code; ba hujja ba ce ta cewa ana sync users, investments, stakes, payments ko Mainnet transaction records zuwa Testnet. Dole ne a kiyaye wannan bambanci a duk wani sabon code.
+6. Babban security finding — Mainnet record_pi_login
+Matsayi: BLOCKER don dogaro da wannan RPC a matsayin tabbatacciyar ALBUKHR identity authority, har sai an sake duba shi. Babu canji da aka yi.
+Binciken live schema ya nuna:
+public.record_pi_login(p_pi_uid, p_username, p_wallet_address, p_network, p_status) yana SECURITY DEFINER.
+anon da authenticated duka suna da EXECUTE permission.
+Function ɗin yana karɓar pi_uid da network daga input, kuma yana yarda da network IN ('mainnet','testnet').
+A success branch yana INSERT ... ON CONFLICT (pi_uid) DO UPDATE, kuma network = EXCLUDED.network yana iya sabunta network na user.
+Function signature ɗin ba ya karɓar Pi access token kuma ba ya kiran Pi Platform API don tabbatar da pi_uid.
+A lokacin binciken, babu testnet users ko login events a Mainnet DB; records da aka ƙidaya duk Mainnet ne. Saboda haka wannan contract risk ne, ba rahoton cewa an riga an sami haɗuwar bayanai ba.
+Tasirin da zai iya tasowa: API caller mai publishable key zai iya kiran RPC da pi_uid da network da ya zaɓa. Wannan bai dace da manufar cewa Testnet records su kasance a Testnet DB kaɗai ba; kuma backend ba zai iya ɗaukar wannan RPC kaɗai a matsayin tabbacin Pi identity ba. Ya kamata a tsara gyara mai iyaka: Mainnet-only network enforcement a Mainnet DB, da kuma tabbatar da Pi identity/server authorization kafin a create/update user record. Sai a shirya SQL migration da rollback/verification plan; kada a yi amfani da SQL write kai tsaye a wannan audit.
+Bambanci: Testnet copy na public.record_pi_login an kulle shi zuwa network='testnet', kuma ACL da aka karanta yana ba service_role kawai izinin execute—anon da authenticated ba su da izini. Wannan bambanci ya kamata a kiyaye.
+7. Ƙarin abubuwan da za a tabbatar kafin sabon service
+Matsayi
+Abin da aka gani
+Mataki na gaba da ya dace
+Blocker
+Mainnet record_pi_login yana ba anon execute kuma yana karɓar testnet network.
+A warware contract ɗin identity/network kafin sabon service ya dogara da users.id.
+High
+dev-albukhr-app yana da tsohon localStorage auth gate wanda ya bambanta da Mainnet shared Auth Core.
+A tabbatar da repository/deployment mapping na dev.albukhr.com; kada a ɗauki dev copy a matsayin canonical source ba tare da tabbatarwa ba.
+High
+Testnet API tana da legacy TESTNET_ADMIN_API_KEY/X-Admin-Key gate don /approve, /complete, /withdraw/lookup, /pay-withdraw da /reconcile-withdraw, alhali akwai wani sabon Testnet Admin code/session gateway.
+A tabbatar da cewa key ɗin ba ya cikin browser bundle, a gano routes/UI da suke amfani da shi, sannan a yanke shawarar ko duka tsarin suna da gangan. Kada a kashe ko maye gurbin shi ba tare da route-by-route review ba.
+Medium
+Testnet Supabase ba shi da Storage bucket; Mainnet yana da buckets biyu da aka keɓe ga wani aiki.
+Idan dApp service yana buƙatar upload/receipts, a tsara dedicated bucket/policies a muhalli da ya dace; kada a sake amfani da External Projects bucket.
+Medium
+Mainnet issuer na user yana tabbatar da Pi token, amma bai tabbatar da cewa Mainnet ALBUKHR account workflow ya kammala ba.
+A amince da policy: valid Mainnet Pi identity kaɗai, ko Mainnet ALBUKHR user/account check ma wajibi ne.
+Blocker / scope
+Ba a sami dApp service tables/RPCs/buckets ko API gateway a cikin main branch da aka bincika ba. DApp pages sun nuna references zuwa scripts waɗanda Phase 0 audit ta ruwaito ba a same su a branch ɗin da aka duba ba.
+A ci gaba da file-by-file audit na dApp pages/scripts da API/Admin routes kafin implementation. Live production assets ba a browser-test ba.
+8. Pi dApp Launch Service: iyakar da ya kamata a yi amfani da ita
+Bisa bayanan da aka tabbatar zuwa yanzu:
+Service workflow: a ƙera shi ne domin Mainnet User Side + Mainnet API + Mainnet Admin Side + Mainnet Supabase, tare da auth mai bin canonical Mainnet Pi Auth Core.
+ALBUKHR Testnet: kada a ɗora masa dApp Launch Service request/quote/payment state a matsayin default. Ya ci gaba da kasancewa environment ɗin Testnet na ALBUKHR da ke amfani da Mainnet-issued handoff.
+Client dApp sandbox testing: a bambanta shi da ALBUKHR Testnet. Za a tsara yadda abokin ciniki zai gwada nasa dApp ta Pi Sandbox/Testnet bisa Pi Developer Platform requirements, ba ta hanyar kwafe Mainnet request/payment data zuwa ALBUKHR Testnet ba.
+Payment: request status, quote status, payment status da delivery status su kasance daban; receipt ko browser callback kaɗai ba hujjar settlement ba ce. Kada a kunna real Pi/bank payment har sai an tabbatar da contracts da end-to-end tests.
+Admin: a yi amfani da canonical Mainnet Admin Auth/MFA/roles; kada a ƙirƙiri Admin login na biyu ko a haɗa dApp workflow cikin External Projects Admin module ba tare da iyakar permissions ba.
+Change policy: babu deployment, SQL migration, Storage write ko GitHub commit kafin a amince da gap report da design.
+9. Abin da wannan audit bai tabbatar ba
+Ba a yi browser end-to-end test na app.albukhr.com, test.albukhr.com ko admin.albukhr.com ba.
+Ba a tabbatar cewa abin da ke live hosting da abin da ke cikin main branch sun yi daidai ba.
+Ba a yi runtime test na Pi /v2/me, HMAC handoff, access-code redemption, Pi payment, bank reconciliation ko payout ba.
+Ba a karanta dukkan kowane file a repos ɗin ba. Wannan audit ɗin ya karanta canonical authentication/environment/gateway entrypoints, API entrypoints, Supabase schema inventory, migration metadata, RLS summaries, Storage metadata da relevant RPC/Edge Function source. Mataki na gaba kafin coding shi ne targeted review na dApp pages, API route contracts da Admin integration files.
+Binciken SQL duk read-only ne; babu mutation da aka gudanar.
+10. Shawarar mataki na gaba
+Kar a gina sabon service yanzu. Da farko a tsara mini-migration/review plan na record_pi_login da network isolation, tare da SQL verification queries kafin da bayan, ba tare da aiwatarwa ba.
+A tabbatar da deployment mapping na albukhr-app, dev-albukhr-app, test-albukhr-app da domains ɗinsu.
+A yi dApp-specific source audit: shafukan pi-dapp-service.html, my-dapp-requests.html, scripts ɗin da suke nuni da su, Mainnet server.js, Admin routes/pages, da payment verification contracts.
+Bayan waɗannan, a gabatar da Architecture v2 mai Mainnet-only dApp service kuma a sa Mainnet → Testnet auth handoff a matsayin existing dependency, ba sabon tsarin da za a sake gina shi ba.
+Kammalawa: Babban tushe na ALBUKHR ya riga ya nuna rarrabuwar muhalli da kuma Mainnet-issued Testnet handoff. Amma kafin dApp service ya yi amfani da wannan tushe, akwai babban rashin daidaito a Mainnet record_pi_login wanda ya kamata a warware da takamaiman migration mai iyaka. Babu wani canji da aka yi a wannan audit.
