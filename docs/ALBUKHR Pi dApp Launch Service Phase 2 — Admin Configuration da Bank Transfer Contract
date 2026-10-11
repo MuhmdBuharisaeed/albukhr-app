@@ -1,0 +1,315 @@
+ALBUKHR Pi dApp Launch Service
+Phase 2 — Admin Configuration da Bank Transfer Contract
+Sigar: 1.0
+Rana: 11 Oktoba 2026
+Matsayi: Design-only / za a sake dubawa kafin coding
+Canje-canjen da aka yi: Babu repo, database, Storage, ko production changes.
+1. Manufar mataki
+Wannan takarda ta fayyace yadda za a tsara Admin Settings, bank-transfer workflow, da yadda wannan zai zauna tare da Pi payment a cikin ALBUKHR Pi dApp Launch Service. Za a iya aiwatar da software kafin a kammala CAC da Moniepoint Business Account, amma bank transfer ba zai zama mai karɓar kuɗi a aikace ba sai an tabbatar da bayanan asusu kuma an yi live verification.
+Abubuwan da wannan mataki ya ƙunsa
+Saitin bank destination da Admin zai iya shigarwa, ajiye a matsayin draft, nema a amince da shi, kunna ko kashe shi.
+Bayanin banki ga mai amfani ta trusted API kawai.
+Ƙirƙirar payment intent tare da price/config snapshot.
+Gabatar da transaction reference da receipt, ba tare da ɗaukar su a matsayin tabbacin biyan kuɗi ba.
+Admin manual reconciliation da immutable audit trail.
+Rarrabe wannan tsarin da Pi U2A payment flow.
+Ba ya ƙunsa
+Ba a ƙirƙiri ko canza SQL tables/RPCs ba.
+Ba a ƙara code, ba a tura deployment, ba a canza Mainnet.
+Ba a saita Moniepoint credentials, bank account, ko real payment secret ba.
+Ba a ƙayyade farashi na ƙarshe, refund policy, ko bank reconciliation authority ba.
+2. Shawarar gine-gine
+Bank transfer da Pi payment su kasance payment methods biyu masu zaman kansu, amma su yi amfani da payment-intent model guda. Request status ba ya maye gurbin payment status.
+User side: shared AlbukhrPiAuth ya tabbatar da identity; UI ya kira trusted API don services, quotes, intents da submissions. Kada form ya dogara da localStorage.pi_user.
+API: a ƙara dedicated dApp-service gateway/module. Kada a sake amfani da Core Project liquidity payment endpoints kai tsaye; waɗannan suna da add_liquidity semantics.
+Admin side: a yi amfani da shared Admin Auth da MFA/AAL2 da role checks da ALBUKHR ya riga ya tanada. Kada a ƙirƙiri login ko MFA na biyu.
+Database: request, price quote, active bank configuration, payment intents, evidence da audit events su kasance a Supabase. RLS, grants, ownership checks, unique constraints da server-side authorization su zama ɓangaren migration ɗaya.
+Storage: bank receipts a private bucket; signed URL na ɗan lokaci ko server-mediated access. Kada a buɗe bucket ga jama'a.
+Network: Mainnet API ya ƙayyade mainnet daga server configuration; kada browser ya zaɓi network ko ya tura wani network da zai canza ikon data. Internal Testnet QA ya kasance a rabe.
+Ka'idar tsaro mai tushe
+Browser bai da ikon tabbatar da bank transfer ko Pi payment. UI button, receipt image, transaction reference, txid, ko success callback ba su isa su nuna PAID ba. Backend/approved Admin workflow ne kawai ke iya canza payment zuwa confirmed bayan takamaiman tabbaci.
+3. Admin Settings — ƙirar allo
+A ƙara wani sashe mai suna Pi dApp Launch Service → Payment Settings a cikin Admin area. Wannan ya zama wani module mai iyaka; kada a canza Dock Navigation ko shared authentication files domin kawai ƙara shi.
+3.1 Bank Account Configuration fields
+Field
+Ma'anarsa
+Dokar validation
+display_name
+Sunan kamfani/mai karɓa da za a nuna
+Required; ya dace da legal/verified account name
+bank_name
+Sunan banki/provider
+Required; ba a ɗauka Moniepoint har sai an tabbatar
+account_name
+Sunan mai asusu kamar yadda bank ya tabbatar
+Required
+account_number
+Lambar asusu
+Required; digits/format bisa provider; mask a Admin list, full value ga payer kawai idan config ta active
+currency
+Kuɗin da za a biya
+A halin yanzu NGN kawai idan product policy ta amince
+payment_instructions
+Umarnin biya ga mai amfani
+Plain text, length-limited, no HTML/script
+verification_status
+unverified, pending_review, verified, rejected
+Server-controlled transitions kawai
+verification_note
+Bayanin admin game da verification
+Private admin-only; kada a nuna wa payer
+verified_at, verified_by
+Lokaci da Admin da ya tabbatar
+Server-generated; cannot be supplied by browser
+status
+draft, pending_approval, active, retired, rejected
+Server-side transition validation
+version
+Sigar config
+Server increments; immutable per saved version
+effective_from, retired_at
+Lokacin fara amfani/ritaya
+Server-generated where appropriate
+Kada a tara ko neman PIN, OTP, password, card data, online-banking credentials, secret key ko login credentials. Waɗannan ba sa cikin Payment Settings.
+3.2 Tsarin amincewa da bank destination
+Admin mai izini ya shigar da bayanan asusu a matsayin draft.
+Ya aiko config don dubawa (pending_approval).
+Authorized verifier ya tabbatar da bank/provider account ta hanyar da kamfani ya amince da ita, tare da rubuta source da date. Screenshot na bank details shi kaɗai ba ya maye gurbin independent verification.
+A fi so maker-checker: mutumin da ya ƙirƙiri/gyara bank destination kada shi kaɗai ya kunna shi. Mai duba na biyu ya amince da bayanan asusu da verification.
+Sai bayan verification_status = verified da approval ne config zai iya zama active.
+Canza account number, account name, bank/provider ko currency yana ƙirƙirar sabon config version, kuma yana buƙatar sake verification/approval. Kada a gyara active version a baya.
+A ƙyale active destination guda ɗaya ga Mainnet + NGN a kowane lokaci, sai dai product owner ya amince da multi-account design daga baya.
+Idan babu verified active bank config, API ta dawo da bank_transfer_available: false; UI ya ɓoye ko disable bank transfer, amma Pi payment na iya kasancewa dabam idan an kunna shi kuma an tabbatar da policy.
+3.3 “Enable” ba yana nufin “verified” ba
+A ware abubuwa biyu:
+verification_status: ko an tabbatar da destination.
+enabled: ko product owner ya ba da izinin karɓar bank transfer a wannan environment.
+enabled = true kaɗai bai isa ba. API ta duba duka verified state, approval state, active version, currency, effective dates da environment kafin ta nuna hanyar biya.
+4. Bank transfer workflow
+4.1 Mai amfani
+Ya shiga ta shared Pi authentication.
+Ya zaɓi service type kuma ya karɓi quote mai quote_id, amount, currency, valid-until da terms version.
+Backend ya ƙirƙiri dapp_service_request da payment_intent da ke nuni da quote.
+Idan bank transfer yana available, backend ya ba UI bank details daga verified active config; UI zai nuna amount, currency, account details, payment reference da expiration.
+Mai amfani ya aika transfer daga bank app dinsa.
+Ya shigar da transaction reference da ranar/amount da aka tura; receipt upload na iya zama optional evidence bisa policy.
+Intent ya shiga submitted_for_review; payment remains pending_verification.
+Mai amfani zai ga status da admin-facing next step. Kada UI ya ce “Paid/Confirmed” har sai backend ya tabbatar.
+4.2 Admin reconciliation
+Admin mai izini ya duba:
+actual credit/transaction a official bank portal/statement ko wata source da kamfani ya amince da ita;
+account/beneficiary da ya karɓi kuɗi;
+amount da currency da aka sa a quote;
+transaction date/time;
+reference/provider identifier;
+matching service request/payment intent;
+yiwuwar duplicate reference ko reused evidence.
+Sakamakon da Admin zai zaɓa:
+confirmed — kawai idan actual credit ya bayyana kuma duk checks sun dace;
+rejected — idan an tabbatar cewa payment ƙarya ne ko bai dace ba, tare da reason;
+needs_more_evidence — idan bayanai ba su isa ba;
+ya bar pending_verification idan ba a iya tantancewa ba tukuna.
+A rubuta actor, time, decision, reason, evidence source type, old/new status da config version a audit trail. Kada a adana cikakken bank statement ko bayanan da ba su da alaƙa fiye da abin da policy ta buƙata.
+4.3 Dokokin anti-duplication
+Normalize transaction reference (trim/normalize case inda ya dace) kafin comparison.
+Ƙirƙiri unique/guard rule na reference bisa destination/config/provider. Idan bank provider bai ba da unique global reference ba, a ayyana composite matching rule; kada a ƙirƙiri unique constraint na ƙarya da zai hana legitimate payment.
+Intent ɗaya ba zai iya haifar da confirmed event fiye da ɗaya ba.
+Reference/evidence ɗaya ba za a iya yi wa intents daban-daban confirmed ba ba tare da explicit exception workflow da audit ba.
+Admin double-click, API retry da concurrent review su kasance idempotent/transactional.
+5. Payment status da request status
+Payment intent status
+created → pending_payment → submitted_for_review → confirmed
+Sauran halayen da za su iya faruwa: rejected, failed, cancelled, expired, refund_pending, refunded. Aiwatar da refund states ne kawai bayan refund policy da izini sun samu amincewa.
+Bank transfer verification status (idan ana son field daban)
+not_submitted, pending_verification, needs_more_evidence, confirmed, rejected.
+Request/service delivery status
+draft → submitted → under_review → approved / revision_requested / rejected → in_progress → completed.
+Kada a haɗa waɗannan a field ɗaya. Payment confirmed ba ya nuna cewa request approved ne ko aikin dApp ya kammala; request approved kuma ba ya tabbatar da biyan kuɗi.
+6. Database contract — proposed objects only
+Sunaye na ƙasa shawarwari ne, za a daidaita su da naming convention da schema mai rai kafin migration.
+6.1 dapp_service_payment_configs
+Purpose: versioned bank destination/settings and payment availability.
+Proposed fields:
+id uuid primary key
+network text not null (mainnet or testnet)
+payment_method text not null (bank_transfer; Pi method configuration may live here or a distinct table)
+version integer not null
+display_name text, bank_name text, account_name text, account_number text, currency text
+payment_instructions text
+verification_status text not null
+config_status text not null
+enabled boolean not null default false
+verification_source_type text, verification_note text
+verified_by uuid, verified_at timestamptz
+created_by uuid, created_at timestamptz, updated_at timestamptz
+approved_by uuid, approved_at timestamptz, effective_from timestamptz, retired_at timestamptz
+Constraints / handling:
+Validate status transitions server-side/RPC.
+One active destination per network + payment method + currency, unless later approved otherwise.
+No anonymous/browser insert or update.
+Direct public table access is not required; expose only safe active details from an API/RPC view with least privilege.
+If account details are treated as operational configuration rather than secret credentials, they still require write access controls and audit; do not expose draft/retired versions to payers.
+6.2 Existing/new dapp_service_requests
+Request ownership derives from trusted server-validated Pi identity, not a client-supplied UID.
+network and service/request status are server-enforced.
+Avoid making user identity editable after creation.
+6.3 dapp_service_quotes
+id, request_id, service type, price revision, amount, currency, optional pi_amount, pi_currency only if policy defines them, terms version, created/valid-until, quote status, created by/source.
+Quote amount and currency are server-owned. Frontend cannot override them.
+Quote acceptance stores accepted quote ID/version/time; expired quotes cannot create new intents.
+6.4 dapp_service_payment_intents
+id, request_id, quote_id, network, method, amount, currency, status, client_reference or server-generated reference, config_id, config_version, destination_snapshot (safe immutable snapshot), provider_payment_id for Pi flow where applicable, idempotency key/hash, expiry and timestamps.
+destination_snapshot records the exact verified pay-to destination shown when intent was created. It must not change if Admin rotates bank configuration later.
+Prevent one provider payment ID from being attached to multiple intents within the same relevant network/provider scope.
+Store only safe display destination fields in snapshot; never store bank login credentials, PIN or OTP.
+6.5 dapp_service_payment_evidence
+Intent ID, evidence type, private storage object path, uploaded by, content type verified server-side, byte size, hash, created at, review state.
+Avoid storing public URLs. Only authorized backend/admin can issue a time-limited download link.
+6.6 dapp_service_payment_events
+Append-only event stream: event ID, intent ID, network, old/new state, actor type/ID, source, reason code, short safe note, provider reference, created at, request correlation ID.
+Prefer blocking direct update/delete for browser roles. Audit rows should not be editable by normal Admin UI.
+6.7 Migration discipline
+Do not run SQL directly in production from this design doc.
+Before writing migration, re-introspect Mainnet + Testnet schema, grants, RLS policies, role/AAL2 checks and existing audit conventions.
+Test migration on isolated Testnet/staging first, including negative tests for anon, authenticated, unauthorized Admin, Admin without AAL2, cross-network access and direct table mutation.
+7. API contract — proposed routes
+All routes below are design proposals and do not yet exist unless separately confirmed by repository audit.
+User routes
+Method / route
+Purpose
+Core server checks
+GET /api/dapp-service/payment-methods
+Return currently available methods and safe active bank details
+Return bank option only if verified + approved + enabled + active for server-selected network
+POST /api/dapp-service/requests
+Create service request
+Pi token/server identity; consent/version; validated fields
+POST /api/dapp-service/requests/:requestId/quotes
+Request/create quote
+Owner, service catalog, server-side price policy
+POST /api/dapp-service/requests/:requestId/payment-intents/bank-transfer
+Create bank intent
+Owner; unexpired accepted quote; NGN pricing; active config; amount is server-derived
+POST /api/dapp-service/payment-intents/:intentId/bank-evidence
+Submit transfer reference and optional receipt path
+Owner; intent pending; validation/rate limit; no status confirmation
+GET /api/dapp-service/requests/:requestId
+Read request/payment status
+Owner + network check; redact private admin notes
+GET /api/dapp-service/requests
+List own requests
+Identity from trusted Pi verification; no client UID filter trust
+Pi payment routes
+Create/approve/complete/reconcile Pi intent
+Must match official documented Pi SDK/server flow; separate metadata and route namespace from investment/liquidity payments
+Admin routes (illustrative)
+Method / route
+Purpose
+Core server checks
+GET /api/admin/dapp-service/payment-settings
+Read config versions/status
+Existing Admin Auth; allowed role; MFA/AAL2; redact fields by role where appropriate
+POST /api/admin/dapp-service/payment-settings
+Create new draft version
+Authorized role/AAL2; validate; audit actor from token, not request body
+POST /api/admin/dapp-service/payment-settings/:id/submit
+Send draft for verification/approval
+Complete fields; config transition allowed
+POST /api/admin/dapp-service/payment-settings/:id/verify
+Record verification outcome
+Authorized verifier; source + evidence reference + reason required; ideally maker-checker
+POST /api/admin/dapp-service/payment-settings/:id/activate
+Activate verified approved version
+Independent approval; effective version uniqueness; audit; disable/retire prior version atomically
+POST /api/admin/dapp-service/payment-settings/:id/disable
+Disable bank transfer
+Authorized role/AAL2; reason required; does not modify past payment snapshots
+GET /api/admin/dapp-service/payment-intents
+Search pending/confirmed/rejected intents
+Authorized role/AAL2; filters constrained; no unrestricted dump
+POST /api/admin/dapp-service/payment-intents/:id/reconcile
+Review submitted bank transfer
+Actual external bank verification evidence + reason + transition check; idempotent
+If existing ALBUKHR admin features are best implemented through protected database RPCs, the final implementation may use that pattern instead of every illustrative REST route. The authorization guarantee must remain server/database-enforced in either design. A hidden button is not authorization.
+JSON response convention
+Success: { "success": true, "data": { ... } }
+Failure: { "success": false, "code": "...", "error": "..." }
+Use appropriate HTTP status codes and never return secrets, service-role/secret keys, Pi Server API Key, raw stack traces or private Admin notes to the user.
+8. Pi payment contract — remains separate
+Pi payment uses the official Pi SDK and documented server-side payment handshake for the registered app.
+Backend validates the user's Pi access token through the documented Pi identity endpoint, and retrieves payment data from Pi Platform API as appropriate.
+Backend matches the Pi payment to a server-created dApp-service intent and compares expected amount, metadata, UID ownership, network and status before approval/completion.
+Use a dApp-specific action/memo/metadata namespace; do not loosen or override existing investment/liquidity metadata validation, especially add_liquidity checks.
+Never trust browser amount, callback success, transaction ID, request ID or metadata without independent server verification.
+Approval and completion retries must be idempotent; incomplete payments need a recovery/reconciliation path.
+Record provider payment ID and confirmed transaction identifier; only server confirmation can set payment_status = confirmed.
+Do not invent or freeze endpoint/request details until the currently published Pi Developer Documentation and exact SDK version used in ALBUKHR are rechecked immediately before coding.
+Official references to re-check during implementation:
+Pi Getting Started: https://developers.minepi.com/docs/build-first-app/GettingStarted
+Pi Register App: https://developers.minepi.com/docs/build-first-app/RegisterApp
+Pi Mainnet Launch: https://developers.minepi.com/docs/build-first-app/Launch
+9. Pricing and currency policy — unresolved decisions
+The existing UI had a conflict between fixed dropdown prices (₦35,000 and ₦500,000) and “flexible service fee” wording. Do not hard-code these as final without product-owner confirmation.
+Before implementation, decide:
+Are service prices fixed, or does each request require an Admin quote?
+Is bank transfer strictly NGN?
+Is there a Pi-denominated amount for each service, or is Pi amount quoted separately?
+If Pi amount is derived from NGN price, what approved exchange-rate source, timestamp and quote expiry rule will be used? Do not assume a market rate or hard-code a conversion without policy.
+What are cancellation, refund, duplicate payment, short payment, overpayment and dispute rules?
+Who can verify bank statements, and what constitutes the approved evidence source?
+Keep an immutable price/config snapshot on each intent so future pricing or account changes do not rewrite an existing payment record.
+10. Security, privacy and audit
+Reuse existing Admin Auth, role enforcement and MFA/AAL2 requirement; verify enforcement on the server/RPC, not only UI.
+Supabase secret/service-role credentials stay only in trusted server/Edge Function environments; never ship them to HTML/JS or write them to logs.
+Enable RLS where relevant, and explicitly design grants and allow/deny policies. RLS with no policy is not a complete test plan; test each verb for anon, authenticated, Admin with/without correct role, and cross-network cases.
+User reads are scoped to their own requests/intents by server-verified identity and/or secure DB policy.
+Admin notes, verification source details and evidence are private. Use least-privilege reads and short-lived signed URLs.
+Rate-limit evidence submissions and reconciliation-sensitive endpoints; validate file content/size server-side, generate storage object paths server-side.
+Use CSRF/origin handling appropriate to existing API architecture; avoid logging full receipts, full bank details or provider secrets.
+Use idempotency, row locking/atomic transitions, unique provider references and audit events to defend concurrent/repeated calls.
+Environment comes from trusted backend config. No request-body network switch can redirect Mainnet actions to Testnet or vice versa.
+Supabase security references:
+RLS guidance: https://supabase.com/docs/guides/database/postgres/row-level-security
+API key safety: https://supabase.com/docs/guides/getting-started/api-keys
+Secure data guidance: https://supabase.com/docs/guides/database/secure-data
+11. Acceptance tests before staging approval
+Admin bank settings
+Draft/unverified account is never returned as a payable bank destination.
+Config cannot activate until verified and approved.
+The maker cannot self-activate their own bank destination if maker-checker is enforced.
+Disabled/retired config is no longer offered for new intents.
+A newly active bank version does not alter an existing intent's snapshot.
+Admin without the required role or AAL2 cannot create, verify, activate, disable or reconcile settings.
+Bank transfer
+A fabricated receipt/reference never confirms a payment by itself.
+Amount/currency/destination mismatch is rejected or left pending.
+One valid transfer cannot be confirmed against multiple requests.
+Repeated submission/reconciliation has no duplicate effect.
+Receipt is inaccessible to another user or via a public URL.
+If no valid active config exists, bank transfer is unavailable and no bank intent can be created.
+Pi payment
+Client success is insufficient to mark paid.
+Pi payment ID from another user's intent or an unrelated Core Project payment is rejected.
+Invalid amount/metadata/network/status fails closed.
+Approve/complete retries are idempotent; incomplete payments can be reconciled.
+Server API Key and secret credentials are absent from browser assets, client responses and logs.
+Separation and regression
+Mainnet cannot read/write Testnet dApp-service data, nor vice versa.
+Request approval does not automatically confirm payment; confirmed payment does not automatically approve or complete a service.
+Existing Core Project investment/liquidity flow continues to require its own add_liquidity checks.
+No changes to Dock Navigation, page-auth-guard.js, environment-core.js, or shared auth/Supabase cores unless a separate reviewed patch proves necessity.
+Regression tests cover current services listing, request submission, My dApp Requests, Admin login/MFA and other existing app pages.
+12. Controlled implementation sequence
+Review design: approve or revise price policy, Admin roles/maker-checker, verification sources, refund rules.
+Read-only re-audit: confirm current repo SHAs, active Admin auth helpers, API conventions and live DB schema before patching.
+Branch-only coding: add service-specific API module/UI and migration file; avoid unrelated refactors and shared core changes.
+Local/static tests: lint/syntax, API contract tests, state-transition tests, RLS tests, idempotency and authorization-negative tests.
+Testnet/staging QA: use only test data and supported Pi test flow; no live bank account or real funds.
+Patch review: provide complete changed-file list/diff, migrations, tests, rollback plan, and unresolved decisions for user approval.
+Mainnet deployment gate: no production migration/deployment until explicit approval, verified company bank account, finalized pricing/terms, Pi Developer Portal readiness, and successful staging sign-off.
+Bank go-live: first activate bank destination only after independent verification; run small controlled reconciliation test and confirm statement matching before public enablement.
+13. Matakin gaba bayan wannan takarda
+Wannan shi ne contract/design deliverable, ba implementation ba. Bayan an duba shi, mataki mafi aminci shi ne:
+kulle business rules da har yanzu ba a yanke shawara a kansu ba (farashi, NGN/Pi pricing, refund, bank verification authority); sannan
+a samar da branch-only implementation patch tare da migration da tests, a duba diff kafin a taɓa Mainnet.
+Babu canjin production da aka yi a wannan mataki.
