@@ -1,0 +1,297 @@
+ALBUKHR
+Pi dApp Launch Service
+Mataki na 3: Quote-First API Contract
+da Database Migration Proposal
+SIGAR DUBAWA • v1.0 CANDIDATE • HAUSA
+
+HUKUNCIN DA AKA AMINCE DA SHI: Quote-first. Admin zai fara duba request, ya fayyace scope da farashi, ya aika quote ga customer, sannan customer ya karɓa kafin a fara payment flow. Payment method, currency, refund policy da SLA ba su kulle ba tukuna.
+
+
+Ranar: 12 Oktoba 2026
+Matsayi: Shawara don review; ba a yi deploy, GitHub write, SQL execution ko Supabase mutation ba.
+Wannan takarda tana tare da OpenAPI YAML da SQL migration draft mai alamar NOT APPLIED.
+
+1. Manufar wannan mataki
+Mataki na 3 yana mayar da shawarar Quote-first zuwa API contract da migration blueprint da za a iya yin review kafin implementation. An sake karɓar source snapshots na yanzu ta hanyar read-only a GitHub domin kwatanta contract ɗin da ainihin code. Wannan audit bai canja kowane repository ko database ba.
+An amince da shi
+Quote-first: babu biyan kuɗi kafin a fitar da quote kuma customer ya amince da takamaiman quote version.
+Quote yana haɗa farashi, currency/asset, scope, deliverables, validity da terms snapshot.
+User identity ta fito daga Pi access token da backend ya tabbatar; ba daga pi_uid da browser ya tura kawai ba.
+Server config ne ke ƙayyade network; request body ba zai iya canza network ba.
+Payment state da request state abubuwa ne biyu daban.
+Payment channels suna disabled ta default; wannan mataki ba ya aiwatar da payment processing.
+Har yanzu ba a amince da shi ba
+Farashi na ƙarshe da ko catalog prices za su bayyana a UI.
+Ko za a karɓi NGN, Pi ko duka biyu; da valuation/conversion rules.
+Lokacin kammalawa/SLA, quote validity, adadin revisions.
+Cancellation, refunds, delivery acceptance, ownership/IP/source-code terms.
+Pi U2A, bank transfer, ko wasu payment methods.
+Admin permission names da ainihin middleware a current repository.
+1A. Sakamakon source refresh na yanzu (read-only)
+API repository: MuhmdBuharisaeed/albukhr-api, main HEAD fc43d266900dc02fb28e61cec2c0c4f277ea739d. server.js SHA bc50e90f8a80b689cbcf780f2724ede6c6924136; src/dapp-service-v2-gateway.js SHA 20c92fcaf4815c5b13660c19862adfa0d5008ab8; render.yaml yana sa DAPP_SERVICE_V2_ENABLED=false, kuma Mainnet Pi API base ya zama https://api.minepi.com/v2.
+App repository: MuhmdBuharisaeed/albukhr-app, main HEAD b3823f5e2425b4c4cb090735f6ee170166457a8e. js/dapp-service-v2-client.js yana wanzu (SHA 3aca679dae8dfece70ff523ee52fafcab5448ea2) kuma yana tsammanin success response envelope; amma shafukan pi-dapp-service.html da my-dapp-requests.html da aka karɓa a wannan HEAD suna nuni da tsoffin js/pi-auth.js, js/pi-dapp-engine.js, js/supabase.js, da js/my-dapp-requests.js paths waɗanda GitHub file lookup ya dawo da su a matsayin 404 a wannan snapshot. Wannan shaida ce ta repo path, ba live-browser proof ba; production na iya bambanta.
+Admin repository: MuhmdBuharisaeed/albukhr-admin, main HEAD 09c81e2e06dabf7939e8fa749a15ee9ea8da4c9f. Read-only search bai gano dedicated dApp Service request/quote workflow ba. Dole a yi haɗin Admin ta existing Admin Auth/role/MFA model bayan an duba ainihin middleware; kada a ƙirƙiri sabon login ko a ɗauka cewa role na External Projects ya dace.
+Ainihin contract na gateway a yanzu (module code; har yanzu feature-flag disabled):
+Route
+Matsayi a source
+Abin da yake yi yanzu
+GET /catalog
+Akwai a gateway module
+Ya dawo da success:true, network, quoteRequired:true, services pi_studio da developer, da payment channels pi:false, bankTransfer:false
+POST /requests
+Akwai a gateway module
+Yana karɓar projectName, description, serviceType, consentVersion, consentAccepted; service type IDs su ne pi_studio da developer; consent version dole ya dace da DAPP_SERVICE_CONSENT_VERSION
+GET /requests
+Akwai a gateway module
+Yana tabbatar da Pi token, sannan ya tace network da applicant_pi_uid; response yana amfani da requests kuma yana iyakance sakamakon zuwa 50
+Quote/Admin routes
+Ba su cikin gateway ɗin yanzu
+Duk routes da aka bayyana a ƙasa domin quote/Admin sabbin routes ne da ake proposed; ba a aiwatar da su ba
+
+
+Current POST response yana amfani da { "success": true, "request": ... }; error yana amfani da { "success": false, "error": "..." }. Don haka wannan proposal ya daidaita existing endpoints da envelope ɗin yanzu, kuma ya ware duk sauran endpoints a matsayin proposed.
+Babban UI conflict: tsohon pi-dapp-service.html yana nuna adadin ₦35,000/₦500,000, direct payment details da receipt fields; wannan bai dace da Quote-first ba. Ba za a yi amfani da shi a matsayin authoritative payment workflow ba. Kafin a maye gurbin pi-dapp-service.html da my-dapp-requests.html, a ajiye kwafin kowane file a farko kamar tsarin aikin da aka amince da shi. Kada a taɓa Dock Navigation ko shared cores a wannan mataki.
+2. Ƙa'idar Quote-first da lifecycle
+Request lifecycle
+submitted → under_review → needs_information (optional) → quote_issued → quote_accepted → queued → in_progress → delivered → completed
+Hanyoyin fita: rejected, quote_declined, cancelled, ko quote_expired. Wannan proposal ne; exact enum da cancellation rules za a kulle su bayan review.
+Matsayi
+Ma'ana
+Sharadin gaba
+submitted
+An ajiye request
+Admin ya duba shi
+under_review
+Admin na nazari
+Bayani ya isa, ko a nemi ƙarin bayani
+needs_information
+Ana jiran amsar customer
+Amsa ta dawo
+quote_issued
+Aika takamaiman quote version
+Customer ya karɓa, ya ƙi, ko quote ya ƙare
+quote_accepted
+Customer ya karɓi version ɗin quote
+Payment rules da aka amince da su su cika kafin a fara aiki
+queued
+An cika sharuddan fara aiki
+Ma'aikaci ya fara aikin
+in_progress
+Ana aiki
+Delivery ko escalation
+delivered
+An miƙa deliverables
+Acceptance process da za a ayyana
+completed
+An kammala bisa policy
+Terminal state
+rejected / cancelled
+An rufe request tare da dalili
+A adana audit record
+
+
+Quote lifecycle
+draft → issued → accepted | declined | expired | revoked | superseded
+Quote da aka issued ba za a canja farashi ko scope dinsa a wuri guda ba.
+Canjin scope ko farashi yana samar da sabon quote version; tsohon version ya kasance a tarihin audit.
+Acceptance ya danganta da quote_id da version takamaimai, tare da actor da timestamp.
+Server ya ƙi karɓar quote idan ya ƙare, an soke shi, an maye gurbinsa, ko ba na request ɗin customer ba ne.
+Idan request ya sami quotes fiye da ɗaya, a bayyana a sarari wanne ne active; kada a bar acceptance ya zaɓi tsohon version.
+3. API base da conventions
+Base path da aka tsara: /api/dapp-service/v2
+Matsayi: candidate contract; ba a tabbatar cewa duk routes ɗin suna cikin live API ba.
+Common rules
+JSON input/output; Content-Type: application/json.
+User routes: Bearer Pi access token; backend ya tabbatar da token ta Pi Platform API /v2/me.
+Admin routes: amfani da ALBUKHR Admin auth/role/MFA checks da ake da su. OpenAPI ya nuna placeholder auth scheme ne kawai; sai an duba ainihin middleware kafin final wiring.
+network ba field ne da client zai iya saita ba. API deployment/configuration ne yake ƙayyade shi.
+User endpoints suna amfani da UID da server ya tabbatar wajen authorization. Kada requestId shi kaɗai ya isa izini.
+Responses su nuna safe public fields kawai; kar a fallasa internal admin notes, raw provider events ko private evidence URLs.
+Existing gateway error envelope shi ne { "success": false, "error": "..." }; existing success responses suna amfani da success: true. Duk proposed endpoints za su bi wannan envelope domin compatibility, sai an amince da versioned breaking change dabam.
+Yi pagination da server limits a Admin list endpoints; kada a mayar da duk records a lokaci guda.
+4. User API routes
+Route
+Matsayi a code yanzu
+Manufa / checks
+GET /catalog
+Akwai a gateway module; feature flag ɗin API disabled
+Service IDs pi_studio da developer; ya nuna quote-required da payment channels disabled
+POST /requests
+Akwai a gateway module; feature flag ɗin API disabled
+Pi token, consentVersion, consentAccepted=true, required fields, server-config network; payment_status=unpaid
+GET /requests
+Akwai a gateway module; feature flag ɗin API disabled
+Tace ta UID da network; returns requests; iyaka 50
+GET /requests/{requestId}
+Proposed — ba a aiwatar ba
+Duba request guda; ownership + network scope
+POST /requests/{requestId}/messages
+Proposed — ba a aiwatar ba
+Amsa ƙarin bayani ko saƙo; ownership, status da allowed message type
+GET /requests/{requestId}/quotes
+Proposed — ba a aiwatar ba
+Duba quotes da aka fitar kawai na request nasa
+POST /quotes/{quoteId}/accept
+Proposed — ba a aiwatar ba
+Karɓar takamaiman quote version; ownership, active version, expiry, terms acceptance, idempotency
+POST /quotes/{quoteId}/decline
+Proposed — ba a aiwatar ba
+Ƙin quote; reason bisa policy
+POST /requests/{requestId}/cancel
+Proposed — ba a aiwatar ba
+Cancellation request bisa cancellation/refund policy da za a kulle
+
+
+Existing `POST /requests` payload (daidaitaccen shape na gateway ɗin yanzu): projectName, description, serviceType, consentVersion, consentAccepted. Service type values su ne pi_studio ko developer. network, applicant_pi_uid, request/payment status da username na verified Pi identity server ne ke saita su.
+Muhimmi: ba a ƙara payment intent endpoints cikin wannan contract ba har sai an amince da payment methods da reconciliation/refund policy. Quote acceptance yana nufin amincewa da scope/farashi, ba payment confirmation ba.
+5. Admin API routes
+Route
+Manufa
+Muhimman checks
+GET /admin/requests
+Neman requests
+Admin role/MFA, network scope, filters/pagination
+GET /admin/requests/{requestId}
+Cikakken request
+Admin permission; internal notes suna ware
+POST /admin/requests/{requestId}/review-action
+Fara review, neman bayani, ko rejection
+Valid transition, reason/actor/timestamp, audit
+POST /admin/requests/{requestId}/quotes
+Ƙirƙiri da fitar da quote
+Server-side validation, amount/currency format, scope, expiry, terms snapshot
+POST /admin/quotes/{quoteId}/revoke
+Soke quote kafin acceptance
+Reason; reject if already accepted except defined incident flow
+POST /admin/requests/{requestId}/messages
+Aika customer-visible response ko internal note
+Permission; is_internal ba ya fita ga customer
+GET /admin/audit-events
+Read-only audit query
+Role restriction, pagination, network scope
+
+
+Admin action dole ne ya kasance server-side validated. Browser ba zai iya PATCH status ko payment_status kai tsaye a Supabase ba.
+6. API payloads (illustrative contract)
+POST /requests
+{
+  "projectName": "My Pi dApp",
+  "serviceType": "pi_studio",
+  "description": "I need help reviewing and preparing my Pi dApp.",
+  "consentVersion": "v1",
+  "consentAccepted": true
+}
+Wannan shape ne na gateway ɗin yanzu: projectName (har 120 chars), description (har 4,000 chars), serviceType (pi_studio ko developer), consentVersion (har 80 chars), da consentAccepted=true. Server ya samo applicant_pi_uid da pi_username daga Pi verification, ya sa network daga server config, ya yi insert da request_status=submitted da payment_status=unpaid. Client ba zai iya aika network, applicant_pi_uid, request_status, payment_status ko amount da zai rinjayi server ba. Kada a mayar da wannan request schema zuwa sabon sunan field ba tare da sabunta client da server tare ba.
+POST /admin/requests/{requestId}/quotes
+{
+  "currency_or_asset": "NGN",
+  "scope_summary": "Design and prepare a basic Pi dApp launch package.",
+  "deliverables": [
+    {"title": "Readiness review", "description": "Technical checklist and findings", "quantity": "1", "unit_amount": "100000.00"},
+    {"title": "Launch guidance", "description": "Documented next steps", "quantity": "1", "unit_amount": "150000.00"}
+  ],
+  "out_of_scope": ["Guaranteed Pi listing or approval"],
+  "valid_until": "2026-10-20T23:59:59Z",
+  "revisions_included": null,
+  "estimated_turnaround_days": null,
+  "terms_version": "dapp-service-terms-v1"
+}
+Wannan misali ne na shape kawai, ba ya tabbatar da farashin, NGN, scope ko SLA. A production, amount ya zama server-validated decimal string; server ya ƙididdige total ɗin line items, kuma ya ƙi body idan total bai dace da quote lines ba. A kulle currency/asset allowlist da integer/decimal precision bayan business approval.
+POST /quotes/{quoteId}/accept
+Idempotency-Key: client-generated-unique-operation-id
+Content-Type: application/json
+{
+  "version": 1,
+  "accepted_terms_version": "dapp-service-terms-v1"
+}
+Server ya tabbatar da cewa quote version ɗin da aka nuna yana active, yana cikin validity, request ɗin na caller ne, kuma terms version ɗin da aka yarda da shi shi ne wanda aka nuna. A rubuta accepted_at, authenticated UID da quote version. Idempotency-Key header ya hana duplicate acceptance daga retries. Wannan endpoint proposed ne, ba ya cikin gateway ɗin yanzu.
+7. Error contract
+A cikin response body, a kiyaye envelope na current gateway { "success": false, "error": "message" }. Teburin da ke ƙasa yana tsara HTTP status da ma'anar kuskure a matsayin design guide; kada frontend ya dogara da error.code field har sai an amince da canjin contract/version daban.
+HTTP
+Code
+Yaushe
+400
+VALIDATION_ERROR
+Input bai cika ka'ida ba
+401
+AUTH_REQUIRED / INVALID_PI_TOKEN
+Pi token babu/ba daidai ba
+403
+FORBIDDEN
+Babu izinin yin aiki da resource
+404
+NOT_FOUND
+Ba a samu resource ba ko ba za a bayyana shi ga caller ba
+409
+STATE_CONFLICT / IDEMPOTENCY_CONFLICT
+Status ko operation ya riga ya canza
+422
+QUOTE_EXPIRED / TERMS_NOT_ACCEPTED
+Quote/terms precondition bai cika ba
+429
+RATE_LIMITED
+An wuce rate limit
+500
+INTERNAL_ERROR
+Kuskuren cikin server; babu stack trace ga client
+502 / 503
+PI_PROVIDER_UNAVAILABLE
+Pi identity verification provider bai samu ba
+
+
+8. Database migration proposal — logical model
+Wannan sashe schema proposal ne kawai. Ba a gudanar da SQL ba. Sunayen public.dapp_service_* sabbin logical objects ne; sai an sake duba current schemas da migration history kafin a tabbatar da sunayen.
+Tebur
+Aikinsa
+Abubuwan tsaro
+dapp_service_requests
+Request, owner UID, network, service type, consent, request/payment statuses
+Network + owner indexes; client direct write a kashe
+dapp_service_request_messages
+Customer-visible messages da Admin internal notes
+Separate is_internal; endpoints su tace internal notes
+dapp_service_quotes
+Versioned price/scope/terms/expiry/acceptance
+Unique (request_id, version); scope na issued quote immutable; sabon quote don canji
+dapp_service_quote_items
+Deliverable/line item, quantity, unit amount, line total
+Server ya ƙididdige totals; FK ya tabbatar da request/network link
+dapp_service_audit_events
+Actor, action, before/after metadata, timestamp
+Append-only contract; no client update/delete
+
+
+Ƙa'idodin schema da RLS
+Duk rows suna ɗauke da network (mainnet ko testnet) kuma foreign keys masu dacewa suna hana cross-network linking.
+User identity ana ɗauka daga verified Pi token a API; ba a amince da browser-sent UID ba.
+Enable RLS ga duk sabbin tables; ba a ba anon ko authenticated raw write access ba. Browser yana shiga ta API mai authorization checks.
+service_role yana server-only; kada key ya shiga browser bundle.
+Indexes a kan (network, applicant_pi_uid, created_at) da (network, request_status, created_at); quotes su sami unique (request_id, version).
+Quote amounts da terms su zama snapshots masu versioning. Kada a sabunta farashi/scope na quote da customer ya riga ya karɓa.
+Audit events ba za a share ko a sake rubuta su ta normal API ba.
+Payment intents/events, evidence storage, bank destinations da payment RPCs an jinkirta su har sai an kulle payment methods, refunds da reconciliation. Kada a ƙirƙira su ta zato a cikin migration na wannan mataki.
+9. Pi payment design boundary
+Wannan phase ba ya aiwatar da payment. Idan daga baya aka amince da Pi U2A, official Pi flow yana buƙatar frontend SDK ya fara payment, sai backend ya yi server-side approval da completion. Pi ta bayyana cewa callbacks na iya maimaituwa, saboda haka idempotency da server-side payment state wajibi ne. Ana adana Server API Key a server kawai. Sources:
+Pi Platform API: https://developers.minepi.com/docs/api-reference/PlatformAPI/
+Pi Payments guide: https://developers.minepi.com/docs/accept-payment/Payments
+Pi SDK reference: https://developers.minepi.com/docs/api-reference/SdkReference
+Kada a kunna payment har sai an zaɓi methods, an kulle quote/payment currency, an rubuta refund policy, an tsara idempotency keys, an gwada reconciliation, kuma mai ALBUKHR ya bayar da izini kai tsaye.
+10. Implementation sequence (ba deployment ba)
+1.  Source refresh (read-only): baseline refresh na server.js, dapp-service-v2-gateway.js, package.json, render.yaml, frontend service page/client da Admin repository an yi. Kafin implementation, sake duba current SHA da Admin auth middleware da migration history; idan SHA ya canza, re-audit kafin patch.
+2.  OpenAPI review: ya bambanta existing gateway routes (catalog/create/list) da proposed quote/Admin routes; kulle Admin auth shape bisa ainihin middleware.
+3.  Schema review: kwatanta logical tables da live Supabase schemas; rubuta SQL proposal versioned, constraints, RLS/grants, rollback da test plan.
+4.  Implementation branch proposal: additive-only routes; payment route ba ya aiki; DAPP_SERVICE_V2_ENABLED=false default.
+5.  Disposable Testnet test: bayan explicit approval kawai, yi test a database da aka ayyana musamman don QA tare da synthetic data; kada a ɗauka cewa live ALBUKHR Testnet ya dace kai tsaye. Test owner isolation, network isolation, quote races, expiry, idempotency da Admin permissions.
+6.  User/Admin UI: implement quote display/acceptance da Admin quote creation; kada a canja Dock Navigation ko shared cores sai idan an amince dabam.
+7.  Security regression: tabbatar liquidity, investment, external project, auth da identity paths ba su canza ba. Identity RPC/security issue da aka ajiye domin daga baya ba za a taɓa shi a wannan aikin ba.
+8.  Go-live approval: Mainnet migration, payment enablement da deployment suna buƙatar amincewa dabam; wannan takarda ba izinin deployment ba ce.
+11. Acceptance tests kafin kowane deployment
+Invalid/expired Pi token da browser-sent UID/network ba su ƙirƙiri request ko sauya ownership/network.
+Customer ba ya shiga request/quote/message na wani customer; internal Admin notes na Admin ne kawai. Admin role/MFA da network scope dole su yi aiki.
+Quote expired/revoked/superseded ba a karɓa; canjin scope/farashi yana ƙirƙirar sabon version; duplicate acceptance idempotent ne kuma yana rubuta actor/version/time.
+Customer ba zai sa payment_status=confirmed ba. Payment endpoints ba su cikin wannan phase; Mainnet/Testnet isolation da regression tests na existing gateway modules dole su wuce.
+12. Abin da ake bukata kafin Phase 4 implementation
+Wannan mataki ya samar da contract proposal, ba production feature ba. Kafin Phase 4:
+1.  A amince da schema/OpenAPI, Admin role contract da request-status transitions bayan an sake tabbatar da source SHAs.
+2.  A kulle farashi/currency, quote expiry, turnaround, revisions, refunds, cancellation, delivery acceptance da IP terms.
+3.  A duba live schema/migration history, a kammala SQL + rollback plan, sannan a ba da izinin QA a database na musamman/disposable Testnet. Babu Mainnet SQL ko deployment ba tare da sabon izini ba.
