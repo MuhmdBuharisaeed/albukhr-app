@@ -50,7 +50,7 @@
   }
 
   function goDappService() {
-    window.location.assign("pi-dapp-service.html");
+    window.location.assign("pi-dapp-service-v2.html");
   }
 
   function goSidraService() {
