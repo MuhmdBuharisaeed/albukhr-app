@@ -1,0 +1,24 @@
+ALBUKHR Pi dApp Launch Service — Kunshin Mataki na 3
+Hukuncin da aka amince da shi: Quote-first.
+Matsayin kunshin: review candidate ne kawai. Ba a yi GitHub write, deployment, SQL execution, Supabase mutation ko payment activation ba.
+Fayilolin kunshin
+ALBUKHR_Pi_dApp_Launch_Service_Phase3_API_Migration_Proposal_HA.docx — takardar karantawa/review.
+ALBUKHR_Pi_dApp_Launch_Service_Phase3_API_Migration_Proposal_HA.md — rubutun Markdown.
+ALBUKHR_Pi_dApp_Launch_Service_Phase3_OpenAPI_HA.yaml — OpenAPI 3.1 proposal, API paths 14 (3 existing module routes; the others are proposed).
+ALBUKHR_Pi_dApp_Launch_Service_Phase3_Migration_DRAFT_NOT_APPLIED.sql — SQL draft da aka tsara domin review kawai.
+ALBUKHR_Pi_dApp_Launch_Service_Phase3_README_HA.md — taƙaitaccen bayani da iyakokin kunshin.
+Read-only source baseline da aka duba
+API HEAD: fc43d266900dc02fb28e61cec2c0c4f277ea739d
+App HEAD: b3823f5e2425b4c4cb090735f6ee170166457a8e
+Admin HEAD: 09c81e2e06dabf7939e8fa749a15ee9ea8da4c9f
+Gateway module a yanzu yana da GET /catalog, POST /requests, GET /requests; har yanzu feature flag DAPP_SERVICE_V2_ENABLED false ne. Quote/Admin routes a OpenAPI su ne proposals kawai. App pages ɗin da aka duba suna nuna legacy static payment details kuma suna nuni da JS paths da GitHub file lookup bai samu ba a wannan snapshot; wannan ba live-browser proof ba ne.
+Muhimman iyakoki
+Kada a gudanar da SQL draft a Mainnet.
+Kada a gudanar da SQL draft a kowane Supabase environment har sai an sake duba live schema/migration history, an kammala review, sannan an bayar da izinin gwaji a environment da aka ayyana.
+OpenAPI routes candidates ne; ba hujja ba ce cewa duk routes suna cikin live API.
+Payment-intent/payment-evidence/bank-destination tables da endpoints ba su cikin migration ɗin nan; payment policy tana buƙatar ƙarin amincewa.
+ExistingAdminSession a OpenAPI placeholder ne. Dole a daidaita shi da ainihin ALBUKHR Admin middleware kafin implementation; ba a gano dedicated dApp service Admin workflow ba a Admin branch da aka duba.
+Ba a gyara identity RPC/security issue da aka ajiye domin daga baya ba.
+Ba a canja Dock Navigation, shared cores, financial/liquidity gateways ko current deployment ba.
+Mataki na gaba
+Source refresh na farko an yi shi read-only; mataki na gaba shi ne review na wannan contract/SQL, a sake tabbatar da repository SHAs kafin implementation, sannan a kulle Admin middleware contract da rollback plan. Sai bayan review da izini za a iya yin test a disposable/approved Testnet environment.
