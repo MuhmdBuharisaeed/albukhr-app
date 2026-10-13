@@ -1,8 +1,162 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Pi dApp Launch Service | ALBUKHR</title>
-<link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/albukhr-ui.css"><link rel="stylesheet" href="css/global-header.css">
-<style>.dsv{max-width:850px;margin:24px auto;padding:0 16px}.card{background:white;border:1px solid #dce7df;border-radius:14px;padding:18px;margin:14px 0}.field{display:grid;gap:6px;margin:12px 0}.field input,.field select,.field textarea{box-sizing:border-box;width:100%;padding:12px;border:1px solid #cbd7cf;border-radius:8px;font:inherit}.field textarea{min-height:120px}.go{background:#087a3e;color:white;border:0;border-radius:8px;padding:12px 16px;font-weight:700}.status{padding:12px;background:#f1f7f3;border-radius:8px;white-space:pre-wrap}.warn{padding:12px;background:#fff7e6;border-radius:8px}</style></head>
-<body><header class="header"><h1 class="brand">ALBUKHR</h1></header><main class="dsv"><a href="index.html">← ALBUKHR</a><h1>Pi dApp Launch Service</h1><p>Request Pi Studio assistance or a developer-built dApp. ALBUKHR reviews your scope and may issue a quote. Submission is not approval and does not guarantee Pi Network approval.</p><p class="warn"><b>Mainnet service.</b> Do not send Pi to a wallet or bank account based on a receipt upload. Payment is only through a server-verified accepted quote.</p>
-<section class="card"><h2>Submit a request</h2><div class="field"><label for="username">Pi username</label><input id="username" readonly placeholder="Verified by Pi sign-in"></div><div class="field"><label for="projectName">Project name</label><input id="projectName" maxlength="120" required></div><div class="field"><label for="serviceType">Service type</label><select id="serviceType"><option value="">Select service</option><option value="pi_studio">Pi Studio Assistance</option><option value="developer">Developer-built dApp</option></select></div><div class="field"><label for="description">Description and required features</label><textarea id="description" maxlength="4000"></textarea></div><div class="field"><label><input type="checkbox" id="consent"> I accept the <a href="pi-dapp-policy.html">service policy</a>. ALBUKHR assists but does not own my dApp; Pi Network approval is not guaranteed.</label></div><button id="submitRequest" class="go">Submit for review</button></section>
-<section class="card"><h2>Quote & payment</h2><p>An Admin must issue a quote first. Accept or decline it through My Requests. Pi checkout appears only when server-side payments are enabled.</p><a href="my-dapp-requests-v2.html">My dApp Requests →</a></section><div id="status" class="status" role="status" aria-live="polite">Initializing secure session…</div></main>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/core/environment-core.js"></script><script src="js/core/supabase-core.js"></script><script src="js/core/pi-auth-core.js"></script><script src="js/dapp-service-v2-page.js"></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0b5031">
+  <title>Pi dApp Launch Service | ALBUKHR</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/albukhr-ui.css">
+  <link rel="stylesheet" href="css/global-header.css">
+  <style>
+    /* Page-scoped UI. Do not change shared ALBUKHR components from this file. */
+    .dsv-page{--dsv-green:#087a3e;--dsv-deep:#073f29;--dsv-ink:#17251e;--dsv-muted:#607168;--dsv-line:#dfe9e3;--dsv-wash:#f4faf6;max-width:1080px;margin:0 auto;padding:24px 18px 56px;color:var(--dsv-ink)}
+    .dsv-page *{box-sizing:border-box}.dsv-page a{color:var(--dsv-green)}
+    .dsv-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
+    .dsv-back{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:14px;padding:8px 0}
+    .dsv-network{display:inline-flex;align-items:center;gap:7px;border:1px solid #b9ddc8;background:#eff9f2;color:#17683d;border-radius:999px;padding:7px 11px;font-size:11px;letter-spacing:.07em;font-weight:800;white-space:nowrap}
+    .dsv-network:before{content:"";width:7px;height:7px;border-radius:50%;background:#18a35b;box-shadow:0 0 0 3px #d7f3e1}
+    .dsv-hero{position:relative;overflow:hidden;border-radius:26px;background:radial-gradient(circle at 90% 12%,rgba(113,224,159,.24),transparent 29%),linear-gradient(120deg,#073f29,#0b6840 64%,#11804a);color:#fff;padding:clamp(24px,5vw,48px);box-shadow:0 20px 50px rgba(6,73,42,.16)}
+    .dsv-hero:after{content:"";position:absolute;width:230px;height:230px;border:1px solid rgba(255,255,255,.12);border-radius:50%;right:-92px;bottom:-126px;box-shadow:0 0 0 26px rgba(255,255,255,.025),0 0 0 54px rgba(255,255,255,.025);pointer-events:none}
+    .dsv-eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:800;color:#b9f3d0;margin:0 0 14px}
+    .dsv-hero h1{font-size:clamp(29px,5vw,46px);line-height:1.08;letter-spacing:-.035em;max-width:680px;margin:0 0 14px;color:#fff}
+    .dsv-hero p{font-size:clamp(14px,2vw,17px);line-height:1.7;max-width:680px;color:#e0f4e8;margin:0}
+    .dsv-hero-foot{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}
+    .dsv-hero-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid rgba(255,255,255,.23);border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;color:#f1fff6;font-weight:650}
+    .dsv-shell{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(250px,.8fr);gap:20px;align-items:start;margin-top:22px}
+    .dsv-main,.dsv-side{min-width:0}.dsv-panel{background:#fff;border:1px solid var(--dsv-line);border-radius:20px;padding:clamp(17px,3vw,26px);box-shadow:0 8px 26px rgba(20,54,34,.045)}
+    .dsv-panel+.dsv-panel{margin-top:16px}.dsv-panel-head{margin:0 0 19px}.dsv-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--dsv-green);font-weight:850;margin:0 0 7px}.dsv-panel h2{font-size:21px;line-height:1.25;margin:0;color:var(--dsv-ink);letter-spacing:-.02em}.dsv-panel-head p{color:var(--dsv-muted);font-size:13px;line-height:1.65;margin:8px 0 0}
+    .dsv-field{display:grid;gap:7px;margin:16px 0}.dsv-field label,.dsv-label{font-size:13px;color:#263b30;font-weight:750}.dsv-field input,.dsv-field select,.dsv-field textarea{width:100%;min-height:46px;border:1px solid #cfded4;border-radius:11px;background:#fff;color:var(--dsv-ink);padding:12px 13px;font:inherit;font-size:14px;outline:0;transition:border-color .15s,box-shadow .15s}.dsv-field textarea{min-height:128px;resize:vertical;line-height:1.55}.dsv-field input:focus,.dsv-field select:focus,.dsv-field textarea:focus{border-color:#16844b;box-shadow:0 0 0 3px rgba(22,132,75,.12)}.dsv-field input[readonly]{background:#f5f8f6;color:#58675e}
+    .dsv-help{font-size:12px;line-height:1.55;color:var(--dsv-muted);margin:0}.dsv-choice-list{display:grid;gap:11px}.dsv-choice{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr) 22px;align-items:start;gap:13px;padding:16px;border:1.5px solid #dfe9e3;border-radius:15px;background:#fff;cursor:pointer;transition:border-color .17s,background .17s,box-shadow .17s}.dsv-choice:hover{border-color:#8fcba7;background:#fbfefc}.dsv-choice:has(input:checked){border-color:#16844b;background:#f0faf3;box-shadow:0 0 0 3px rgba(22,132,75,.08)}.dsv-choice input{position:absolute;opacity:0;pointer-events:none}.dsv-choice:focus-within{outline:3px solid rgba(22,132,75,.18);outline-offset:2px}.dsv-choice-icon{height:44px;width:44px;border-radius:13px;display:grid;place-items:center;background:#e8f6ed;color:#087a3e;font-size:20px;font-weight:850}.dsv-choice-title{font-size:14px;line-height:1.35;font-weight:850;color:#1b2d22;margin:0 0 5px}.dsv-choice-copy{font-size:12px;line-height:1.6;color:#627168;margin:0}.dsv-choice-mark{border:1.5px solid #b8c9be;border-radius:50%;width:19px;height:19px;margin-top:2px;background:#fff}.dsv-choice input:checked~.dsv-choice-mark{border:6px solid #16844b}
+    .dsv-rule{display:flex;align-items:flex-start;gap:10px;padding:13px;border:1px solid #deebe2;background:#f5faf6;border-radius:12px;margin:15px 0}.dsv-rule-symbol{flex:0 0 24px;width:24px;height:24px;border-radius:7px;background:#dfefe4;color:#17683d;display:grid;place-items:center;font-weight:900;font-size:13px}.dsv-rule strong{display:block;font-size:12px;color:#284335;margin:0 0 3px}.dsv-rule p{font-size:12px;line-height:1.55;margin:0;color:#607168}
+    .dsv-owner-box{display:none;margin-top:14px;padding:15px;border:1px solid #cde6d5;border-radius:14px;background:#f6fcf7}.dsv-owner-box.is-visible{display:block}.dsv-owner-box h3{font-size:14px;margin:0 0 6px}.dsv-owner-box p{font-size:12px;line-height:1.6;color:#5a6b60;margin:0 0 10px}.dsv-inline-status{padding:11px 12px;border-radius:10px;background:#eef5f0;color:#42554a;font-size:12px;line-height:1.55;white-space:pre-wrap}.dsv-inline-status[data-kind="error"]{background:#fff1ef;color:#9a2b21}.dsv-inline-status[data-kind="success"]{background:#eaf8ef;color:#166638}.dsv-inline-status[data-kind="warning"]{background:#fff7e7;color:#755016}
+    .dsv-consent{display:flex;align-items:flex-start;gap:10px;margin:18px 0;color:#53655b;font-size:12px;line-height:1.6}.dsv-consent input{margin-top:3px;width:17px;height:17px;accent-color:#087a3e;flex:0 0 auto}.dsv-submit{width:100%;min-height:49px;border:0;border-radius:12px;padding:13px 16px;background:linear-gradient(120deg,#087a3e,#0d8d4a);color:#fff;font-size:14px;font-weight:850;cursor:pointer;box-shadow:0 7px 16px rgba(8,122,62,.18);transition:transform .15s,filter .15s}.dsv-submit:hover{filter:brightness(1.04);transform:translateY(-1px)}.dsv-submit:disabled{opacity:.6;cursor:wait;transform:none;box-shadow:none}.dsv-link-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;border:1px solid #cfe0d4;border-radius:11px;padding:10px 13px;text-decoration:none;font-size:13px;font-weight:800;background:#fff}.dsv-micro{font-size:11px;line-height:1.6;color:#6b7b71;margin:10px 0 0}
+    .dsv-side-card{border-radius:20px;padding:22px;background:linear-gradient(150deg,#f0f9f3,#fff);border:1px solid #dcebe0}.dsv-side-card h2{font-size:17px;margin:0 0 8px;letter-spacing:-.02em}.dsv-side-card>p{font-size:12px;line-height:1.65;margin:0;color:#617167}.dsv-steps{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:14px}.dsv-steps li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start}.dsv-stepnum{width:29px;height:29px;border-radius:10px;background:#deefe4;color:#17683d;display:grid;place-items:center;font-size:12px;font-weight:900}.dsv-steptext strong{display:block;font-size:12px;color:#25392d;margin:1px 0 4px}.dsv-steptext span{display:block;color:#67766d;font-size:11px;line-height:1.55}.dsv-side-note{margin-top:15px;border-top:1px solid #dce9e0;padding-top:14px;font-size:11px;line-height:1.65;color:#67766d}.dsv-quote-card{margin-top:16px;background:#fff;border:1px solid var(--dsv-line);border-radius:16px;padding:18px}.dsv-quote-card h3{font-size:14px;margin:0 0 6px}.dsv-quote-card p{font-size:12px;line-height:1.6;color:#68776e;margin:0 0 12px}.dsv-quote-card a{font-size:12px;font-weight:800;text-decoration:none}
+    .dsv-auth-strip{display:flex;gap:11px;align-items:center;padding:13px 15px;border:1px solid var(--dsv-line);border-radius:14px;margin:0 0 16px;background:#fff}.dsv-auth-avatar{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#e6f4ea;color:#087a3e;font-weight:900}.dsv-auth-data{min-width:0;flex:1}.dsv-auth-data strong{display:block;font-size:13px;overflow-wrap:anywhere}.dsv-auth-data span{display:block;font-size:11px;color:#6a7a70;margin-top:4px}.dsv-auth-tag{font-size:10px;font-weight:850;letter-spacing:.05em;border-radius:999px;padding:6px 8px;color:#17683d;background:#eaf8ef;white-space:nowrap}
+    .dsv-status-wrap{margin-top:16px}.dsv-status-wrap[hidden]{display:none}.dsv-mobile-only{display:none}
+    @media(max-width:820px){.dsv-shell{grid-template-columns:1fr}.dsv-side{order:2}.dsv-main{order:1}.dsv-side-card{padding:18px}.dsv-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.dsv-steps li{grid-template-columns:28px minmax(0,1fr);gap:7px}.dsv-side-note{margin-top:12px}.dsv-quote-card{margin-top:12px}}
+    @media(max-width:520px){.dsv-page{padding:14px 12px 36px}.dsv-hero{border-radius:21px;padding:24px 20px}.dsv-hero h1{font-size:31px}.dsv-hero-foot{gap:7px}.dsv-hero-chip{font-size:10px;padding:7px 9px}.dsv-panel{padding:16px;border-radius:17px}.dsv-choice{grid-template-columns:39px minmax(0,1fr) 18px;gap:10px;padding:13px}.dsv-choice-icon{width:39px;height:39px;border-radius:11px;font-size:18px}.dsv-choice-title{font-size:13px}.dsv-choice-copy{font-size:11px}.dsv-steps{grid-template-columns:1fr;gap:12px}.dsv-steps li{grid-template-columns:30px minmax(0,1fr);gap:10px}.dsv-auth-tag{display:none}.dsv-topline{margin-bottom:12px}}
+    @media(prefers-reduced-motion:reduce){.dsv-page *{transition:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <header class="header"><h1 class="brand">ALBUKHR</h1></header>
+  <main class="dsv-page">
+    <div class="dsv-topline">
+      <a class="dsv-back" href="index.html" aria-label="Back to ALBUKHR">← <span>ALBUKHR</span></a>
+      <span class="dsv-network" id="networkPill">MAINNET SERVICE</span>
+    </div>
+
+    <section class="dsv-hero" aria-labelledby="dsvHeroTitle">
+      <p class="dsv-eyebrow">ALBUKHR • BUILD &amp; LAUNCH</p>
+      <h1 id="dsvHeroTitle">Bring your Pi dApp idea to life.</h1>
+      <p>Get help launching through Pi Studio, work with developers, or request a dedicated app for a project you manage in the ALBUKHR ecosystem.</p>
+      <div class="dsv-hero-foot">
+        <span class="dsv-hero-chip">✓ Guided request process</span>
+        <span class="dsv-hero-chip">◇ Quote before payment</span>
+        <span class="dsv-hero-chip">⌁ Progress in My Requests</span>
+      </div>
+    </section>
+
+    <div class="dsv-shell">
+      <div class="dsv-main">
+        <div class="dsv-auth-strip" aria-live="polite">
+          <div class="dsv-auth-avatar" id="authAvatar">A</div>
+          <div class="dsv-auth-data"><strong id="username">Checking Pi sign-in…</strong><span id="authCaption">Secure Mainnet identity verification</span></div>
+          <span class="dsv-auth-tag" id="authTag">CHECKING</span>
+        </div>
+
+        <section class="dsv-panel" aria-labelledby="dsvServicesTitle">
+          <div class="dsv-panel-head">
+            <p class="dsv-kicker">Step 1 of 3</p>
+            <h2 id="dsvServicesTitle">Which service fits your idea?</h2>
+            <p>Choose one route. You can describe your requirements in the next step.</p>
+          </div>
+          <fieldset style="border:0;padding:0;margin:0;min-width:0">
+            <legend class="dsv-label" style="margin-bottom:10px">Select a service</legend>
+            <div class="dsv-choice-list" id="serviceChoices">
+              <label class="dsv-choice" for="servicePiStudio">
+                <input id="servicePiStudio" type="radio" name="serviceType" value="pi_studio">
+                <span class="dsv-choice-icon" aria-hidden="true">◈</span>
+                <span><span class="dsv-choice-title">Pi Studio Assistance</span><span class="dsv-choice-copy">Guidance to prepare and launch your dApp through Pi Studio. Best when you want help with the Pi Studio route.</span></span>
+                <span class="dsv-choice-mark" aria-hidden="true"></span>
+              </label>
+              <label class="dsv-choice" for="serviceDeveloper">
+                <input id="serviceDeveloper" type="radio" name="serviceType" value="developer">
+                <span class="dsv-choice-icon" aria-hidden="true">&lt;/&gt;</span>
+                <span><span class="dsv-choice-title">Developer-built dApp</span><span class="dsv-choice-copy">Request a custom dApp built by developers. You do not need to own a project in ALBUKHR to use this service.</span></span>
+                <span class="dsv-choice-mark" aria-hidden="true"></span>
+              </label>
+              <label class="dsv-choice" for="serviceAlbukhrProject">
+                <input id="serviceAlbukhrProject" type="radio" name="serviceType" value="albukhr_project">
+                <span class="dsv-choice-icon" aria-hidden="true">▦</span>
+                <span><span class="dsv-choice-title">Build an App for My ALBUKHR Project</span><span class="dsv-choice-copy">For an authorized project owner or manager. We will check your access and connect the request to the correct project.</span></span>
+                <span class="dsv-choice-mark" aria-hidden="true"></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="dsv-owner-box" id="ownerProjectBox" aria-live="polite">
+            <h3>Choose your project</h3>
+            <p>Only projects you are authorized to manage should appear here. If you do not yet have an ALBUKHR project, you can start external project registration.</p>
+            <div class="dsv-inline-status" id="projectLookupStatus" data-kind="info">Checking project access…</div>
+            <div class="dsv-field" id="projectSelectWrap" hidden>
+              <label for="ownedProjectSelect">Project</label>
+              <select id="ownedProjectSelect"><option value="">Select an authorized project</option></select>
+            </div>
+            <a class="dsv-link-button" id="externalRegistrationLink" href="external-create.html" hidden>Register an External Project →</a>
+          </div>
+
+          <div class="dsv-rule">
+            <span class="dsv-rule-symbol" aria-hidden="true">i</span>
+            <div><strong>Every request is reviewed first</strong><p>Submitting a request does not mean it has been approved and does not guarantee Pi Network approval. A quote must be issued before any payment is considered.</p></div>
+          </div>
+        </section>
+
+        <section class="dsv-panel" aria-labelledby="dsvDetailsTitle">
+          <div class="dsv-panel-head">
+            <p class="dsv-kicker">Step 2 of 3</p>
+            <h2 id="dsvDetailsTitle">Tell us what you need</h2>
+            <p>Give enough detail for the team to understand your use case and required features.</p>
+          </div>
+          <form id="dappRequestForm" novalidate>
+            <div class="dsv-field"><label for="projectName">App or project name</label><input id="projectName" name="projectName" maxlength="120" required placeholder="e.g. My Business dApp" autocomplete="organization-title"><p class="dsv-help" id="projectNameHelp">Use the name you want associated with this dApp request.</p></div>
+            <div class="dsv-field"><label for="description">Requirements and key features</label><textarea id="description" name="description" maxlength="4000" required placeholder="What should the app do? Who will use it? What screens or features are essential?"></textarea><p class="dsv-help">Include the main purpose, intended users, essential screens and any integration requirements.</p></div>
+            <div class="dsv-field" id="selectedProjectSummaryWrap" hidden><label>Linked ALBUKHR project</label><input id="selectedProjectSummary" readonly aria-readonly="true"><p class="dsv-help">The server must verify this project association when you submit.</p></div>
+            <label class="dsv-consent"><input type="checkbox" id="consent" required><span>I accept the <a href="pi-dapp-policy.html" target="_blank" rel="noopener">Pi dApp service policy</a>. ALBUKHR assists with the process but does not own my dApp, and Pi Network approval is not guaranteed.</span></label>
+            <button class="dsv-submit" id="submitRequest" type="submit">Submit request for review <span aria-hidden="true">→</span></button>
+            <p class="dsv-micro">Your Pi identity is verified by the secure sign-in session. Do not send Pi or bank payments based on a screenshot or receipt upload.</p>
+          </form>
+          <div class="dsv-status-wrap" id="statusWrap" hidden><div class="dsv-inline-status" id="status" role="status" aria-live="polite">Initializing secure session…</div></div>
+        </section>
+      </div>
+
+      <aside class="dsv-side" aria-label="How the service works">
+        <section class="dsv-side-card">
+          <p class="dsv-kicker">Step 3 of 3</p>
+          <h2>What happens next?</h2>
+          <p>ALBUKHR reviews the details and guides you through the next steps.</p>
+          <ol class="dsv-steps">
+            <li><span class="dsv-stepnum">1</span><span class="dsv-steptext"><strong>Submit your request</strong><span>Tell us which route you need and what the app should do.</span></span></li>
+            <li><span class="dsv-stepnum">2</span><span class="dsv-steptext"><strong>Admin review &amp; quote</strong><span>The team reviews scope and may request more information or issue a quote.</span></span></li>
+            <li><span class="dsv-stepnum">3</span><span class="dsv-steptext"><strong>Follow progress</strong><span>Check status, quotes and payment eligibility in My dApp Requests.</span></span></li>
+          </ol>
+          <div class="dsv-side-note"><strong>Payment safety:</strong> Pi checkout appears only when the server confirms payment is enabled and an accepted quote is payable. This page never enables payments itself.</div>
+        </section>
+        <section class="dsv-quote-card">
+          <h3>Already submitted a request?</h3>
+          <p>Return to your request history to check updates, review quotes and respond when an action is required.</p>
+          <a href="my-dapp-requests-v2.html">Open My dApp Requests →</a>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/core/environment-core.js"></script>
+  <script src="js/core/supabase-core.js"></script>
+  <script src="js/core/pi-auth-core.js"></script>
+  <script src="js/dapp-service-v2-page.js"></script>
+</body>
+</html>
