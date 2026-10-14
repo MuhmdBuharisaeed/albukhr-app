@@ -46,9 +46,9 @@
     if (!piAuth.isAuthenticated() || !piAuth.getPiUid() || !piAuth.getAccessToken()) {
       throw new Error("Open ALBUKHR in Pi Browser and sign in with Pi to continue.");
     }
-    const username = "@" + String(piAuth.getUsername() || "").replace(/^@/, "");
-    $("username").textContent = username || "Verified Pi user";
-    $("authAvatar").textContent = String(piAuth.getUsername() || "A").replace(/^@/, "").charAt(0).toUpperCase() || "A";
+    const handle = String(piAuth.getUsername() || "").replace(/^@/, "").trim();
+    $("username").textContent = handle ? "@" + handle : "Verified Pi user";
+    $("authAvatar").textContent = handle.charAt(0).toUpperCase() || "A";
     $("authCaption").textContent = "Pi identity verified for this session";
     $("authTag").textContent = "VERIFIED";
     return piAuth;
@@ -116,7 +116,7 @@
     $("externalRegistrationLink").hidden = true;
     $("ownedProjectSelect").innerHTML = '<option value="">Select an authorized project</option>';
     $("projectName").value = "";
-    projectStatus("Verifying your project-management access with ALBUKHR…", "info");
+    projectStatus("Verifying direct project ownership with ALBUKHR…", "info");
 
     try {
       // This endpoint is part of the staged API addition; it is not in the current production gateway.
@@ -124,9 +124,9 @@
       if (sequence !== projectLookupSequence || selectedType() !== "albukhr_project") return;
 
       const projects = Array.isArray(result.projects) ? result.projects : [];
-      ownedProjects = projects.filter(p => p && typeof p.id === "string" && typeof p.name === "string");
+      ownedProjects = projects.filter(p => p && typeof p.id === "string" && typeof p.name === "string" && ["internal", "external"].includes(p.project_type) && ["approved", "active"].includes(p.status));
       if (!ownedProjects.length) {
-        projectStatus("No eligible Internal or External project was found for your verified owner identity. Manager-permission verification is not connected yet, so this does not prove that you have no project. Core projects are managed by the ALBUKHR Team and are not available in this service path. If you believe you own an Internal or registered External project, contact ALBUKHR Admin to verify its ownership link; otherwise you can register an External Project below.", "warning");
+        projectStatus("No eligible Internal or External project directly owned by this verified ALBUKHR account was found. You can register an external project and return after approval.", "warning");
         $("externalRegistrationLink").hidden = false;
         return;
       }
@@ -140,7 +140,7 @@
       $("projectSelectWrap").hidden = false;
       projectStatus(ownedProjects.length === 1
         ? "One project is available to this account. Confirm it below."
-        : "Select the Internal or registered External project linked to your verified owner identity.", "success");
+        : "Select a project directly owned by your verified ALBUKHR account.", "success");
       if (ownedProjects.length === 1) {
         $("ownedProjectSelect").value = ownedProjects[0].id;
         applySelectedProject();
@@ -148,7 +148,7 @@
     } catch (error) {
       if (sequence !== projectLookupSequence || selectedType() !== "albukhr_project") return;
       // Do not mistake an unavailable API for a person having no project.
-      projectStatus("Project access verification is not connected yet. Your eligibility has not been determined. Use one of the existing services, or try again after the project-access API is enabled.", "error");
+      projectStatus("ALBUKHR could not verify project ownership right now. Your eligibility is unknown; no request was submitted. Please retry later or use one of the existing services.", "error");
       console.warn("[ALBUKHR DApp Service] Project eligibility check unavailable:", error && error.message);
     }
   }
@@ -192,27 +192,33 @@
       if (!projectName || !description) throw new Error("Enter the app/project name and describe the required features.");
       if (!consentAccepted) throw new Error("Please accept the service policy before submitting.");
 
-      let payload = {
-        projectName,
-        description,
-        serviceType: type,
-        consentAccepted: true,
-        consentVersion: CONSENT
-      };
+      let result;
+      button.disabled = true;
+      button.textContent = "Submitting securely…";
 
       if (type === "albukhr_project") {
         const project = selectedProject();
-        if (!project) throw new Error("Select a project returned by ALBUKHR's eligibility check before submitting.");
-        // These fields require the corresponding additive API/schema update. Do not silently fall back.
-        payload.projectId = project.id;
-        payload.projectType = cleanText(project.project_type, 30);
-      } else if (!["pi_studio", "developer"].includes(type)) {
+        if (!project || !["internal", "external"].includes(project.project_type)) {
+          throw new Error("Select a verified Internal or External project before submitting.");
+        }
+        // Project identity and ownership are re-verified by the API; the browser sends only the project ID.
+        result = await api("/requests/project", {
+          projectId: project.id,
+          description,
+          consentAccepted: true,
+          consentVersion: CONSENT
+        }, "POST");
+      } else if (["pi_studio", "developer"].includes(type)) {
+        result = await api("/requests", {
+          projectName,
+          description,
+          serviceType: type,
+          consentAccepted: true,
+          consentVersion: CONSENT
+        }, "POST");
+      } else {
         throw new Error("Unsupported service selection.");
       }
-
-      button.disabled = true;
-      button.textContent = "Submitting securely…";
-      const result = await api("/requests", payload, "POST");
       const reference = result.request && result.request.id ? result.request.id : "submitted";
       status("Request submitted successfully. Reference: " + reference + ". Open My dApp Requests to follow updates.", "success");
       $("projectName").value = "";
