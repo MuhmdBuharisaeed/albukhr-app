@@ -91,7 +91,7 @@
               <label class="dsv-choice" for="serviceAlbukhrProject">
                 <input id="serviceAlbukhrProject" type="radio" name="serviceType" value="albukhr_project">
                 <span class="dsv-choice-icon" aria-hidden="true">▦</span>
-                <span><span class="dsv-choice-title">Build an App for My ALBUKHR Project</span><span class="dsv-choice-copy">For an authorized project owner or manager. We will check your access and connect the request to the correct project.</span></span>
+                <span><span class="dsv-choice-title">Build an App for My ALBUKHR Project</span><span class="dsv-choice-copy">For a verified owner of an eligible Internal or External ALBUKHR project. Core projects are managed by the ALBUKHR Team and are not selectable here.</span></span>
                 <span class="dsv-choice-mark" aria-hidden="true"></span>
               </label>
             </div>
@@ -99,11 +99,11 @@
 
           <div class="dsv-owner-box" id="ownerProjectBox" aria-live="polite">
             <h3>Choose your project</h3>
-            <p>Only projects you are authorized to manage should appear here. If you do not yet have an ALBUKHR project, you can start external project registration.</p>
+            <p>Only approved Internal and External projects directly owned by your verified ALBUKHR account appear here. Core projects are reserved for the ALBUKHR Team. Manager access is not enabled in this pathway yet. If you do not yet have an eligible project, you can start external project registration.</p>
             <div class="dsv-inline-status" id="projectLookupStatus" data-kind="info">Checking project access…</div>
             <div class="dsv-field" id="projectSelectWrap" hidden>
               <label for="ownedProjectSelect">Project</label>
-              <select id="ownedProjectSelect"><option value="">Select an authorized project</option></select>
+              <select id="ownedProjectSelect"><option value="">Select a directly owned project</option></select>
             </div>
             <a class="dsv-link-button" id="externalRegistrationLink" href="external-create.html" hidden>Register an External Project →</a>
           </div>
