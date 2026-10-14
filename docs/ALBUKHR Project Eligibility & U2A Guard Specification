@@ -1,0 +1,194 @@
+ALBUKHR Project Eligibility & U2A Guard Specification
+Version: 1.0
+Status: Read-only audit / implementation proposal — NOT approved for deployment
+Scope: Core, Internal, External Projects; Mainnet and Testnet; dApp Launch Service separation
+Change controls: No GitHub writes, Supabase writes/migrations, Storage changes, live Pi payments, or deployment are authorized by this document.
+1. Purpose
+Ensure no ALBUKHR project can accept a Mainnet investment/staking payment unless the authoritative Mainnet project record is ACTIVE and all applicable investment-readiness gates pass. Projects in APPROVED status may be tested in the ALBUKHR Testnet environment only, using Testnet-only infrastructure and data.
+This contract must be enforced in the browser, API gateway, and settlement RPC/database transaction. UI-only protection is not sufficient.
+2. Binding eligibility matrix
+Network
+Project type
+Project status
+Permitted activity
+Required enforcement
+Mainnet
+Core
+active
+Mainnet investment/staking may proceed only if all other gates pass
+Core-only Mainnet API and settlement contract
+Mainnet
+Internal
+active
+Mainnet investment/staking may proceed only if all other gates pass
+Contributor Internal API and settlement contract
+Mainnet
+External
+active
+Only after a dedicated External investment gateway/settlement contract exists and all external readiness gates pass
+External-specific server and database checks; never route through the Core staking engine
+Mainnet
+Core/Internal/External
+approved, draft, restricted, paused, suspended, closed, unknown/null
+Reject new investment/staking
+Reject before invoking Pi SDK, and independently reject at the API and database settlement layers
+Testnet
+Core/Internal/External
+approved or active
+Test-only U2A/staking flow, when the dedicated Testnet testing gateway is implemented/enabled
+Pi Testnet only, Testnet API and Supabase only, test-only records and clearly marked UI
+Testnet
+Core/Internal/External
+other/unknown status
+Reject test investment unless a separately defined QA fixture rule explicitly permits it
+Testnet server-side check
+Any
+dApp Launch Service
+request/quote/payment statuses
+Pay only for the accepted service quote; do not create an investment stake
+Dedicated dApp Service payment tables, RPCs and API flow
+Any
+Project liquidity contribution
+Project and treasury readiness determines eligibility
+Settle as liquidity only; must not implicitly create an investor stake
+Dedicated liquidity payment flow and liquidity settlement only
+Approved does not equal Active. Testnet's approved-project exception is a testing-only policy, not a Mainnet exception and not a way to activate the production project.
+3. Authoritative decision sequence
+For Mainnet Core/Internal/External investment, the server must evaluate in this order:
+Authenticate the Pi access token against the Pi Platform API and derive the UID from that verified response. Never trust a UID supplied by the browser.
+Derive the network from the deployed gateway configuration. Do not allow request-body network to switch the server's target database or Pi API.
+Load the authoritative project using its stable database ID/code and the expected network.
+Confirm the exact allowed project type and registration source. No type fall-through to Core.
+Require project.status = 'active' for every Mainnet investment/staking route.
+Confirm investment is enabled for that project/activity and the correct published, effective staking term exists for the exact project and requested duration.
+Confirm treasury/network/wallet and all required liquidity/readiness conditions for the applicable project type.
+Verify the Pi PaymentDTO server-side: payment ID, U2A direction, expected network, exact sender UID, amount, recipient, payment status, project/action metadata, and accepted term/contract version.
+Approve/completion-confirm via the Pi Platform API and re-read payment state after completion.
+In one authoritative database transaction, settle the verified payment and create at most one stake. A failed gate must leave no stake and no partial financial ledger effect.
+Return a success response only after the authoritative settlement RPC confirms success.
+The browser may make the user experience clearer, but cannot override any of these gates.
+4. Project-type boundaries
+4.1 Core
+Existing pathway reviewed:
+Frontend: albukhr-app/js/staking.js
+Project page: albukhr-app/js/project.js
+API: albukhr-api/src/financial-gateway.js
+Mainnet settlement: public.create_stake_from_completed_payment and public.settle_project_liquidity_payment
+Existing source checks include Mainnet-only behavior, Core project identity, ACTIVE status, published staking terms, treasury, and idempotent payment/stake handling in the settlement functions. Preserve the Core contract; do not broaden the Core route to accept Internal/External projects.
+4.2 Internal / Contributor Internal
+Existing pathway reviewed:
+Frontend: albukhr-app/js/internal-staking.js
+API: albukhr-api/src/internal-investment-gateway.js
+Mainnet settlement: public.create_internal_stake_from_completed_payment
+Existing checks include project_type = internal, registration_source = contributor_internal, Mainnet network, ACTIVE status, treasury readiness, liquidity threshold, published term and owner/identity-specific protections in the applicable liquidity path. Preserve these checks and close sender UID validation gaps described in Section 7.
+4.3 External Projects
+The read-only repository review did not identify a dedicated External investment/staking API and settlement RPC equivalent to the Core and Internal pathways. The Marketplace engine checks that a project is active, but delegates to the Core staking engine. The Core gateway then rejects non-Core project types. This can reject the attempted investment server-side, but it may do so only after the user has started a Pi payment, creating a risk of an incomplete/pending payment.
+Before External investment is enabled:
+Add a project-type guard in the Marketplace/user flow before Pi.createPayment.
+Create a dedicated External investment gateway and settlement contract, if investment in External Projects is part of the approved business model.
+Bind external application, converted project ID, External readiness/activation record, treasury/custody model, published terms, and payment ID server-side.
+Require Mainnet External project status active; approved applications or registry records must be rejected for Mainnet investment.
+Revalidate External eligibility at both approval and completion, not just when the payment starts.
+Never let an External payment write Core liquidity/stake tables unless an explicitly reviewed contract defines that relationship.
+External activation must remain distinct from merely approving an external application.
+5. Testnet-only testing pathway
+The current Testnet UI inspected (test-albukhr-app/index.html and test-albukhr-app/project.html) explicitly says Investment/Staking are LOCKED / not enabled. The current Testnet API code reviewed includes a Testnet-only project-liquidity payment router, not an investor staking gateway. Therefore the desired APPROVED-project staking test exception is not implemented/available in the inspected Testnet UI today.
+If authorized for future development, build a dedicated testing flow with these controls:
+Environment must be testnet; Testnet Supabase Core must report network = testnet.
+Use Pi SDK sandbox/Testnet configuration and the Testnet Pi Platform/Horizon endpoints only.
+Project record must be loaded from Testnet public.projects; never look up a Mainnet project as a fallback.
+For test investment only, accept project status approved or active according to this policy. Do not mutate Mainnet project status to achieve this.
+Use a Testnet-specific payment route and test settlement function; do not call the Mainnet /api/pi-payment-approve, /api/pi-payment-complete, or Mainnet settlement RPCs.
+Persist only Testnet payment/stake rows in the Testnet database. Ensure every query/write is scoped to network = 'testnet' even where the database is already dedicated to Testnet.
+Label the UI and records as TESTNET / TEST ONLY — NO MAINNET VALUE.
+Do not allow testing to call Mainnet treasury, production fee/settlement functions, or Mainnet payout paths.
+A Testnet transaction may test the Pi Testnet blockchain but does not prove Mainnet incoming-multisig readiness, Mainnet treasury configuration, or production liquidity readiness.
+Keep the Testnet investment gateway disabled until the test contract, auth/session checks, server verification, recovery and regression tests are approved.
+6. dApp Launch Service and liquidity separation
+The dApp Launch Service has its own request/quote/payment model and dedicated payment functions:
+Mainnet API: albukhr-api/src/dapp-service-v2-gateway.js (gateway disabled by default unless DAPP_SERVICE_V2_ENABLED=true; Pi payments also require separate enablement).
+Tables: dapp_service_requests, dapp_service_quotes, dapp_service_payments, dapp_service_audit_events.
+Settlement/status functions include dapp_service_prepare_pi_payment, dapp_service_record_pi_approval, dapp_service_confirm_pi_payment, and dapp_service_fail_pi_payment.
+Rules:
+dApp service payments pay an accepted quote for the service. They must not create a stake or settle Core/Internal/External investment.
+Payment status, request status, quote status and delivery status remain separate.
+Keep the service gateway and payment channel disabled until independently reviewed and expressly enabled.
+Keep existing Pi Studio Assistance and Developer-built dApp workflows separate from the albukhr_project project pathway; Core projects are excluded from the Build an App for My ALBUKHR Project pathway.
+Project liquidity contributions update the applicable project-liquidity ledger and treasury only. Liquidity completion must not silently create an investor stake.
+7. High-priority payment verification hardening
+The Mainnet Core and Internal investment gateways contain an assertSender pattern that rejects a mismatch when a sender UID is present, but does not reject a missing sender UID. Before live U2A is enabled, require a non-empty server-returned Pi payment sender UID and exact equality with the UID derived from the verified bearer token.
+Also require, using fields supported by the actual Pi PaymentDTO/API response:
+U2A direction is exactly correct.
+Payment network is explicitly verified as the expected network; missing/unknown network must fail closed unless the authoritative Pi API contract documents that field as legitimately absent and another server-side proof is used.
+Recipient must be present and exactly equal the expected treasury/app wallet before approval and after completion.
+Completion txid matches the verified Pi payment transaction; a client-supplied txid alone is never proof.
+Payment status is valid for the requested transition; approved/completed retries must be idempotent and state-aware.
+Payment metadata and accepted staking-term version match the persisted investment intent. Do not silently settle under a newer staking-term version than the one the user accepted.
+A duplicate payment ID cannot be rebound to a different UID, project, network, amount, recipient, duration, quote or term version.
+These are proposed requirements for future patches; this document does not change the code.
+8. Acceptance and regression tests
+All tests should use controlled fixtures and Testnet-only payment simulation until production approval. Test cases should include at least:
+Mainnet status gates
+Core + approved → API approval rejected; no successful stake.
+Internal + approved → API approval rejected; no successful stake.
+External + approved → rejected before Pi SDK launch and by any server route.
+Core/Internal/External + draft, restricted, paused, suspended, closed, missing or unknown status → reject.
+Each eligible project type + active but missing/expired terms → reject.
+active project with wrong/missing treasury, inadequate liquidity, mismatched project identity, or missing required readiness state → reject.
+Change status from active to a blocking status between approval and completion → completion rejects and no stake is created.
+Call the Mainnet Core route with an Internal/External project ID/code → reject; no cross-type fallback.
+Network isolation
+Testnet token/session against Mainnet API → reject.
+Mainnet token against Testnet gateway → reject.
+Testnet request body claiming network=mainnet → cannot change Testnet server configuration/data source.
+Testnet payment ID or row provided to Mainnet settlement → reject.
+Confirm all Testnet test stakes/payment records remain in Testnet Supabase only.
+Pi payment verification and recovery
+Missing sender UID → reject approval and completion.
+Sender UID mismatches verified bearer UID → reject.
+Missing/wrong payment direction, unexpected/missing network, wrong amount, wrong recipient, project metadata, duration or term version → reject.
+Cancelled/failed/unapproved payment → must not create a stake.
+Completion with wrong txid or transaction not verified by Pi → reject.
+Repeat approval callback, repeat completion callback and two simultaneous completion requests → no duplicate stake or duplicate settlement ledger entry.
+Pi payment is approved or transaction was submitted but HTTP/network response was lost → recover from authoritative Pi state; do not start a second payment blindly.
+Incomplete payment callback must trigger a controlled recovery process, not only write to browser console.
+Database failure after Pi completion → record recoverable state; user must not be told settlement succeeded unless settlement can be confirmed on retry.
+Service separation
+dApp service quote payment completes → dApp Service records update; no stake is created.
+Liquidity payment completes → applicable liquidity/treasury ledger updates only; no investor stake is created by that path.
+Pi dApp Launch Service payment channels remain disabled until separate approval.
+External readiness approval does not itself turn on staking unless a separate authorized activation transition and dedicated External investment route both permit it.
+Authorization
+anon and authenticated cannot execute service-role-only settlement RPCs.
+Invalid/expired Pi token, missing UID, and cross-user payment ID cannot settle funds for another user.
+No error/recovery path bypasses canonical auth, network checks, server-side status checks or transaction audit.
+9. Findings from the inspected code/database
+Core UI and Core gateway enforce ACTIVE, and the Core settlement RPC rechecks project status/type/network.
+Internal UI/gateway/settlement pathway also enforces ACTIVE, internal project type and contributor_internal registration source.
+Mainnet Core/Internal settlement RPC execution privileges were observed as service-role-only; anon and authenticated cannot execute them directly.
+The inspected External project workflow includes a separate activation readiness process, but a dedicated External investment/staking gateway and settlement function were not identified in this read-only review.
+The inspected Testnet project UI says investment/staking are locked, and the Testnet API route inspected handles liquidity contributions rather than investor stake creation.
+Mainnet project status counts at audit time: 5 Core approved, 2 Core draft, 1 Internal approved; no active or External project rows were present in the query result.
+Testnet project status counts at audit time: 5 Core approved, 1 Internal approved; no active or External project rows were present in the query result.
+Mainnet dApp Service table counts at audit time: 1 request, 0 quotes, 0 payments. This describes those tables only; it does not by itself establish any broader payment history.
+10. Proposed implementation sequence
+Phase A — No-write review: approve or amend this contract; capture exact production/Testnet branch and deployment SHAs; verify the complete Pi PaymentDTO schema and all routes that can create a stake.
+Phase B — Patch proposal only: draft minimal additive patches and SQL migration proposals for (1) fail-closed sender/network/direction/recipient/term validation, (2) incomplete-payment recovery/idempotency, (3) pre-payment project-type/status guards, (4) dedicated External investment path if required, and (5) dedicated Testnet approved-project testing path. Do not apply these changes yet.
+Phase C — Disposable Testnet QA: use Testnet-only project/payment fixtures; test all acceptance cases above, including retries, network failure, wrong identity and duplicate callbacks. Do not use Mainnet Pi or Mainnet Supabase for QA.
+Phase D — Separate explicit go-live approval: only after test results, Mainnet Incoming Multisig Wallet approval/connection, treasury mapping, Mainnet verification and deployment plan are reviewed. No production payment enablement occurs under this proposal alone.
+11. Source files inspected
+Core frontend: https://github.com/MuhmdBuharisaeed/albukhr-app/blob/main/js/staking.js
+Project page: https://github.com/MuhmdBuharisaeed/albukhr-app/blob/main/js/project.js
+Marketplace: https://github.com/MuhmdBuharisaeed/albukhr-app/blob/main/js/marketplace/marketplace-engine.js
+Internal frontend: https://github.com/MuhmdBuharisaeed/albukhr-app/blob/main/js/internal-staking.js
+Core API: https://github.com/MuhmdBuharisaeed/albukhr-api/blob/main/src/financial-gateway.js
+Internal API: https://github.com/MuhmdBuharisaeed/albukhr-api/blob/main/src/internal-investment-gateway.js
+External API mount: https://github.com/MuhmdBuharisaeed/albukhr-api/blob/main/server.js
+dApp Service API: https://github.com/MuhmdBuharisaeed/albukhr-api/blob/main/src/dapp-service-v2-gateway.js
+dApp Service project pathway: https://github.com/MuhmdBuharisaeed/albukhr-api/blob/main/src/dapp-service-project-pathway.js
+Testnet home: https://github.com/MuhmdBuharisaeed/test-albukhr-app/blob/main/index.html
+Testnet project page: https://github.com/MuhmdBuharisaeed/test-albukhr-app/blob/main/project.html
+Testnet project registry: https://github.com/MuhmdBuharisaeed/test-albukhr-app/blob/main/js/project-registry.js
+Testnet API: https://github.com/MuhmdBuharisaeed/test-albukhr-api/blob/main/server.js
+Testnet liquidity router: https://github.com/MuhmdBuharisaeed/test-albukhr-api/blob/main/testnet-liquidity-payment-router.js
+Read-only statement: This is a specification based on source inspection and read-only database queries. It is not a claim that every acceptance test has been executed. No code, database, payment channel, wallet setting, or deployment was changed during this step.
