@@ -1,0 +1,55 @@
+ALBUKHR Mainnet U2A Payment — Read-only Audit
+Date: 2026-10-14
+Scope: Mainnet user-to-app investment payments, Pi access-token flow, API gateways, and relevant live Mainnet Supabase schema/functions.
+Execution mode: Read-only. No GitHub writes, SQL mutations, deployments, project activations, or live Pi payments were performed.
+Executive verdict
+NOT READY for live Mainnet U2A payments. The current shared Pi Access Token flow is structurally sound in the main payment API path, but several fail-open payment checks and a separately exposed identity-registration RPC must be resolved before production approval. Mainnet data currently has no active projects, which causes the inspected investment gateways to reject new investments as intended.
+What passed
+js/core/pi-auth-core.js obtains the token from Pi.authenticate() and keeps it in an in-memory variable; the inspected file documents no persistence to LocalStorage, sessionStorage, or cookies.
+js/core/albukhr-api-core.js reads AlbukhrPiAuth.getAccessToken(), refuses to use the Mainnet API from Testnet, and sends Authorization: Bearer <Pi access token> with credentials: "omit".
+Mainnet API Core and Internal investment routes independently validate that bearer token using GET https://api.minepi.com/v2/me, then use the UID returned by Pi rather than trusting a body-supplied UID.
+Core and Contributor Internal payment paths have separate gateway routes and database settlement RPCs. Project/network/status checks are present.
+The settlement RPCs public.create_stake_from_completed_payment and public.create_internal_stake_from_completed_payment are SECURITY DEFINER, have a fixed search_path, and execute permission is limited to service_role in the live Mainnet database. Financial tables inspected have RLS enabled.
+project.html loads the shared Pi Auth Core, shared API Core, Core staking engine, and Internal staking engine. The inspected page does not load the separate legacy js/pi-payment.js helper.
+Blocking findings
+P1 — Public identity-registration RPC trusts client-supplied identity
+The live Mainnet database reports public.record_pi_login as SECURITY DEFINER with execution available to anon and authenticated. Its body accepts p_pi_uid, p_username, p_wallet_address, p_network, and p_status; on a successful login it inserts/upserts public.users, changes the stored network on conflict, increments login_count, and writes login_events. The function does not accept or validate a Pi access token. The frontend calls it directly after client-side Pi.authenticate().
+This is separate from the U2A payment endpoints, which do verify the token with Pi /me; it does not by itself demonstrate that a caller can pass the U2A payment route. It does mean the shared identity registry can be spoofed or altered by a direct RPC call, and must be fixed without breaking the login path. Do not simply revoke client execution until a trusted server-side replacement is ready.
+Required direction: Have a trusted Mainnet backend validate the access token with Pi /me and perform the user upsert using that verified UID; reduce direct client privileges for the SECURITY DEFINER write path. Keep user profile presentation data distinct from trusted identity claims.
+P1 — Payment validation is fail-open for missing sender and recipient
+In src/financial-gateway.js and src/internal-investment-gateway.js, assertSender() rejects a mismatched sender only if a sender UID is present. A missing sender UID is allowed through. Recipient validation before approval similarly rejects a mismatch only when a recipient is present; a missing recipient can pass approval-stage checks.
+Required direction: Require a non-empty Pi-server-returned user_uid exactly matching the UID returned by /me; require a non-empty to_address exactly matching the expected treasury before approval and recheck it after completion. Missing fields must fail closed.
+P1 — Direction and Pi PaymentDTO network are not fully enforced
+The current Core verifier only checks payment.network if the field is truthy. The Internal verifier checks metadata.network === "mainnet" but does not independently check payment.network. Neither gateway checks that the PaymentDTO direction is exactly user_to_app.
+Pi's current Platform API documentation lists user_uid, to_address, direction, network, and transaction.verified in the PaymentDTO; the network values are Pi Network or Pi Testnet.
+Required direction: Require exact network === "Pi Network", exact direction === "user_to_app", and validate them both before approval and after completion. Do not use client-controlled metadata as a substitute for the authoritative payment fields.
+P1 — Completion does not strictly require the server-returned verified transaction
+The gateways re-read the payment and require a completed status, but the inspected code does not require transaction.verified === true. Core completion can fall back to the client-provided txid when the refreshed PaymentDTO does not provide a server-returned transaction ID; Internal does the same for the recorded verification reference.
+Required direction: Require a non-empty transaction object from Pi, transaction.verified === true, a server-returned transaction ID, and equality with the submitted transaction ID when applicable. Never treat the client-supplied transaction ID alone as proof.
+P1 — Accepted staking-term version is not bound end-to-end
+The frontend includes term_version_id in payment metadata/request payloads. The inspected Core and Internal API validators do not compare it with authoritative payment metadata. The settlement RPCs select the latest currently effective published term by project and duration rather than requiring the exact version the user accepted.
+Required direction: Bind the accepted term-version ID through the persisted investment intent, Pi payment metadata, API validation, and settlement RPC. Reject if any ID/version differs; do not silently settle under a newer term.
+P1 / contract decision — Core investment currently reuses liquidity settlement
+src/financial-gateway.js handles the Core U2A investment route with metadata action add_liquidity. public.create_stake_from_completed_payment calls public.settle_project_liquidity_payment, which writes a project_liquidity_payments record and increments project_treasury.verified_liquidity, then the outer function creates the stake. Contributor Internal investments instead use a separate internal_investment_payments ledger and settlement RPC.
+This means the Core payment is not a pure investment-only settlement path. Confirm the intended accounting contract before changing code. The nested liquidity function contains an approved-to-active path, but the outer Core stake RPC explicitly requires the project to already be active, so that auto-activation branch should not trigger through this Core stake endpoint. The confirmed concern is liquidity-ledger coupling and inconsistent accounting semantics, not a claim that this route currently activates an approved project.
+Required direction: Decide explicitly whether each Core U2A investment is meant to credit project liquidity as well as create an investor stake. Keep standalone liquidity contribution and investor investment contracts distinct; if both effects are intended, make the dual effect explicit and test it transactionally. Align API action, payment record type, treasury ledger, and stake settlement in the same reviewed contract.
+Live Mainnet database snapshot
+Read-only counts at audit time:
+Mainnet projects with status = 'active': 0
+Mainnet projects with status = 'approved': 6
+public.stakes rows: 0
+public.project_liquidity_payments rows: 0
+public.internal_investment_payments rows: 0
+The inspected gateways require active project status, so new Mainnet investments should currently be rejected. Do not activate a project merely to test payments.
+Relevant source references
+Frontend shared Pi auth: https://github.com/MuhmdBuharisaeed/albukhr-app/blob/main/js/core/pi-auth-core.js
+Frontend API client: https://github.com/MuhmdBuharisaeed/albukhr-app/blob/main/js/core/albukhr-api-core.js
+Core U2A investment: https://github.com/MuhmdBuharisaeed/albukhr-app/blob/main/js/staking.js
+Internal U2A investment: https://github.com/MuhmdBuharisaeed/albukhr-app/blob/main/js/internal-staking.js
+Core API gateway: https://github.com/MuhmdBuharisaeed/albukhr-api/blob/main/src/financial-gateway.js
+Internal API gateway: https://github.com/MuhmdBuharisaeed/albukhr-api/blob/main/src/internal-investment-gateway.js
+Pi API client: https://github.com/MuhmdBuharisaeed/albukhr-api/blob/main/src/pi-client.js
+Pi Platform API docs: https://developers.minepi.com/docs/api-reference/PlatformAPI
+Pi SDK authentication docs: https://developers.minepi.com/docs/api-reference/SdkReference
+Recommended next step
+Prepare a local, reviewable Mainnet U2A patch proposal covering the shared login RPC, strict PaymentDTO verification, term-version binding, and the Core liquidity-versus-investment contract. Run static/diff checks against the current source. Keep the work local/read-only with respect to GitHub, Supabase, and deployment until explicitly authorized.
