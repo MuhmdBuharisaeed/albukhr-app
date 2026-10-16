@@ -1,0 +1,37 @@
+ALBUKHR FINANCE OVERSIGHT — MAINNET POST-APPLICATION AUDIT
+Ranar bincike: 16 Oktoba 2026
+Mainnet Supabase ref: ribpntyqdleytsyktdfb
+Migration: 20261016092840_finance_oversight_test_authorization_v3
+
+Sakamako: AN AIWATAR DA FINANCE MIGRATION A MAINNET, KUMA BINCiken BAYAN AIWATARWA YA WUCE.
+
+GYARAN DA AKA YI KAFIN AIWATARWA
+- An gano alias bug a cikin `run_finance_project_preflight`: an yi amfani da `c->>'key'` da `c->>'detail'` alhali row alias ɗin `jsonb_array_elements` shi ne `value`.
+- An gyara shi zuwa `value->>'key'` da `value->>'detail'` kafin migration. Wannan yana ba da damar ƙirƙirar blockers daga readiness checks ba tare da runtime error ba.
+
+ABUBUWAN DA AKA TABBATAR BAYAN AIWATARWA
+- Teburin `albukhr_security.finance_test_authorizations` yana nan, RLS a kunne, kuma direct CRUD ba a ba `authenticated`, `anon` ko `service_role` ba.
+- RPC huɗu sun kasance: `get_finance_oversight_workspace`, `start_finance_project_test`, `run_finance_project_preflight`, da `close_finance_project_test`.
+- Duk RPC huɗu `SECURITY DEFINER` ne, mallakin postgres; `authenticated` na da EXECUTE, amma `anon` da `PUBLIC` ba su da shi.
+- Read-only workspace smoke test ya dawo da `success=true`, `authorized=true`, `network=mainnet`, da projects guda 8.
+- An yi runtime smoke test na start → preflight → close a cikin transaction sannan aka yi `ROLLBACK`. Dukkan ayyukan sun dawo da success; preflight ya samar da checks guda 10; ba a kira Pi approval/completion ko settlement ba.
+- Bayan rollback: authorizations = 0, Finance audit events = 0, Mainnet projects = 8, approved projects = 6, core/internal investment payment records = 0, core/internal liquidity payment records = 0, Mainnet stakes = 0.
+
+ABIN DA BA A CANZA BA
+- Ba a taɓa Testnet ba.
+- Ba a yi GitHub write ko deployment ba; ba a canza Render environment ba.
+- Ba a aiwatar da activation-hardening migration ba.
+- Ba a yi Pi transaction, ba a tabbatar da real PaymentDTO, kuma ba a yi payment settlement ba.
+
+READINESS BLOCKERS DA AKA GANO A PROJECT ƊAYA
+A yayin gwajin transaction wanda aka rollback, approved internal project MAITAGOGO-2457 ya dawo `readiness_passed=false`. Checks da ba su wuce ba:
+1. Mainnet Internal treasury bai shirya ba.
+2. Verified liquidity ba ta shirya ba.
+3. Babu staking term da aka publish kuma yake effective yanzu.
+4. Internal investment runtime bai nuna readiness ba.
+
+Waɗannan ba kuskuren migration ba ne; su ne readiness conditions na project. Ba a ƙirƙiri treasury/term/runtime ko canza status ɗin project ba. An yi rollback, don haka babu test authorization ko audit event da ya rage.
+
+IYAKOKIN GWADAWA
+- An yi runtime smoke test a database cikin transaction tare da simulated AAL2 claims na active super_admin. Wannan ya gwada SQL paths da rollback, amma ba a gwada ainihin browser login da JWT na mai amfani ba.
+- Wannan Finance preflight ba hujja ba ce cewa Pi U2A payments suna shirye. Ci gaba da barin live Pi payment execution a kashe har sai an yi gwajin Pi authentication da PaymentDTO dabam.
