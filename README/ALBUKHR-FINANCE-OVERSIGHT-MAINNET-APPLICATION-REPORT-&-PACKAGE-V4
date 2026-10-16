@@ -1,0 +1,44 @@
+ALBUKHR FINANCE OVERSIGHT — MAINNET APPLICATION REPORT / PACKAGE V4
+Date: 16 October 2026
+Target: App Albukhr project (Mainnet), Supabase ref ribpntyqdleytsyktdfb
+Applied migration: 20261016092840_finance_oversight_test_authorization_v3
+
+STATUS
+The Finance Oversight migration was applied successfully to Mainnet and then verified. All four Finance RPCs exist, are SECURITY DEFINER functions owned by postgres, are executable by authenticated, and are not executable by anon or PUBLIC. The new table has RLS enabled, no direct table grants to authenticated/anon/service_role, and zero direct RLS policies; access is routed through the guarded RPCs.
+
+WHAT THIS MIGRATION ADDS
+- albukhr_security.finance_test_authorizations, with a short-lived authorization record, Mainnet-only constraint, project/type checks, an expiry constraint, and a unique index that permits no more than one active authorization per project.
+- get_finance_oversight_workspace(): secured Mainnet financial/readiness summary and last 100 finance-related records.
+- start_finance_project_test(): AAL2 + active/unrevoked super_admin/finance_admin gate; only approved Mainnet Core and Contributor Internal projects; 5–30 minute expiry.
+- run_finance_project_preflight(): configuration/readiness checks only; it explicitly reports that Pi authentication, a real PaymentDTO, Pi approval/completion, and settlement are not tested/called.
+- close_finance_project_test(): closes or marks an expired authorization and records governance audit data.
+
+CORRECTION MADE BEFORE APPLICATION
+The V3 draft had an undefined SQL alias in the preflight blocker aggregation (`c->>'key'`, `c->>'detail'`) even though the `jsonb_array_elements` row was named `value`. This was corrected to `value->>'key'` and `value->>'detail'` before applying the migration. That prevents the preflight from failing at runtime while building the list of readiness blockers.
+
+POST-APPLICATION VERIFICATION
+- Confirmed table and all four RPCs exist.
+- Confirmed RLS on the new table; authenticated direct SELECT/INSERT/UPDATE/DELETE are false; service_role direct SELECT is false.
+- Confirmed all four RPCs are SECURITY DEFINER and owned by postgres; authenticated EXECUTE true; anon/PUBLIC EXECUTE false.
+- Read-only workspace smoke test returned success=true, authorized=true, network=mainnet, and 8 Mainnet projects.
+- Transactional runtime smoke test ran start -> preflight -> close inside BEGIN/ROLLBACK. Start/preflight/close returned success; all 10 internal-project checks were built; no Pi approval/completion or settlement was invoked. The test was rolled back, leaving zero authorizations and zero Finance audit events.
+- After rollback, Mainnet still had 8 projects, 6 approved projects, zero records in the four investment/liquidity payment tables, and zero Mainnet stakes.
+
+READINESS FINDING — SEPARATE FROM MIGRATION SUCCESS
+The temporary preflight for approved internal project MAITAGOGO-2457 returned readiness_passed=false. It identified four existing project-readiness blockers: Mainnet Internal treasury not configured, verified liquidity not ready, no currently published/effective staking terms, and Internal investment runtime not ready. This package does not make up treasury records, publish terms, activate engines, or change the project's status. These must be addressed through the established governance/workflows if/when appropriate. The temporary test was rolled back, so no authorization or audit event remains.
+
+NOT CHANGED
+- Test Albukhr/Testnet was not modified.
+- No GitHub write, HTML/JS deployment, Render environment change, or Render deployment was made.
+- No activation-hardening migration was applied; it remains separate and unapproved for application in this operation.
+- No Pi transaction, PaymentDTO verification, payment approval/completion, stake creation, withdrawal settlement, or treasury settlement was performed.
+
+PACKAGE FILES
+- 20261016_finance_oversight_test_authorization.sql: local SQL reference for the applied migration, including the corrected blocker alias.
+- admin-module.js and admin-module.html: local UI draft only; not pushed/deployed by this operation.
+- 20261016_harden_activation_role_and_owner_gates.sql: separate migration draft; NOT APPLIED.
+- AUDIT_REPORT_HA.txt: detailed outcome and limits.
+- STATIC_CHECK_RESULTS.txt: static checks and post-deployment runtime checks.
+
+IMPORTANT LIMIT
+Database function bodies were runtime-smoke-tested through an internal transaction with simulated AAL2 claims for the active super_admin. This verifies SQL paths and rollback behavior, but is not a real browser session or real user JWT end-to-end test. Finance preflight is not proof of Pi U2A readiness. Keep live Pi payment execution disabled until separate Pi auth/payment validation is completed.
