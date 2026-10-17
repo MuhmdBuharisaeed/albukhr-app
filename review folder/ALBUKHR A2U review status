@@ -1,0 +1,20 @@
+ALBUKHR A2U review status — v1.3
+Date: 2026-10-17 Target: current main branches and existing Mainnet Supabase project ribpntyqdleytsyktdfb.
+Outcome
+NOT READY TO APPLY OR DEPLOY. The prior v1.2 package is useful as a source/test snapshot, but its guarded applicator pins obsolete blob hashes for files that have changed in current main. The Mainnet SQL draft also needs concurrency and manual-payment boundary corrections before it can be called a safe migration.
+Confirmed current source blob IDs
+src/financial-gateway.js: 0fba8784a1bb76eb2c58e8ebeb9ac3b71bcbb377
+src/pi-a2u-client.js: a86878f93b4528020f8fbde30a40e1b72d1043a7
+src/a2u-worker.js: 3ae3cfe5c3f6cdc066c84d83adaa66c5ba03162f
+scripts/a2u-payout-cron.js: 0559b0fab137325998ed48231db64792dda85039
+src/a2u-payout-service.js: b3054df86cf8c65bdc691aced213aaf3d95397fa
+package.json: 8fdae094ae29b6645f640136beba30f2a470fc28
+The previous v1.2 applicator expected different SHA values for src/pi-a2u-client.js, src/a2u-worker.js, and scripts/a2u-payout-cron.js; it must not be used against current main without re-basing and re-review. The stale mutating script is excluded from this v1.3 bundle; a read-only verifier is included instead.
+Changes not performed
+No GitHub commit/push, branch update or pull request.
+No Supabase schema/data/RPC changes.
+No Render environment/configuration/deployment changes.
+No Pi API call or blockchain payment.
+No withdrawal/stake/reward/fee/balance/treasury/transaction row changed.
+Mainnet A2U status
+MAINNET_A2U_OFFICIALLY_SUPPORTED = false remains the required code-level gate. Pi’s current Advanced Payments guide says A2U is Testnet-only; the Mainnet launch guide separately notes selected Mainnet apps may need an approved Outgoing Wallet. Treat A2U as unavailable to ALBUKHR Mainnet until Pi’s official eligibility and ALBUKHR approval are confirmed.
