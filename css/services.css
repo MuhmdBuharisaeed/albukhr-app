@@ -666,3 +666,26 @@ body[data-page="services"] .section {
     transform: none;
   }
   }
+
+/* Active dock item — match ALBUKHR Transparency navigation */
+.dock-nav .dock-item.active {
+  position: relative;
+  background: rgba(0, 0, 0, 0.14);
+  border-radius: 22px;
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.dock-nav .dock-item.active .dock-icon {
+  color: #ffffff;
+  stroke: currentColor;
+}
+
+.dock-nav .dock-item.active span {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.dock-nav .dock-item {
+  transition: background-color 180ms ease, color 180ms ease;
+}
