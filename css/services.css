@@ -1,7 +1,668 @@
-/* ALBUKHR Services UI refresh — scoped to services.html */
-:root{--services-green:#08783e;--services-green-dark:#075f33;--services-ink:#17231c;--services-muted:#66736b;--services-card:#fff;--services-bg:#f4f7f5;--services-radius:22px}
-html{scroll-behavior:smooth}body[data-page="services"]{margin:0;padding-bottom:calc(112px + env(safe-area-inset-bottom));background:var(--services-bg);color:var(--services-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}body[data-page="services"] *{box-sizing:border-box}.skip-link{position:absolute;left:12px;top:-60px;z-index:1000;padding:10px 14px;background:#fff;color:var(--services-green-dark);border-radius:10px;box-shadow:0 4px 20px #0002}.skip-link:focus{top:12px}
-.services-header{min-height:76px;padding:14px max(20px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;background:var(--services-green);color:#fff;box-shadow:0 3px 14px #063c2414}.services-header .brand{color:#fff;font-size:22px;font-weight:800;letter-spacing:.015em}.header-subtitle{display:block;margin-top:3px;font-size:11px;color:#d8f0e1;letter-spacing:.07em;text-transform:uppercase}.services-header .header-right{display:flex;align-items:center}.services-header .notification-btn{position:relative;display:grid;place-items:center;width:46px;height:46px;border:1px solid #ffffff28;border-radius:15px;background:#ffffff16;color:#fff;cursor:pointer}.services-header .notification-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}.header-icon{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.notification-badge{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:#ff5a52}
-.services-page{width:min(100%,920px);margin:0 auto}.services-intro{padding:25px 20px 14px}.eyebrow{margin:0 0 7px;color:var(--services-green);font-size:10px;font-weight:800;letter-spacing:.13em}.services-intro h1{margin:0;font-size:clamp(27px,6vw,34px);line-height:1.15;letter-spacing:-.035em}.services-lead{max-width:620px;margin:9px 0 0;color:var(--services-muted);font-size:14px;line-height:1.6}.section.services-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding:10px 16px 26px}
-.service-card{display:flex;align-items:flex-start;gap:15px;width:100%;min-width:0;margin:0;padding:19px;border:1px solid #edf1ee;border-radius:var(--services-radius);background:var(--services-card);color:inherit;text-align:left;text-decoration:none;box-shadow:0 5px 18px #1b34230a;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;-webkit-tap-highlight-color:transparent}.service-card a,.service-card button{font:inherit}a.service-card,button.service-card{cursor:pointer}a.service-card:hover,button.service-card:hover{transform:translateY(-2px);border-color:#cce4d4;box-shadow:0 12px 28px #153d2512}.service-card:focus-visible{outline:3px solid #12834b55;outline-offset:3px}.service-icon{display:grid;place-items:center;flex:0 0 52px;width:52px;height:52px;border-radius:17px;background:#f0f7f2;color:var(--services-green)}.service-icon svg{display:block;width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}.service-body{display:block;flex:1 1 auto;min-width:0}.service-title{display:block;margin:1px 0 5px;color:#1c2821;font-size:16px;font-weight:750;line-height:1.35;letter-spacing:-.015em}.service-desc{display:block;color:#6b756f;font-size:13.5px;line-height:1.55;overflow-wrap:anywhere}.badge{display:inline-flex;align-items:center;min-height:25px;margin-top:10px;padding:4px 10px;border-radius:999px;font-size:10.5px;line-height:1.2;font-weight:750;letter-spacing:.01em}.badge.public{background:#e4f4ea;color:#197342}.badge.paid{background:#fff4d2;color:#80651b}.badge.restricted{background:#fbe9e9;color:#963c43}.badge.coming{background:#eaf2ff;color:#365d94}.badge.planned{background:#e9eafe;color:#4c4f9d}.service-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}.service-action{color:var(--services-green);font-size:13px;font-weight:750}.arrow-icon{flex:0 0 19px;width:19px;height:19px;fill:none;stroke:var(--services-green);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.muted-action{color:#77847b}.service-card.is-disabled{cursor:default}.service-card.is-disabled:hover{transform:none;border-color:#edf1ee;box-shadow:0 5px 18px #1b34230a}.service-card.is-disabled .service-icon{background:#f3f5f4;color:#849188}.service-card.is-restricted{cursor:pointer;font:inherit}.service-card.is-restricted .service-icon{background:#f9f0f0;color:#9b5358}.token-card{border-color:#e4e5fa;background:linear-gradient(135deg,#fff 0%,#fbfbff 100%)}.token-card .token-icon{background:#f0f0ff;color:#5958a8}.token-card .service-title{color:#24264f}.token-card .service-note{display:block;margin-top:10px;color:#73748f;font-size:11px;line-height:1.5}.token-card .arrow-icon{stroke:#8586a8}.notice{display:flex;align-items:flex-start;gap:11px;padding:15px 16px;border:1px solid #e1e9e3;border-radius:16px;background:#edf4ef;color:#536258}.notice svg{flex:0 0 20px;width:20px;height:20px;margin-top:1px;fill:none;stroke:#4b7b5d;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.notice p{margin:0;font-size:11.5px;line-height:1.6}.dock-nav{padding-bottom:max(8px,env(safe-area-inset-bottom))}.dock-icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.dock-item{text-decoration:none}.dock-item.active{color:#fff}
-@media(min-width:680px){.services-intro{padding:34px 24px 18px}.section.services-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:12px 24px 30px}.notice{grid-column:1/-1}.service-card{padding:20px}}@media(max-width:420px){.services-header{min-height:70px;padding-top:12px;padding-bottom:12px}.services-header .brand{font-size:20px}.services-intro{padding:22px 16px 12px}.services-lead{font-size:13px}.section.services-grid{gap:12px;padding:9px 12px 22px}.service-card{gap:12px;padding:15px;border-radius:19px}.service-icon{flex-basis:45px;width:45px;height:45px;border-radius:14px}.service-icon svg{width:24px;height:24px}.service-title{font-size:14.5px}.service-desc{font-size:12.5px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.service-card{transition:none}.service-card:hover{transform:none}}
+/* =========================================================
+   ALBUKHR SERVICES — UI/UX STYLES
+   Compatible with services.html
+   SVG icons | Responsive layout | Accessibility
+========================================================= */
+
+:root {
+  --services-green: #0f7a3d;
+  --services-green-dark: #096532;
+  --services-green-soft: #e6f5ec;
+  --services-ink: #18231d;
+  --services-muted: #68736c;
+  --services-border: #e7ede9;
+  --services-background: #f4f7f6;
+  --services-card-background: #ffffff;
+  --services-radius: 19px;
+  --services-shadow: 0 6px 18px rgba(0, 0, 0, 0.045);
+  --services-shadow-hover: 0 11px 26px rgba(0, 0, 0, 0.075);
+}
+
+/* =========================================================
+   BASE
+========================================================= */
+
+html {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body[data-page="services"] {
+  margin: 0;
+  padding: 0;
+  padding-bottom: calc(110px + env(safe-area-inset-bottom));
+  background: var(--services-background);
+  color: var(--services-ink);
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body[data-page="services"] *,
+body[data-page="services"] *::before,
+body[data-page="services"] *::after {
+  box-sizing: border-box;
+}
+
+body[data-page="services"] button,
+body[data-page="services"] input {
+  font: inherit;
+}
+
+/* Accessible keyboard skip link */
+
+.skip-link {
+  position: absolute;
+  z-index: 10000;
+  top: -60px;
+  left: 12px;
+  padding: 11px 15px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--services-green-dark);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+/* =========================================================
+   PAGE INTRODUCTION
+========================================================= */
+
+.services-intro {
+  padding: 10px 4px 19px;
+}
+
+.services-eyebrow {
+  margin: 0 0 7px;
+  color: var(--services-green);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  line-height: 1.5;
+}
+
+.services-heading {
+  margin: 0;
+  color: var(--services-ink);
+  font-size: clamp(25px, 6vw, 33px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.services-description {
+  max-width: 620px;
+  margin: 9px 0 0;
+  color: var(--services-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+body[data-page="services"] .section {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 17px 16px 26px;
+}
+
+/* =========================================================
+   SERVICE CARDS
+========================================================= */
+
+.service-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 15px;
+  padding: 17px;
+  overflow-wrap: anywhere;
+
+  border: 1px solid var(--services-border);
+  border-radius: var(--services-radius);
+  background: var(--services-card-background);
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+
+  box-shadow: var(--services-shadow);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+.service-card[onclick],
+.service-card[role="button"] {
+  cursor: pointer;
+}
+
+.service-card:focus {
+  outline: none;
+}
+
+.service-card:focus-visible {
+  outline: 3px solid rgba(15, 122, 61, 0.32);
+  outline-offset: 3px;
+}
+
+.service-card[aria-disabled="true"],
+.service-card.locked {
+  cursor: default;
+}
+
+/* Never use CSS state as authorization.
+   JavaScript/backend must enforce actual access control. */
+
+@media (hover: hover) and (pointer: fine) {
+  .service-card[onclick]:not(.locked):hover,
+  .service-card[role="button"]:not(.locked):hover {
+    transform: translateY(-2px);
+    border-color: #d3e7da;
+    box-shadow: var(--services-shadow-hover);
+  }
+}
+
+.service-card:active:not(.locked) {
+  transform: scale(0.995);
+}
+
+/* =========================================================
+   SVG SERVICE ICONS
+========================================================= */
+
+.service-icon {
+  display: flex;
+  flex: 0 0 48px;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+
+  background: #f0f7f2;
+  color: var(--services-green);
+}
+
+.service-icon svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+  overflow: visible;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* =========================================================
+   SERVICE CONTENT
+========================================================= */
+
+.service-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.service-title {
+  display: block;
+  margin: 1px 0 5px;
+
+  color: #202a24;
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+}
+
+.service-desc {
+  display: block;
+  margin: 0;
+
+  color: #69736d;
+  font-size: 12.8px;
+  font-weight: 400;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.service-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.service-action {
+  color: var(--services-green);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.arrow,
+.arrow-icon {
+  display: inline-flex;
+  flex: 0 0 19px;
+  align-items: center;
+  justify-content: center;
+
+  width: 19px;
+  height: 19px;
+
+  color: var(--services-green);
+}
+
+.arrow-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* =========================================================
+   SERVICE BADGES
+========================================================= */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  max-width: 100%;
+  min-height: 24px;
+  margin-top: 9px;
+  padding: 4px 10px;
+
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.badge.public {
+  background: #e6f5ec;
+  color: #0f7a3d;
+}
+
+.badge.paid {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.badge.restricted {
+  background: #f8dfe1;
+  color: #842029;
+}
+
+.badge.coming {
+  background: #e7f1ff;
+  color: #084298;
+}
+
+.badge.planned {
+  background: #ecebff;
+  color: #4c4c99;
+}
+
+/* =========================================================
+   LOCKED / UNAVAILABLE SERVICES
+========================================================= */
+
+.service-card.locked {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.025);
+}
+
+.service-card.locked .service-icon {
+  background: #f1f4f2;
+  color: #849087;
+}
+
+.service-card.locked .service-title {
+  color: #59645d;
+}
+
+.service-card.locked .service-desc {
+  color: #858e88;
+}
+
+.service-card.locked .service-action {
+  color: #879189;
+}
+
+.service-card.locked .arrow-icon {
+  color: #879189;
+}
+
+.service-card.locked .service-footer {
+  opacity: 0.95;
+}
+
+/* =========================================================
+   ALB TOKEN & POINTS REWARDS
+   Planned service — intentionally not interactive
+========================================================= */
+
+.alb-token-card {
+  border-color: #e3e3f5;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fcfbff 100%
+  );
+}
+
+.alb-token-card .alb-token-icon {
+  background: #eeeeff;
+  color: #5555a1;
+}
+
+.alb-token-card .service-title {
+  color: #29294f;
+}
+
+.alb-token-card .service-desc {
+  color: #6f7089;
+}
+
+.alb-token-card .service-action {
+  color: #62639f;
+}
+
+.alb-token-card .arrow-icon {
+  color: #8585ad;
+}
+
+.alb-token-card .service-note {
+  display: block;
+  margin: 10px 0 0;
+  padding-top: 9px;
+
+  border-top: 1px solid #ededf8;
+
+  color: #777895;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* Keep closed token card visibly distinct without implying availability. */
+
+.alb-token-card[aria-disabled="true"] {
+  cursor: default;
+}
+
+.alb-token-card[aria-disabled="true"]:hover {
+  transform: none;
+  border-color: #e3e3f5;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.025);
+}
+
+/* =========================================================
+   NOTICE
+========================================================= */
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  margin-top: 20px;
+  padding: 14px 15px;
+
+  border: 1px solid #e2ebe5;
+  border-radius: 15px;
+  background: #edf4ef;
+
+  color: #59665d;
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.notice > svg {
+  display: block;
+  flex: 0 0 20px;
+
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+
+  fill: none;
+  stroke: #4d795b;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notice p {
+  min-width: 0;
+  margin: 0;
+}
+
+/* =========================================================
+   NOTIFICATION BUTTON SVG
+========================================================= */
+
+.notification-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 42px;
+  min-height: 42px;
+  padding: 8px;
+
+  border: 0;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.notification-btn:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.75);
+  outline-offset: 3px;
+}
+
+.notification-btn .header-icon {
+  display: block;
+  width: 23px;
+  height: 23px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  background: #ff514d;
+}
+
+/* =========================================================
+   BOTTOM DOCK NAVIGATION
+========================================================= */
+
+.dock-nav {
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.dock-item {
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dock-item:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+.dock-item .dock-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dock-item[aria-current="page"] {
+  color: #ffffff;
+}
+
+/* =========================================================
+   RESPONSIVE LAYOUT
+========================================================= */
+
+@media (min-width: 680px) {
+  body[data-page="services"] .section {
+    padding: 24px 24px 32px;
+  }
+
+  .services-intro {
+    padding: 10px 4px 22px;
+  }
+
+  .service-card {
+    padding: 20px;
+  }
+
+  .service-icon {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .service-icon svg {
+    width: 27px;
+    height: 27px;
+  }
+
+  .service-title {
+    font-size: 16px;
+  }
+
+  .service-desc {
+    font-size: 13.5px;
+  }
+}
+
+@media (max-width: 420px) {
+  body[data-page="services"] .section {
+    padding: 14px 12px 22px;
+  }
+
+  .services-intro {
+    padding: 8px 3px 16px;
+  }
+
+  .services-heading {
+    font-size: 27px;
+  }
+
+  .services-description {
+    font-size: 12.5px;
+  }
+
+  .service-card {
+    gap: 12px;
+    margin-bottom: 13px;
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .service-icon {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+  }
+
+  .service-icon svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .service-title {
+    font-size: 14px;
+  }
+
+  .service-desc {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .service-action {
+    font-size: 12px;
+  }
+
+  .badge {
+    font-size: 9.5px;
+  }
+
+  .notice {
+    padding: 12px;
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .service-card {
+    transition: none;
+  }
+
+  .service-card:hover,
+  .service-card:active {
+    transform: none;
+  }
+  }
