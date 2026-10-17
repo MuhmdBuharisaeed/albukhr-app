@@ -1,0 +1,36 @@
+ALBUKHR A2U Safety Patch v1.2 — review only
+Matsayi: kayan bincike ne kawai. Ba a yarda a kai Mainnet ba.
+Abin da v1.2 ya ƙara
+Tattara withdrawals da aka riga aka yi: SQL draft ɗin yana cire jimillar requested_amount + fee_amount na duk requests masu pending, approved, ko paid daga asalin stakes.amount ko stakes.reward_amount, bisa withdrawal_type. An gyara duka overloads na create_my_withdrawal_request da API ke amfani da su/da suka wanzu.
+Kulle rashin tabbas kafin ƙirƙirar Pi payment: an rubuta payment_creation_started_at kafin kiran create-payment. Idan amsa ta ɓace kuma ba a sami payment ID ba, worker zai dakata ya buƙaci reconciliation maimakon ƙirƙirar payment na biyu.
+Kulle rashin tabbas kafin aika transaction: an rubuta submission_started_at kafin submitPayment. Idan amsa ta ɓace kuma ba a sami txid ba, worker zai dakata maimakon sake aikawa da Pi kai tsaye.
+Lease/fencing token: claim da progress/finalize suna amfani da lease token; denial ba zai mayar da token ga worker ba.
+A2U a kashe a source: MAINNET_A2U_OFFICIALLY_SUPPORTED = false yana hana kowane payout, ko da environment flags sun zama true.
+Fayiloli
+src/a2u-payout-service.js — hanyar payout guda ɗaya tare da marker na create/submission da recovery mai tsaro.
+src/pi-a2u-client.js — client na official pi-backend SDK, hard gate a kashe, kuma yana tabbatar da PI_ENV=production saboda SDK ɗin yana karanta PI_ENV (ba NODE_ENV kaɗai ba).
+sql/20261017_prepare_a2u_payout_safety_v3.sql — SQL migration draft; kar a gudanar da ita a Mainnet.
+tests/ — static checks, hard-gate runtime check, unit/model check na balance, da mock-based uncertainty checks.
+scripts/apply-review-patch.js — dry-run by default; yana duba Git blob hashes na ainihin baseline kuma ba ya commit/deploy ko gudanar da SQL.
+Abin da bai faru ba
+Ba a yi commit ko push zuwa GitHub ba.
+Ba a canza Supabase Mainnet schema ko data ba.
+Ba a canza Render env vars ba, kuma ba a ƙirƙiri Render Cron service ba.
+Ba a kira Pi API ko aika blockchain transaction ba.
+Ba a canza fees, balances, treasury, stakes ko withdrawal rows ba.
+Muhimman ƙuntatawa
+Takardar official Pi Advanced Payments har yanzu tana cewa A2U yana samuwa ne a Testnet kawai: https://developers.minepi.com/docs/accept-payment/PaymentsAdvanced
+Dole ne a gwada SQL migration a database na wucin-gadi, sannan a yi Pi Testnet integration tests a environment da Pi ta yarda da shi.
+Idan create-payment/submission outcome ba a tabbatar ba, tsarin zai tsaya. Wannan yana nufin yana iya buƙatar aikin reconciliation na admin kafin a ci gaba; an zaɓi rashin biyan sau biyu fiye da retry da zai iya aika Pi sau biyu.
+package.json na target zai buƙaci pi-backend@0.1.3 da ingantaccen yarn.lock saboda Render na yanzu yana amfani da yarn install. Wannan bundle bai ƙirƙiri lockfile ba.
+Fee policy code har yanzu yana ɗaukar 1% a A2U service. Mainnet policy ɗin da aka duba yana 1%, amma dole a yi review idan fee policy ta canza.
+Gwaje-gwaje
+Gudanar da test suite na patch a cikin wannan folder da Node.js 20+:
+node --check src/pi-a2u-client.js
+node --check src/a2u-payout-service.js
+node --check scripts/a2u-payout-cron.js
+node tests/a2u-source-gate.test.js
+node tests/a2u-runtime-gate.test.js
+node tests/a2u-uncertain-outcome.test.js
+node tests/withdrawal-balance-model.test.js
+Waɗannan gwaje-gwaje na source/mock/model ne, ba su maye gurbin PostgreSQL function tests, Pi Testnet integration, ko security review ba.
