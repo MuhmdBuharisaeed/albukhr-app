@@ -1,0 +1,15 @@
+Cross-system security review — v1.3
+P0 — A2U service cannot safely run against current Mainnet schema
+The Node service expects v2 claim/progress/fail/finalize RPCs and attempt markers that are not in the database. Do not enable the worker or route until a coordinated SQL + API + Admin patch exists and is reviewed.
+P0 — Admin manual payout boundary conflicts with future A2U automation
+mark_withdrawal_paid currently verifies Finance/Super Admin, AAL2, approved status and TXID, then writes an audit row. It does not block marking a request paid while an A2U attempt has an active lease or uncertain create/submission state. Since the UI asks the finance administrator to send Pi before entering a TXID, a UI-only warning cannot prevent a duplicate payout. Add the guard to the database RPC and expose attempt state in the review queue before any automatic payout is enabled.
+P1 — claim/finalize row locks are ordered differently
+The SQL draft claim locks the request first, then the attempt. The draft finalize locks the attempt first, then the request. Under concurrent reclaim/finalize, PostgreSQL may deadlock. Normalize lock ordering in the corrected migration and test parallel claim/finalize transactions.
+P1 — the prior apply script has stale baseline hashes
+The old v1.2 script pins these current files to obsolete hashes: src/pi-a2u-client.js, src/a2u-worker.js, and scripts/a2u-payout-cron.js. It must not be run against current main. The old script is preserved only under a NOT_READY_ filename. A read-only baseline verifier is included instead.
+P1 — user-side withdrawal page/API contract is incomplete in current main
+investor-dashboard.html links to withdraw.html, but no withdraw.html exists in the fetched albukhr-app/main tree. No user withdrawal-history route/caller was found in the app/API sources. Confirm whether production is built from another source or page mapping before replacing the UI.
+P2 — single payout path and dependency checks
+src/financial-gateway.js still has a standalone payout implementation and /api/pay-withdrawal, while src/a2u-payout-service.js is the newer durable path. Before future activation, have the legacy route delegate to the service, add pi-backend@0.1.3 dependency and syntax checks, and keep unrelated U2A/investment routes untouched.
+Required safety state
+MAINNET_A2U_OFFICIALLY_SUPPORTED = false; no Cron activation; no wallet seed changes; no Mainnet payment.
