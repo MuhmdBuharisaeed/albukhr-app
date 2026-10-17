@@ -1,66 +1,23 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#087a3e">
-  <meta name="robots" content="noindex,nofollow">
-  <meta name="color-scheme" content="light">
-  <title>ALBUKHR — Withdrawals</title>
-  <link rel="stylesheet" href="css/withdrawal-page.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f7a3d"><meta name="robots" content="noindex,nofollow"><meta name="color-scheme" content="light">
+<title>Withdrawals | ALBUKHR</title><link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/albukhr-ui.css"><link rel="stylesheet" href="css/global-header.css"><link rel="stylesheet" href="css/global-buttons.css"><link rel="stylesheet" href="css/investor-dashboard.css"><link rel="stylesheet" href="css/investor-dashboard-ui-v6.css"><link rel="stylesheet" href="css/withdrawal-page.css">
 </head>
-<body>
-  <header class="topbar">
-    <a class="brand" href="investor-dashboard.html" aria-label="Return to investor dashboard">
-      <span class="brand-mark" aria-hidden="true">A</span>
-      <span><strong>ALBUKHR</strong><small>INVESTOR WITHDRAWALS</small></span>
-    </a>
-    <span class="network-pill">MAINNET</span>
-  </header>
-
-  <main class="container">
-    <a class="back-link" href="investor-dashboard.html">← Investor Dashboard</a>
-    <section class="page-intro">
-      <p class="eyebrow">MAINNET ACCOUNT</p>
-      <h1>Withdrawal Requests</h1>
-      <p>Review eligible positions and submit a withdrawal request for administrative review. Submitting a request does not send Pi.</p>
-    </section>
-
-    <div id="securityStatus" class="status" role="status" aria-live="polite">Verifying Mainnet identity…</div>
-
-    <section class="notice" aria-label="Payment notice">
-      <strong>Important payment boundary</strong>
-      <p>This page only submits a withdrawal request. It does not create, sign, submit, complete, or send a Pi payment. A request must pass the server-side balance, maturity, fee-policy, review, and payout safety checks.</p>
-    </section>
-
-    <section class="section-card">
-      <div class="section-heading">
-        <div><h2>Eligible staking positions</h2><p>Available amounts shown here are estimates. The Mainnet database makes the final eligibility and balance decision.</p></div>
-        <button id="refreshButton" class="button secondary" type="button">Refresh</button>
-      </div>
-      <div id="stakesStatus" class="muted" role="status" aria-live="polite">Loading Mainnet positions…</div>
-      <div id="stakeList" class="stake-list"></div>
-    </section>
-
-    <section class="section-card">
-      <div class="section-heading">
-        <div><h2>My withdrawal history</h2><p>Requests associated with the authenticated Pi identity.</p></div>
-        <span id="historyCount" class="count-pill">0</span>
-      </div>
-      <div id="historyStatus" class="muted" role="status" aria-live="polite">Loading withdrawal history…</div>
-      <div id="historyList" class="history-list"></div>
-    </section>
-
-    <footer class="footer-note">ALBUKHR Mainnet · Pi identity is verified by the trusted API. This page does not store the Pi access token or use browser storage for financial state.</footer>
-  </main>
-
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/core/environment-core.js"></script>
-  <script src="js/core/supabase-core.js"></script>
-  <script src="js/core/pi-auth-core.js"></script>
-  <script src="js/core/page-auth-guard.js"></script>
-  <script src="js/core/albukhr-api-core.js"></script>
-  <script src="js/withdrawal-page.js" defer></script>
-</body>
-</html>
+<body class="withdrawal-page">
+<header class="header"><div class="header-left"><span class="brand">ALBUKHR</span></div><div class="header-right"><span class="withdraw-network">MAINNET</span></div></header>
+<main class="withdraw-layout">
+<a class="withdraw-back" href="investor-dashboard.html">← Investor Dashboard</a>
+<section class="withdraw-hero"><div class="withdraw-hero-orb" aria-hidden="true"></div><div class="withdraw-hero-content"><div class="withdraw-kicker">INVESTOR ACCOUNT · MAINNET</div><h1>Withdrawals</h1><p>Manage eligible investments and review your withdrawal requests.</p><span class="withdraw-hero-tag">Request review only · No Pi sent</span></div><svg class="withdraw-hero-icon" viewBox="0 0 64 64" aria-hidden="true"><rect x="9" y="17" width="46" height="34" rx="8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M9 27h46M32 32v13m-6-6 6 6 6-6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></section>
+<div id="securityStatus" class="status" role="status" aria-live="polite">Verifying Mainnet identity…</div>
+<section class="withdraw-info"><div class="withdraw-info-icon" aria-hidden="true">ⓘ</div><div><strong>How withdrawals work</strong><p>Submit a request for administrative review. The Mainnet server verifies your available balance, maturity and fees. Submitting a request does not transfer Pi.</p></div></section>
+<section class="section-card"><div class="section-heading"><div><h2>Eligible investments</h2><p>Check available capital and rewards from your Mainnet positions.</p></div><button id="refreshButton" class="button secondary" type="button">Refresh</button></div><div id="stakesStatus" class="muted" role="status" aria-live="polite">Loading Mainnet positions…</div><div id="stakeList" class="stake-list"></div></section>
+<section class="section-card"><div class="section-heading"><div><h2>Withdrawal history</h2><p>Track requests linked to your verified Pi account.</p></div><span id="historyCount" class="count-pill">0</span></div><div id="historyStatus" class="muted" role="status" aria-live="polite">Loading withdrawal history…</div><div id="historyList" class="history-list"></div></section>
+<p class="withdraw-footnote">ALBUKHR Mainnet · Final financial decisions are verified by the trusted API. No Pi access token is stored by this page.</p>
+</main>
+<!-- Same ALBUKHR dock navigation structure as investor-dashboard.html -->
+<div class="dock-nav"><a href="index.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M3 10L12 3l9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Home</span></a><a href="investor-dashboard.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M16 11c1.66 0 3-1.34 3-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zM2 20v-1c0-2.21 3.58-4 6-4s6 1.79 6 4v1zM14 20v-1c0-1.5 1.5-2.8 3.5-3.5 2 .7 3.5 2 3.5 3.5v1z"/></svg><span>Investors</span></a><a href="transparency.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><path d="M6 3h8l4 4v14H6zM14 3v4h4M8 11h8M8 14h8"/></svg><span>Transparency</span></a><a href="services.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1 1 0 000-6l2-1-2-3-2 1a7 7 0 00-4-2V1H10v3a7 7 0 00-4 2l-2-1-2 3 2 1a7 7 0 000 6l-2 1 2 3 2-1a7 7 0 004 2v3h4v-3a7 7 0 004-2l2 1 2-3z"/></svg><span>Services</span></a></div>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/core/environment-core.js"></script><script src="js/core/supabase-core.js"></script><script src="js/core/pi-auth-core.js"></script><script src="js/core/page-auth-guard.js"></script><script src="js/core/albukhr-api-core.js"></script><script src="js/withdrawal-page.js" defer></script>
+</body></html>
