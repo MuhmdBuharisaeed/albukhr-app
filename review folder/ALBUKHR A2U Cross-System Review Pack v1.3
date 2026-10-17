@@ -1,0 +1,25 @@
+ALBUKHR A2U Cross-System Review Pack v1.3
+Matsayi: REVIEW ONLY — ba a shirya yin apply/deploy ba.
+Wannan siga ta sabunta binciken da aka yi kan ainihin main branch na albukhr-api, albukhr-app, albukhr-admin, da Mainnet Supabase a ranar 17 Oktoba 2026. Ba ta canza GitHub, Supabase, Render ko wani payment ba.
+Abin da aka tabbatar
+A2U payout service, Pi client, worker da cron entry point suna cikin albukhr-api/main.
+src/pi-a2u-client.js yana da source-level hard gate MAINNET_A2U_OFFICIALLY_SUPPORTED = false; wannan dole ne ya ci gaba da kasancewa a kashe.
+src/a2u-payout-service.js yana kira da v2 RPC guda huɗu da ba su cikin Mainnet Supabase a yanzu.
+/api/pay-withdrawal a src/financial-gateway.js har yanzu yana ɗauke da tsohon payout implementation daban, ba ya amfani da DB fencing/claim v2.
+server.js bai mount src/a2u-worker.js ba; render.yaml ba shi da Render Cron service. Ba a ƙara su a wannan review pack ba.
+albukhr-app/main yana da href="withdraw.html" a investor-dashboard.html, amma withdraw.html bai bayyana cikin tree na main ba; babu GET /api/withdrawal-history ko get_my_withdrawal_requests caller da aka samu a API repo.
+Admin withdrawal UI har yanzu yana amfani da manual Mark as Paid flow bayan saka TXID.
+Abubuwan da ke cikin bundle
+src/ da scripts/a2u-payout-cron.js: snapshot ɗin A2U safety code da aka yi review, ba sabuwar production activation ba.
+tests/: static/model/mock tests.
+sql/NOT_READY_DO_NOT_APPLY_20261017_a2u_payout_safety_v3.sql: tsohon SQL draft domin review kawai; an sanya suna da gangan don hana ɗaukar shi a matsayin migration da aka amince da ita.
+docs/CURRENT_MAIN_AUDIT_2026-10-17.md: abubuwan da aka tabbatar daga current sources/database.
+docs/SQL_REVISION_REQUIRED_HA.md: SQL/admin concurrency blockers kafin a tsara migration ta ƙarshe.
+docs/API_AND_UI_GAPS_HA.md: sauran haɗin user-side, admin-side da API.
+scripts/verify-current-main-baseline.js: read-only checker don tabbatar da hashes na current API main baseline idan an samu local clone.
+scripts/apply-api-single-payout-review.js: dry-run by default; idan an yi review dabam, --apply-local yana canza local checkout files biyu kawai (API gateway da package manifest). Ba ya canza GitHub/DB/Render, kuma ba ya sa A2U ya kunna.
+tests/api-single-payout-transform.test.js: synthetic fixture test na gateway transformation; ba full API integration test ba.
+Test status
+Gwaje-gwajen static, runtime gate, uncertainty mock, da balance model daga wannan bundle sun wuce a Node.js v22.16.0. Waɗannan ba su maye gurbin PostgreSQL/PLpgSQL validation, SQL privilege tests, Pi Testnet integration ko Admin concurrency tests ba.
+Haramcin wannan matakin
+Kada a gudanar da SQL draft, kada a kunna A2U, kada a haɗa wallet seed, kada a ƙirƙiri Cron service, kada a canza Render env vars, kada a aika Pi, kuma kada a commit/deploy source daga wannan bundle. A2U Mainnet sai bayan Pi ta tabbatar da eligibility/Outgoing Wallet da kuma ALBUKHR ya yi review da amincewa daban.
