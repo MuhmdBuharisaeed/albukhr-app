@@ -69,3 +69,13 @@ img,svg,video{max-width:100%}
   .document-control{width:100%;box-shadow:none;break-inside:avoid;border:1px solid #d8e0da}
   a{color:#075b31;text-decoration:underline}
 }
+
+.authorized-signature {
+  display: block;
+  width: min(100%, 360px);
+  height: auto;
+  max-height: 110px;
+  object-fit: contain;
+  object-position: left center;
+  margin: 10px 0;
+  }
