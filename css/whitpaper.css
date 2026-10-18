@@ -70,12 +70,26 @@ img,svg,video{max-width:100%}
   a{color:#075b31;text-decoration:underline}
 }
 
-.authorized-signature {
+/* Compact handwritten signature size */
+.document-control img.authorized-signature {
   display: block;
-  width: min(100%, 360px);
-  height: auto;
-  max-height: 110px;
-  object-fit: contain;
-  object-position: left center;
-  margin: 10px 0;
+  width: 190px !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 58px !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+  margin: 8px 0 6px !important;
+}
+@media (min-width: 700px) {
+  .document-control img.authorized-signature {
+    width: 210px !important;
+    max-height: 64px !important;
   }
+}
+@media print {
+  .document-control img.authorized-signature {
+    width: 170px !important;
+    max-height: 52px !important;
+  }
+}
