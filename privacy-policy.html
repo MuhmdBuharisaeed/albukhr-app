@@ -1,229 +1,1446 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="ALBUKHR Investment Limited Privacy Policy: how personal information is collected, used, protected, retained and shared."
+  >
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0f7a3d">
 
-<title>ALBUKHR Privacy Policy</title>
+  <title>ALBUKHR Privacy Policy</title>
 
-<style>
+  <style>
+    :root {
+      --green: #0f7a3d;
+      --green-dark: #075b31;
+      --green-soft: #eaf6ee;
+      --page-bg: #f6fbf8;
+      --surface: #ffffff;
+      --text: #26332b;
+      --muted: #66736b;
+      --border: #dfe9e2;
+      --shadow: 0 6px 22px rgba(16, 55, 31, 0.06);
+      --radius: 16px;
+      --content-width: 920px;
+    }
 
-body{
-margin:0;
-font-family:system-ui,-apple-system,sans-serif;
-background:#f6fbf8;
-color:#333;
-line-height:1.7;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-/* HEADER */
-.header{
-background:#0f7a3d;
-color:#fff;
-padding:25px 20px;
-text-align:center;
-}
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 20px;
+    }
 
-.header h1{
-margin:0;
-font-size:22px;
-}
+    body {
+      margin: 0;
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.75;
+      overflow-wrap: anywhere;
+    }
 
-.header p{
-margin:6px 0 0;
-font-size:13px;
-opacity:.9;
-}
+    button,
+    a {
+      font: inherit;
+    }
 
-/* LANGUAGE */
-.lang-switch{
-display:flex;
-justify-content:center;
-gap:10px;
-padding:12px;
-background:#fff;
-border-bottom:1px solid #eee;
-}
+    a {
+      color: var(--green-dark);
+      text-underline-offset: 3px;
+    }
 
-.lang-btn{
-padding:6px 14px;
-border-radius:20px;
-cursor:pointer;
-background:#e6f6ec;
-font-size:12px;
-font-weight:600;
-}
+    a:hover {
+      text-decoration-thickness: 2px;
+    }
 
-/* CONTAINER */
-.container{
-max-width:900px;
-margin:auto;
-padding:20px;
-}
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid #70bd8b;
+      outline-offset: 3px;
+    }
 
-/* SECTION */
-.section{
-background:#fff;
-padding:20px;
-border-radius:14px;
-margin-bottom:16px;
-box-shadow:0 6px 18px rgba(0,0,0,0.05);
-}
+    .site-header {
+      padding: 34px 18px 30px;
+      color: #ffffff;
+      text-align: center;
+      background:
+        linear-gradient(
+          135deg,
+          var(--green-dark),
+          var(--green)
+        );
+    }
 
-.section h2{
-color:#0f7a3d;
-margin-top:0;
-}
+    .brand-name {
+      margin: 0;
+      font-size: clamp(1.45rem, 4vw, 2rem);
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+    }
 
-/* FOOTER */
-.footer{
-text-align:center;
-padding:20px;
-font-size:12px;
-color:#777;
-}
+    .page-title {
+      margin: 10px 0 0;
+      font-size: clamp(1.05rem, 3vw, 1.35rem);
+      font-weight: 650;
+    }
 
-</style>
+    .header-description {
+      max-width: 680px;
+      margin: 8px auto 0;
+      font-size: 0.94rem;
+      opacity: 0.94;
+    }
 
+    .language-bar {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 9px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .language-label {
+      margin-right: 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 650;
+    }
+
+    .language-button {
+      min-height: 38px;
+      padding: 7px 15px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--green-dark);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 700;
+      transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
+    }
+
+    .language-button:hover {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .language-button[aria-pressed="true"] {
+      border-color: var(--green);
+      background: var(--green);
+      color: #ffffff;
+    }
+
+    .container {
+      width: min(100% - 32px, var(--content-width));
+      margin: 28px auto;
+    }
+
+    .policy-notice {
+      margin-bottom: 20px;
+      padding: 16px 18px;
+      border: 1px solid #e4d9ac;
+      border-radius: 12px;
+      background: #fffdf4;
+      color: #584b22;
+      font-size: 0.92rem;
+    }
+
+    .policy-notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .policy-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin: 0 0 20px;
+      padding: 0 2px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .section {
+      margin-bottom: 16px;
+      padding: clamp(18px, 4vw, 26px);
+      border: 1px solid rgba(223, 233, 226, 0.8);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .section h2 {
+      margin: 0 0 12px;
+      color: var(--green-dark);
+      font-size: clamp(1.08rem, 3vw, 1.25rem);
+      line-height: 1.45;
+    }
+
+    .section p {
+      margin: 0 0 12px;
+    }
+
+    .section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .section ul {
+      margin: 10px 0 14px;
+      padding-left: 24px;
+    }
+
+    .section li {
+      margin: 6px 0;
+      padding-left: 2px;
+    }
+
+    .section li:last-child {
+      margin-bottom: 0;
+    }
+
+    .section h3 {
+      margin: 20px 0 8px;
+      color: var(--green-dark);
+      font-size: 1rem;
+    }
+
+    .section h3:first-of-type {
+      margin-top: 14px;
+    }
+
+    .contact-email {
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
+
+    .footer {
+      padding: 24px 16px 30px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.875rem;
+    }
+
+    .footer p {
+      margin: 4px 0;
+    }
+
+    .footer a {
+      font-weight: 650;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 560px) {
+      body {
+        font-size: 15px;
+      }
+
+      .site-header {
+        padding: 28px 16px 24px;
+      }
+
+      .language-bar {
+        gap: 7px;
+        padding: 12px 10px;
+      }
+
+      .language-label {
+        width: 100%;
+        margin: 0;
+        text-align: center;
+      }
+
+      .language-button {
+        padding: 7px 12px;
+      }
+
+      .container {
+        width: min(100% - 20px, var(--content-width));
+        margin: 18px auto;
+      }
+
+      .section {
+        margin-bottom: 12px;
+        border-radius: 12px;
+      }
+
+      .section ul {
+        padding-left: 21px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-<h1>ALBUKHR Investment Limited</h1>
-<p>Privacy Policy</p>
-</div>
+  <!-- HEADER -->
+  <header class="site-header">
+    <p class="brand-name" data-i18n="brand">
+      ALBUKHR Investment Limited
+    </p>
 
-<!-- LANGUAGE -->
-<div class="lang-switch">
-<div class="lang-btn">English</div>
-<div class="lang-btn">Hausa</div>
-<div class="lang-btn">Français</div>
-</div>
+    <h1 class="page-title" data-i18n="pageTitle">
+      Privacy Policy
+    </h1>
 
-<div class="container">
+    <p class="header-description" data-i18n="headerDescription">
+      Information about how ALBUKHR handles personal data when you use
+      its platform and services.
+    </p>
+  </header>
 
-<!-- 1 INTRO -->
-<div class="section">
-<h2>1. Introduction</h2>
+  <!-- FUNCTIONAL LANGUAGE SELECTOR -->
+  <nav
+    class="language-bar"
+    aria-label="Language selection"
+    data-i18n-aria-label="languageNav"
+  >
+    <span class="language-label" data-i18n="languageLabel">
+      Language
+    </span>
 
-<p>
-ALBUKHR Investment Limited respects your privacy and is committed to protecting your personal information. 
-This Privacy Policy explains how we collect, use, and safeguard your data when you use our platform.
-</p>
+    <button
+      class="language-button"
+      type="button"
+      data-language="en"
+      aria-pressed="true"
+    >
+      English
+    </button>
 
-</div>
+    <button
+      class="language-button"
+      type="button"
+      data-language="ha"
+      aria-pressed="false"
+    >
+      Hausa
+    </button>
 
-<!-- 2 DATA -->
-<div class="section">
-<h2>2. Information We Collect</h2>
+    <button
+      class="language-button"
+      type="button"
+      data-language="fr"
+      aria-pressed="false"
+    >
+      Français
+    </button>
+  </nav>
 
-<p>We may collect the following types of information:</p>
+  <main class="container">
 
-<ul>
-<li>User identification (e.g. username)</li>
-<li>Wallet or transaction data</li>
-<li>Investment activity</li>
-<li>Device and technical data</li>
-<li>Application usage behavior</li>
-</ul>
+    <!-- REVIEW STATUS -->
+    <aside class="policy-notice" role="note">
+      <strong data-i18n="draftHeading">
+        Draft for review
+      </strong>
 
-</div>
+      <span data-i18n="draftText">
+        Proposed policy revision. It should be reviewed and approved
+        before being treated as the formally adopted policy.
+      </span>
+    </aside>
 
-<!-- 3 USE -->
-<div class="section">
-<h2>3. How We Use Your Information</h2>
+    <div class="policy-meta">
+      <span>
+        <strong data-i18n="versionLabel">Version:</strong>
+        <span data-i18n="versionValue">2.0 — Proposed revision</span>
+      </span>
 
-<ul>
-<li>To secure the platform and prevent fraud</li>
-<li>To process transactions and investments</li>
-<li>To improve user experience</li>
-<li>To maintain transparency and governance</li>
-</ul>
+      <span>
+        <strong data-i18n="companyLabel">Organisation:</strong>
+        ALBUKHR Investment Limited
+      </span>
+    </div>
 
-</div>
+    <!-- 1. INTRODUCTION -->
+    <section class="section" id="introduction">
+      <h2 data-i18n="s1Title">1. Introduction</h2>
 
-<!-- 4 SECURITY -->
-<div class="section">
-<h2>4. Data Security</h2>
+      <p data-i18n="s1p1">
+        ALBUKHR Investment Limited respects your privacy and is committed
+        to handling personal information responsibly. This Privacy Policy
+        explains how information may be collected, used, protected,
+        retained and shared when you access or use our platform and services.
+      </p>
 
-<p>
-We implement strong security measures including encryption, authentication systems, and controlled access 
-to protect user data and digital assets.
-</p>
+      <p data-i18n="s1p2">
+        This policy should be read together with any service-specific
+        notices, terms or consent notices shown when you use a particular
+        ALBUKHR feature.
+      </p>
+    </section>
 
-</div>
+    <!-- 2. INFORMATION COLLECTED -->
+    <section class="section" id="information-collected">
+      <h2 data-i18n="s2Title">2. Information We Collect</h2>
 
-<!-- 5 SHARING -->
-<div class="section">
-<h2>5. Data Sharing</h2>
+      <p data-i18n="s2Intro">
+        Depending on the services and features you use, we may process
+        the following categories of information:
+      </p>
 
-<p>
-ALBUKHR does not sell or trade user data. Information may only be shared when necessary for platform operation 
-or to comply with legal obligations.
-</p>
+      <ul>
+        <li data-i18n="s2li1">
+          Identification and account information, such as a Pi Network
+          user identifier and username.
+        </li>
 
-</div>
+        <li data-i18n="s2li2">
+          Wallet and network information, such as a wallet address and
+          the selected platform network.
+        </li>
 
-<!-- 6 RIGHTS -->
-<div class="section">
-<h2>6. Your Rights</h2>
+        <li data-i18n="s2li3">
+          Investment, transaction, contribution or other activity records
+          associated with the features you use.
+        </li>
 
-<ul>
-<li>Access your personal data</li>
-<li>Request corrections or updates</li>
-<li>Request deletion of your data</li>
-</ul>
+        <li data-i18n="s2li4">
+          Contact details you provide, including an email address and
+          telephone number.
+        </li>
 
-</div>
+        <li data-i18n="s2li5">
+          Business and project application information, which may include
+          business details, location, funding requests, team details,
+          uploaded documents and project logos.
+        </li>
 
-<!-- 7 RETENTION -->
-<div class="section">
-<h2>7. Data Retention</h2>
+        <li data-i18n="s2li6">
+          Contributor profile information, where applicable, such as
+          expertise, occupation, experience and contribution preferences.
+        </li>
 
-<p>
-We retain data only for as long as necessary to operate the platform and meet legal requirements.
-</p>
+        <li data-i18n="s2li7">
+          Security and technical records, which may include login times,
+          login outcomes, network information, device or browser details,
+          and audit records generated when relevant services are used.
+        </li>
+      </ul>
 
-</div>
+      <p data-i18n="s2p2">
+        The information collected depends on the feature involved. We
+        should not collect information that is unnecessary for the
+        relevant, stated purpose.
+      </p>
+    </section>
 
-<!-- 8 THIRD PARTY -->
-<div class="section">
-<h2>8. Third-Party Services</h2>
+    <!-- 3. PURPOSES -->
+    <section class="section" id="how-we-use-information">
+      <h2 data-i18n="s3Title">3. How We Use Your Information</h2>
 
-<p>
-Our platform may integrate with external services such as Pi Network. These services have their own privacy policies.
-</p>
+      <p data-i18n="s3Intro">
+        Subject to applicable law, information may be used for purposes
+        such as:
+      </p>
 
-</div>
+      <ul>
+        <li data-i18n="s3li1">
+          Authenticating users and helping protect accounts and platform
+          access.
+        </li>
 
-<!-- 9 UPDATES -->
-<div class="section">
-<h2>9. Policy Updates</h2>
+        <li data-i18n="s3li2">
+          Operating requested platform features and processing relevant
+          applications, contributions or transactions.
+        </li>
 
-<p>
-This Privacy Policy may be updated periodically. Continued use of the platform indicates acceptance of any changes.
-</p>
+        <li data-i18n="s3li3">
+          Reviewing business project applications, supporting governance
+          processes and maintaining appropriate records.
+        </li>
 
-</div>
+        <li data-i18n="s3li4">
+          Detecting suspicious activity, preventing fraud and investigating
+          security incidents.
+        </li>
 
-<!-- 10 CONTACT -->
-<div class="section">
-<h2>10. Contact</h2>
+        <li data-i18n="s3li5">
+          Maintaining technical reliability, troubleshooting issues and
+          improving the user experience.
+        </li>
 
-<p>
-For questions or concerns regarding this policy, please contact ALBUKHR through official communication channels.
-</p>
+        <li data-i18n="s3li6">
+          Meeting applicable legal obligations and responding to lawful
+          requests from competent authorities.
+        </li>
+      </ul>
+    </section>
 
-</div>
+    <!-- 4. LAWFUL BASIS -->
+    <section class="section" id="lawful-basis">
+      <h2 data-i18n="s4Title">
+        4. Lawful Basis for Processing
+      </h2>
 
-</div>
+      <p data-i18n="s4p1">
+        Where applicable data protection law requires a lawful basis,
+        the basis used depends on the purpose and circumstances of the
+        processing. Depending on the situation, this may include taking
+        steps to provide a requested service or perform an agreement,
+        complying with a legal obligation, pursuing a legitimate interest
+        where legally permitted, or obtaining consent where required.
+      </p>
 
-<div class="footer">
-ALBUKHR Investment Limited — Privacy Policy
-</div>
+      <p data-i18n="s4p2">
+        Where processing relies on consent, you may withdraw that consent
+        where the law provides this right. Withdrawal does not necessarily
+        affect processing that was lawful before the withdrawal, and
+        another lawful basis may apply to information that must be retained.
+      </p>
+
+      <p data-i18n="s4p3">
+        If required information is not provided, some platform features
+        or services may not be available or may not be capable of being
+        completed.
+      </p>
+    </section>
+
+    <!-- 5. SECURITY -->
+    <section class="section" id="data-security">
+      <h2 data-i18n="s5Title">5. Data Security</h2>
+
+      <p data-i18n="s5p1">
+        We use appropriate technical and organisational safeguards intended
+        to protect personal information against unauthorised access,
+        alteration, disclosure, loss or misuse. Depending on the system
+        and feature, safeguards may include access controls, authentication
+        procedures, security monitoring and encryption where appropriate
+        and supported.
+      </p>
+
+      <p data-i18n="s5p2">
+        No website, network, storage system or method of electronic
+        transmission can be guaranteed to be completely secure. Users
+        should protect their account credentials and report suspected
+        unauthorised activity promptly.
+      </p>
+    </section>
+
+    <!-- 6. SHARING -->
+    <section class="section" id="data-sharing">
+      <h2 data-i18n="s6Title">6. Data Sharing</h2>
+
+      <p data-i18n="s6p1">
+        ALBUKHR does not sell personal data as a commercial product.
+        Information may be shared only where reasonably necessary for
+        a stated purpose, permitted by applicable law or otherwise
+        authorised by you.
+      </p>
+
+      <p data-i18n="s6p2">
+        Depending on the service, recipients may include:
+      </p>
+
+      <ul>
+        <li data-i18n="s6li1">
+          Hosting, database, infrastructure, security and technical
+          service providers supporting platform operations.
+        </li>
+
+        <li data-i18n="s6li2">
+          Pi Network or other external services when you use a feature
+          that integrates with them.
+        </li>
+
+        <li data-i18n="s6li3">
+          Relevant parties involved in a requested service or transaction,
+          where the disclosure is necessary and properly authorised.
+        </li>
+
+        <li data-i18n="s6li4">
+          Regulators, courts, law enforcement bodies or other competent
+          authorities when disclosure is legally required or permitted.
+        </li>
+      </ul>
+
+      <p data-i18n="s6p3">
+        Service providers should process information in accordance with
+        their applicable responsibilities and arrangements. External
+        services may also have their own privacy policies and terms.
+      </p>
+    </section>
+
+    <!-- 7. RETENTION -->
+    <section class="section" id="data-retention">
+      <h2 data-i18n="s7Title">7. Data Retention</h2>
+
+      <p data-i18n="s7p1">
+        We retain personal information only for as long as reasonably
+        necessary for the purpose for which it was collected, subject
+        to applicable legal, regulatory, security, accounting and
+        recordkeeping requirements.
+      </p>
+
+      <p data-i18n="s7p2">
+        The appropriate retention period depends on the information
+        involved, the relevant service, the need to maintain transaction
+        or audit records, and whether a legal claim or investigation
+        may require the information to be preserved.
+      </p>
+
+      <p data-i18n="s7p3">
+        When information is no longer required, we will take appropriate
+        steps to delete it, anonymise it or otherwise handle it in
+        accordance with applicable requirements. A deletion request
+        may be subject to lawful exceptions.
+      </p>
+    </section>
+
+    <!-- 8. THIRD-PARTY SERVICES -->
+    <section class="section" id="third-party-services">
+      <h2 data-i18n="s8Title">8. Third-Party Services</h2>
+
+      <p data-i18n="s8p1">
+        Some platform features may depend on third-party services,
+        including Pi Network and technical infrastructure providers.
+        When you use an integrated service, the relevant provider may
+        process information under its own terms and privacy policy.
+      </p>
+
+      <p data-i18n="s8p2">
+        We encourage users to review the privacy information of relevant
+        external services before using them. ALBUKHR cannot control every
+        aspect of a third party's independent processing activities.
+      </p>
+
+      <p data-i18n="s8p3">
+        Where a feature involves public blockchain or other external
+        network records, information recorded on that network may be
+        visible to others and may not be capable of being changed or
+        deleted by ALBUKHR. This applies only where the relevant feature
+        actually uses such a network.
+      </p>
+    </section>
+
+    <!-- 9. INTERNATIONAL TRANSFERS -->
+    <section class="section" id="international-transfers">
+      <h2 data-i18n="s9Title">9. International Data Transfers</h2>
+
+      <p data-i18n="s9p1">
+        Some infrastructure or external service providers may process
+        information in countries other than the country in which you
+        are located. Where personal data is transferred across borders,
+        the transfer must be handled in accordance with applicable
+        data protection requirements and any safeguards required by law.
+      </p>
+
+      <p data-i18n="s9p2">
+        You may contact us using the details in this policy to request
+        further information about a relevant transfer, subject to
+        applicable law and the circumstances of the request.
+      </p>
+    </section>
+
+    <!-- 10. TECHNICAL DATA AND COOKIES -->
+    <section class="section" id="technical-data">
+      <h2 data-i18n="s10Title">
+        10. Technical Information and Cookies
+      </h2>
+
+      <p data-i18n="s10p1">
+        When you visit a website or use an integrated service, certain
+        technical information may be processed to support security,
+        network communication, reliability and troubleshooting.
+        Depending on the tools in use, this may include browser,
+        device, connection or diagnostic information.
+      </p>
+
+      <p data-i18n="s10p2">
+        Cookies or similar technologies may be used by a website or
+        an integrated provider where needed for essential functions,
+        preferences, security or other disclosed purposes. The
+        technologies in use depend on the relevant service. Where
+        consent or additional notice is required by law, it should
+        be provided before the relevant optional processing begins.
+      </p>
+
+      <p data-i18n="s10p3">
+        You can review your browser settings to manage certain
+        cookies or website storage. Blocking some technologies may
+        affect the operation of particular features.
+      </p>
+    </section>
+
+    <!-- 11. USER RIGHTS -->
+    <section class="section" id="your-rights">
+      <h2 data-i18n="s11Title">11. Your Privacy Rights</h2>
+
+      <p data-i18n="s11Intro">
+        Subject to applicable law and any lawful exceptions, you may
+        have the right to:
+      </p>
+
+      <ul>
+        <li data-i18n="s11li1">
+          Receive information about how your personal data is processed.
+        </li>
+
+        <li data-i18n="s11li2">
+          Request access to personal data held about you.
+        </li>
+
+        <li data-i18n="s11li3">
+          Request correction of inaccurate or incomplete information.
+        </li>
+
+        <li data-i18n="s11li4">
+          Request erasure of personal data where the legal conditions
+          for deletion are met.
+        </li>
+
+        <li data-i18n="s11li5">
+          Request restriction of processing or object to certain
+          processing where the applicable law allows.
+        </li>
+
+        <li data-i18n="s11li6">
+          Request a copy of eligible data in a portable format where
+          the legal requirements for data portability are met.
+        </li>
+
+        <li data-i18n="s11li7">
+          Withdraw consent where processing is based on consent and
+          the right to withdraw applies.
+        </li>
+
+        <li data-i18n="s11li8">
+          Seek information or appropriate intervention in relation
+          to automated decision-making where the law provides such rights.
+        </li>
+
+        <li data-i18n="s11li9">
+          Lodge a complaint with the relevant data protection authority.
+        </li>
+      </ul>
+
+      <p data-i18n="s11p2">
+        To exercise a right, contact us using the email address in
+        Section 14 and describe your request. We may need to verify
+        your identity and clarify the scope of the request before
+        taking action.
+      </p>
+
+      <p data-i18n="s11p3">
+        Some information cannot be deleted or altered where we are
+        legally required to retain it, where it is needed for a lawful
+        security or recordkeeping purpose, where another person's rights
+        would be affected, or where another lawful exception applies.
+      </p>
+
+      <p data-i18n="s11p4">
+        If you are in Nigeria, you may also contact the Nigeria Data
+        Protection Commission (NDPC) using its official channels if you
+        believe your data protection rights have been infringed.
+      </p>
+
+      <p>
+        <a
+          href="https://ndpc.gov.ng/"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-i18n="ndpcLink"
+        >
+          Official Nigeria Data Protection Commission website
+        </a>
+      </p>
+    </section>
+
+    <!-- 12. CHILDREN -->
+    <section class="section" id="children">
+      <h2 data-i18n="s12Title">12. Children's Privacy</h2>
+
+      <p data-i18n="s12p1">
+        Our services are not intended to collect children's personal
+        information unlawfully. Where the law requires parental or
+        guardian authorisation for processing a child's personal data,
+        the applicable requirements must be followed.
+      </p>
+
+      <p data-i18n="s12p2">
+        If you believe that a child has provided personal information
+        in circumstances where it should not have been collected,
+        please contact us so that we can review the matter and take
+        appropriate action where required.
+      </p>
+    </section>
+
+    <!-- 13. POLICY UPDATES -->
+    <section class="section" id="policy-updates">
+      <h2 data-i18n="s13Title">13. Policy Updates</h2>
+
+      <p data-i18n="s13p1">
+        We may revise this Privacy Policy to reflect changes in our
+        platform, services, data handling practices or legal obligations.
+      </p>
+
+      <p data-i18n="s13p2">
+        When a change is material, we will take appropriate steps to
+        provide notice where required. The revised policy should identify
+        its applicable version or revision date. Continued use of the
+        platform does not replace any consent that the law requires us
+        to obtain separately.
+      </p>
+    </section>
+
+    <!-- 14. CONTACT -->
+    <section class="section" id="contact">
+      <h2 data-i18n="s14Title">14. Contact ALBUKHR</h2>
+
+      <p data-i18n="s14p1">
+        For privacy questions, requests to access or correct personal
+        information, deletion or restriction requests, or concerns
+        about how your information is processed, contact ALBUKHR
+        Investment Limited through the email address below.
+      </p>
+
+      <p>
+        <strong data-i18n="emailLabel">Privacy contact email:</strong>
+        <br>
+
+        <a
+          class="contact-email"
+          href="mailto:albukhrinvestmentlimited@gmail.com?subject=Privacy%20Request"
+        >
+          albukhrinvestmentlimited@gmail.com
+        </a>
+      </p>
+
+      <p data-i18n="s14p2">
+        Please do not include passwords, private keys, passphrases or
+        other secret authentication credentials in your email.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>ALBUKHR Investment Limited</p>
+
+    <p data-i18n="footerText">
+      Privacy Policy — Proposed revision, pending approval.
+    </p>
+
+    <p>
+      <a
+        href="mailto:albukhrinvestmentlimited@gmail.com?subject=Privacy%20Request"
+        data-i18n="footerContact"
+      >
+        Contact us about privacy
+      </a>
+    </p>
+  </footer>
+
+  <!-- LANGUAGE TRANSLATIONS -->
+  <script>
+    (function () {
+      "use strict";
+
+      const translations = {
+        en: {
+          brand: "ALBUKHR Investment Limited",
+          pageTitle: "Privacy Policy",
+          headerDescription:
+            "Information about how ALBUKHR handles personal data when you use its platform and services.",
+          languageNav: "Language selection",
+          languageLabel: "Language",
+          draftHeading: "Draft for review",
+          draftText:
+            "Proposed policy revision. It should be reviewed and approved before being treated as the formally adopted policy.",
+          versionLabel: "Version:",
+          versionValue: "2.0 — Proposed revision",
+          companyLabel: "Organisation:",
+
+          s1Title: "1. Introduction",
+          s1p1:
+            "ALBUKHR Investment Limited respects your privacy and is committed to handling personal information responsibly. This Privacy Policy explains how information may be collected, used, protected, retained and shared when you access or use our platform and services.",
+          s1p2:
+            "This policy should be read together with any service-specific notices, terms or consent notices shown when you use a particular ALBUKHR feature.",
+
+          s2Title: "2. Information We Collect",
+          s2Intro:
+            "Depending on the services and features you use, we may process the following categories of information:",
+          s2li1:
+            "Identification and account information, such as a Pi Network user identifier and username.",
+          s2li2:
+            "Wallet and network information, such as a wallet address and the selected platform network.",
+          s2li3:
+            "Investment, transaction, contribution or other activity records associated with the features you use.",
+          s2li4:
+            "Contact details you provide, including an email address and telephone number.",
+          s2li5:
+            "Business and project application information, which may include business details, location, funding requests, team details, uploaded documents and project logos.",
+          s2li6:
+            "Contributor profile information, where applicable, such as expertise, occupation, experience and contribution preferences.",
+          s2li7:
+            "Security and technical records, which may include login times, login outcomes, network information, device or browser details, and audit records generated when relevant services are used.",
+          s2p2:
+            "The information collected depends on the feature involved. We should not collect information that is unnecessary for the relevant, stated purpose.",
+
+          s3Title: "3. How We Use Your Information",
+          s3Intro:
+            "Subject to applicable law, information may be used for purposes such as:",
+          s3li1:
+            "Authenticating users and helping protect accounts and platform access.",
+          s3li2:
+            "Operating requested platform features and processing relevant applications, contributions or transactions.",
+          s3li3:
+            "Reviewing business project applications, supporting governance processes and maintaining appropriate records.",
+          s3li4:
+            "Detecting suspicious activity, preventing fraud and investigating security incidents.",
+          s3li5:
+            "Maintaining technical reliability, troubleshooting issues and improving the user experience.",
+          s3li6:
+            "Meeting applicable legal obligations and responding to lawful requests from competent authorities.",
+
+          s4Title: "4. Lawful Basis for Processing",
+          s4p1:
+            "Where applicable data protection law requires a lawful basis, the basis used depends on the purpose and circumstances of the processing. Depending on the situation, this may include taking steps to provide a requested service or perform an agreement, complying with a legal obligation, pursuing a legitimate interest where legally permitted, or obtaining consent where required.",
+          s4p2:
+            "Where processing relies on consent, you may withdraw that consent where the law provides this right. Withdrawal does not necessarily affect processing that was lawful before the withdrawal, and another lawful basis may apply to information that must be retained.",
+          s4p3:
+            "If required information is not provided, some platform features or services may not be available or may not be capable of being completed.",
+
+          s5Title: "5. Data Security",
+          s5p1:
+            "We use appropriate technical and organisational safeguards intended to protect personal information against unauthorised access, alteration, disclosure, loss or misuse. Depending on the system and feature, safeguards may include access controls, authentication procedures, security monitoring and encryption where appropriate and supported.",
+          s5p2:
+            "No website, network, storage system or method of electronic transmission can be guaranteed to be completely secure. Users should protect their account credentials and report suspected unauthorised activity promptly.",
+
+          s6Title: "6. Data Sharing",
+          s6p1:
+            "ALBUKHR does not sell personal data as a commercial product. Information may be shared only where reasonably necessary for a stated purpose, permitted by applicable law or otherwise authorised by you.",
+          s6p2: "Depending on the service, recipients may include:",
+          s6li1:
+            "Hosting, database, infrastructure, security and technical service providers supporting platform operations.",
+          s6li2:
+            "Pi Network or other external services when you use a feature that integrates with them.",
+          s6li3:
+            "Relevant parties involved in a requested service or transaction, where the disclosure is necessary and properly authorised.",
+          s6li4:
+            "Regulators, courts, law enforcement bodies or other competent authorities when disclosure is legally required or permitted.",
+          s6p3:
+            "Service providers should process information in accordance with their applicable responsibilities and arrangements. External services may also have their own privacy policies and terms.",
+
+          s7Title: "7. Data Retention",
+          s7p1:
+            "We retain personal information only for as long as reasonably necessary for the purpose for which it was collected, subject to applicable legal, regulatory, security, accounting and recordkeeping requirements.",
+          s7p2:
+            "The appropriate retention period depends on the information involved, the relevant service, the need to maintain transaction or audit records, and whether a legal claim or investigation may require the information to be preserved.",
+          s7p3:
+            "When information is no longer required, we will take appropriate steps to delete it, anonymise it or otherwise handle it in accordance with applicable requirements. A deletion request may be subject to lawful exceptions.",
+
+          s8Title: "8. Third-Party Services",
+          s8p1:
+            "Some platform features may depend on third-party services, including Pi Network and technical infrastructure providers. When you use an integrated service, the relevant provider may process information under its own terms and privacy policy.",
+          s8p2:
+            "We encourage users to review the privacy information of relevant external services before using them. ALBUKHR cannot control every aspect of a third party's independent processing activities.",
+          s8p3:
+            "Where a feature involves public blockchain or other external network records, information recorded on that network may be visible to others and may not be capable of being changed or deleted by ALBUKHR. This applies only where the relevant feature actually uses such a network.",
+
+          s9Title: "9. International Data Transfers",
+          s9p1:
+            "Some infrastructure or external service providers may process information in countries other than the country in which you are located. Where personal data is transferred across borders, the transfer must be handled in accordance with applicable data protection requirements and any safeguards required by law.",
+          s9p2:
+            "You may contact us using the details in this policy to request further information about a relevant transfer, subject to applicable law and the circumstances of the request.",
+
+          s10Title: "10. Technical Information and Cookies",
+          s10p1:
+            "When you visit a website or use an integrated service, certain technical information may be processed to support security, network communication, reliability and troubleshooting. Depending on the tools in use, this may include browser, device, connection or diagnostic information.",
+          s10p2:
+            "Cookies or similar technologies may be used by a website or an integrated provider where needed for essential functions, preferences, security or other disclosed purposes. The technologies in use depend on the relevant service. Where consent or additional notice is required by law, it should be provided before the relevant optional processing begins.",
+          s10p3:
+            "You can review your browser settings to manage certain cookies or website storage. Blocking some technologies may affect the operation of particular features.",
+
+          s11Title: "11. Your Privacy Rights",
+          s11Intro:
+            "Subject to applicable law and any lawful exceptions, you may have the right to:",
+          s11li1:
+            "Receive information about how your personal data is processed.",
+          s11li2:
+            "Request access to personal data held about you.",
+          s11li3:
+            "Request correction of inaccurate or incomplete information.",
+          s11li4:
+            "Request erasure of personal data where the legal conditions for deletion are met.",
+          s11li5:
+            "Request restriction of processing or object to certain processing where the applicable law allows.",
+          s11li6:
+            "Request a copy of eligible data in a portable format where the legal requirements for data portability are met.",
+          s11li7:
+            "Withdraw consent where processing is based on consent and the right to withdraw applies.",
+          s11li8:
+            "Seek information or appropriate intervention in relation to automated decision-making where the law provides such rights.",
+          s11li9:
+            "Lodge a complaint with the relevant data protection authority.",
+          s11p2:
+            "To exercise a right, contact us using the email address in Section 14 and describe your request. We may need to verify your identity and clarify the scope of the request before taking action.",
+          s11p3:
+            "Some information cannot be deleted or altered where we are legally required to retain it, where it is needed for a lawful security or recordkeeping purpose, where another person's rights would be affected, or where another lawful exception applies.",
+          s11p4:
+            "If you are in Nigeria, you may also contact the Nigeria Data Protection Commission (NDPC) using its official channels if you believe your data protection rights have been infringed.",
+          ndpcLink: "Official Nigeria Data Protection Commission website",
+
+          s12Title: "12. Children's Privacy",
+          s12p1:
+            "Our services are not intended to collect children's personal information unlawfully. Where the law requires parental or guardian authorisation for processing a child's personal data, the applicable requirements must be followed.",
+          s12p2:
+            "If you believe that a child has provided personal information in circumstances where it should not have been collected, please contact us so that we can review the matter and take appropriate action where required.",
+
+          s13Title: "13. Policy Updates",
+          s13p1:
+            "We may revise this Privacy Policy to reflect changes in our platform, services, data handling practices or legal obligations.",
+          s13p2:
+            "When a change is material, we will take appropriate steps to provide notice where required. The revised policy should identify its applicable version or revision date. Continued use of the platform does not replace any consent that the law requires us to obtain separately.",
+
+          s14Title: "14. Contact ALBUKHR",
+          s14p1:
+            "For privacy questions, requests to access or correct personal information, deletion or restriction requests, or concerns about how your information is processed, contact ALBUKHR Investment Limited through the email address below.",
+          emailLabel: "Privacy contact email:",
+          s14p2:
+            "Please do not include passwords, private keys, passphrases or other secret authentication credentials in your email.",
+
+          footerText: "Privacy Policy — Proposed revision, pending approval.",
+          footerContact: "Contact us about privacy"
+        },
+
+        ha: {
+          brand: "ALBUKHR Investment Limited",
+          pageTitle: "Manufar Kare Sirrin Bayanai",
+          headerDescription:
+            "Bayani kan yadda ALBUKHR ke sarrafa bayanan mutum yayin amfani da dandamali da ayyukanta.",
+          languageNav: "Zaɓin harshe",
+          languageLabel: "Harshe",
+          draftHeading: "Daftarin da ake son dubawa",
+          draftText:
+            "Sabon gyaran manufar da ake gabatarwa. Ya kamata a duba shi kuma a amince da shi kafin a ɗauke shi a matsayin manufar da aka amince da ita a hukumance.",
+          versionLabel: "Siga:",
+          versionValue: "2.0 — Gyaran da ake gabatarwa",
+          companyLabel: "Ƙungiya:",
+
+          s1Title: "1. Gabatarwa",
+          s1p1:
+            "ALBUKHR Investment Limited tana mutunta sirrinka kuma tana ƙoƙarin sarrafa bayanan mutum cikin kulawa. Wannan manufar ta bayyana yadda za a iya tattarawa, amfani da su, kare su, adana su da kuma raba bayanai yayin da kake shiga ko amfani da dandamalinmu da ayyukanmu.",
+          s1p2:
+            "Ya kamata a karanta wannan manufar tare da duk wata sanarwa, ƙa’ida ko sanarwar amincewa da aka nuna yayin amfani da wani takamaiman fasali na ALBUKHR.",
+
+          s2Title: "2. Bayanai da Muke Tattarawa",
+          s2Intro:
+            "Dangane da ayyuka da fasalolin da kake amfani da su, muna iya sarrafa waɗannan rukunin bayanai:",
+          s2li1:
+            "Bayanan tantance mutum da asusu, kamar Pi Network user ID da sunan mai amfani.",
+          s2li2:
+            "Bayanan walat da network, kamar adireshin walat da network ɗin dandamalin da aka zaɓa.",
+          s2li3:
+            "Bayanan zuba jari, ma’amaloli, gudummawa ko wasu ayyukan da suka shafi fasalolin da kake amfani da su.",
+          s2li4:
+            "Bayanan tuntuɓa da ka bayar, ciki har da adireshin imel da lambar waya.",
+          s2li5:
+            "Bayanan kasuwanci da neman amincewar project, waɗanda za su iya haɗawa da bayanan kasuwanci, wurin da yake, buƙatar jari, bayanan tawaga, takardun da aka ɗora da tambarin project.",
+          s2li6:
+            "Bayanan bayanin martabar mai bayar da gudummawa idan ya dace, kamar ƙwarewa, sana’a, gogewa da fifikon irin gudummawar da zai bayar.",
+          s2li7:
+            "Bayanan tsaro da fasaha, waɗanda za su iya haɗawa da lokutan shiga, sakamakon shiga, bayanan network, bayanan na’ura ko browser, da bayanan binciken ayyukan da aka samar yayin amfani da wasu ayyuka.",
+          s2p2:
+            "Irin bayanan da ake tattarawa ya danganta da fasalin da ake amfani da shi. Bai kamata a tattara bayanan da ba su da muhimmanci ga manufar da aka bayyana ba.",
+
+          s3Title: "3. Yadda Muke Amfani da Bayananka",
+          s3Intro:
+            "Bisa abin da dokokin da suka dace suka yarda, ana iya amfani da bayanai domin:",
+          s3li1:
+            "Tantance masu amfani da kuma taimakawa wajen kare asusu da damar shiga dandamali.",
+          s3li2:
+            "Gudanar da fasalolin da aka nema da sarrafa buƙatun aikace-aikace, gudummawa ko ma’amaloli da suka dace.",
+          s3li3:
+            "Duba buƙatun business project, tallafa wa tsarin sa ido da shugabanci, da kuma adana bayanan da suka dace.",
+          s3li4:
+            "Gano ayyukan da ake zargi, hana zamba da binciken matsalolin tsaro.",
+          s3li5:
+            "Kula da ingancin tsarin fasaha, warware matsaloli da inganta kwarewar mai amfani.",
+          s3li6:
+            "Cika wajibin doka da kuma amsa buƙatun hukuma masu inganci bisa doka.",
+
+          s4Title: "4. Tushen Doka na Sarrafa Bayanai",
+          s4p1:
+            "Inda dokar kare bayanai ta buƙaci ingantaccen tushen doka, tushen da ake amfani da shi ya danganta da manufa da yanayin sarrafa bayanan. Dangane da halin da ake ciki, wannan na iya haɗawa da ɗaukar matakan samar da sabis da aka nema ko cika yarjejeniya, bin wajibin doka, bin halastacciyar muradun da doka ta yarda da su, ko samun amincewa idan ana buƙatarta.",
+          s4p2:
+            "Idan ana sarrafa bayanai bisa amincewa, za ka iya janye amincewar inda doka ta ba da wannan dama. Janyewa ba lallai ya shafi sarrafa bayanan da aka yi bisa doka kafin janyewar ba; haka kuma, wani tushen doka na iya ba da damar ci gaba da adana bayanan da dole ne a riƙe.",
+          s4p3:
+            "Idan ba a bayar da bayanan da ake buƙata ba, wasu fasaloli ko ayyuka na dandamali na iya kasa samuwa ko kammalawa.",
+
+          s5Title: "5. Tsaron Bayanai",
+          s5p1:
+            "Muna amfani da matakan tsaro na fasaha da na gudanarwa da suka dace domin kare bayanan mutum daga shiga ba tare da izini ba, sauya su, bayyana su, rasa su ko amfani da su ta hanyar da ba ta dace ba. Dangane da tsarin da fasalin da ake amfani da shi, matakan na iya haɗawa da takaita izinin shiga, hanyoyin tantance asusu, sa ido kan tsaro da ɓoye bayanai (encryption) inda ya dace kuma tsarin ya tallafa.",
+          s5p2:
+            "Ba za a iya tabbatar da cewa kowane shafi, network, tsarin adana bayanai ko hanyar aika bayanai ta lantarki tana da cikakken tsaro ba. Masu amfani su kare bayanan shiga asusunsu kuma su sanar da mu da wuri idan sun zargi wani ya shiga ba tare da izini ba.",
+
+          s6Title: "6. Raba Bayanai",
+          s6p1:
+            "ALBUKHR ba ta sayar da bayanan mutum a matsayin kayan kasuwanci. Ana iya raba bayanai ne kawai idan ana buƙatarsu da kyau domin wata manufar da aka bayyana, doka ta yarda da hakan, ko kuma ka ba da izini.",
+          s6p2: "Dangane da sabis ɗin, waɗanda za su iya karɓar bayanai sun haɗa da:",
+          s6li1:
+            "Masu samar da hosting, database, kayayyakin more rayuwar fasaha, tsaro da sauran ayyukan fasaha da ke tallafa wa dandamali.",
+          s6li2:
+            "Pi Network ko wasu ayyukan waje idan ka yi amfani da fasalin da aka haɗa da su.",
+          s6li3:
+            "Bangarorin da suka dace da wani sabis ko ma’amala da aka nema, idan bayyana bayanan ya zama dole kuma an ba da izinin da ya dace.",
+          s6li4:
+            "Masu kula da doka, kotuna, hukumomin tsaro ko wasu hukumomin da suka cancanta idan doka ta buƙaci ko ta yarda a bayyana bayanan.",
+          s6p3:
+            "Ya kamata masu samar da sabis su sarrafa bayanai bisa nauyin da ya rataya a kansu da yarjejeniyoyin da suka dace. Ayyukan waje na iya samun nasu manufofin sirri da ƙa’idoji.",
+
+          s7Title: "7. Tsawon Lokacin Adana Bayanai",
+          s7p1:
+            "Muna adana bayanan mutum na tsawon lokacin da ake buƙata da ma’ana domin manufar da aka tattara su, tare da bin wajibin doka, ƙa’ida, tsaro, lissafi da adana bayanan da suka dace.",
+          s7p2:
+            "Lokacin adanawa ya danganta da irin bayanan, sabis ɗin da ya shafa, buƙatar adana bayanan ma’amala ko bincike, da kuma yiwuwar buƙatar kiyaye bayanan domin da’awar shari’a ko bincike.",
+          s7p3:
+            "Idan ba a ƙara buƙatar bayanai ba, za mu ɗauki matakan da suka dace domin gogewa, cire bayanan da za su iya tantance mutum ko sarrafa su bisa buƙatun da suka dace. Buƙatar gogewa na iya fuskantar keɓantattun yanayin da doka ta yarda da su.",
+
+          s8Title: "8. Ayyukan Kamfanonin Waje",
+          s8p1:
+            "Wasu fasalolin dandamali na iya dogara da ayyukan kamfanonin waje, ciki har da Pi Network da masu samar da kayan aikin fasaha. Lokacin da ka yi amfani da sabis ɗin da aka haɗa, mai samar da sabis ɗin na iya sarrafa bayanai bisa nasa ƙa’idoji da manufar sirri.",
+          s8p2:
+            "Muna ƙarfafa masu amfani su karanta bayanan sirri na ayyukan waje masu dacewa kafin amfani da su. ALBUKHR ba ta da ikon sarrafa kowane ɓangare na yadda wani kamfani mai zaman kansa ke sarrafa bayanai.",
+          s8p3:
+            "Idan wani fasali ya yi amfani da blockchain na jama’a ko bayanan da ke kan wani network na waje, wasu mutane na iya ganin bayanan da aka rubuta a wannan network, kuma ALBUKHR na iya kasa sauya ko goge su. Wannan ya shafi fasalolin da suke amfani da irin wannan network kawai.",
+
+          s9Title: "9. Canja Bayanai Zuwa Wasu Ƙasashe",
+          s9p1:
+            "Wasu masu samar da kayan aikin fasaha ko ayyukan waje na iya sarrafa bayanai a ƙasar da ba ƙasar da kake ciki ba. Idan aka canja bayanan mutum tsakanin ƙasashe, dole ne a gudanar da canjin bisa dokokin kare bayanai da duk matakan kariya da doka ta buƙata.",
+          s9p2:
+            "Za ka iya tuntuɓarmu ta bayanan da aka bayar a cikin wannan manufar domin neman ƙarin bayani game da canjin bayanai da ya dace, bisa doka da yanayin buƙatarka.",
+
+          s10Title: "10. Bayanan Fasaha da Cookies",
+          s10p1:
+            "Lokacin da ka ziyarci shafi ko amfani da sabis ɗin da aka haɗa, ana iya sarrafa wasu bayanan fasaha domin tsaro, sadarwar network, ingancin aiki da gano matsaloli. Dangane da kayan aikin da ake amfani da su, waɗannan na iya haɗawa da bayanan browser, na’ura, haɗin sadarwa ko bayanan tantance matsala.",
+          s10p2:
+            "Shafi ko mai samar da sabis na waje na iya amfani da cookies ko makamantansu inda ake buƙatarsu domin muhimman ayyuka, zaɓukan mai amfani, tsaro ko wasu dalilan da aka bayyana. Irin fasahar da ake amfani da ita ya danganta da sabis ɗin. Idan doka ta buƙaci amincewa ko ƙarin sanarwa, ya kamata a bayar da ita kafin fara sarrafawar zaɓi da abin ya shafa.",
+          s10p3:
+            "Za ka iya duba saitunan browser ɗinka domin sarrafa wasu cookies ko ajiyar bayanai ta shafi. Toshe wasu fasahohi na iya shafar yadda wasu fasaloli ke aiki.",
+
+          s11Title: "11. Haƙƙoƙinka na Sirrin Bayanai",
+          s11Intro:
+            "Bisa dokar da ta dace da keɓantattun yanayin da doka ta yarda da su, kana iya samun haƙƙin:",
+          s11li1:
+            "Samun bayani kan yadda ake sarrafa bayananka na mutum.",
+          s11li2:
+            "Neman ganin bayanan mutum da ake riƙe da su game da kai.",
+          s11li3:
+            "Neman gyara bayanan da ba daidai ba ko waɗanda ba su cika ba.",
+          s11li4:
+            "Neman gogewa idan an cika sharuɗɗan doka na gogewa.",
+          s11li5:
+            "Neman takaita sarrafa bayanai ko ƙin wasu nau’o’in sarrafawa inda doka ta ba da wannan dama.",
+          s11li6:
+            "Neman kwafin bayanan da suka dace a tsarin da za a iya turawa wani wuri, idan an cika sharuɗɗan doka.",
+          s11li7:
+            "Janye amincewa idan sarrafa bayanai ya dogara da amincewa kuma kana da haƙƙin janyewa.",
+          s11li8:
+            "Neman bayani ko sa hannun mutum game da yanke shawara ta atomatik inda doka ta ba da wannan haƙƙi.",
+          s11li9:
+            "Miƙa ƙorafi ga hukumar da ke kula da kare bayanai da ta dace.",
+          s11p2:
+            "Domin amfani da waɗannan haƙƙoƙi, tuntuɓe mu ta imel ɗin da aka nuna a Sashe na 14, ka bayyana buƙatarka. Muna iya buƙatar tantance shaidarka da fayyace buƙatar kafin ɗaukar mataki.",
+          s11p3:
+            "Ba za a iya goge ko sauya wasu bayanai ba idan doka ta buƙaci a riƙe su, idan ana buƙatarsu domin ingantaccen dalilin tsaro ko adana bayanai, idan hakan zai shafi haƙƙin wani mutum, ko kuma wani keɓantaccen dalilin da doka ta yarda da shi ya shafa.",
+          s11p4:
+            "Idan kana Najeriya, za ka iya tuntuɓar Nigeria Data Protection Commission (NDPC) ta hanyoyin sadarwa na hukuma idan kana ganin an tauye haƙƙoƙinka na kare bayanai.",
+          ndpcLink: "Shafin hukuma na Nigeria Data Protection Commission",
+
+          s12Title: "12. Sirrin Bayanai na Yara",
+          s12p1:
+            "Ba a tsara ayyukanmu domin tattara bayanan yara ta hanyar da ta saɓa wa doka ba. Idan doka ta buƙaci izinin iyaye ko waliyyi kafin sarrafa bayanan yaro, dole ne a bi waɗannan buƙatu.",
+          s12p2:
+            "Idan kana ganin yaro ya bayar da bayanan mutum a yanayin da bai kamata a tattara su ba, tuntuɓe mu domin mu binciki lamarin kuma mu ɗauki matakin da ya dace idan ana buƙata.",
+
+          s13Title: "13. Sabunta Manufar",
+          s13p1:
+            "Muna iya sabunta wannan manufar domin nuna canje-canje a dandamalinmu, ayyukanmu, hanyoyin sarrafa bayanai ko wajibin doka.",
+          s13p2:
+            "Idan canjin yana da muhimmanci, za mu ɗauki matakan sanarwa da suka dace inda doka ta buƙata. Sabuwar manufar ya kamata ta nuna sigarta ko ranar gyara. Ci gaba da amfani da dandamali ba ya maye gurbin amincewar da doka ta buƙaci mu nema dabam.",
+
+          s14Title: "14. Tuntuɓar ALBUKHR",
+          s14p1:
+            "Don tambayoyi kan sirri, buƙatar ganin ko gyara bayanan mutum, buƙatar gogewa ko takaita sarrafawa, ko ƙorafi kan yadda ake sarrafa bayananka, tuntuɓi ALBUKHR Investment Limited ta adireshin imel ɗin da ke ƙasa.",
+          emailLabel: "Imel ɗin tuntuɓar sirrin bayanai:",
+          s14p2:
+            "Don Allah kada ka haɗa kalmar sirri, private key, passphrase ko wasu sirrin tantance asusu a cikin imel ɗinka.",
+
+          footerText: "Manufar Sirrin Bayanai — Gyaran da ake gabatarwa, yana jiran amincewa.",
+          footerContact: "Tuntuɓe mu game da sirri"
+        },
+
+        fr: {
+          brand: "ALBUKHR Investment Limited",
+          pageTitle: "Politique de confidentialité",
+          headerDescription:
+            "Informations sur la manière dont ALBUKHR traite les données personnelles lors de l'utilisation de sa plateforme et de ses services.",
+          languageNav: "Choix de la langue",
+          languageLabel: "Langue",
+          draftHeading: "Projet à examiner",
+          draftText:
+            "Révision proposée de la politique. Elle doit être examinée et approuvée avant d'être considérée comme officiellement adoptée.",
+          versionLabel: "Version :",
+          versionValue: "2.0 — Révision proposée",
+          companyLabel: "Organisation :",
+
+          s1Title: "1. Introduction",
+          s1p1:
+            "ALBUKHR Investment Limited respecte votre vie privée et s'engage à traiter les données personnelles de manière responsable. Cette politique explique comment les informations peuvent être collectées, utilisées, protégées, conservées et partagées lorsque vous accédez à notre plateforme ou utilisez nos services.",
+          s1p2:
+            "Cette politique doit être lue avec les avis, conditions ou demandes de consentement propres au service qui peuvent être présentés lors de l'utilisation d'une fonctionnalité particulière d'ALBUKHR.",
+
+          s2Title: "2. Informations que nous collectons",
+          s2Intro:
+            "Selon les services et fonctionnalités que vous utilisez, nous pouvons traiter les catégories d'informations suivantes :",
+          s2li1:
+            "Informations d'identification et de compte, telles qu'un identifiant utilisateur Pi Network et un nom d'utilisateur.",
+          s2li2:
+            "Informations relatives au portefeuille et au réseau, telles qu'une adresse de portefeuille et le réseau sélectionné sur la plateforme.",
+          s2li3:
+            "Données relatives aux investissements, transactions, contributions ou autres activités liées aux fonctionnalités utilisées.",
+          s2li4:
+            "Coordonnées que vous fournissez, notamment une adresse e-mail et un numéro de téléphone.",
+          s2li5:
+            "Informations relatives aux entreprises et aux demandes de projets, pouvant inclure les détails de l'entreprise, sa localisation, les demandes de financement, les membres de l'équipe, les documents téléversés et les logos de projet.",
+          s2li6:
+            "Le cas échéant, informations du profil de contributeur, telles que les compétences, la profession, l'expérience et les préférences de contribution.",
+          s2li7:
+            "Données techniques et de sécurité pouvant inclure les heures de connexion, les résultats de connexion, les informations réseau, les détails du navigateur ou de l'appareil et les journaux d'audit générés lors de l'utilisation des services concernés.",
+          s2p2:
+            "Les informations collectées dépendent de la fonctionnalité utilisée. Nous ne devrions pas collecter des données qui ne sont pas nécessaires à la finalité déclarée concernée.",
+
+          s3Title: "3. Utilisation de vos informations",
+          s3Intro:
+            "Sous réserve du droit applicable, les informations peuvent être utilisées notamment pour :",
+          s3li1:
+            "Authentifier les utilisateurs et contribuer à la protection des comptes et de l'accès à la plateforme.",
+          s3li2:
+            "Fournir les fonctionnalités demandées et traiter les demandes, contributions ou transactions concernées.",
+          s3li3:
+            "Examiner les demandes de projets commerciaux, soutenir les processus de gouvernance et conserver les dossiers appropriés.",
+          s3li4:
+            "Détecter les activités suspectes, prévenir la fraude et enquêter sur les incidents de sécurité.",
+          s3li5:
+            "Maintenir la fiabilité technique, résoudre les problèmes et améliorer l'expérience utilisateur.",
+          s3li6:
+            "Respecter les obligations légales applicables et répondre aux demandes légales des autorités compétentes.",
+
+          s4Title: "4. Base juridique du traitement",
+          s4p1:
+            "Lorsque la législation applicable sur la protection des données exige une base juridique, celle-ci dépend de la finalité et des circonstances du traitement. Selon le cas, il peut s'agir de prendre des mesures pour fournir un service demandé ou exécuter un accord, de respecter une obligation légale, de poursuivre un intérêt légitime lorsque la loi le permet, ou d'obtenir un consentement lorsque celui-ci est requis.",
+          s4p2:
+            "Lorsque le traitement repose sur le consentement, vous pouvez le retirer lorsque la loi vous reconnaît ce droit. Le retrait n'affecte pas nécessairement la légalité du traitement effectué avant celui-ci, et une autre base juridique peut s'appliquer aux informations qui doivent être conservées.",
+          s4p3:
+            "Si les informations requises ne sont pas fournies, certaines fonctionnalités ou certains services peuvent ne pas être disponibles ou ne pas pouvoir être menés à terme.",
+
+          s5Title: "5. Sécurité des données",
+          s5p1:
+            "Nous utilisons des mesures techniques et organisationnelles appropriées destinées à protéger les données personnelles contre les accès non autorisés, la modification, la divulgation, la perte ou l'utilisation abusive. Selon le système et la fonctionnalité, ces mesures peuvent inclure des contrôles d'accès, des procédures d'authentification, une surveillance de sécurité et le chiffrement lorsque cela est approprié et pris en charge.",
+          s5p2:
+            "Aucun site web, réseau, système de stockage ou moyen de transmission électronique ne peut être garanti totalement sécurisé. Les utilisateurs doivent protéger leurs identifiants et signaler rapidement toute activité suspecte ou non autorisée.",
+
+          s6Title: "6. Partage des données",
+          s6p1:
+            "ALBUKHR ne vend pas les données personnelles en tant que produit commercial. Les informations ne peuvent être partagées que lorsqu'elles sont raisonnablement nécessaires à une finalité déclarée, autorisées par la loi applicable ou autrement autorisées par vous.",
+          s6p2: "Selon le service, les destinataires peuvent comprendre :",
+          s6li1:
+            "Les fournisseurs d'hébergement, de bases de données, d'infrastructure, de sécurité et de services techniques qui soutiennent la plateforme.",
+          s6li2:
+            "Pi Network ou d'autres services externes lorsque vous utilisez une fonctionnalité qui y est intégrée.",
+          s6li3:
+            "Les parties concernées par un service ou une transaction demandée, lorsque la divulgation est nécessaire et dûment autorisée.",
+          s6li4:
+            "Les autorités de régulation, tribunaux, services de maintien de l'ordre ou autres autorités compétentes lorsque la loi exige ou autorise la divulgation.",
+          s6p3:
+            "Les fournisseurs de services doivent traiter les informations conformément à leurs responsabilités et aux accords applicables. Les services externes peuvent également avoir leurs propres politiques de confidentialité et conditions.",
+
+          s7Title: "7. Conservation des données",
+          s7p1:
+            "Nous conservons les données personnelles uniquement pendant la durée raisonnablement nécessaire à la finalité pour laquelle elles ont été collectées, sous réserve des obligations légales, réglementaires, de sécurité, de comptabilité et de conservation des dossiers applicables.",
+          s7p2:
+            "La durée appropriée dépend des informations concernées, du service utilisé, de la nécessité de conserver des enregistrements de transactions ou d'audit, et de l'éventualité qu'une réclamation juridique ou une enquête exige leur conservation.",
+          s7p3:
+            "Lorsque les informations ne sont plus nécessaires, nous prendrons les mesures appropriées pour les supprimer, les anonymiser ou les traiter autrement conformément aux exigences applicables. Une demande de suppression peut être soumise à des exceptions légales.",
+
+          s8Title: "8. Services de tiers",
+          s8p1:
+            "Certaines fonctionnalités de la plateforme peuvent dépendre de services tiers, notamment Pi Network et des fournisseurs d'infrastructure technique. Lorsque vous utilisez un service intégré, le fournisseur concerné peut traiter les informations selon ses propres conditions et sa politique de confidentialité.",
+          s8p2:
+            "Nous encourageons les utilisateurs à consulter les informations de confidentialité des services externes concernés avant de les utiliser. ALBUKHR ne peut pas contrôler tous les aspects des activités de traitement indépendantes d'un tiers.",
+          s8p3:
+            "Lorsqu'une fonctionnalité utilise une blockchain publique ou des enregistrements sur un réseau externe, les informations inscrites sur ce réseau peuvent être visibles par d'autres personnes et peuvent ne pas pouvoir être modifiées ou supprimées par ALBUKHR. Cela ne concerne que les fonctionnalités qui utilisent effectivement un tel réseau.",
+
+          s9Title: "9. Transferts internationaux de données",
+          s9p1:
+            "Certains fournisseurs d'infrastructure ou services externes peuvent traiter des informations dans des pays autres que celui où vous vous trouvez. Lorsqu'une donnée personnelle est transférée à l'étranger, le transfert doit respecter les règles applicables en matière de protection des données et les garanties exigées par la loi.",
+          s9p2:
+            "Vous pouvez nous contacter aux coordonnées indiquées dans cette politique afin de demander des informations supplémentaires sur un transfert concerné, sous réserve de la loi applicable et des circonstances de la demande.",
+
+          s10Title: "10. Informations techniques et cookies",
+          s10p1:
+            "Lorsque vous visitez un site web ou utilisez un service intégré, certaines informations techniques peuvent être traitées pour la sécurité, les communications réseau, la fiabilité et le diagnostic des problèmes. Selon les outils utilisés, elles peuvent inclure des informations sur le navigateur, l'appareil, la connexion ou les diagnostics.",
+          s10p2:
+            "Un site web ou un fournisseur intégré peut utiliser des cookies ou technologies similaires pour des fonctions essentielles, des préférences, la sécurité ou d'autres finalités communiquées. Les technologies utilisées dépendent du service concerné. Lorsque la loi exige un consentement ou une information supplémentaire, celle-ci doit être fournie avant le début du traitement facultatif concerné.",
+          s10p3:
+            "Vous pouvez consulter les paramètres de votre navigateur pour gérer certains cookies ou stockages de site web. Le blocage de certaines technologies peut affecter le fonctionnement de certaines fonctionnalités.",
+
+          s11Title: "11. Vos droits en matière de confidentialité",
+          s11Intro:
+            "Sous réserve du droit applicable et des exceptions légales, vous pouvez avoir le droit de :",
+          s11li1:
+            "Recevoir des informations sur la manière dont vos données personnelles sont traitées.",
+          s11li2:
+            "Demander l'accès aux données personnelles détenues à votre sujet.",
+          s11li3:
+            "Demander la correction des informations inexactes ou incomplètes.",
+          s11li4:
+            "Demander l'effacement des données personnelles lorsque les conditions légales sont remplies.",
+          s11li5:
+            "Demander la limitation du traitement ou vous opposer à certains traitements lorsque la loi le permet.",
+          s11li6:
+            "Demander une copie des données admissibles dans un format portable lorsque les conditions légales sont remplies.",
+          s11li7:
+            "Retirer votre consentement lorsque le traitement repose sur celui-ci et que le droit de retrait s'applique.",
+          s11li8:
+            "Demander des informations ou une intervention appropriée concernant une décision automatisée lorsque la loi prévoit de tels droits.",
+          s11li9:
+            "Déposer une plainte auprès de l'autorité compétente en matière de protection des données.",
+          s11p2:
+            "Pour exercer un droit, contactez-nous à l'adresse e-mail indiquée à la section 14 et décrivez votre demande. Nous pouvons devoir vérifier votre identité et clarifier la portée de la demande avant d'agir.",
+          s11p3:
+            "Certaines informations ne peuvent pas être supprimées ou modifiées lorsque la loi impose leur conservation, lorsqu'elles sont nécessaires à une finalité légitime de sécurité ou de conservation des dossiers, lorsque les droits d'une autre personne seraient affectés ou lorsqu'une autre exception légale s'applique.",
+          s11p4:
+            "Si vous êtes au Nigeria, vous pouvez également contacter la Nigeria Data Protection Commission (NDPC) par ses canaux officiels si vous estimez que vos droits en matière de protection des données ont été enfreints.",
+          ndpcLink: "Site officiel de la Nigeria Data Protection Commission",
+
+          s12Title: "12. Vie privée des enfants",
+          s12p1:
+            "Nos services ne sont pas destinés à collecter illégalement des données personnelles concernant des enfants. Lorsque la loi exige l'autorisation d'un parent ou d'un tuteur pour traiter les données personnelles d'un enfant, les exigences applicables doivent être respectées.",
+          s12p2:
+            "Si vous pensez qu'un enfant a fourni des informations personnelles dans des circonstances où elles n'auraient pas dû être collectées, veuillez nous contacter afin que nous puissions examiner la situation et prendre les mesures appropriées si nécessaire.",
+
+          s13Title: "13. Mises à jour de la politique",
+          s13p1:
+            "Nous pouvons réviser cette politique pour refléter les changements de notre plateforme, de nos services, de nos pratiques de traitement des données ou de nos obligations légales.",
+          s13p2:
+            "Lorsqu'un changement est important, nous prendrons les mesures appropriées pour fournir un avis lorsque cela est requis. La politique révisée devrait indiquer sa version ou sa date de révision. La poursuite de l'utilisation de la plateforme ne remplace pas un consentement que la loi nous impose d'obtenir séparément.",
+
+          s14Title: "14. Contacter ALBUKHR",
+          s14p1:
+            "Pour toute question relative à la confidentialité, demande d'accès ou de correction, demande de suppression ou de limitation, ou préoccupation concernant le traitement de vos informations, contactez ALBUKHR Investment Limited à l'adresse e-mail ci-dessous.",
+          emailLabel: "Adresse e-mail pour la confidentialité :",
+          s14p2:
+            "Veuillez ne pas inclure de mots de passe, clés privées, phrases de récupération ou autres identifiants secrets dans votre e-mail.",
+
+          footerText: "Politique de confidentialité — Révision proposée, en attente d'approbation.",
+          footerContact: "Nous contacter au sujet de la confidentialité"
+        }
+      };
+
+      const supportedLanguages = ["en", "ha", "fr"];
+      const languageButtons = document.querySelectorAll("[data-language]");
+      const translatableElements = document.querySelectorAll("[data-i18n]");
+      const translatableAriaElements =
+        document.querySelectorAll("[data-i18n-aria-label]");
+
+      function applyLanguage(language) {
+        if (!supportedLanguages.includes(language)) {
+          language = "en";
+        }
+
+        const dictionary = translations[language];
+
+        translatableElements.forEach(function (element) {
+          const key = element.getAttribute("data-i18n");
+
+          if (
+            Object.prototype.hasOwnProperty.call(dictionary, key)
+          ) {
+            element.textContent = dictionary[key];
+          }
+        });
+
+        translatableAriaElements.forEach(function (element) {
+          const key = element.getAttribute("data-i18n-aria-label");
+
+          if (
+            Object.prototype.hasOwnProperty.call(dictionary, key)
+          ) {
+            element.setAttribute("aria-label", dictionary[key]);
+          }
+        });
+
+        languageButtons.forEach(function (button) {
+          const isActive =
+            button.getAttribute("data-language") === language;
+
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        document.documentElement.lang = language;
+
+        const pageTitleByLanguage = {
+          en: "ALBUKHR Privacy Policy",
+          ha: "ALBUKHR — Manufar Kare Sirrin Bayanai",
+          fr: "ALBUKHR — Politique de confidentialité"
+        };
+
+        document.title = pageTitleByLanguage[language];
+      }
+
+      languageButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          applyLanguage(
+            button.getAttribute("data-language")
+          );
+        });
+      });
+
+      /* English is the default. No browser storage is required. */
+      applyLanguage("en");
+    })();
+  </script>
 
 </body>
-</html>
+        </html>
