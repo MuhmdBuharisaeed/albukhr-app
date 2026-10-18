@@ -1,52 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Albukhr Projects</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f7a3d">
+  <meta
+    name="description"
+    content="Explore approved and active projects registered in the ALBUKHR ecosystem."
+  >
+  <title>Explore Projects | ALBUKHR</title>
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/global-header.css">
-<link rel="stylesheet" href="css/explore-projects.css">
-
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/global-header.css">
+  <link rel="stylesheet" href="css/explore-projects.css">
 </head>
 
 <body data-page="projects">
 
-<header class="header">
-  <div class="header-left">
-    <span class="brand">ALBUKHR</span>
-  </div>
-</header>
+  <a class="skip-link" href="#projectList">Skip to projects</a>
 
-<section class="section">
+  <header class="header">
+    <div class="header-left">
+      <span class="brand">ALBUKHR</span>
+    </div>
+  </header>
 
-  <div class="search-box">
-    <span aria-hidden="true">🔍</span>
-    <input
-      id="searchInput"
-      type="search"
-      autocomplete="off"
-      placeholder="Search projects..."
-      aria-label="Search projects"
+  <main class="section" id="exploreProjectsMain">
+
+    <section class="projects-intro" aria-labelledby="projectsHeading">
+      <p class="projects-eyebrow">ALBUKHR ECOSYSTEM</p>
+      <h1 id="projectsHeading">Explore Projects</h1>
+      <p class="projects-description">
+        Discover projects registered in the ALBUKHR ecosystem.
+        Projects are displayed according to their registry status
+        and the network you are currently using.
+      </p>
+    </section>
+
+    <section aria-label="Search registered projects">
+
+      <div class="search-box">
+        <svg
+          class="search-icon"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="10.8" cy="10.8" r="6.8"></circle>
+          <path d="m16 16 4.5 4.5"></path>
+        </svg>
+
+        <input
+          id="searchInput"
+          type="search"
+          autocomplete="off"
+          placeholder="Search registered projects..."
+          aria-label="Search registered projects"
+          aria-controls="projectList"
+        >
+      </div>
+
+    </section>
+
+    <section
+      class="registered-projects-section"
+      aria-labelledby="registeredProjectsHeading"
     >
-  </div>
+      <div class="projects-heading-row">
+        <h2 class="section-title" id="registeredProjectsHeading">
+          Registered Projects
+        </h2>
 
-  <div class="section-title">Albukhr Core Projects</div>
-  <div id="internalList" aria-live="polite"></div>
+        <span
+          id="projectCount"
+          class="project-count"
+          aria-live="polite"
+        >—</span>
+      </div>
 
-  <div class="section-title">Verified External Projects</div>
-  <div id="externalList" aria-live="polite"></div>
+      <div
+        id="projectList"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div class="empty">Loading registered projects...</div>
+      </div>
+    </section>
 
-</section>
+    <p class="projects-footnote">
+      Project approval and investment eligibility are different.
+      Only projects with an active status may pass the investment
+      eligibility check. All access remains subject to ALBUKHR's
+      applicable rules and authorization controls.
+    </p>
 
-<!-- ALBUKHR runtime: same environment + Supabase Core used by the current app -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/core/environment-core.js"></script>
-<script src="js/core/supabase-core.js"></script>
-<script src="js/project-config.js"></script>
-<script src="js/project-navigation.js"></script>
-<script src="js/explore-projects.js"></script>
+  </main>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Shared ALBUKHR Core -->
+  <script src="js/core/environment-core.js"></script>
+  <script src="js/core/supabase-core.js"></script>
+
+  <!-- Project registry and navigation -->
+  <script src="js/project-config.js"></script>
+  <script src="js/project-navigation.js"></script>
+
+  <!-- Explore Projects page controller -->
+  <script src="js/explore-projects.js"></script>
 
 </body>
 </html>
