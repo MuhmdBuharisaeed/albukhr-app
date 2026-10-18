@@ -1,112 +1,321 @@
 /* =========================================================
    ALBUKHR — EXPLORE PROJECTS
-   User-side project discovery UI
-   ---------------------------------------------------------
-   Design target:
-   - Clean ALBUKHR green/white ecosystem
-   - Large, readable project cards
-   - Official project logos displayed consistently
-   - Mobile-first layout matching the current user-side UI
-   - Works with registry-driven .project-card markup
-   - No project emoji/icon styling
-   - Does not modify Dock Navigation
+   File: css/explore-projects.css
+
+   Design:
+   - Modern ALBUKHR green and white interface
+   - Unified registry project listing
+   - No Core / Internal / External visual separation
+   - Responsive project cards
+   - Accessible search and status labels
+   - Official project logos
+   - No changes to global dock navigation
 ========================================================= */
 
 :root {
   --albukhr-green: #0f7a3d;
-  --albukhr-green-dark: #0b6632;
+  --albukhr-green-dark: #096532;
+  --albukhr-green-light: #159653;
   --albukhr-green-soft: #e8f6ee;
+
   --albukhr-page: #f4f7f5;
   --albukhr-card: #ffffff;
-  --albukhr-text: #171b18;
-  --albukhr-muted: #69716c;
-  --albukhr-border: #e6ece8;
-  --albukhr-shadow: 0 4px 18px rgba(15, 122, 61, 0.07);
+
+  --albukhr-text: #17221b;
+  --albukhr-muted: #6c7770;
+  --albukhr-subtle: #8b958e;
+
+  --albukhr-border: #e4ebe6;
+  --albukhr-border-strong: #d6e5db;
+
+  --albukhr-shadow:
+    0 5px 20px rgba(24, 67, 42, 0.055);
+
+  --albukhr-shadow-hover:
+    0 12px 28px rgba(24, 67, 42, 0.09);
+
+  --albukhr-radius-card: 22px;
+  --albukhr-radius-control: 16px;
 }
 
 /* =========================================================
-   PAGE
+   BASE
 ========================================================= */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
 
 body[data-page="projects"] {
-  background: var(--albukhr-page);
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      ellipse at top right,
+      rgba(15, 122, 61, 0.045),
+      transparent 34%
+    ),
+    var(--albukhr-page);
+
   color: var(--albukhr-text);
+
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
 }
 
-body[data-page="projects"] .section {
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 22px 18px 100px;
+body[data-page="projects"] *,
+body[data-page="projects"] *::before,
+body[data-page="projects"] *::after {
   box-sizing: border-box;
+}
+
+body[data-page="projects"] input,
+body[data-page="projects"] button {
+  font: inherit;
 }
 
 /* =========================================================
-   SEARCH
+   ACCESSIBILITY
 ========================================================= */
 
-body[data-page="projects"] .search-box {
-  width: 100%;
-  min-height: 64px;
-  box-sizing: border-box;
-  background: #fff;
-  border: 1px solid rgba(15, 122, 61, 0.04);
-  border-radius: 20px;
-  padding: 0 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 2px 0 24px;
+body[data-page="projects"] .skip-link {
+  position: absolute;
+  z-index: 9999;
+  top: -70px;
+  left: 14px;
+
+  padding: 12px 16px;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: var(--albukhr-green-dark);
+
+  font-size: 14px;
+  font-weight: 750;
+  text-decoration: none;
+
   box-shadow: var(--albukhr-shadow);
 }
 
-body[data-page="projects"] .search-box > span {
-  flex: 0 0 auto;
-  font-size: 25px;
-  line-height: 1;
-  opacity: 0.78;
+body[data-page="projects"] .skip-link:focus {
+  top: 12px;
 }
 
-body[data-page="projects"] .search-box input {
-  width: 100%;
-  min-width: 0;
-  height: 62px;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--albukhr-text);
-  font-family: inherit;
-  font-size: 17px;
-  font-weight: 400;
-}
-
-body[data-page="projects"] .search-box input::placeholder {
-  color: #8a918d;
-  opacity: 1;
-}
-
-body[data-page="projects"] .search-box:focus-within {
-  border-color: rgba(15, 122, 61, 0.22);
-  box-shadow: 0 5px 20px rgba(15, 122, 61, 0.10);
+body[data-page="projects"] a:focus-visible,
+body[data-page="projects"] input:focus-visible {
+  outline: 3px solid rgba(15, 122, 61, 0.30);
+  outline-offset: 3px;
 }
 
 /* =========================================================
-   SECTION TITLES
+   MAIN PAGE LAYOUT
 ========================================================= */
 
-body[data-page="projects"] .section-title {
-  margin: 0 0 12px;
-  padding: 0;
-  color: var(--albukhr-green);
-  font-size: 18px;
-  line-height: 1.3;
-  font-weight: 700;
-  letter-spacing: -0.1px;
+body[data-page="projects"] .section {
+  width: 100%;
+  max-width: 790px;
+  min-width: 0;
+
+  margin: 0 auto;
+  padding: 25px 18px 110px;
 }
 
-body[data-page="projects"] .section-title:not(:first-of-type) {
-  margin-top: 28px;
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+body[data-page="projects"] .projects-intro {
+  position: relative;
+  margin: 0 0 24px;
+  padding: 9px 2px 0;
+}
+
+body[data-page="projects"] .projects-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  margin: 0 0 10px;
+
+  color: var(--albukhr-green);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+  line-height: 1.5;
+}
+
+body[data-page="projects"] .projects-eyebrow::before {
+  content: "";
+  display: inline-block;
+
+  width: 18px;
+  height: 3px;
+
+  border-radius: 99px;
+  background: var(--albukhr-green);
+}
+
+body[data-page="projects"] #projectsHeading {
+  margin: 0;
+
+  color: var(--albukhr-text);
+
+  font-size: clamp(27px, 6vw, 35px);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 1.16;
+}
+
+body[data-page="projects"] .projects-description {
+  max-width: 570px;
+
+  margin: 12px 0 0;
+
+  color: var(--albukhr-muted);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.75;
+}
+
+/* =========================================================
+   SEARCH FIELD
+========================================================= */
+
+body[data-page="projects"] .search-box {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  min-height: 60px;
+
+  margin: 0 0 28px;
+  padding: 0 17px;
+
+  border: 1px solid var(--albukhr-border);
+  border-radius: var(--albukhr-radius-control);
+
+  background: var(--albukhr-card);
+
+  box-shadow:
+    0 4px 14px rgba(24, 67, 42, 0.025);
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+body[data-page="projects"] .search-box:focus-within {
+  border-color: rgba(15, 122, 61, 0.48);
+
+  box-shadow:
+    0 0 0 4px rgba(15, 122, 61, 0.075),
+    0 5px 18px rgba(24, 67, 42, 0.04);
+}
+
+body[data-page="projects"] .search-icon {
+  display: block;
+  flex: 0 0 21px;
+
+  width: 21px;
+  height: 21px;
+
+  fill: none;
+  stroke: var(--albukhr-green);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  opacity: 0.9;
+}
+
+body[data-page="projects"] #searchInput {
+  display: block;
+
+  width: 100%;
+  min-width: 0;
+  height: 58px;
+  padding: 0;
+
+  border: 0;
+  outline: none;
+  border-radius: 0;
+
+  background: transparent;
+  color: var(--albukhr-text);
+
+  font-size: 15px;
+  font-weight: 450;
+  line-height: normal;
+}
+
+body[data-page="projects"] #searchInput::placeholder {
+  color: #909992;
+  opacity: 1;
+}
+
+body[data-page="projects"] #searchInput::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* =========================================================
+   PROJECT SECTION HEADER
+========================================================= */
+
+body[data-page="projects"] .registered-projects-section {
+  width: 100%;
+  min-width: 0;
+}
+
+body[data-page="projects"] .projects-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin: 0 2px 15px;
+}
+
+body[data-page="projects"] .section-title {
+  min-width: 0;
+  margin: 0;
+
+  color: var(--albukhr-text);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.4;
+}
+
+body[data-page="projects"] .project-count {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 32px;
+  min-height: 28px;
+  padding: 4px 9px;
+
+  border: 1px solid #dcece1;
+  border-radius: 999px;
+
+  background: var(--albukhr-green-soft);
+  color: var(--albukhr-green-dark);
+
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 /* =========================================================
@@ -114,73 +323,49 @@ body[data-page="projects"] .section-title:not(:first-of-type) {
 ========================================================= */
 
 body[data-page="projects"] .project-card {
-  width: 100%;
-  min-height: 146px;
-  box-sizing: border-box;
   position: relative;
 
-  background: var(--albukhr-card);
-  border: 1px solid rgba(15, 122, 61, 0.035);
-  border-radius: 22px;
-
-  padding: 20px 18px;
-  margin: 0 0 14px;
-
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 15px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 150px;
+
+  margin: 0 0 15px;
+  padding: 19px 17px;
+
+  border: 1px solid rgba(222, 234, 226, 0.92);
+  border-radius: var(--albukhr-radius-card);
+
+  background: var(--albukhr-card);
 
   box-shadow: var(--albukhr-shadow);
 
+  overflow-wrap: anywhere;
+
   transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    border-color 0.16s ease;
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
 
-  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-
-body[data-page="projects"] .project-card:hover {
-  transform: translateY(-1px);
-  border-color: rgba(15, 122, 61, 0.10);
-  box-shadow: 0 7px 24px rgba(15, 122, 61, 0.10);
-}
-
-body[data-page="projects"] .project-card:active {
-  transform: scale(0.992);
 }
 
 /* =========================================================
    PROJECT LOGO
-   Standardized for every registered project.
 ========================================================= */
 
 body[data-page="projects"] .project-icon,
 body[data-page="projects"] .project-logo-wrap {
-  width: 56px;
-  height: 56px;
-  min-width: 56px;
-  min-height: 56px;
-  max-width: 56px;
-  max-height: 56px;
-
-  flex: 0 0 56px;
+  position: relative;
 
   display: flex;
+  flex: 0 0 56px;
   align-items: center;
   justify-content: center;
 
-  margin: 0;
-  padding: 0;
-
-  border-radius: 50%;
-  overflow: hidden;
-
-  background: var(--albukhr-green-soft);
-}
-
-body[data-page="projects"] img.project-logo {
   width: 56px;
   height: 56px;
   min-width: 56px;
@@ -188,43 +373,66 @@ body[data-page="projects"] img.project-logo {
   max-width: 56px;
   max-height: 56px;
 
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  border: 1px solid #e3eee7;
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f2faf5,
+      #e8f5ed
+    );
+
+  color: var(--albukhr-green);
+}
+
+body[data-page="projects"] img.project-logo,
+body[data-page="projects"] .project-icon img {
   display: block;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+
   margin: 0;
   padding: 0;
 
   object-fit: contain;
   object-position: center;
+
   border: 0;
-  border-radius: 50%;
+  border-radius: inherit;
 
-  background: var(--albukhr-green-soft);
+  background: transparent;
 }
 
-/*
- * Some older renderer versions may put the image directly
- * inside .project-icon. Keep the same sizing.
- */
-body[data-page="projects"] .project-icon img {
-  width: 56px;
-  height: 56px;
-  max-width: 56px;
-  max-height: 56px;
-  object-fit: contain;
-  object-position: center;
-  display: block;
-  margin: 0;
-}
+/* SVG fallback for a missing logo */
 
-/* Missing logo state */
 body[data-page="projects"] .project-logo-missing {
-  border: 1px solid #dce9e1;
-  background: #f0f8f3;
-  color: var(--albukhr-green);
-  border-radius: 50%;
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2px;
+  border-color: #dce9e1;
+  background: #f0f7f2;
+  color: #6e9279;
+}
+
+body[data-page="projects"] .project-logo-missing svg {
+  display: block;
+
+  width: 25px;
+  height: 25px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* =========================================================
@@ -234,74 +442,104 @@ body[data-page="projects"] .project-logo-missing {
 body[data-page="projects"] .project-body {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 0;
+  padding: 1px 0 0;
 }
 
 body[data-page="projects"] .project-title {
   margin: 0;
+
   color: var(--albukhr-text);
-  font-size: 17px;
-  line-height: 1.25;
-  font-weight: 700;
-  letter-spacing: -0.15px;
+
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.4;
 
   overflow-wrap: anywhere;
 }
 
 body[data-page="projects"] .project-desc {
-  margin: 4px 0 0;
-  color: var(--albukhr-muted);
-  font-size: 14px;
-  line-height: 1.32;
-  font-weight: 400;
-
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
+
+  margin: 6px 0 0;
   overflow: hidden;
+
+  color: var(--albukhr-muted);
+
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
 }
 
 body[data-page="projects"] .project-meta {
-  margin: 7px 0 0;
-  color: var(--albukhr-green);
-  font-size: 13px;
-  line-height: 1.3;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  margin: 10px 0 0;
+
+  color: var(--albukhr-green-dark);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.45;
 }
 
 /* =========================================================
-   PROJECT TAG
+   PROJECT STATUS BADGES
 ========================================================= */
 
 body[data-page="projects"] .project-tag {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  max-width: 100%;
   width: fit-content;
 
-  margin: 8px 0 0;
-  padding: 5px 11px;
+  margin: 10px 0 0;
+  padding: 6px 10px;
 
+  border: 1px solid #dcefe3;
   border-radius: 999px;
-  background: var(--albukhr-green-soft);
-  color: var(--albukhr-green);
 
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 600;
-  white-space: nowrap;
+  background: #eaf7ef;
+  color: #176b39;
+
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
-body[data-page="projects"] .project-tag.external {
-  background: #fff5d9;
-  color: #856404;
+/* The JS may use this class for active status in future. */
+
+body[data-page="projects"] .project-tag.active {
+  border-color: #ccebd7;
+  background: #e2f6e9;
+  color: #116b34;
+}
+
+body[data-page="projects"] .project-tag.approved {
+  border-color: #e7e5c9;
+  background: #fbf8e8;
+  color: #786a21;
 }
 
 /* =========================================================
-   ACTION
+   PROJECT ACTION
 ========================================================= */
 
 body[data-page="projects"] .project-action {
+  display: flex;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
   align-self: center;
   margin-left: auto;
 }
@@ -311,115 +549,250 @@ body[data-page="projects"] .project-action a {
   align-items: center;
   justify-content: center;
 
-  min-height: 34px;
-  padding: 0 10px;
+  min-height: 38px;
+  padding: 0 11px;
 
-  border-radius: 10px;
+  border: 1px solid #dcece2;
+  border-radius: 12px;
 
-  color: var(--albukhr-green);
-  background: transparent;
+  background: #f4faf6;
+  color: var(--albukhr-green-dark);
 
   font-size: 12px;
-  line-height: 1;
-  font-weight: 700;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
   text-decoration: none;
   white-space: nowrap;
+
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
 }
 
-body[data-page="projects"] .project-action a:hover {
-  background: var(--albukhr-green-soft);
+body[data-page="projects"] .project-action a:focus-visible {
+  outline: 3px solid rgba(15, 122, 61, 0.28);
+  outline-offset: 3px;
 }
 
 /* =========================================================
-   EMPTY / ERROR
+   EMPTY, LOADING AND ERROR STATES
 ========================================================= */
 
 body[data-page="projects"] .empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   width: 100%;
-  box-sizing: border-box;
+  min-height: 104px;
+  padding: 23px 18px;
 
-  padding: 22px 16px;
-  margin: 0 0 14px;
+  margin: 0 0 15px;
 
-  border: 1px dashed #d8e4dc;
-  border-radius: 18px;
+  border: 1px dashed #d6e5db;
+  border-radius: 19px;
 
-  background: rgba(255, 255, 255, 0.72);
-  color: #737b76;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--albukhr-muted);
 
   text-align: center;
   font-size: 13px;
-  line-height: 1.45;
+  font-weight: 500;
+  line-height: 1.7;
 }
 
 /* =========================================================
-   SMALL MOBILE
+   PAGE FOOTNOTE
 ========================================================= */
 
-@media (max-width: 480px) {
+body[data-page="projects"] .projects-footnote {
+  margin: 23px 4px 0;
+  padding: 0 8px;
+
+  color: #7c8780;
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.8;
+  text-align: center;
+}
+
+/* =========================================================
+   TABLET / DESKTOP
+========================================================= */
+
+@media (min-width: 680px) {
   body[data-page="projects"] .section {
-    padding: 18px 14px 96px;
+    padding: 34px 25px 120px;
+  }
+
+  body[data-page="projects"] .projects-intro {
+    margin-bottom: 28px;
+  }
+
+  body[data-page="projects"] .projects-description {
+    font-size: 14.5px;
   }
 
   body[data-page="projects"] .search-box {
-    min-height: 60px;
-    margin-bottom: 22px;
-    padding: 0 16px;
-    border-radius: 19px;
+    min-height: 64px;
+    margin-bottom: 32px;
   }
 
-  body[data-page="projects"] .search-box input {
-    height: 58px;
-    font-size: 16px;
-  }
-
-  body[data-page="projects"] .section-title {
-    font-size: 17px;
-    margin-bottom: 11px;
+  body[data-page="projects"] #searchInput {
+    height: 62px;
+    font-size: 15px;
   }
 
   body[data-page="projects"] .project-card {
-    min-height: 142px;
-    padding: 18px 16px;
-    gap: 14px;
-    border-radius: 21px;
+    align-items: center;
+    gap: 18px;
+    min-height: 156px;
+    padding: 21px;
   }
 
   body[data-page="projects"] .project-icon,
   body[data-page="projects"] .project-logo-wrap {
-    width: 52px;
-    height: 52px;
-    min-width: 52px;
-    min-height: 52px;
-    max-width: 52px;
-    max-height: 52px;
-    flex-basis: 52px;
-  }
-
-  body[data-page="projects"] img.project-logo,
-  body[data-page="projects"] .project-icon img {
-    width: 52px;
-    height: 52px;
-    max-width: 52px;
-    max-height: 52px;
+    flex-basis: 62px;
+    width: 62px;
+    height: 62px;
+    min-width: 62px;
+    min-height: 62px;
+    max-width: 62px;
+    max-height: 62px;
   }
 
   body[data-page="projects"] .project-title {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   body[data-page="projects"] .project-desc {
+    max-width: 490px;
+    font-size: 13.5px;
+  }
+}
+
+/* =========================================================
+   HOVER EFFECTS
+========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+  body[data-page="projects"] .project-card:hover {
+    transform: translateY(-2px);
+
+    border-color: var(--albukhr-border-strong);
+    box-shadow: var(--albukhr-shadow-hover);
+  }
+
+  body[data-page="projects"] .project-action a:hover {
+    border-color: #b9dfc6;
+    background: #e7f6ec;
+    color: #07592b;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  body[data-page="projects"] .section {
+    padding: 22px 14px 105px;
+  }
+
+  body[data-page="projects"] .projects-intro {
+    margin-bottom: 21px;
+    padding-top: 5px;
+  }
+
+  body[data-page="projects"] #projectsHeading {
+    font-size: 29px;
+  }
+
+  body[data-page="projects"] .projects-description {
+    margin-top: 10px;
     font-size: 13px;
+    line-height: 1.7;
+  }
+
+  body[data-page="projects"] .search-box {
+    min-height: 57px;
+    margin-bottom: 25px;
+    padding: 0 14px;
+    border-radius: 15px;
+  }
+
+  body[data-page="projects"] #searchInput {
+    height: 55px;
+    font-size: 14px;
+  }
+
+  body[data-page="projects"] .projects-heading-row {
+    margin-bottom: 13px;
+  }
+
+  body[data-page="projects"] .section-title {
+    font-size: 17px;
+  }
+
+  body[data-page="projects"] .project-card {
+    gap: 12px;
+    min-height: 0;
+
+    margin-bottom: 13px;
+    padding: 15px 13px;
+
+    border-radius: 19px;
+  }
+
+  body[data-page="projects"] .project-icon,
+  body[data-page="projects"] .project-logo-wrap {
+    flex-basis: 48px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    max-width: 48px;
+    max-height: 48px;
+
+    border-radius: 14px;
+  }
+
+  body[data-page="projects"] .project-title {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  body[data-page="projects"] .project-desc {
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.6;
+    -webkit-line-clamp: 3;
   }
 
   body[data-page="projects"] .project-meta {
-    font-size: 12px;
+    margin-top: 8px;
+    font-size: 11px;
+  }
+
+  body[data-page="projects"] .project-tag {
+    margin-top: 8px;
+    padding: 5px 8px;
+    font-size: 9px;
   }
 
   body[data-page="projects"] .project-action a {
-    min-height: 30px;
-    padding: 0 6px;
-    font-size: 11px;
+    min-height: 32px;
+    padding: 0 7px;
+    border-radius: 9px;
+    font-size: 10px;
+  }
+
+  body[data-page="projects"] .projects-footnote {
+    margin-top: 21px;
+    padding: 0 5px;
+    font-size: 10.5px;
   }
 }
 
@@ -428,28 +801,33 @@ body[data-page="projects"] .empty {
 ========================================================= */
 
 @media (max-width: 360px) {
+  body[data-page="projects"] .section {
+    padding-right: 11px;
+    padding-left: 11px;
+  }
+
   body[data-page="projects"] .project-card {
-    gap: 11px;
-    padding: 16px 13px;
+    gap: 10px;
+    padding: 13px 11px;
   }
 
   body[data-page="projects"] .project-icon,
   body[data-page="projects"] .project-logo-wrap {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    min-height: 48px;
-    max-width: 48px;
-    max-height: 48px;
-    flex-basis: 48px;
+    flex-basis: 43px;
+    width: 43px;
+    height: 43px;
+    min-width: 43px;
+    min-height: 43px;
+    max-width: 43px;
+    max-height: 43px;
   }
 
-  body[data-page="projects"] img.project-logo,
-  body[data-page="projects"] .project-icon img {
-    width: 48px;
-    height: 48px;
-    max-width: 48px;
-    max-height: 48px;
+  body[data-page="projects"] .project-title {
+    font-size: 13px;
+  }
+
+  body[data-page="projects"] .project-desc {
+    font-size: 11.5px;
   }
 
   body[data-page="projects"] .project-action {
@@ -462,7 +840,16 @@ body[data-page="projects"] .empty {
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  body[data-page="projects"] .project-card {
-    transition: none;
+  html {
+    scroll-behavior: auto;
   }
-}
+
+  body[data-page="projects"] *,
+  body[data-page="projects"] *::before,
+  body[data-page="projects"] *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+   }
