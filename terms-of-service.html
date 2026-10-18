@@ -1,248 +1,1293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Terms governing access to and use of the ALBUKHR Investment Limited platform and services.">
+  <meta name="theme-color" content="#0f7a3d">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALBUKHR Terms of Service</title>
 
-<title>ALBUKHR Terms of Service</title>
+  <style>
+    :root {
+      --green: #0f7a3d;
+      --green-dark: #075b31;
+      --green-soft: #eaf6ee;
+      --page-bg: #f6fbf8;
+      --surface: #fff;
+      --text: #26332b;
+      --muted: #66736b;
+      --border: #dfe9e2;
+      --content-width: 920px;
+    }
 
-<style>
+    * {
+      box-sizing: border-box;
+    }
 
-body{
-margin:0;
-font-family:system-ui,-apple-system,sans-serif;
-background:#f6fbf8;
-color:#333;
-line-height:1.7;
-}
+    html {
+      scroll-behavior: smooth;
+    }
 
-/* HEADER */
-.header{
-background:#0f7a3d;
-color:#fff;
-padding:25px 20px;
-text-align:center;
-}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.75;
+      overflow-wrap: anywhere;
+    }
 
-.header h1{
-margin:0;
-font-size:22px;
-}
+    a {
+      color: var(--green-dark);
+      text-underline-offset: 3px;
+    }
 
-.header p{
-margin:6px 0 0;
-font-size:13px;
-opacity:.9;
-}
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid #70bd8b;
+      outline-offset: 3px;
+    }
 
-/* LANGUAGE */
-.lang-switch{
-display:flex;
-justify-content:center;
-gap:10px;
-padding:12px;
-background:#fff;
-border-bottom:1px solid #eee;
-}
+    .header {
+      padding: 32px 18px;
+      background: linear-gradient(135deg, var(--green-dark), var(--green));
+      color: #fff;
+      text-align: center;
+    }
 
-.lang-btn{
-padding:6px 14px;
-border-radius:20px;
-cursor:pointer;
-background:#e6f6ec;
-font-size:12px;
-font-weight:600;
-}
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      line-height: 1.35;
+    }
 
-/* CONTAINER */
-.container{
-max-width:900px;
-margin:auto;
-padding:20px;
-}
+    .header p {
+      max-width: 700px;
+      margin: 9px auto 0;
+      font-size: 0.95rem;
+    }
 
-/* SECTION */
-.section{
-background:#fff;
-padding:20px;
-border-radius:14px;
-margin-bottom:16px;
-box-shadow:0 6px 18px rgba(0,0,0,0.05);
-}
+    .lang-switch {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+      padding: 14px 12px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+    }
 
-.section h2{
-color:#0f7a3d;
-margin-top:0;
-}
+    .lang-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 650;
+    }
 
-/* FOOTER */
-.footer{
-text-align:center;
-padding:20px;
-font-size:12px;
-color:#777;
-}
+    .lang-btn {
+      min-height: 38px;
+      padding: 7px 15px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--green-dark);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
 
-</style>
+    .lang-btn:hover {
+      background: var(--green-soft);
+      border-color: var(--green);
+    }
 
+    .lang-btn[aria-pressed="true"] {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .container {
+      width: min(100% - 32px, var(--content-width));
+      margin: 26px auto;
+    }
+
+    .notice {
+      margin-bottom: 20px;
+      padding: 16px 18px;
+      border: 1px solid #e4d9ac;
+      border-radius: 12px;
+      background: #fffdf4;
+      color: #584b22;
+      font-size: 0.92rem;
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .section {
+      margin-bottom: 16px;
+      padding: clamp(18px, 4vw, 26px);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--surface);
+      box-shadow: 0 6px 20px rgba(16, 55, 31, 0.05);
+    }
+
+    .section h2 {
+      margin: 0 0 12px;
+      color: var(--green-dark);
+      font-size: clamp(1.08rem, 3vw, 1.25rem);
+      line-height: 1.45;
+    }
+
+    .section p {
+      margin: 0 0 12px;
+    }
+
+    .section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .section ul {
+      margin: 10px 0 14px;
+      padding-left: 24px;
+    }
+
+    .section li {
+      margin: 6px 0;
+      padding-left: 2px;
+    }
+
+    .footer {
+      padding: 24px 16px 30px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.875rem;
+    }
+
+    .footer p {
+      margin: 4px 0;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 560px) {
+      body {
+        font-size: 15px;
+      }
+
+      .header {
+        padding: 27px 16px;
+      }
+
+      .lang-switch {
+        gap: 7px;
+      }
+
+      .lang-label {
+        width: 100%;
+        text-align: center;
+      }
+
+      .lang-btn {
+        padding: 7px 12px;
+      }
+
+      .container {
+        width: min(100% - 20px, var(--content-width));
+        margin: 18px auto;
+      }
+
+      .section {
+        margin-bottom: 12px;
+        border-radius: 12px;
+      }
+
+      .section ul {
+        padding-left: 21px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-<h1>ALBUKHR Investment Limited</h1>
-<p>Terms of Service</p>
-</div>
+  <header class="header">
+    <h1>ALBUKHR Investment Limited</h1>
+    <p data-i18n="subtitle">Terms of Service</p>
+  </header>
 
-<!-- LANGUAGE -->
-<div class="lang-switch">
-<div class="lang-btn">English</div>
-<div class="lang-btn">Hausa</div>
-<div class="lang-btn">Français</div>
-</div>
+  <nav class="lang-switch" aria-label="Language selection"
+       data-i18n-aria="languageNav">
+    <span class="lang-label" data-i18n="languageLabel">Language</span>
 
-<div class="container">
+    <button type="button" class="lang-btn"
+            data-language="en" aria-pressed="true">
+      English
+    </button>
 
-<!-- 1 INTRO -->
-<div class="section">
-<h2>1. Introduction</h2>
+    <button type="button" class="lang-btn"
+            data-language="ha" aria-pressed="false">
+      Hausa
+    </button>
 
-<p>
-These Terms of Service govern your access to and use of the ALBUKHR Investment Limited platform. 
-By using our services, you agree to be bound by these terms and all applicable laws.
-</p>
+    <button type="button" class="lang-btn"
+            data-language="fr" aria-pressed="false">
+      Français
+    </button>
+  </nav>
 
-</div>
+  <main class="container">
 
-<!-- 2 ELIGIBILITY -->
-<div class="section">
-<h2>2. Eligibility</h2>
+    <aside class="notice" role="note">
+      <strong data-i18n="draftHeading">Draft for review</strong>
+      <span data-i18n="draftText">
+        Proposed revision pending review and approval. This page should
+        not be treated as the formally adopted version until approved.
+      </span>
+    </aside>
 
-<ul>
-<li>You must be at least 18 years old</li>
-<li>You must provide accurate and complete information</li>
-<li>You must comply with all applicable laws and regulations</li>
-</ul>
+    <div class="meta">
+      <span>
+        <strong data-i18n="versionLabel">Version:</strong>
+        <span data-i18n="versionValue">2.0 — Proposed revision</span>
+      </span>
+      <span>
+        <strong data-i18n="companyLabel">Organisation:</strong>
+        ALBUKHR Investment Limited
+      </span>
+    </div>
 
-</div>
+    <!-- 1. INTRODUCTION -->
+    <section class="section" id="introduction">
+      <h2 data-i18n="s1t">1. Introduction</h2>
+      <p data-i18n="s1p1">
+        These Terms of Service govern your access to and use of the
+        ALBUKHR Investment Limited platform and its services. They should
+        be read together with applicable project-specific terms, payment
+        notices, the Privacy Policy and any other terms shown for a
+        particular feature.
+      </p>
+      <p data-i18n="s1p2">
+        By accessing or using a service, you agree to these terms to the
+        extent permitted by applicable law. If you do not agree, you
+        should stop using the relevant service. Mandatory rights granted
+        by law are not removed by these terms.
+      </p>
+    </section>
 
-<!-- 3 ACCOUNTS -->
-<div class="section">
-<h2>3. User Accounts</h2>
+    <!-- 2. ELIGIBILITY -->
+    <section class="section" id="eligibility">
+      <h2 data-i18n="s2t">2. Eligibility and User Information</h2>
+      <p data-i18n="s2intro">
+        To use features that require an account or participation in
+        financial activity, you must meet the applicable legal and
+        service requirements. These may include:
+      </p>
+      <ul>
+        <li data-i18n="s2l1">
+          Being at least 18 years old, or meeting any higher age or
+          legal-capacity requirement imposed by applicable law.
+        </li>
+        <li data-i18n="s2l2">
+          Providing accurate, current and complete information when
+          requested.
+        </li>
+        <li data-i18n="s2l3">
+          Using your own authorised account and not impersonating
+          another person or organisation.
+        </li>
+        <li data-i18n="s2l4">
+          Complying with applicable laws, eligibility restrictions and
+          verification requirements for the service concerned.
+        </li>
+      </ul>
+      <p data-i18n="s2p">
+        We may ask you to correct or verify information where reasonably
+        necessary to protect the platform, review an application or
+        meet legal obligations.
+      </p>
+    </section>
 
-<p>
-Users are responsible for maintaining the confidentiality and security of their accounts, 
-including wallet credentials and access to the platform.
-</p>
+    <!-- 3. ACCOUNT SECURITY -->
+    <section class="section" id="accounts">
+      <h2 data-i18n="s3t">3. User Accounts and Access Security</h2>
+      <p data-i18n="s3p1">
+        Users are responsible for protecting their account access,
+        connected wallet access and authentication credentials. You
+        must not share passwords, private keys, recovery phrases or
+        other secrets with anyone claiming to represent ALBUKHR.
+      </p>
+      <p data-i18n="s3p2">
+        You should notify ALBUKHR promptly if you suspect unauthorised
+        access, identity misuse or suspicious activity. We may take
+        reasonable security measures, including verification or
+        temporary restrictions, where needed to protect users or the
+        platform.
+      </p>
+    </section>
 
-</div>
+    <!-- 4. PLATFORM SCOPE -->
+    <section class="section" id="platform-scope">
+      <h2 data-i18n="s4t">4. Platform Scope and Availability</h2>
+      <p data-i18n="s4p1">
+        ALBUKHR provides digital platform features related to project
+        information, participation, investment-related workflows and
+        ecosystem services, depending on what is available and enabled
+        at the relevant time.
+      </p>
+      <p data-i18n="s4p2">
+        A page, project listing, button, description or roadmap does
+        not by itself confirm that a service, payment channel, investment
+        opportunity or transaction is active or available. Users must
+        rely on the current status and instructions presented through
+        the relevant official feature.
+      </p>
+      <p data-i18n="s4p3">
+        Features may be changed, restricted, suspended or withdrawn
+        for operational, security, legal or other legitimate reasons,
+        subject to applicable law and any specific commitments that
+        apply to a service.
+      </p>
+    </section>
 
-<!-- 4 INVESTMENT -->
-<div class="section">
-<h2>4. Investment Terms</h2>
+    <!-- 5. PROJECTS AND GOVERNANCE -->
+    <section class="section" id="projects">
+      <h2 data-i18n="s5t">5. Projects, Applications and Governance</h2>
+      <p data-i18n="s5p1">
+        ALBUKHR may provide processes for submitting, reviewing,
+        displaying or administering internal and external project
+        information. A submission is not automatically approved, and
+        a listing does not by itself mean that funding is open or that
+        ALBUKHR guarantees the project's performance.
+      </p>
+      <p data-i18n="s5p2">
+        Project applicants are responsible for ensuring that the
+        information and documents they submit are accurate, authorised
+        and not misleading. Applicants must promptly notify ALBUKHR
+        of material changes affecting an application or an approved
+        project.
+      </p>
+      <p data-i18n="s5p3">
+        ALBUKHR uses governance and administrative review processes
+        intended to support oversight, financial monitoring,
+        operational control, transparency and accountability. Such
+        processes do not eliminate all risks, guarantee that every
+        statement by a project is true, or guarantee any project's
+        commercial success.
+      </p>
+    </section>
 
-<p>
-All investments made through ALBUKHR are voluntary and subject to operational and market risks. 
-Participation in projects does not guarantee profit or return.
-</p>
+    <!-- 6. INVESTMENT AND STAKING -->
+    <section class="section" id="investment">
+      <h2 data-i18n="s6t">6. Investment, Staking and Rewards</h2>
+      <p data-i18n="s6p1">
+        Participation in investment-related, staking or project-funding
+        features is voluntary and may be subject to separate disclosures,
+        eligibility conditions and project-specific terms. You should
+        review those materials and understand the risks before deciding
+        to participate.
+      </p>
+      <p data-i18n="s6p2">
+        Digital assets and real-world projects may involve market,
+        liquidity, operational, technology, counterparty, regulatory and
+        project-performance risks. The value of a digital asset may
+        change, and you may lose some or all of the value committed.
+      </p>
+      <p data-i18n="s6p3">
+        Where a staking or rewards feature is actually offered, any
+        rewards, calculation method, duration, eligibility conditions
+        and withdrawal rules depend on the applicable feature rules and
+        disclosures. Project performance may affect an outcome where
+        those rules say so. No profit, reward, return, liquidity or
+        protection of principal is guaranteed by these general terms.
+      </p>
+      <p data-i18n="s6p4">
+        Do not assume that a project listing creates an automatic
+        investment relationship between you, ALBUKHR and the project
+        owner. The rights and responsibilities for a particular
+        participation must be established by the terms that apply to
+        that participation and by applicable law.
+      </p>
+    </section>
 
-</div>
+    <!-- 7. PAYMENTS AND TRANSACTIONS -->
+    <section class="section" id="payments">
+      <h2 data-i18n="s7t">7. Payments, Wallets and Transactions</h2>
+      <p data-i18n="s7p1">
+        A payment or transaction should only be initiated through an
+        official feature that is expressly presented as available and
+        enabled. These terms alone do not activate any payment method
+        or confirm that a particular transaction can be completed.
+      </p>
+      <p data-i18n="s7p2">
+        Before confirming a transaction, users should check the asset,
+        amount, recipient, network, applicable fees and any relevant
+        terms shown in the official transaction flow. Do not send
+        assets to an address or account based solely on an unofficial
+        message or an unverified instruction.
+      </p>
+      <p data-i18n="s7p3">
+        Transactions processed through an external network or wallet
+        provider may be subject to that provider's rules, network
+        conditions, confirmation times and technical limitations.
+        Some completed network transactions may be irreversible.
+      </p>
+      <p data-i18n="s7p4">
+        Do not assume that a payment is successful until the official
+        interface or a relevant confirmation process indicates its
+        status. If a transaction appears incorrect or unresolved,
+        contact ALBUKHR using its official communication channel and
+        provide the relevant non-secret reference details.
+      </p>
+    </section>
 
-<!-- 5 STAKING -->
-<div class="section">
-<h2>5. Staking Policy</h2>
+    <!-- 8. FEES AND TAXES -->
+    <section class="section" id="fees">
+      <h2 data-i18n="s8t">8. Fees, Network Costs and Taxes</h2>
+      <p data-i18n="s8p1">
+        Any platform charge, service fee or other amount payable should
+        be disclosed through the relevant service or transaction terms
+        before you commit, where required by law. Network or external
+        provider fees may apply separately.
+      </p>
+      <p data-i18n="s8p2">
+        Users are responsible for understanding their own tax and
+        reporting obligations arising from their activities, subject
+        to applicable law. You should seek qualified professional
+        advice when needed.
+      </p>
+    </section>
 
-<p>
-Users may stake digital assets into projects and earn rewards based on project performance, 
-duration, and internal policies defined by ALBUKHR.
-</p>
+    <!-- 9. RISK AND NO FINANCIAL ADVICE -->
+    <section class="section" id="risk">
+      <h2 data-i18n="s9t">9. Risk Disclosure and Information</h2>
+      <p data-i18n="s9p1">
+        Information displayed on the platform is provided to help users
+        understand relevant services or projects. Unless expressly
+        stated in a separate written arrangement, it should not be
+        treated as a personalised recommendation, legal opinion, tax
+        opinion or guarantee of investment performance.
+      </p>
+      <p data-i18n="s9p2">
+        Past performance, projected results, estimates or statements
+        from a project are not reliable guarantees of future outcomes.
+        Users should make independent assessments and obtain qualified
+        advice where appropriate before making significant decisions.
+      </p>
+    </section>
 
-</div>
+    <!-- 10. SECURITY -->
+    <section class="section" id="security">
+      <h2 data-i18n="s10t">10. Security and Responsible Use</h2>
+      <p data-i18n="s10p1">
+        ALBUKHR applies or intends to apply appropriate security and
+        access controls for its systems and services. No online
+        platform can guarantee absolute security or uninterrupted
+        operation.
+      </p>
+      <p data-i18n="s10p2">
+        Users must not attempt to bypass access controls, interfere
+        with platform operations, probe systems without authorisation
+        or misuse another person's account or information.
+      </p>
+    </section>
 
-<!-- 6 RISK -->
-<div class="section">
-<h2>6. Risk Disclosure</h2>
+    <!-- 11. PROHIBITED ACTIVITIES -->
+    <section class="section" id="prohibited">
+      <h2 data-i18n="s11t">11. Prohibited Activities</h2>
+      <p data-i18n="s11intro">
+        When using ALBUKHR, you must not:
+      </p>
+      <ul>
+        <li data-i18n="s11l1">
+          Commit fraud, misrepresentation, deception or other unlawful acts.
+        </li>
+        <li data-i18n="s11l2">
+          Attempt unauthorised access, hacking, disruption or circumvention
+          of security controls.
+        </li>
+        <li data-i18n="s11l3">
+          Submit forged, misleading, stolen or unauthorised information,
+          business records or project documents.
+        </li>
+        <li data-i18n="s11l4">
+          Use the platform to violate another person's rights or
+          applicable laws.
+        </li>
+        <li data-i18n="s11l5">
+          Misuse the platform, interfere with other users, or attempt
+          to manipulate project, investment or governance processes.
+        </li>
+      </ul>
+      <p data-i18n="s11p">
+        We may review suspected violations and take proportionate action
+        where permitted by law.
+      </p>
+    </section>
 
-<p>
-Investing in digital and real-world projects involves risk. 
-ALBUKHR does not guarantee profits, returns, or capital protection.
-</p>
+    <!-- 12. SUBMISSIONS AND CONTENT -->
+    <section class="section" id="submissions">
+      <h2 data-i18n="s12t">12. Project Submissions and User Content</h2>
+      <p data-i18n="s12p1">
+        You retain any rights you lawfully hold in material you submit.
+        By submitting material for a platform feature, you authorise
+        ALBUKHR to receive, store, review and use it to operate that
+        feature, assess an application, provide requested services,
+        maintain records and meet applicable obligations.
+      </p>
+      <p data-i18n="s12p2">
+        You must have the necessary rights and permissions to submit
+        the material. Do not upload confidential information belonging
+        to another person without authority or provide information
+        that is unlawful, misleading or infringing.
+      </p>
+      <p data-i18n="s12p3">
+        Uploading a logo, document or other project material does not
+        automatically transfer ownership of that material to ALBUKHR
+        or grant ownership of the ALBUKHR brand to the uploader.
+      </p>
+    </section>
 
-</div>
+    <!-- 13. INTELLECTUAL PROPERTY -->
+    <section class="section" id="intellectual-property">
+      <h2 data-i18n="s13t">13. Intellectual Property</h2>
+      <p data-i18n="s13p1">
+        Unless expressly stated otherwise, ALBUKHR's platform design,
+        branding, software, text and other original materials are
+        owned by or used with permission by their respective rights
+        holders.
+      </p>
+      <p data-i18n="s13p2">
+        You may use the platform only for lawful purposes and within
+        the permissions provided. You must not copy, modify,
+        redistribute or exploit protected material in a way that
+        infringes applicable rights or the relevant licence.
+      </p>
+    </section>
 
-<!-- 7 SECURITY -->
-<div class="section">
-<h2>7. Security</h2>
+    <!-- 14. PRIVACY AND THIRD PARTIES -->
+    <section class="section" id="privacy">
+      <h2 data-i18n="s14t">14. Privacy and Third-Party Services</h2>
+      <p data-i18n="s14p1">
+        Our handling of personal data is described in the
+        <a href="privacy-policy.html" data-i18n="privacyLink">
+          ALBUKHR Privacy Policy
+        </a>.
+        Please review that policy to understand the categories of
+        information that may be processed, the purposes of processing
+        and your applicable rights.
+      </p>
+      <p data-i18n="s14p2">
+        Some features may rely on third-party services, including
+        Pi Network, wallet or network services, and technical
+        infrastructure providers. Those services may have their own
+        terms, privacy notices, fees, availability conditions and
+        technical limitations.
+      </p>
+      <p data-i18n="s14p3">
+        ALBUKHR does not control every independent act or system of
+        an external provider. This does not remove any responsibility
+        that ALBUKHR has under applicable law.
+      </p>
+    </section>
 
-<p>
-We implement strong security measures including encryption, authentication systems, 
-and monitoring to protect user data and transactions.
-</p>
+    <!-- 15. SUSPENSION AND TERMINATION -->
+    <section class="section" id="termination">
+      <h2 data-i18n="s15t">15. Account Suspension and Termination</h2>
+      <p data-i18n="s15p1">
+        ALBUKHR may restrict, suspend or terminate access where there
+        are reasonable grounds to believe that these terms have been
+        violated, the platform is at risk, unlawful activity is
+        suspected, information needs verification or a legal
+        requirement applies.
+      </p>
+      <p data-i18n="s15p2">
+        Where appropriate and permitted by law, we will provide
+        information about the restriction or a way to request review.
+        Immediate action may be necessary to protect users, assets,
+        records or the platform. Suspension does not automatically
+        cancel separate obligations or determine the outcome of a
+        pending transaction or project.
+      </p>
+    </section>
 
-</div>
+    <!-- 16. LIABILITY -->
+    <section class="section" id="liability">
+      <h2 data-i18n="s16t">16. Disclaimers and Limitation of Liability</h2>
+      <p data-i18n="s16p1">
+        To the extent permitted by applicable law, the platform and
+        its general information are provided subject to availability
+        and may contain interruptions, errors or delays. We do not
+        guarantee uninterrupted access, error-free operation or any
+        particular commercial or investment outcome.
+      </p>
+      <p data-i18n="s16p2">
+        To the extent permitted by law, ALBUKHR is not responsible
+        for indirect or consequential losses arising from use of the
+        platform, third-party service interruptions or project outcomes
+        outside its control. Nothing in these terms excludes or
+        restricts liability or rights that cannot lawfully be excluded
+        or restricted.
+      </p>
+      <p data-i18n="s16p3">
+        Nothing in this section replaces a separate written agreement
+        or mandatory legal protection that applies to a particular
+        service or transaction.
+      </p>
+    </section>
 
-<!-- 8 GOVERNANCE -->
-<div class="section">
-<h2>8. Governance</h2>
+    <!-- 17. CHANGES -->
+    <section class="section" id="changes">
+      <h2 data-i18n="s17t">17. Changes to These Terms</h2>
+      <p data-i18n="s17p1">
+        We may revise these terms to reflect changes in the platform,
+        services, operational practices or legal requirements.
+      </p>
+      <p data-i18n="s17p2">
+        Where a change is material, we will take appropriate steps
+        to provide notice when required by law or the relevant service
+        terms. The revised version should identify its version or
+        revision date. If separate consent is legally required, simply
+        continuing to use the platform does not replace that consent.
+      </p>
+    </section>
 
-<p>
-ALBUKHR operates under structured governance including administrative oversight, 
-financial monitoring, and operational controls to ensure transparency and accountability.
-</p>
+    <!-- 18. GOVERNING LAW AND DISPUTES -->
+    <section class="section" id="disputes">
+      <h2 data-i18n="s18t">18. Governing Law and Disputes</h2>
+      <p data-i18n="s18p1">
+        These terms are to be interpreted in accordance with applicable
+        law, including the laws that apply to ALBUKHR and the relevant
+        service. Any governing-law or dispute-resolution provision
+        must be reviewed and finalised before this draft is formally
+        adopted.
+      </p>
+      <p data-i18n="s18p2">
+        If you have a concern, please contact ALBUKHR first so that
+        the matter can be reviewed. This does not prevent you from
+        exercising a legal right or contacting a competent authority
+        where the law permits.
+      </p>
+    </section>
 
-</div>
+    <!-- 19. CONTACT -->
+    <section class="section" id="contact">
+      <h2 data-i18n="s19t">19. Contact ALBUKHR</h2>
+      <p data-i18n="s19p">
+        For questions about these terms, a platform service or a
+        reported issue, contact ALBUKHR Investment Limited through
+        the email address below.
+      </p>
+      <p>
+        <strong data-i18n="emailLabel">Official contact email:</strong>
+        <br>
+        <a href="mailto:albukhrinvestmentlimited@gmail.com">
+          albukhrinvestmentlimited@gmail.com
+        </a>
+      </p>
+      <p data-i18n="s19p2">
+        Do not include passwords, private keys, wallet recovery
+        phrases or other secret authentication credentials in your
+        communication.
+      </p>
+    </section>
 
-<!-- 9 PROHIBITED -->
-<div class="section">
-<h2>9. Prohibited Activities</h2>
+  </main>
 
-<ul>
-<li>Fraud or deceptive practices</li>
-<li>Unauthorized access or hacking attempts</li>
-<li>Abuse or misuse of the platform</li>
-</ul>
+  <footer class="footer">
+    <p>ALBUKHR Investment Limited</p>
+    <p data-i18n="footerText">
+      Terms of Service — Proposed revision, pending approval.
+    </p>
+    <p>
+      <a href="mailto:albukhrinvestmentlimited@gmail.com"
+         data-i18n="footerContact">
+        Contact ALBUKHR
+      </a>
+    </p>
+  </footer>
 
-</div>
+  <script>
+    (function () {
+      "use strict";
 
-<!-- 10 TERMINATION -->
-<div class="section">
-<h2>10. Account Suspension & Termination</h2>
+      const translations = {
+        en: {
+          subtitle: "Terms of Service",
+          languageNav: "Language selection",
+          languageLabel: "Language",
+          draftHeading: "Draft for review",
+          draftText:
+            "Proposed revision pending review and approval. This page should not be treated as the formally adopted version until approved.",
+          versionLabel: "Version:",
+          versionValue: "2.0 — Proposed revision",
+          companyLabel: "Organisation:",
 
-<p>
-ALBUKHR reserves the right to suspend or terminate any account that violates these terms 
-or engages in harmful activities.
-</p>
+          s1t: "1. Introduction",
+          s1p1:
+            "These Terms of Service govern your access to and use of the ALBUKHR Investment Limited platform and its services. They should be read together with applicable project-specific terms, payment notices, the Privacy Policy and any other terms shown for a particular feature.",
+          s1p2:
+            "By accessing or using a service, you agree to these terms to the extent permitted by applicable law. If you do not agree, you should stop using the relevant service. Mandatory rights granted by law are not removed by these terms.",
 
-</div>
+          s2t: "2. Eligibility and User Information",
+          s2intro:
+            "To use features that require an account or participation in financial activity, you must meet the applicable legal and service requirements. These may include:",
+          s2l1:
+            "Being at least 18 years old, or meeting any higher age or legal-capacity requirement imposed by applicable law.",
+          s2l2:
+            "Providing accurate, current and complete information when requested.",
+          s2l3:
+            "Using your own authorised account and not impersonating another person or organisation.",
+          s2l4:
+            "Complying with applicable laws, eligibility restrictions and verification requirements for the service concerned.",
+          s2p:
+            "We may ask you to correct or verify information where reasonably necessary to protect the platform, review an application or meet legal obligations.",
 
-<!-- 11 CHANGES -->
-<div class="section">
-<h2>11. Changes to Terms</h2>
+          s3t: "3. User Accounts and Access Security",
+          s3p1:
+            "Users are responsible for protecting their account access, connected wallet access and authentication credentials. You must not share passwords, private keys, recovery phrases or other secrets with anyone claiming to represent ALBUKHR.",
+          s3p2:
+            "You should notify ALBUKHR promptly if you suspect unauthorised access, identity misuse or suspicious activity. We may take reasonable security measures, including verification or temporary restrictions, where needed to protect users or the platform.",
 
-<p>
-We may update these Terms of Service from time to time. Continued use of the platform 
-constitutes acceptance of any changes.
-</p>
+          s4t: "4. Platform Scope and Availability",
+          s4p1:
+            "ALBUKHR provides digital platform features related to project information, participation, investment-related workflows and ecosystem services, depending on what is available and enabled at the relevant time.",
+          s4p2:
+            "A page, project listing, button, description or roadmap does not by itself confirm that a service, payment channel, investment opportunity or transaction is active or available. Users must rely on the current status and instructions presented through the relevant official feature.",
+          s4p3:
+            "Features may be changed, restricted, suspended or withdrawn for operational, security, legal or other legitimate reasons, subject to applicable law and any specific commitments that apply to a service.",
 
-</div>
+          s5t: "5. Projects, Applications and Governance",
+          s5p1:
+            "ALBUKHR may provide processes for submitting, reviewing, displaying or administering internal and external project information. A submission is not automatically approved, and a listing does not by itself mean that funding is open or that ALBUKHR guarantees the project's performance.",
+          s5p2:
+            "Project applicants are responsible for ensuring that the information and documents they submit are accurate, authorised and not misleading. Applicants must promptly notify ALBUKHR of material changes affecting an application or an approved project.",
+          s5p3:
+            "ALBUKHR uses governance and administrative review processes intended to support oversight, financial monitoring, operational control, transparency and accountability. Such processes do not eliminate all risks, guarantee that every statement by a project is true, or guarantee any project's commercial success.",
 
-<!-- 12 CONTACT -->
-<div class="section">
-<h2>12. Contact</h2>
+          s6t: "6. Investment, Staking and Rewards",
+          s6p1:
+            "Participation in investment-related, staking or project-funding features is voluntary and may be subject to separate disclosures, eligibility conditions and project-specific terms. You should review those materials and understand the risks before deciding to participate.",
+          s6p2:
+            "Digital assets and real-world projects may involve market, liquidity, operational, technology, counterparty, regulatory and project-performance risks. The value of a digital asset may change, and you may lose some or all of the value committed.",
+          s6p3:
+            "Where a staking or rewards feature is actually offered, any rewards, calculation method, duration, eligibility conditions and withdrawal rules depend on the applicable feature rules and disclosures. Project performance may affect an outcome where those rules say so. No profit, reward, return, liquidity or protection of principal is guaranteed by these general terms.",
+          s6p4:
+            "Do not assume that a project listing creates an automatic investment relationship between you, ALBUKHR and the project owner. The rights and responsibilities for a particular participation must be established by the terms that apply to that participation and by applicable law.",
 
-<p>
-For questions or concerns regarding these terms, please contact ALBUKHR through official communication channels.
-</p>
+          s7t: "7. Payments, Wallets and Transactions",
+          s7p1:
+            "A payment or transaction should only be initiated through an official feature that is expressly presented as available and enabled. These terms alone do not activate any payment method or confirm that a particular transaction can be completed.",
+          s7p2:
+            "Before confirming a transaction, users should check the asset, amount, recipient, network, applicable fees and any relevant terms shown in the official transaction flow. Do not send assets to an address or account based solely on an unofficial message or an unverified instruction.",
+          s7p3:
+            "Transactions processed through an external network or wallet provider may be subject to that provider's rules, network conditions, confirmation times and technical limitations. Some completed network transactions may be irreversible.",
+          s7p4:
+            "Do not assume that a payment is successful until the official interface or a relevant confirmation process indicates its status. If a transaction appears incorrect or unresolved, contact ALBUKHR using its official communication channel and provide the relevant non-secret reference details.",
 
-</div>
+          s8t: "8. Fees, Network Costs and Taxes",
+          s8p1:
+            "Any platform charge, service fee or other amount payable should be disclosed through the relevant service or transaction terms before you commit, where required by law. Network or external provider fees may apply separately.",
+          s8p2:
+            "Users are responsible for understanding their own tax and reporting obligations arising from their activities, subject to applicable law. You should seek qualified professional advice when needed.",
 
-</div>
+          s9t: "9. Risk Disclosure and Information",
+          s9p1:
+            "Information displayed on the platform is provided to help users understand relevant services or projects. Unless expressly stated in a separate written arrangement, it should not be treated as a personalised recommendation, legal opinion, tax opinion or guarantee of investment performance.",
+          s9p2:
+            "Past performance, projected results, estimates or statements from a project are not reliable guarantees of future outcomes. Users should make independent assessments and obtain qualified advice where appropriate before making significant decisions.",
 
-<div class="footer">
-ALBUKHR Investment Limited — Terms of Service
-</div>
+          s10t: "10. Security and Responsible Use",
+          s10p1:
+            "ALBUKHR applies or intends to apply appropriate security and access controls for its systems and services. No online platform can guarantee absolute security or uninterrupted operation.",
+          s10p2:
+            "Users must not attempt to bypass access controls, interfere with platform operations, probe systems without authorisation or misuse another person's account or information.",
+
+          s11t: "11. Prohibited Activities",
+          s11intro: "When using ALBUKHR, you must not:",
+          s11l1: "Commit fraud, misrepresentation, deception or other unlawful acts.",
+          s11l2:
+            "Attempt unauthorised access, hacking, disruption or circumvention of security controls.",
+          s11l3:
+            "Submit forged, misleading, stolen or unauthorised information, business records or project documents.",
+          s11l4:
+            "Use the platform to violate another person's rights or applicable laws.",
+          s11l5:
+            "Misuse the platform, interfere with other users, or attempt to manipulate project, investment or governance processes.",
+          s11p:
+            "We may review suspected violations and take proportionate action where permitted by law.",
+
+          s12t: "12. Project Submissions and User Content",
+          s12p1:
+            "You retain any rights you lawfully hold in material you submit. By submitting material for a platform feature, you authorise ALBUKHR to receive, store, review and use it to operate that feature, assess an application, provide requested services, maintain records and meet applicable obligations.",
+          s12p2:
+            "You must have the necessary rights and permissions to submit the material. Do not upload confidential information belonging to another person without authority or provide information that is unlawful, misleading or infringing.",
+          s12p3:
+            "Uploading a logo, document or other project material does not automatically transfer ownership of that material to ALBUKHR or grant ownership of the ALBUKHR brand to the uploader.",
+
+          s13t: "13. Intellectual Property",
+          s13p1:
+            "Unless expressly stated otherwise, ALBUKHR's platform design, branding, software, text and other original materials are owned by or used with permission by their respective rights holders.",
+          s13p2:
+            "You may use the platform only for lawful purposes and within the permissions provided. You must not copy, modify, redistribute or exploit protected material in a way that infringes applicable rights or the relevant licence.",
+
+          s14t: "14. Privacy and Third-Party Services",
+          s14p1:
+            "Our handling of personal data is described in the ALBUKHR Privacy Policy. Please review that policy to understand the categories of information that may be processed, the purposes of processing and your applicable rights.",
+          privacyLink: "ALBUKHR Privacy Policy",
+          s14p2:
+            "Some features may rely on third-party services, including Pi Network, wallet or network services, and technical infrastructure providers. Those services may have their own terms, privacy notices, fees, availability conditions and technical limitations.",
+          s14p3:
+            "ALBUKHR does not control every independent act or system of an external provider. This does not remove any responsibility that ALBUKHR has under applicable law.",
+
+          s15t: "15. Account Suspension and Termination",
+          s15p1:
+            "ALBUKHR may restrict, suspend or terminate access where there are reasonable grounds to believe that these terms have been violated, the platform is at risk, unlawful activity is suspected, information needs verification or a legal requirement applies.",
+          s15p2:
+            "Where appropriate and permitted by law, we will provide information about the restriction or a way to request review. Immediate action may be necessary to protect users, assets, records or the platform. Suspension does not automatically cancel separate obligations or determine the outcome of a pending transaction or project.",
+
+          s16t: "16. Disclaimers and Limitation of Liability",
+          s16p1:
+            "To the extent permitted by applicable law, the platform and its general information are provided subject to availability and may contain interruptions, errors or delays. We do not guarantee uninterrupted access, error-free operation or any particular commercial or investment outcome.",
+          s16p2:
+            "To the extent permitted by law, ALBUKHR is not responsible for indirect or consequential losses arising from use of the platform, third-party service interruptions or project outcomes outside its control. Nothing in these terms excludes or restricts liability or rights that cannot lawfully be excluded or restricted.",
+          s16p3:
+            "Nothing in this section replaces a separate written agreement or mandatory legal protection that applies to a particular service or transaction.",
+
+          s17t: "17. Changes to These Terms",
+          s17p1:
+            "We may revise these terms to reflect changes in the platform, services, operational practices or legal requirements.",
+          s17p2:
+            "Where a change is material, we will take appropriate steps to provide notice when required by law or the relevant service terms. The revised version should identify its version or revision date. If separate consent is legally required, simply continuing to use the platform does not replace that consent.",
+
+          s18t: "18. Governing Law and Disputes",
+          s18p1:
+            "These terms are to be interpreted in accordance with applicable law, including the laws that apply to ALBUKHR and the relevant service. Any governing-law or dispute-resolution provision must be reviewed and finalised before this draft is formally adopted.",
+          s18p2:
+            "If you have a concern, please contact ALBUKHR first so that the matter can be reviewed. This does not prevent you from exercising a legal right or contacting a competent authority where the law permits.",
+
+          s19t: "19. Contact ALBUKHR",
+          s19p:
+            "For questions about these terms, a platform service or a reported issue, contact ALBUKHR Investment Limited through the email address below.",
+          emailLabel: "Official contact email:",
+          s19p2:
+            "Do not include passwords, private keys, wallet recovery phrases or other secret authentication credentials in your communication.",
+
+          footerText: "Terms of Service — Proposed revision, pending approval.",
+          footerContact: "Contact ALBUKHR"
+        },
+
+        ha: {
+          subtitle: "Ƙa’idojin Amfani da Sabis",
+          languageNav: "Zaɓin harshe",
+          languageLabel: "Harshe",
+          draftHeading: "Daftarin da ake son dubawa",
+          draftText:
+            "Wannan gyara ne da ake gabatarwa domin dubawa da amincewa. Kada a ɗauke shi a matsayin sigar da aka amince da ita a hukumance har sai an amince da shi.",
+          versionLabel: "Siga:",
+          versionValue: "2.0 — Gyaran da ake gabatarwa",
+          companyLabel: "Ƙungiya:",
+
+          s1t: "1. Gabatarwa",
+          s1p1:
+            "Waɗannan ƙa’idoji sun shafi yadda za ka shiga da amfani da dandamali da ayyukan ALBUKHR Investment Limited. Ya kamata a karanta su tare da ƙa’idojin takamaiman project, sanarwar biyan kuɗi, Manufar Kare Sirrin Bayanai da sauran ƙa’idojin da aka nuna ga wani fasali.",
+          s1p2:
+            "Ta hanyar shiga ko amfani da sabis, kana amincewa da waɗannan ƙa’idoji gwargwadon abin da dokar da ta dace ta yarda. Idan ba ka amince ba, ka daina amfani da sabis ɗin da abin ya shafa. Waɗannan ƙa’idoji ba sa kawar da haƙƙoƙin da doka ta wajabta a kiyaye.",
+
+          s2t: "2. Cancanta da Bayanan Mai Amfani",
+          s2intro:
+            "Domin amfani da fasalolin da ke buƙatar asusu ko shiga ayyukan kuɗi, dole ne ka cika sharuɗɗan doka da na sabis ɗin. Waɗannan na iya haɗawa da:",
+          s2l1:
+            "Kasancewa da shekaru 18 ko fiye, ko cika duk wani ƙarin sharaɗin shekaru ko cancantar doka.",
+          s2l2:
+            "Bayar da bayanai na gaskiya, na yanzu kuma cikakku idan an buƙata.",
+          s2l3:
+            "Amfani da asusunka da aka ba ka izini, ba tare da kwaikwayon wani mutum ko ƙungiya ba.",
+          s2l4:
+            "Bin dokoki, sharuɗɗan cancanta da matakan tantancewa da suka shafi sabis ɗin.",
+          s2p:
+            "Muna iya neman ka gyara ko tabbatar da bayanai idan ana buƙata domin kare dandamali, duba aikace-aikace ko cika wajibin doka.",
+
+          s3t: "3. Asusun Mai Amfani da Tsaron Shiga",
+          s3p1:
+            "Mai amfani ne ke da alhakin kare damar shiga asusunsa, walat ɗin da aka haɗa da asusu da bayanan tantancewa. Kada ka ba kowa kalmar sirri, private key, kalmomin dawo da walat ko wani sirri na asusu, ko da mutum ya ce yana wakiltar ALBUKHR.",
+          s3p2:
+            "Ka sanar da ALBUKHR da wuri idan kana zargin an shiga asusunka ba tare da izini ba, an yi amfani da sunanka ta hanyar da ba daidai ba, ko an samu wani aiki da ake zargi. Muna iya ɗaukar matakan tsaro da suka dace, ciki har da tantancewa ko takaita shiga na ɗan lokaci.",
+
+          s4t: "4. Iyakar Ayyukan Dandamali da Samuwarsu",
+          s4p1:
+            "ALBUKHR tana samar da fasalolin dandamali na dijital da suka shafi bayanan projects, shiga ayyuka, tsarin da ya shafi zuba jari da sauran ayyukan ecosystem, gwargwadon abin da yake samuwa kuma aka kunna a lokacin.",
+          s4p2:
+            "Samuwar shafi, project, maɓalli, bayani ko shirin gaba ba ta tabbatar da cewa sabis, hanyar biyan kuɗi, damar zuba jari ko ma’amala tana aiki ko a buɗe take ba. Ka dogara da matsayin yanzu da umarnin da aka nuna a cikin fasalin hukuma da abin ya shafa.",
+          s4p3:
+            "Ana iya sauya fasaloli, takaita su, dakatar da su ko cire su saboda dalilan aiki, tsaro, doka ko wasu dalilai masu inganci, bisa dokar da ta dace da takamaiman alkawuran da aka yi game da sabis ɗin.",
+
+          s5t: "5. Projects, Aikace-aikace da Tsarin Gudanarwa",
+          s5p1:
+            "ALBUKHR na iya samar da hanyoyin miƙa, dubawa, nuna ko gudanar da bayanan internal da external projects. Miƙa project ba yana nufin an amince da shi kai tsaye ba; haka kuma, nuna project ba yana nufin an buɗe neman jari ko cewa ALBUKHR ta ba da garanti kan nasararsa ba.",
+          s5p2:
+            "Masu neman amincewar project ne ke da alhakin tabbatar da cewa bayanai da takardun da suka miƙa daidai ne, suna da izini kuma ba sa yaudarar mutane. Dole ne su sanar da ALBUKHR da wuri idan wani muhimmin bayani game da aikace-aikacensu ko project ɗin da aka amince da shi ya sauya.",
+          s5p3:
+            "ALBUKHR tana amfani da hanyoyin gudanarwa da bitar aikace-aikace da aka tsara domin tallafa wa sa ido, sa ido kan harkokin kuɗi, kula da aiki, bayyana gaskiya da riƙon amana. Waɗannan hanyoyi ba sa kawar da dukkan haɗari, tabbatar da gaskiyar kowane iƙirari ko tabbatar da nasarar kasuwancin project.",
+
+          s6t: "6. Zuba Jari, Staking da Lada",
+          s6p1:
+            "Shiga fasalolin zuba jari, staking ko neman jari na project na son rai, kuma yana iya kasancewa ƙarƙashin sanarwa dabam, sharuɗɗan cancanta da ƙa’idojin takamaiman project. Ka karanta waɗannan bayanai kuma ka fahimci haɗarin kafin yanke shawarar shiga.",
+          s6p2:
+            "Kadarorin dijital da projects na zahiri na iya fuskantar haɗarin kasuwa, rashin sauƙin canza kadara zuwa kuɗi, matsalolin aiki da fasaha, haɗarin abokan hulɗa, sauyin dokoki da yadda project ya gudana. Darajar kadara ta dijital na iya sauyawa, kuma kana iya rasa wani ɓangare ko duk abin da ka saka.",
+          s6p3:
+            "Idan an samar da fasalin staking ko lada da gaske, ladar, yadda ake lissafa ta, tsawon lokaci, sharuɗɗan cancanta da dokokin cirewa za su dogara da ƙa’idoji da sanarwar wannan fasalin. Ayyukan project na iya shafar sakamako idan ƙa’idojin sun bayyana haka. Waɗannan ƙa’idoji na gama-gari ba sa ba da garanti na riba, lada, dawowar jari, sauƙin cire kuɗi ko kare asalin jarin.",
+          s6p4:
+            "Kada ka ɗauka cewa nuna project ya samar da dangantakar zuba jari ta atomatik tsakanin kai, ALBUKHR da mai project. Haƙƙoƙi da nauyin da ya shafi shiga takamaiman project dole su fito daga ƙa’idojin wannan shiga da dokar da ta dace.",
+
+          s7t: "7. Biyan Kuɗi, Walat da Ma’amaloli",
+          s7p1:
+            "Ya kamata a fara biyan kuɗi ko ma’amala ne kawai ta wani fasalin hukuma da aka bayyana a sarari cewa yana samuwa kuma an kunna shi. Waɗannan ƙa’idoji kaɗai ba sa kunna hanyar biyan kuɗi ko tabbatar da cewa za a iya kammala wata ma’amala.",
+          s7p2:
+            "Kafin tabbatar da ma’amala, ka duba kadara, adadi, wanda zai karɓa, network, kuɗaɗen da suka dace da duk wani sharadi da aka nuna a cikin hanyar ma’amala ta hukuma. Kada ka aika kadara zuwa adireshi ko asusu saboda saƙon da ba na hukuma ba ko umarni da ba a tantance ba.",
+          s7p3:
+            "Ma’amaloli ta network ko mai samar da walat na waje na iya bin ƙa’idojinsu, yanayin network, lokacin tabbatarwa da iyakokin fasaha. Wasu ma’amalolin network da aka kammala ba za a iya mayar da su baya ba.",
+          s7p4:
+            "Kada ka ɗauka cewa biya ya yi nasara sai hanyar hukuma ko tsarin tabbatarwa ya nuna matsayin sa. Idan ma’amala ta nuna matsala ko ba ta kammala ba, tuntuɓi ALBUKHR ta hanyar hukuma tare da bayanan shaida da ba sirrin asusu ba.",
+
+          s8t: "8. Kuɗaɗen Sabis, Network da Haraji",
+          s8p1:
+            "Duk wani kuɗin amfani da dandamali, kuɗin sabis ko wani adadin da za a biya ya kamata a bayyana shi ta ƙa’idojin sabis ko ma’amala kafin ka amince, inda doka ta buƙata. Kuɗin network ko na mai samar da sabis na waje na iya zama dabam.",
+          s8p2:
+            "Masu amfani ne ke da alhakin fahimtar wajibin haraji da bayar da rahoton da ya shafi ayyukansu, bisa dokar da ta dace. Ka nemi shawarar ƙwararren mai ba da shawara idan ana buƙata.",
+
+          s9t: "9. Bayanin Haɗari da Bayanai",
+          s9p1:
+            "Ana nuna bayanai a dandamali domin taimaka wa masu amfani su fahimci ayyuka ko projects. Sai idan wata yarjejeniya ta rubuce ta bayyana akasin haka, kada a ɗauki waɗannan bayanai a matsayin shawarar musamman ga mutum, ra’ayin lauya ko mai haraji, ko garanti na sakamakon zuba jari.",
+          s9p2:
+            "Sakamakon baya, hasashen gaba, ƙiyasin kuɗi ko iƙirarin project ba garanti ne mai inganci na sakamakon gaba ba. Masu amfani su yi nasu bincike kuma su nemi shawarar ƙwararru idan ya dace kafin manyan yanke shawara.",
+
+          s10t: "10. Tsaro da Amfani Mai Kyau",
+          s10p1:
+            "ALBUKHR tana amfani ko tana da niyyar amfani da matakan tsaro da kula da izinin shiga da suka dace. Babu dandamalin intanet da zai iya tabbatar da cikakken tsaro ko aiki ba tare da katsewa ba.",
+          s10p2:
+            "Masu amfani ba za su yi ƙoƙarin ƙetare matakan izini ba, su tsoma baki cikin aiki, su binciki tsarin ba tare da izini ba, ko su yi amfani da asusu ko bayanan wani ba bisa ka’ida ba.",
+
+          s11t: "11. Ayyukan da Aka Hana",
+          s11intro: "Lokacin amfani da ALBUKHR, ba a yarda ka:",
+          s11l1: "Yi zamba, yaudara, bayar da bayanan ƙarya ko wani aiki na haram.",
+          s11l2:
+            "Yi ƙoƙarin shiga ba tare da izini ba, hacking, kawo cikas ko ƙetare matakan tsaro.",
+          s11l3:
+            "Miƙa bayanan ƙarya, masu yaudarar jama’a, na sata ko takardun kasuwanci/project da ba ka da izinin bayarwa.",
+          s11l4:
+            "Yi amfani da dandamali wajen tauye haƙƙin wani ko karya dokokin da suka dace.",
+          s11l5:
+            "Yi amfani da dandamali ta hanyar da ba ta dace ba, ka tsoma baki ga wasu masu amfani ko ka yi ƙoƙarin karkatar da tsarin project, zuba jari ko gudanarwa.",
+          s11p:
+            "Muna iya binciken zargin karya ƙa’idoji da ɗaukar matakin da ya dace inda doka ta yarda.",
+
+          s12t: "12. Takardun Project da Bayanan da Mai Amfani Ya Miƙa",
+          s12p1:
+            "Kana riƙe da haƙƙoƙin da kake da su bisa doka a kan kayan da ka miƙa. Ta hanyar miƙa kayan domin wani fasali, kana ba ALBUKHR izinin karɓa, adanawa, dubawa da amfani da su domin gudanar da wannan fasali, tantance aikace-aikace, samar da sabis da aka nema, riƙe bayanai da cika wajibin da ya dace.",
+          s12p2:
+            "Dole ne ka mallaki haƙƙoƙi da izinin da ake buƙata domin miƙa kayan. Kada ka ɗora bayanan sirri na wani ba tare da izini ba, ko ka bayar da bayanan haram, masu yaudarar jama’a ko masu tauye haƙƙin wani.",
+          s12p3:
+            "Ɗora tambari, takarda ko wani kayan project ba ya mayar da mallakar kayan ga ALBUKHR kai tsaye, kuma ba ya ba mai ɗorawa mallakar alamar ALBUKHR.",
+
+          s13t: "13. Haƙƙin Mallakar Fasaha",
+          s13p1:
+            "Sai idan an bayyana akasin haka, ƙirar dandamali, tambura, software, rubutu da sauran kayan asali na ALBUKHR mallakin masu haƙƙinsu ne ko ana amfani da su da izini.",
+          s13p2:
+            "Za ka iya amfani da dandamali ne kawai bisa doka da izinin da aka bayar. Kada ka kwafa, sauya, sake rarrabawa ko amfani da kayan da ake da haƙƙinsu ta hanyar da za ta karya haƙƙin da ya dace ko lasisin amfani.",
+
+          s14t: "14. Sirrin Bayanai da Ayyukan Waje",
+          s14p1:
+            "An bayyana yadda muke sarrafa bayanan mutum a cikin Manufar Kare Sirrin Bayanai ta ALBUKHR. Ka karanta manufar domin fahimtar nau’o’in bayanan da ake iya sarrafawa, dalilan sarrafawa da haƙƙoƙinka.",
+          privacyLink: "Manufar Kare Sirrin Bayanai ta ALBUKHR",
+          s14p2:
+            "Wasu fasaloli na iya dogara da ayyukan waje, ciki har da Pi Network, ayyukan walat ko network da masu samar da kayan aikin fasaha. Waɗannan ayyuka na iya samun nasu ƙa’idoji, sanarwar sirri, kuɗaɗe, sharuɗɗan samuwa da iyakokin fasaha.",
+          s14p3:
+            "ALBUKHR ba ta sarrafa dukkan ayyuka ko tsarin mai samar da sabis na waje mai zaman kansa. Wannan ba ya kawar da nauyin da dokar da ta dace ta ɗora wa ALBUKHR.",
+
+          s15t: "15. Takaita Asusu ko Dakatar da Amfani",
+          s15p1:
+            "ALBUKHR na iya takaita, dakatar ko kawo ƙarshen damar shiga idan akwai dalilai masu ma’ana na zargin an karya ƙa’idoji, dandamali na cikin haɗari, ana zargin haramun, ana buƙatar tantance bayanai ko akwai wajibin doka.",
+          s15p2:
+            "Inda ya dace kuma doka ta yarda, za mu bayar da bayani game da takaitawar ko hanyar neman a sake duba ta. Wani lokaci ana buƙatar ɗaukar mataki nan take domin kare masu amfani, kadarori, bayanai ko dandamali. Dakatarwa ba ta soke wasu wajibai dabam kai tsaye, kuma ba ta yanke hukuncin sakamakon ma’amala ko project da ke jiran kammalawa.",
+
+          s16t: "16. Keɓancewa da Iyakance Nauyin Alhaki",
+          s16p1:
+            "Gwargwadon abin da doka ta yarda, ana samar da dandamali da bayanansa na gama-gari bisa samuwarsu, kuma ana iya samun katsewa, kuskure ko jinkiri. Ba mu bayar da garanti na shiga ba tare da katsewa ba, aiki ba tare da kuskure ba ko wani takamaiman sakamakon kasuwanci ko zuba jari.",
+          s16p2:
+            "Gwargwadon abin da doka ta yarda, ALBUKHR ba ta da alhakin wasu asara ta kaikaice ko sakamakon hasarar da ya biyo daga amfani da dandamali, katsewar sabis na waje ko sakamakon project da ya wuce ikonmu. Babu wani abu a waɗannan ƙa’idoji da zai cire ko takaita alhaki ko haƙƙin da doka ba ta yarda a cire ko takaita ba.",
+          s16p3:
+            "Wannan sashe ba ya maye gurbin wata yarjejeniya ta rubuce ko kariyar doka ta wajibi da ta shafi wani sabis ko ma’amala.",
+
+          s17t: "17. Sauye-sauyen Waɗannan Ƙa’idoji",
+          s17p1:
+            "Muna iya gyara waɗannan ƙa’idoji domin nuna sauye-sauyen dandamali, ayyuka, tsarin aiki ko wajibin doka.",
+          s17p2:
+            "Idan sauyin yana da muhimmanci, za mu ɗauki matakan sanarwa da suka dace inda doka ko ƙa’idojin sabis suka buƙata. Ya kamata a nuna sigar sabuwar takarda ko ranar gyara. Idan doka ta buƙaci amincewa dabam, ci gaba da amfani da dandamali ba ya maye gurbin wannan amincewa.",
+
+          s18t: "18. Dokar da Ta Dace da Warware Saɓani",
+          s18p1:
+            "Za a fassara waɗannan ƙa’idoji bisa dokokin da suka dace, ciki har da dokokin da suka shafi ALBUKHR da sabis ɗin da abin ya shafa. Dole ne a sake duba tare da kammala sashe game da dokar da za ta yi aiki da warware saɓani kafin a amince da wannan daftari a hukumance.",
+          s18p2:
+            "Idan kana da ƙorafi, tuntuɓi ALBUKHR da farko domin a duba lamarin. Wannan ba ya hana ka amfani da haƙƙin doka ko tuntuɓar hukumar da ta dace inda doka ta yarda.",
+
+          s19t: "19. Tuntuɓar ALBUKHR",
+          s19p:
+            "Don tambayoyi game da waɗannan ƙa’idoji, sabis na dandamali ko matsalar da aka ruwaito, tuntuɓi ALBUKHR Investment Limited ta adireshin imel ɗin da ke ƙasa.",
+          emailLabel: "Imel ɗin tuntuɓa na hukuma:",
+          s19p2:
+            "Kada ka haɗa kalmar sirri, private key, kalmomin dawo da walat ko wani sirrin tantance asusu a cikin saƙonka.",
+
+          footerText: "Ƙa’idojin Amfani — Gyaran da ake gabatarwa, yana jiran amincewa.",
+          footerContact: "Tuntuɓar ALBUKHR"
+        },
+
+        fr: {
+          subtitle: "Conditions d'utilisation",
+          languageNav: "Choix de la langue",
+          languageLabel: "Langue",
+          draftHeading: "Projet à examiner",
+          draftText:
+            "Révision proposée en attente d'examen et d'approbation. Cette page ne doit pas être considérée comme la version officiellement adoptée avant son approbation.",
+          versionLabel: "Version :",
+          versionValue: "2.0 — Révision proposée",
+          companyLabel: "Organisation :",
+
+          s1t: "1. Introduction",
+          s1p1:
+            "Les présentes conditions régissent votre accès à la plateforme ALBUKHR Investment Limited et son utilisation. Elles doivent être lues avec les conditions propres aux projets, les avis de paiement, la politique de confidentialité et toute autre condition affichée pour une fonctionnalité particulière.",
+          s1p2:
+            "En accédant à un service ou en l'utilisant, vous acceptez ces conditions dans la mesure permise par la loi applicable. Si vous ne les acceptez pas, vous devez cesser d'utiliser le service concerné. Les droits impératifs accordés par la loi ne sont pas supprimés par ces conditions.",
+
+          s2t: "2. Éligibilité et informations utilisateur",
+          s2intro:
+            "Pour utiliser des fonctionnalités nécessitant un compte ou une participation à une activité financière, vous devez satisfaire aux exigences légales et aux conditions du service concerné. Celles-ci peuvent notamment comprendre :",
+          s2l1:
+            "Avoir au moins 18 ans, ou satisfaire à toute exigence d'âge ou de capacité juridique plus élevée prévue par la loi.",
+          s2l2:
+            "Fournir des informations exactes, à jour et complètes lorsqu'elles sont demandées.",
+          s2l3:
+            "Utiliser votre propre compte autorisé et ne pas usurper l'identité d'une personne ou d'une organisation.",
+          s2l4:
+            "Respecter les lois, restrictions d'éligibilité et exigences de vérification applicables au service.",
+          s2p:
+            "Nous pouvons vous demander de corriger ou de vérifier des informations lorsque cela est raisonnablement nécessaire pour protéger la plateforme, examiner une demande ou respecter une obligation légale.",
+
+          s3t: "3. Comptes utilisateur et sécurité des accès",
+          s3p1:
+            "Les utilisateurs sont responsables de la protection de leur accès au compte, de leurs portefeuilles connectés et de leurs identifiants. Vous ne devez partager aucun mot de passe, clé privée, phrase de récupération ou autre secret avec une personne prétendant représenter ALBUKHR.",
+          s3p2:
+            "Vous devez informer rapidement ALBUKHR si vous soupçonnez un accès non autorisé, une usurpation d'identité ou une activité suspecte. Nous pouvons prendre des mesures de sécurité raisonnables, notamment une vérification ou des restrictions temporaires, lorsque cela est nécessaire pour protéger les utilisateurs ou la plateforme.",
+
+          s4t: "4. Portée et disponibilité de la plateforme",
+          s4p1:
+            "ALBUKHR propose des fonctionnalités numériques liées aux informations sur les projets, à la participation, aux processus liés aux investissements et aux services de l'écosystème, selon ce qui est disponible et activé au moment concerné.",
+          s4p2:
+            "Une page, une fiche de projet, un bouton, une description ou une feuille de route ne confirme pas à lui seul qu'un service, un moyen de paiement, une possibilité d'investissement ou une transaction est actif ou disponible. Les utilisateurs doivent se fier au statut actuel et aux instructions présentés dans la fonctionnalité officielle concernée.",
+          s4p3:
+            "Les fonctionnalités peuvent être modifiées, limitées, suspendues ou retirées pour des raisons opérationnelles, de sécurité, juridiques ou d'autres motifs légitimes, sous réserve du droit applicable et des engagements spécifiques concernant le service.",
+
+          s5t: "5. Projets, demandes et gouvernance",
+          s5p1:
+            "ALBUKHR peut proposer des processus de soumission, d'examen, de présentation ou de gestion d'informations sur des projets internes et externes. Une demande n'est pas automatiquement approuvée et une fiche de projet ne signifie pas, à elle seule, que le financement est ouvert ou qu'ALBUKHR garantit les résultats du projet.",
+          s5p2:
+            "Les demandeurs sont responsables de l'exactitude, de l'autorisation et du caractère non trompeur des informations et documents soumis. Ils doivent informer rapidement ALBUKHR de tout changement important concernant une demande ou un projet approuvé.",
+          s5p3:
+            "ALBUKHR utilise des processus de gouvernance et d'examen administratif destinés à soutenir la supervision, le suivi financier, le contrôle opérationnel, la transparence et la responsabilité. Ces processus ne suppriment pas tous les risques, ne garantissent pas l'exactitude de chaque déclaration d'un projet et ne garantissent pas sa réussite commerciale.",
+
+          s6t: "6. Investissement, staking et récompenses",
+          s6p1:
+            "La participation aux fonctionnalités d'investissement, de staking ou de financement de projets est volontaire et peut être soumise à des informations distinctes, des conditions d'éligibilité et des conditions propres au projet. Vous devez examiner ces documents et comprendre les risques avant de participer.",
+          s6p2:
+            "Les actifs numériques et les projets réels peuvent comporter des risques de marché, de liquidité, d'exploitation, de technologie, de contrepartie, de réglementation et de performance du projet. La valeur d'un actif numérique peut évoluer et vous pouvez perdre une partie ou la totalité de la valeur engagée.",
+          s6p3:
+            "Lorsqu'une fonctionnalité de staking ou de récompense est effectivement proposée, les récompenses, leur méthode de calcul, la durée, les conditions d'éligibilité et les règles de retrait dépendent des règles et informations applicables à cette fonctionnalité. Les résultats d'un projet peuvent avoir une incidence lorsque ces règles le prévoient. Ces conditions générales ne garantissent aucun profit, récompense, rendement, liquidité ou protection du capital.",
+          s6p4:
+            "Ne supposez pas qu'une fiche de projet crée automatiquement une relation d'investissement entre vous, ALBUKHR et le propriétaire du projet. Les droits et obligations liés à une participation particulière doivent être définis par les conditions applicables et par la loi.",
+
+          s7t: "7. Paiements, portefeuilles et transactions",
+          s7p1:
+            "Un paiement ou une transaction ne doit être initié qu'au moyen d'une fonctionnalité officielle expressément présentée comme disponible et activée. Ces conditions ne permettent pas, à elles seules, d'activer un moyen de paiement ni de confirmer qu'une transaction particulière peut être réalisée.",
+          s7p2:
+            "Avant de confirmer une transaction, vérifiez l'actif, le montant, le destinataire, le réseau, les frais applicables et les conditions affichées dans le parcours officiel de transaction. N'envoyez pas d'actifs à une adresse ou à un compte sur la seule base d'un message non officiel ou d'une instruction non vérifiée.",
+          s7p3:
+            "Les transactions effectuées par l'intermédiaire d'un réseau externe ou d'un fournisseur de portefeuille peuvent être soumises aux règles de ce fournisseur, aux conditions du réseau, aux délais de confirmation et aux limites techniques. Certaines transactions réseau achevées peuvent être irréversibles.",
+          s7p4:
+            "Ne considérez pas un paiement comme réussi avant que l'interface officielle ou un processus de confirmation approprié n'en indique le statut. Si une transaction semble incorrecte ou non résolue, contactez ALBUKHR par un canal officiel en fournissant les références pertinentes qui ne sont pas secrètes.",
+
+          s8t: "8. Frais, coûts de réseau et impôts",
+          s8p1:
+            "Tout frais de plateforme, frais de service ou autre montant payable devrait être communiqué dans les conditions du service ou de la transaction avant votre engagement, lorsque la loi l'exige. Des frais de réseau ou de fournisseurs externes peuvent s'appliquer séparément.",
+          s8p2:
+            "Les utilisateurs sont responsables de comprendre leurs obligations fiscales et déclaratives liées à leurs activités, sous réserve du droit applicable. Demandez un conseil professionnel qualifié lorsque cela est nécessaire.",
+
+          s9t: "9. Risques et informations",
+          s9p1:
+            "Les informations affichées sur la plateforme visent à aider les utilisateurs à comprendre les services ou projets concernés. Sauf indication expresse dans un accord écrit distinct, elles ne doivent pas être considérées comme une recommandation personnalisée, un avis juridique, un avis fiscal ou une garantie de performance d'investissement.",
+          s9p2:
+            "Les performances passées, projections, estimations ou déclarations d'un projet ne garantissent pas les résultats futurs. Les utilisateurs doivent effectuer leurs propres évaluations et obtenir des conseils qualifiés lorsque cela est approprié avant de prendre des décisions importantes.",
+
+          s10t: "10. Sécurité et utilisation responsable",
+          s10p1:
+            "ALBUKHR applique ou entend appliquer des mesures de sécurité et des contrôles d'accès appropriés à ses systèmes et services. Aucune plateforme en ligne ne peut garantir une sécurité absolue ou un fonctionnement ininterrompu.",
+          s10p2:
+            "Les utilisateurs ne doivent pas tenter de contourner les contrôles d'accès, perturber le fonctionnement de la plateforme, examiner des systèmes sans autorisation ou utiliser abusivement le compte ou les informations d'une autre personne.",
+
+          s11t: "11. Activités interdites",
+          s11intro: "Lors de l'utilisation d'ALBUKHR, vous ne devez pas :",
+          s11l1: "Commettre une fraude, une tromperie, une fausse déclaration ou un autre acte illégal.",
+          s11l2:
+            "Tenter un accès non autorisé, un piratage, une perturbation ou un contournement des contrôles de sécurité.",
+          s11l3:
+            "Soumettre des informations, registres commerciaux ou documents de projet falsifiés, trompeurs, volés ou non autorisés.",
+          s11l4:
+            "Utiliser la plateforme pour enfreindre les droits d'autrui ou les lois applicables.",
+          s11l5:
+            "Utiliser abusivement la plateforme, gêner d'autres utilisateurs ou tenter de manipuler les processus de projet, d'investissement ou de gouvernance.",
+          s11p:
+            "Nous pouvons examiner les violations présumées et prendre des mesures proportionnées lorsque la loi le permet.",
+
+          s12t: "12. Soumissions de projets et contenu utilisateur",
+          s12p1:
+            "Vous conservez les droits que vous détenez légalement sur les éléments soumis. En soumettant du contenu pour une fonctionnalité de la plateforme, vous autorisez ALBUKHR à le recevoir, le stocker, l'examiner et l'utiliser pour exploiter cette fonctionnalité, évaluer une demande, fournir les services demandés, conserver des dossiers et respecter ses obligations applicables.",
+          s12p2:
+            "Vous devez disposer des droits et autorisations nécessaires pour soumettre ces éléments. Ne téléversez pas, sans autorisation, des informations confidentielles appartenant à autrui et ne fournissez pas d'informations illégales, trompeuses ou portant atteinte aux droits d'autrui.",
+          s12p3:
+            "Le téléversement d'un logo, document ou autre élément de projet ne transfère pas automatiquement sa propriété à ALBUKHR et ne confère pas au déposant la propriété de la marque ALBUKHR.",
+
+          s13t: "13. Propriété intellectuelle",
+          s13p1:
+            "Sauf indication contraire expresse, la conception de la plateforme, la marque, les logiciels, les textes et autres éléments originaux d'ALBUKHR appartiennent à leurs titulaires respectifs ou sont utilisés avec autorisation.",
+          s13p2:
+            "Vous ne pouvez utiliser la plateforme qu'à des fins légales et dans les limites des autorisations accordées. Vous ne devez pas copier, modifier, redistribuer ou exploiter des éléments protégés d'une manière qui enfreint les droits applicables ou la licence concernée.",
+
+          s14t: "14. Confidentialité et services tiers",
+          s14p1:
+            "Le traitement des données personnelles est décrit dans la politique de confidentialité d'ALBUKHR. Veuillez la consulter pour comprendre les catégories d'informations susceptibles d'être traitées, les finalités du traitement et vos droits applicables.",
+          privacyLink: "Politique de confidentialité d'ALBUKHR",
+          s14p2:
+            "Certaines fonctionnalités peuvent dépendre de services tiers, notamment Pi Network, des services de portefeuille ou de réseau et des fournisseurs d'infrastructure technique. Ces services peuvent disposer de leurs propres conditions, avis de confidentialité, frais, conditions de disponibilité et limites techniques.",
+          s14p3:
+            "ALBUKHR ne contrôle pas chaque acte ou système indépendant d'un fournisseur externe. Cela ne supprime aucune responsabilité qu'ALBUKHR peut avoir en vertu de la loi applicable.",
+
+          s15t: "15. Suspension et résiliation du compte",
+          s15p1:
+            "ALBUKHR peut limiter, suspendre ou résilier l'accès lorsqu'il existe des motifs raisonnables de croire que ces conditions ont été violées, que la plateforme est menacée, qu'une activité illégale est suspectée, que des informations doivent être vérifiées ou qu'une obligation légale s'applique.",
+          s15p2:
+            "Lorsque cela est approprié et autorisé par la loi, nous fournirons des informations sur la restriction ou un moyen de demander son réexamen. Une action immédiate peut être nécessaire pour protéger les utilisateurs, les actifs, les dossiers ou la plateforme. La suspension n'annule pas automatiquement les obligations distinctes et ne détermine pas le résultat d'une transaction ou d'un projet en attente.",
+
+          s16t: "16. Exclusions et limitation de responsabilité",
+          s16p1:
+            "Dans la mesure permise par la loi, la plateforme et ses informations générales sont fournies selon leur disponibilité et peuvent connaître des interruptions, erreurs ou retards. Nous ne garantissons ni un accès ininterrompu, ni un fonctionnement sans erreur, ni un résultat commercial ou d'investissement particulier.",
+          s16p2:
+            "Dans la mesure permise par la loi, ALBUKHR n'est pas responsable des pertes indirectes ou consécutives résultant de l'utilisation de la plateforme, d'interruptions de services tiers ou de résultats de projets échappant à son contrôle. Aucune disposition de ces conditions n'exclut ou ne limite une responsabilité ou un droit qui ne peut légalement être exclu ou limité.",
+          s16p3:
+            "Cette section ne remplace pas un accord écrit distinct ni une protection légale impérative applicable à un service ou à une transaction spécifique.",
+
+          s17t: "17. Modifications des présentes conditions",
+          s17p1:
+            "Nous pouvons réviser ces conditions pour refléter les changements de la plateforme, des services, des pratiques opérationnelles ou des exigences légales.",
+          s17p2:
+            "Lorsqu'une modification est importante, nous prendrons les mesures appropriées pour en informer les utilisateurs lorsque la loi ou les conditions du service l'exigent. La version révisée devrait indiquer son numéro de version ou sa date de révision. Si la loi exige un consentement distinct, la poursuite de l'utilisation de la plateforme ne remplace pas ce consentement.",
+
+          s18t: "18. Droit applicable et litiges",
+          s18p1:
+            "Les présentes conditions doivent être interprétées conformément au droit applicable, y compris les lois qui s'appliquent à ALBUKHR et au service concerné. Toute clause relative au droit applicable ou au règlement des litiges doit être examinée et finalisée avant l'adoption officielle de ce projet.",
+          s18p2:
+            "En cas de préoccupation, veuillez d'abord contacter ALBUKHR afin que la question puisse être examinée. Cela ne vous empêche pas d'exercer un droit légal ou de contacter une autorité compétente lorsque la loi le permet.",
+
+          s19t: "19. Contacter ALBUKHR",
+          s19p:
+            "Pour toute question concernant ces conditions, un service de la plateforme ou un problème signalé, contactez ALBUKHR Investment Limited à l'adresse e-mail ci-dessous.",
+          emailLabel: "Adresse e-mail officielle :",
+          s19p2:
+            "N'incluez pas de mots de passe, clés privées, phrases de récupération de portefeuille ou autres identifiants secrets dans votre communication.",
+
+          footerText: "Conditions d'utilisation — Révision proposée, en attente d'approbation.",
+          footerContact: "Contacter ALBUKHR"
+        }
+      };
+
+      const languages = ["en", "ha", "fr"];
+      const buttons = document.querySelectorAll("[data-language]");
+      const textElements = document.querySelectorAll("[data-i18n]");
+      const ariaElements = document.querySelectorAll("[data-i18n-aria]");
+
+      function setLanguage(language) {
+        if (!languages.includes(language)) {
+          language = "en";
+        }
+
+        const dictionary = translations[language];
+
+        textElements.forEach(function (element) {
+          const key = element.getAttribute("data-i18n");
+
+          if (Object.prototype.hasOwnProperty.call(dictionary, key)) {
+            element.textContent = dictionary[key];
+          }
+        });
+
+        ariaElements.forEach(function (element) {
+          const key = element.getAttribute("data-i18n-aria");
+
+          if (Object.prototype.hasOwnProperty.call(dictionary, key)) {
+            element.setAttribute("aria-label", dictionary[key]);
+          }
+        });
+
+        buttons.forEach(function (button) {
+          const active =
+            button.getAttribute("data-language") === language;
+
+          button.setAttribute("aria-pressed", String(active));
+        });
+
+        document.documentElement.lang = language;
+
+        const titles = {
+          en: "ALBUKHR Terms of Service",
+          ha: "ALBUKHR — Ƙa’idojin Amfani da Sabis",
+          fr: "ALBUKHR — Conditions d'utilisation"
+        };
+
+        document.title = titles[language];
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          setLanguage(button.getAttribute("data-language"));
+        });
+      });
+
+      /* English is the default; no browser storage is required. */
+      setLanguage("en");
+    })();
+  </script>
 
 </body>
 </html>
