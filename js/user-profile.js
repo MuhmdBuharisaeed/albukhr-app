@@ -47,7 +47,7 @@
     const stateLine = document.querySelector(".profile-status-line");
     if (section) section.classList.remove("hidden");
     setText("profileErrorMessage", message || "Please reload the page or sign in again.");
-    setText("profileSessionStatus", "Session unavailable");
+    setText("profileSessionStatus", "Authentication could not be completed");
     if (stateLine) stateLine.classList.add("is-error");
     setText("profileAuthState", "Unavailable");
   }
@@ -153,7 +153,31 @@
         throw new Error("ALBUKHR Page Auth Guard is unavailable. Reload the page and sign in again.");
       }
 
-      const user = await guard.waitForAuth();
+      setText("profileSessionStatus", "Waiting for Pi authentication…");
+      setText("profileAuthState", "Waiting for Pi");
+
+      /*
+       * Pi authentication or the trusted identity API can remain pending
+       * when the Pi Browser prompt is not completed or the API is unreachable.
+       * Do not leave the profile showing an endless loader.
+       */
+      const authTimeoutMs = 30000;
+      let authTimer;
+      const authTimeout = new Promise((_, reject) => {
+        authTimer = window.setTimeout(() => {
+          reject(new Error(
+            "Pi authentication did not finish within 30 seconds. Open this page in Pi Browser, complete the sign-in prompt, or return to login and sign in again."
+          ));
+        }, authTimeoutMs);
+      });
+
+      let user;
+      try {
+        user = await Promise.race([guard.waitForAuth(), authTimeout]);
+      } finally {
+        window.clearTimeout(authTimer);
+      }
+
       if (!user) throw new Error("A verified ALBUKHR sign-in is required to view this profile.");
       if (!supabase.isNetwork(user.network)) {
         throw new Error("Your profile network does not match the active ALBUKHR data environment.");
