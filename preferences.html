@@ -1,703 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f7a3d">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Review ALBUKHR ecosystem preferences and available settings.">
+  <title>Preferences | ALBUKHR</title>
 
-<meta charset="UTF-8">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/preferences.css">
 
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1.0">
-
-<title>Preferences</title>
-
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/preferences.css">
-
-<link
-rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+  <script defer src="js/core/environment-core.js"></script>
+  <script defer src="js/preferences.js"></script>
 </head>
-
-<body>
-
-<div class="preferences-page">
-
-<!-- =========================
-HEADER
-========================= -->
-
-<header class="preferences-header">
-
-<button
-class="back-btn"
-onclick="history.back()">
-
-<i class="fa-solid fa-arrow-left"></i>
-
-</button>
-
-<h2>
-
-Preferences
-
-</h2>
-
-<button
-class="save-btn"
-onclick="savePreferences()">
-
-Save
-
-</button>
-
-</header>
-
-<!-- =========================
-APPEARANCE
-========================= -->
-
-<section class="pref-card">
-
-<div class="pref-title">
-
-<i class="fa-solid fa-palette"></i>
-
-<span>
-
-Appearance
-
-</span>
-
-</div>
-
-<div class="pref-item">
-
-<div>
-
-<h4>
-
-Theme
-
-</h4>
-
-<p>
-
-Application Theme
-
-</p>
-
-</div>
-
-<select id="themeSelect">
-
-<option value="green">
-
-Green
-
-</option>
-
-<option value="light">
-
-Light
-
-</option>
-
-<option value="dark">
-
-Dark (Coming Soon)
-
-</option>
-
-</select>
-
-</div>
-
-<div class="pref-item">
-
-<div>
-
-<h4>
-
-Accent Color
-
-</h4>
-
-<p>
-
-Application Color
-
-</p>
-
-</div>
-
-<select id="accentColor">
-
-<option value="green">
-
-Green
-
-</option>
-
-<option value="blue">
-
-Blue
-
-</option>
-
-<option value="gold">
-
-Gold
-
-</option>
-
-</select>
-
-</div>
-
-</section>
-
-<!-- =========================
-LANGUAGE
-========================= -->
-
-<section class="pref-card">
-
-<div class="pref-title">
-
-<i class="fa-solid fa-language"></i>
-
-<span>
-
-Language
-
-</span>
-
-</div>
-
-<div class="pref-item">
-
-<div>
-
-<h4>
-
-Language
-
-</h4>
-
-<p>
-
-Application Language
-
-</p>
-
-</div>
-
-<select id="languageSelect">
-
-<option value="en">
-
-English
-
-</option>
-
-<option value="ha">
-
-Hausa (Coming Soon)
-
-</option>
-
-<option value="fr">
-
-French (Coming Soon)
-
-</option>
-
-</select>
-
-</div>
-
-</section>
-
-<!-- =========================
-NOTIFICATIONS
-========================= -->
-
-<section class="pref-card">
-
-<div class="pref-title">
-
-<i class="fa-solid fa-bell"></i>
-
-<span>
-
-Notifications
-
-</span>
-
-</div>
-
-<div class="switch-row">
-
-<span>
-
-Project Updates
-
-</span>
-
-<label class="switch">
-
-<input
-type="checkbox"
-id="notifyProjects"
-checked>
-
-<span class="slider"></span>
-
-</label>
-
-</div>
-
-<div class="switch-row">
-
-<span>
-
-Rewards
-
-</span>
-
-<label class="switch">
-
-<input
-type="checkbox"
-id="notifyRewards"
-checked>
-
-<span class="slider"></span>
-
-</label>
-
-</div>
-
-<div class="switch-row">
-
-<span>
-
-Transactions
-
-</span>
-
-<label class="switch">
-
-<input
-type="checkbox"
-id="notifyTransactions"
-checked>
-
-<span class="slider"></span>
-
-</label>
-
-</div>
-
-<div class="switch-row">
-
-<span>
-
-Marketing
-
-</span>
-
-<label class="switch">
-
-<input
-type="checkbox"
-id="notifyMarketing">
-
-<span class="slider"></span>
-
-</label>
-
-</div>
-
-  </section>
-
-<!-- =========================
-PRIVACY
-========================= -->
-
-<section class="pref-card">
-
-    <div class="pref-title">
-
-        <i class="fa-solid fa-user-shield"></i>
-
-        <span>Privacy</span>
-
-    </div>
-
-    <div class="switch-row">
-
-        <span>Hide Wallet Balance</span>
-
-        <label class="switch">
-
-            <input
-            type="checkbox"
-            id="hideBalance">
-
-            <span class="slider"></span>
-
-        </label>
-
-    </div>
-
-    <div class="switch-row">
-
-        <span>Hide Assets</span>
-
-        <label class="switch">
-
-            <input
-            type="checkbox"
-            id="hideAssets">
-
-            <span class="slider"></span>
-
-        </label>
-
-    </div>
-
-    <div class="switch-row">
-
-        <span>Show Online Status</span>
-
-        <label class="switch">
-
-            <input
-            type="checkbox"
-            id="onlineStatus"
-            checked>
-
-            <span class="slider"></span>
-
-        </label>
-
-    </div>
-
-</section>
-
-<!-- =========================
-SECURITY
-========================= -->
-
-<section class="pref-card">
-
-    <div class="pref-title">
-
-        <i class="fa-solid fa-shield-halved"></i>
-
-        <span>Security</span>
-
-    </div>
-
-    <div class="switch-row">
-
-        <span>Biometric Login</span>
-
-        <label class="switch">
-
-            <input
-            type="checkbox"
-            id="biometric"
-            checked>
-
-            <span class="slider"></span>
-
-        </label>
-
-    </div>
-
-    <div class="switch-row">
-
-        <span>Two-Factor Authentication</span>
-
-        <label class="switch">
-
-            <input
-            type="checkbox"
-            id="twoFactor"
-            checked>
-
-            <span class="slider"></span>
-
-        </label>
-
-    </div>
-
-</section>
-
-<!-- =========================
-REGION
-========================= -->
-
-<section class="pref-card">
-
-    <div class="pref-title">
-
-        <i class="fa-solid fa-earth-africa"></i>
-
-        <span>Region</span>
-
-    </div>
-
-    <div class="pref-item">
-
+<body class="preferences-body">
+  <a class="preferences-skip-link" href="#preferencesMain">Skip to preferences</a>
+
+  <div class="preferences-page">
+    <header class="preferences-header">
+      <button class="preferences-back" id="preferencesBack" type="button" aria-label="Go back">
+        <span aria-hidden="true">←</span>
+      </button>
+      <div class="preferences-heading">
+        <p class="preferences-eyebrow">ALBUKHR ECOSYSTEM</p>
+        <h1>Preferences</h1>
+      </div>
+      <a class="preferences-home" href="index.html" aria-label="Open ALBUKHR home">Home</a>
+    </header>
+
+    <main id="preferencesMain" class="preferences-main">
+      <section class="preferences-intro" aria-labelledby="preferencesIntroTitle">
+        <div class="preferences-intro-icon" aria-hidden="true">⚙</div>
         <div>
-
-            <h4>Country</h4>
-
-            <p>Your Current Country</p>
-
+          <h2 id="preferencesIntroTitle">Your settings, clearly defined</h2>
+          <p>Review the current ALBUKHR experience and open supported account guidance. Options that do not yet have a shared, verified settings service are shown as unavailable instead of pretending to save changes.</p>
         </div>
+      </section>
 
-        <select id="country">
-
-            <option>Nigeria</option>
-
-        </select>
-
-    </div>
-
-    <div class="pref-item">
-
-        <div>
-
-            <h4>Time Zone</h4>
-
-            <p>Current Time Zone</p>
-
+      <section class="preferences-card environment-card" aria-labelledby="environmentTitle">
+        <div class="preferences-card-heading">
+          <div class="preferences-heading-icon" aria-hidden="true">◎</div>
+          <div>
+            <h2 id="environmentTitle">Current environment</h2>
+            <p>Read-only status from ALBUKHR Environment Core</p>
+          </div>
         </div>
-
-        <select id="timezone">
-
-            <option>GMT +1</option>
-
-        </select>
-
-    </div>
-
-    <div class="pref-item">
-
-        <div>
-
-            <h4>Currency</h4>
-
-            <p>Display Currency</p>
-
+        <div class="environment-status-row">
+          <span class="environment-dot" id="environmentDot" aria-hidden="true"></span>
+          <strong id="environmentName" aria-live="polite">Checking environment…</strong>
+          <span class="environment-status" id="environmentStatus">Checking</span>
         </div>
-
-        <select id="currency">
-
-            <option>Pi (π)</option>
-
-        </select>
-
-    </div>
-
-</section>
-
-<!-- =========================
-APP SETTINGS
-========================= -->
-
-<section class="pref-card">
-
-    <div class="pref-title">
-
-        <i class="fa-solid fa-mobile-screen"></i>
-
-        <span>App Settings</span>
-
-    </div>
-
-    <div
-    class="pref-link"
-    onclick="clearCache()">
-
-        <i class="fa-solid fa-broom"></i>
-
-        <span>Clear Cache</span>
-
-        <i class="fa-solid fa-angle-right"></i>
-
-    </div>
-
-    <div
-    class="pref-link"
-    onclick="resetPreferences()">
-
-        <i class="fa-solid fa-rotate-left"></i>
-
-        <span>Reset Preferences</span>
-
-        <i class="fa-solid fa-angle-right"></i>
-
-    </div>
-
-</section>
-
-<!-- =========================
-ABOUT APP
-========================= -->
-
-<section class="pref-card">
-
-    <div class="pref-title">
-
-        <i class="fa-solid fa-circle-info"></i>
-
-        <span>About ALBUKHR</span>
-
-    </div>
-
-    <div class="pref-info">
-
-        <div class="info-row">
-
-            <span>Version</span>
-
-            <strong>1.0.0</strong>
-
+        <p class="preferences-detail" id="environmentDetail">This page does not switch networks or read investment data.</p>
+        <div class="preferences-note" role="note">
+          Mainnet and Testnet must remain separate. Use the environment switcher in the main page drawer when switching is supported; this page does not perform a network switch.
         </div>
+      </section>
 
-        <div class="info-row">
-
-            <span>Platform</span>
-
-            <strong>Pi Network</strong>
-
+      <section class="preferences-card" aria-labelledby="appearanceTitle">
+        <div class="preferences-card-heading">
+          <div class="preferences-heading-icon" aria-hidden="true">◐</div>
+          <div>
+            <h2 id="appearanceTitle">Appearance</h2>
+            <p>Current site presentation</p>
+          </div>
         </div>
-
-        <div class="info-row">
-
-            <span>Company</span>
-
-            <strong>ALBUKHR Investment Limited</strong>
-
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Application theme</strong>
+            <p>The current ALBUKHR green interface is active on this page.</p>
+          </div>
+          <span class="preferences-state state-current">Current</span>
         </div>
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Accent colour</strong>
+            <p>Uses the existing ALBUKHR design system. Custom accent selection is not connected across the ecosystem.</p>
+          </div>
+          <span class="preferences-state state-unavailable">Unavailable</span>
+        </div>
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Dark theme</strong>
+            <p>A saved, site-wide dark theme is not implemented yet.</p>
+          </div>
+          <span class="preferences-state state-unavailable">Unavailable</span>
+        </div>
+      </section>
 
-    </div>
+      <section class="preferences-card" aria-labelledby="languageTitle">
+        <div class="preferences-card-heading">
+          <div class="preferences-heading-icon" aria-hidden="true">文</div>
+          <div>
+            <h2 id="languageTitle">Language and region</h2>
+            <p>Display information from this device</p>
+          </div>
+        </div>
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Interface language</strong>
+            <p>The current interface is displayed in English. A whole-site language switch has not been connected.</p>
+          </div>
+          <span class="preferences-state state-current">English</span>
+        </div>
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Device language</strong>
+            <p id="deviceLanguage">Checking device language…</p>
+          </div>
+          <span class="preferences-state state-readonly">Device info</span>
+        </div>
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Device time zone</strong>
+            <p id="deviceTimezone">Checking device time zone…</p>
+          </div>
+          <span class="preferences-state state-readonly">Device info</span>
+        </div>
+        <p class="preferences-footnote">Hausa and French are not presented as active interface options until the translations are integrated across the supported pages.</p>
+      </section>
 
-</section>
+      <section class="preferences-card" aria-labelledby="notificationsTitle">
+        <div class="preferences-card-heading">
+          <div class="preferences-heading-icon" aria-hidden="true">♧</div>
+          <div>
+            <h2 id="notificationsTitle">Notifications</h2>
+            <p>Notification preferences are not yet saved through a verified account settings service</p>
+          </div>
+        </div>
+        <div class="preferences-unavailable-panel">
+          <strong>Category controls are not active here</strong>
+          <p>Project updates, rewards, transaction alerts and marketing preferences need a shared, account-bound settings store before these choices can reliably affect notification delivery across pages.</p>
+        </div>
+        <a class="preferences-action-link" href="investor-dashboard.html">Open Investor Dashboard <span aria-hidden="true">→</span></a>
+      </section>
 
-<!-- =========================
-SAVE BUTTON
-========================= -->
+      <section class="preferences-card" aria-labelledby="privacyTitle">
+        <div class="preferences-card-heading">
+          <div class="preferences-heading-icon" aria-hidden="true">◈</div>
+          <div>
+            <h2 id="privacyTitle">Privacy and display</h2>
+            <p>Controls that affect the visibility of account information</p>
+          </div>
+        </div>
+        <div class="preferences-unavailable-panel">
+          <strong>No global visibility setting is connected</strong>
+          <p>Balance and asset visibility must not be represented as a site-wide preference until the setting is shared by the pages that display those values. This screen will not change wallet, investment or account data.</p>
+        </div>
+        <a class="preferences-action-link" href="privacy-policy.html">Read Privacy Policy <span aria-hidden="true">→</span></a>
+      </section>
 
-<section class="save-section">
+      <section class="preferences-card" aria-labelledby="securityTitle">
+        <div class="preferences-card-heading">
+          <div class="preferences-heading-icon" aria-hidden="true">⬡</div>
+          <div>
+            <h2 id="securityTitle">Security</h2>
+            <p>Account protection guidance</p>
+          </div>
+        </div>
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Biometric login</strong>
+            <p>This page cannot enable biometric authentication. No such switch is exposed as an active security control.</p>
+          </div>
+          <span class="preferences-state state-unavailable">Not connected</span>
+        </div>
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Two-factor authentication</strong>
+            <p>This page does not enable or disable additional authentication factors.</p>
+          </div>
+          <span class="preferences-state state-unavailable">Not connected</span>
+        </div>
+        <a class="preferences-action-link" href="security.html">Open Security Guidance <span aria-hidden="true">→</span></a>
+      </section>
 
-    <button
-    class="save-preferences-btn"
-    onclick="savePreferences()">
+      <section class="preferences-card" aria-labelledby="appSettingsTitle">
+        <div class="preferences-card-heading">
+          <div class="preferences-heading-icon" aria-hidden="true">▣</div>
+          <div>
+            <h2 id="appSettingsTitle">App settings</h2>
+            <p>Safe actions available from this page</p>
+          </div>
+        </div>
+        <div class="preferences-setting-row">
+          <div class="preferences-setting-copy">
+            <strong>Reload environment status</strong>
+            <p>Re-check the environment information displayed above. This does not clear browser cache or account data.</p>
+          </div>
+          <button class="preferences-small-button" id="refreshEnvironment" type="button">Refresh</button>
+        </div>
+        <div class="preferences-note" role="note">
+          Save, Reset Preferences and Clear Cache actions have been removed from this version because no verified shared preferences store is available. No authentication state, browser storage, Supabase records, wallet data or transactions are modified by this page.
+        </div>
+      </section>
 
-        <i class="fa-solid fa-floppy-disk"></i>
-
-        Save Changes
-
-    </button>
-
-</section>
-
-<!-- =========================
-FOOTER
-========================= -->
-
-<footer class="preferences-footer">
-
-    <img
-    src="images/file_0000000061cc6246adf4801e7ed9ef6c.png"
-    class="footer-logo"
-    alt="ALBUKHR">
-
-    <h3>
-
-        ALBUKHR Investment Limited
-
-    </h3>
-
-    <p>
-
-        Community Investment Platform
-        Powered by Pi Network
-
-    </p>
-
-    <small>
-
-        © 2024 ALBUKHR Investment Limited.
-        All Rights Reserved.
-
-    </small>
-
-</footer>
-
-</div>
-
-<!-- =========================
-ALBUKHR APP ALERT
-========================= -->
-
-<div
-id="appAlert"
-class="app-alert">
-
-    <div class="app-alert-box">
-
-        <h3 id="appAlertTitle">
-
-            Notice
-
-        </h3>
-
-        <p id="appAlertText">
-
-        </p>
-
-        <button
-        onclick="closeAppAlert()">
-
-            OK
-
-        </button>
-
-    </div>
-
-</div>
-
-<!-- =========================
-SCRIPTS
-========================= -->
-
-<script src="js/preferences.js"></script>
-
-<script src="js/app-alert.js"></script>
-
-<script>
-
-function savePreferences(){
-
-    if(window.savePreferencesData){
-
-        savePreferencesData();
-
-    }
-
-}
-
-</script>
-
+      <footer class="preferences-footer">
+        <strong>ALBUKHR Investment Limited</strong>
+        <p>Building sustainable industries and connecting digital participation with real-world economic activity.</p>
+        <small>Preferences status · Read-only environment check</small>
+      </footer>
+    </main>
+  </div>
 </body>
-
 </html>
