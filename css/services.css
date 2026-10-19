@@ -1,91 +1,35 @@
-html,body{
-margin:0;
-padding:0;
-background:#f4f7f6;
-font-family:system-ui;
-padding-bottom:110px;
-}
-.section{padding:16px;}
-.service-card{
-background:#fff;
-border-radius:18px;
-padding:16px;
-margin-bottom:16px;
-display:flex;
-gap:14px;
-box-shadow:0 6px 18px rgba(0,0,0,0.06);
-cursor:pointer;
-transition:.25s;
-}
-.service-card:hover{
-transform:translateY(-2px);
-box-shadow:0 10px 24px rgba(0,0,0,0.08);
-}
-.service-card:focus-visible{
-outline:3px solid rgba(15,122,61,.28);
-outline-offset:3px;
-}
-.service-icon{
-font-size:24px;
-width:44px;
-height:44px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:12px;
-background:#f2f7f4;
-flex:0 0 44px;
-}
-.service-body{flex:1;min-width:0;}
-.service-title{
-font-weight:700;
-font-size:15px;
-margin-bottom:4px;
-}
-.service-desc{
-font-size:13px;
-color:#666;
-line-height:1.5;
-}
-.service-footer{
-margin-top:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-.service-action{
-font-size:13px;
-font-weight:600;
-color:#0f7a3d;
-}
-.arrow{font-size:14px;color:#0f7a3d;}
-.badge{
-display:inline-block;
-font-size:10px;
-padding:4px 9px;
-border-radius:20px;
-margin-top:6px;
-font-weight:600;
-}
-.badge.public{background:#e6f5ec;color:#0f7a3d;}
-.badge.paid{background:#fff3cd;color:#856404;}
-.badge.restricted{background:#f8d7da;color:#842029;}
-.badge.coming{background:#e7f1ff;color:#084298;}
-/* UI state only; never authorization */
-.locked{
-opacity:.55;
-pointer-events:none;
-}
-.notice{
-font-size:12px;
-color:#777;
-line-height:1.6;
-margin-top:20px;
-}
-@media(max-width:420px){
-.section{padding:14px 12px;}
-.service-card{padding:14px;gap:12px;margin-bottom:14px;border-radius:16px;}
-.service-icon{width:42px;height:42px;flex:0 0 42px;font-size:22px;}
-.service-title{font-size:14px;}
-.service-desc{font-size:12px;}
-              }
+/* ALBUKHR Services page — scoped responsive styles */
+html,body{margin:0;padding:0;min-height:100%;background:#f4f7f6;color:#202923;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding-bottom:110px}
+#servicesMain{width:100%;min-width:0}
+.section{box-sizing:border-box;width:100%;max-width:920px;margin:0 auto;padding:18px 16px 28px}
+.services-intro{margin:0 0 18px}
+.services-eyebrow{margin:0 0 4px;color:#64736a;font-size:10px;font-weight:750;letter-spacing:.12em;line-height:1.4}
+.services-heading{margin:0 0 6px;color:#17231b;font-size:clamp(25px,5vw,32px);font-weight:750;line-height:1.15}
+.services-description{max-width:680px;margin:0;color:#5f6b63;font-size:13px;line-height:1.55}
+.service-card{box-sizing:border-box;display:flex;align-items:flex-start;gap:13px;width:100%;min-width:0;margin:0 0 14px;padding:16px;overflow:hidden;border:1px solid rgba(28,65,42,.045);border-radius:17px;background:#fff;box-shadow:0 5px 17px rgba(20,45,30,.055);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:box-shadow 160ms ease,transform 160ms ease}
+.service-card:hover{box-shadow:0 8px 22px rgba(20,45,30,.085)}
+.service-card:focus-visible{outline:3px solid rgba(15,122,61,.28);outline-offset:3px}
+.service-icon{box-sizing:border-box;display:flex;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;background:#f0f5f1;color:#647269}
+/* Constrain inline SVGs: prevents global SVG rules from producing oversized arrows/icons. */
+.service-card svg,.notice svg{display:block;box-sizing:border-box;width:22px;height:22px;max-width:100%;flex:0 0 auto;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.service-icon svg{width:23px;height:23px;stroke-width:1.7}
+.service-body{flex:1 1 auto;min-width:0}
+.service-title{margin:1px 0 5px;color:#1d2921;font-size:14px;font-weight:750;line-height:1.35;overflow-wrap:anywhere}
+.service-desc{color:#657068;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.badge{display:inline-flex;align-items:center;max-width:100%;margin-top:8px;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+.badge.public{background:#e6f5ec;color:#0f7a3d}.badge.paid{background:#fff3cd;color:#856404}.badge.restricted{background:#f8d7da;color:#842029}.badge.coming{background:#e7f1ff;color:#084298}.badge.planned{background:#edf0f1;color:#505d56}
+.service-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:13px}
+.service-action{color:#0f7a3d;font-size:12px;font-weight:700;line-height:1.4}
+.arrow-icon{display:block;flex:0 0 20px;width:20px!important;height:20px!important;color:#0f7a3d}
+.arrow-icon path{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Visual state only; authorization remains server-enforced. */
+.service-card.locked{opacity:.58;cursor:not-allowed;box-shadow:0 4px 14px rgba(20,45,30,.035)}
+.service-card.locked:hover{transform:none}.service-card.locked .service-icon{background:#f0f1f0}
+.service-note{margin:12px 0 0;padding-top:11px;border-top:1px solid #edf0ed;color:#68736c;font-size:11px;line-height:1.55}
+.alb-token-card .service-icon{background:#f0f1ef}.alb-token-icon{color:#626c65}
+.notice{display:flex;align-items:flex-start;gap:10px;margin:22px 2px 0;color:#6b756e;font-size:11px;line-height:1.6}
+.notice svg{flex:0 0 18px;width:18px;height:18px;margin-top:1px;color:#7a857d}.notice p{min-width:0;margin:0}
+@media(min-width:640px){.section{padding:24px 22px 34px}.service-card{gap:16px;padding:18px;border-radius:18px}.service-title{font-size:15px}.service-desc{font-size:13px}}
+@media(max-width:420px){.section{padding:14px 10px 24px}.services-intro{margin-bottom:15px}.service-card{gap:10px;margin-bottom:12px;padding:13px 12px;border-radius:15px}.service-icon{flex-basis:36px;width:36px;height:36px;border-radius:10px}.service-icon svg{width:21px;height:21px}.service-title{font-size:13px}.service-desc{font-size:11px;line-height:1.5}.service-footer{margin-top:11px}.service-action{font-size:11px}.arrow-icon{flex-basis:18px;width:18px!important;height:18px!important}}
+@media(prefers-reduced-motion:reduce){.service-card{transition:none}}
