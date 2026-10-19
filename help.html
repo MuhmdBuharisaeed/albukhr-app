@@ -1,826 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ALBUKHR Help Center: account guidance, project information, security tips and support resources.">
+  <meta name="theme-color" content="#0f7a3d">
 
-<meta charset="UTF-8">
+  <title>ALBUKHR Help Center</title>
 
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1.0">
-
-<title>
-ALBUKHR Help Center
-</title>
-
-<link
-rel="stylesheet"
-href="css/style.css">
-
-<link
-rel="stylesheet"
-href="css/help.css">
-
-<link
-rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/help.css">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  >
 </head>
 
 <body>
-
-<div class="help-page">
-
-<!-- ===========================
-HEADER
-=========================== -->
-
-<header class="help-header">
-
-<button
-class="back-btn"
-onclick="history.back()">
-
-<i class="fa-solid fa-arrow-left"></i>
-
-</button>
-
-<h2>
-
-Help Center
-
-</h2>
-
-<button
-class="home-btn"
-onclick="location.href='dashboard.html'">
-
-<i class="fa-solid fa-house"></i>
-
-</button>
-
-</header>
-
-<!-- ===========================
-WELCOME CARD
-=========================== -->
-
-<section class="help-hero">
-
-<h2>
-
-How can we help you?
-
-</h2>
-
-<p>
-
-Find answers, guides and support for
-your ALBUKHR account.
-
-</p>
-
-</section>
-
-<!-- ===========================
-SEARCH
-=========================== -->
-
-<section class="help-search">
-
-<div class="search-box">
-
-<i class="fa-solid fa-magnifying-glass"></i>
-
-<input
-type="text"
-id="helpSearch"
-placeholder="Search help articles...">
-
-</div>
-
-</section>
-
-<!-- ===========================
-QUICK HELP
-=========================== -->
-
-<section class="help-card">
-
-<div class="section-title">
-
-<i class="fa-solid fa-bolt"></i>
-
-<span>
-
-Quick Help
-
-</span>
-
-</div>
-
-<div class="quick-grid">
-
-<button
-class="quick-help-btn"
-onclick="comingSoon('Wallet Help')">
-
-<i class="fa-solid fa-wallet"></i>
-
-<span>
-
-Wallet
-
-</span>
-
-</button>
-
-<button
-class="quick-help-btn"
-onclick="comingSoon('Staking Help')">
-
-<i class="fa-solid fa-chart-line"></i>
-
-<span>
-
-Staking
-
-</span>
-
-</button>
-
-<button
-class="quick-help-btn"
-onclick="comingSoon('Rewards Help')">
-
-<i class="fa-solid fa-coins"></i>
-
-<span>
-
-Rewards
-
-</span>
-
-</button>
-
-<button
-class="quick-help-btn"
-onclick="comingSoon('Security Help')">
-
-<i class="fa-solid fa-shield-halved"></i>
-
-<span>
-
-Security
-
-</span>
-
-</button>
-
-</div>
-
-</section>
-
-<!-- ===========================
-POPULAR QUESTIONS
-=========================== -->
-
-<section class="help-card">
-
-<div class="section-title">
-
-<i class="fa-solid fa-circle-question"></i>
-
-<span>
-
-Popular Questions
-
-</span>
-
-</div>
-
-<div class="faq-list">
-
-<div class="faq-item">
-
-<button
-class="faq-question">
-
-<span>
-
-How do I start staking?
-
-</span>
-
-<i class="fa-solid fa-angle-down"></i>
-
-</button>
-
-<div class="faq-answer">
-
-Choose a project from Explore Projects,
-select an amount, duration and complete
-your Pi payment.
-
-</div>
-
-</div>
-
-<div class="faq-item">
-
-<button
-class="faq-question">
-
-<span>
-
-How are rewards calculated?
-
-</span>
-
-<i class="fa-solid fa-angle-down"></i>
-
-</button>
-
-<div class="faq-answer">
-
-Rewards are calculated according to
-your selected project and staking
-duration.
-
-</div>
-
-</div>
-
-<div class="faq-item">
-
-<button
-class="faq-question">
-
-<span>
-
-Can I withdraw before maturity?
-
-</span>
-
-<i class="fa-solid fa-angle-down"></i>
-
-</button>
-
-<div class="faq-answer">
-
-Early withdrawal depends on the
-project policy and may include
-certain restrictions.
-
-</div>
-
-</div>
-
-<div class="faq-item">
-
-<button
-class="faq-question">
-
-<span>
-
-Is my Pi Wallet secure?
-
-</span>
-
-<i class="fa-solid fa-angle-down"></i>
-
-</button>
-
-<div class="faq-answer">
-
-Yes. ALBUKHR never stores your
-private keys. Authentication is
-handled securely through Pi Network.
-
-</div>
-
-</div>
-
-</div>
-
-  </section>
-
-  <!-- ===========================
-CONTACT SUPPORT
-=========================== -->
-
-<section class="help-card">
-
-    <div class="section-title">
-
-        <i class="fa-solid fa-headset"></i>
-
+  <main class="help-page">
+
+    <!-- HEADER -->
+    <header class="help-header">
+      <button
+        class="back-btn"
+        type="button"
+        onclick="history.back()"
+        aria-label="Go back"
+      >
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      </button>
+
+      <h2>Help Center</h2>
+
+      <button
+        class="home-btn"
+        type="button"
+        onclick="location.href='index.html'"
+        aria-label="Go to home"
+      >
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <!-- WELCOME -->
+    <section class="help-hero">
+      <h2>How can we help you?</h2>
+      <p>
+        Find answers, guidance and support for your ALBUKHR account
+        and ecosystem services.
+      </p>
+    </section>
+
+    <!-- SEARCH -->
+    <section class="help-search" aria-label="Search help">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+
+        <input
+          type="search"
+          id="helpSearch"
+          placeholder="Search help articles..."
+          aria-label="Search help articles"
+          autocomplete="off"
+        >
+      </div>
+
+      <p
+        id="helpSearchStatus"
+        class="help-search-status"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></p>
+    </section>
+
+    <!-- QUICK HELP -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+        <span>Quick Help</span>
+      </div>
+
+      <div class="quick-grid">
+        <button
+          class="quick-help-btn"
+          type="button"
+          onclick="comingSoon('Wallet Help')"
+        >
+          <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+          <span>Wallet</span>
+        </button>
+
+        <button
+          class="quick-help-btn"
+          type="button"
+          onclick="comingSoon('Staking Help')"
+        >
+          <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+          <span>Staking</span>
+        </button>
+
+        <button
+          class="quick-help-btn"
+          type="button"
+          onclick="comingSoon('Rewards Help')"
+        >
+          <i class="fa-solid fa-coins" aria-hidden="true"></i>
+          <span>Rewards</span>
+        </button>
+
+        <button
+          class="quick-help-btn"
+          type="button"
+          onclick="location.href='security.html'"
+        >
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          <span>Security</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- POPULAR QUESTIONS -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+        <span>Popular Questions</span>
+      </div>
+
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <button
+            class="faq-question"
+            type="button"
+            aria-expanded="false"
+          >
+            <span>How do I start staking?</span>
+            <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
+          </button>
+
+          <div class="faq-answer" hidden>
+            Review the available project information, eligibility
+            conditions, duration and risks first. Follow the official
+            participation flow only when the relevant feature is shown
+            as available. Do not initiate a payment unless the official
+            interface expressly confirms that the payment channel is enabled.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button
+            class="faq-question"
+            type="button"
+            aria-expanded="false"
+          >
+            <span>How are rewards calculated?</span>
+            <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
+          </button>
+
+          <div class="faq-answer" hidden>
+            Any rewards depend on the rules and disclosures applicable
+            to the particular project or feature. Review the calculation
+            method, duration, eligibility rules and risks before
+            participating. Rewards or profit are not guaranteed unless
+            an applicable written agreement expressly says otherwise
+            and the law permits it.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button
+            class="faq-question"
+            type="button"
+            aria-expanded="false"
+          >
+            <span>Can I withdraw before maturity?</span>
+            <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
+          </button>
+
+          <div class="faq-answer" hidden>
+            Early withdrawal depends on the rules that apply to the
+            particular project or feature. Restrictions, processing
+            conditions or fees may apply if disclosed in the applicable
+            terms. Review those terms before participating; do not
+            assume that early withdrawal is always available.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button
+            class="faq-question"
+            type="button"
+            aria-expanded="false"
+          >
+            <span>How do I protect my Pi Wallet?</span>
+            <i class="fa-solid fa-angle-down" aria-hidden="true"></i>
+          </button>
+
+          <div class="faq-answer" hidden>
+            Never share your Pi Wallet passphrase, private keys or
+            recovery information. Use official Pi Network channels
+            for wallet-related actions. ALBUKHR support should not
+            ask you to disclose your wallet secrets. Check every
+            transaction carefully before confirming it.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CONTACT SUPPORT -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-headset" aria-hidden="true"></i>
         <span>Contact Support</span>
+      </div>
 
-    </div>
-
-    <div class="help-menu">
+      <div class="help-menu">
 
         <button
-        class="help-item"
-        onclick="comingSoon('Live Chat')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-comments"></i>
-
-                <span>Live Chat</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Live Chat')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-comments" aria-hidden="true"></i>
+            <span>Live Chat</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="comingSoon('Email Support')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-envelope"></i>
-
-                <span>Email Support</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="location.href='mailto:albukhrinvestmentlimited@gmail.com?subject=ALBUKHR%20Support'"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+            <span>Email Support</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="comingSoon('Support Ticket')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-ticket"></i>
-
-                <span>Submit Ticket</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Support Ticket')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+            <span>Submit Ticket</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
-    </div>
+      </div>
+    </section>
 
-</section>
-
-<!-- ===========================
-REPORT A PROBLEM
-=========================== -->
-
-<section class="help-card">
-
-    <div class="section-title">
-
-        <i class="fa-solid fa-bug"></i>
-
+    <!-- REPORT A PROBLEM -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-bug" aria-hidden="true"></i>
         <span>Report a Problem</span>
+      </div>
 
-    </div>
-
-    <div class="help-menu">
+      <div class="help-menu">
 
         <button
-        class="help-item"
-        onclick="comingSoon('Bug Report')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-triangle-exclamation"></i>
-
-                <span>Report a Bug</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Bug Report')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            <span>Report a Bug</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="comingSoon('Payment Issue')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-credit-card"></i>
-
-                <span>Payment Issues</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Payment Issue')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
+            <span>Payment Issues</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="comingSoon('Account Recovery')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-user-lock"></i>
-
-                <span>Recover Account</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Account Recovery')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-user-lock" aria-hidden="true"></i>
+            <span>Recover Account</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
-    </div>
+      </div>
+    </section>
 
-</section>
-
-<!-- ===========================
-PI WALLET HELP
-=========================== -->
-
-<section class="help-card">
-
-    <div class="section-title">
-
-        <i class="fa-brands fa-pied-piper"></i>
-
+    <!-- PI WALLET HELP -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-wallet" aria-hidden="true"></i>
         <span>Pi Wallet Help</span>
+      </div>
 
-    </div>
-
-    <div class="help-menu">
+      <div class="help-menu">
 
         <button
-        class="help-item"
-        onclick="comingSoon('Connect Wallet')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-link"></i>
-
-                <span>Connect Wallet</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Connect Wallet')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-link" aria-hidden="true"></i>
+            <span>Connect Wallet</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="comingSoon('Wallet Verification')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-circle-check"></i>
-
-                <span>Wallet Verification</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Wallet Verification')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+            <span>Wallet Verification</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="comingSoon('Pi Payments')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-coins"></i>
-
-                <span>Pi Payments</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Pi Payments')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-coins" aria-hidden="true"></i>
+            <span>Pi Payments</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
-    </div>
+      </div>
+    </section>
 
-</section>
-
-<!-- ===========================
-SECURITY TIPS
-=========================== -->
-
-<section class="help-card">
-
-    <div class="section-title">
-
-        <i class="fa-solid fa-shield-halved"></i>
-
+    <!-- SECURITY TIPS -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
         <span>Security Tips</span>
+      </div>
 
-    </div>
-
-    <div class="tips-list">
+      <div class="tips-list">
 
         <div class="tip-item">
-
-            <i class="fa-solid fa-check-circle"></i>
-
-            <p>
-                Never share your Pi Wallet passphrase with anyone.
-            </p>
-
+          <i class="fa-solid fa-check-circle" aria-hidden="true"></i>
+          <p>Never share your Pi Wallet passphrase, private keys or recovery information.</p>
         </div>
 
         <div class="tip-item">
-
-            <i class="fa-solid fa-check-circle"></i>
-
-            <p>
-                Always verify payments before confirming transactions.
-            </p>
-
+          <i class="fa-solid fa-check-circle" aria-hidden="true"></i>
+          <p>Verify the recipient, amount and network before confirming a transaction.</p>
         </div>
 
         <div class="tip-item">
-
-            <i class="fa-solid fa-check-circle"></i>
-
-            <p>
-                Enable biometric authentication whenever available.
-            </p>
-
+          <i class="fa-solid fa-check-circle" aria-hidden="true"></i>
+          <p>Use device security features, such as a screen lock, where available.</p>
         </div>
 
         <div class="tip-item">
-
-            <i class="fa-solid fa-check-circle"></i>
-
-            <p>
-                Keep your ALBUKHR application updated to the latest version.
-            </p>
-
+          <i class="fa-solid fa-check-circle" aria-hidden="true"></i>
+          <p>Use official ALBUKHR and Pi Network channels and be cautious of impersonators.</p>
         </div>
 
-    </div>
+      </div>
+    </section>
 
-</section>
+    <!-- COMMUNITY & RESOURCES -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-users" aria-hidden="true"></i>
+        <span>Community &amp; Resources</span>
+      </div>
 
-<!-- ===========================
-COMMUNITY & RESOURCES
-=========================== -->
-
-<section class="help-card">
-
-    <div class="section-title">
-
-        <i class="fa-solid fa-users"></i>
-
-        <span>Community & Resources</span>
-
-    </div>
-
-    <div class="help-menu">
+      <div class="help-menu">
 
         <button
-        class="help-item"
-        onclick="comingSoon('Community Forum')">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-user-group"></i>
-
-                <span>Community Forum</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Community Forum')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+            <span>Community Forum</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="location.href='news.html'">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-newspaper"></i>
-
-                <span>Latest News</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="comingSoon('Latest News')"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-newspaper" aria-hidden="true"></i>
+            <span>Latest News</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="location.href='whitepaper.html'">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-book-open"></i>
-
-                <span>Whitepaper</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="location.href='whitepaper.html'"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+            <span>Whitepaper</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
-    </div>
+      </div>
+    </section>
 
-</section>
-
-<!-- ===========================
-LEGAL
-=========================== -->
-
-<section class="help-card">
-
-    <div class="section-title">
-
-        <i class="fa-solid fa-scale-balanced"></i>
-
+    <!-- LEGAL -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
         <span>Legal</span>
+      </div>
 
-    </div>
-
-    <div class="help-menu">
+      <div class="help-menu">
 
         <button
-        class="help-item"
-        onclick="location.href='privacy-policy.html'">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-user-shield"></i>
-
-                <span>Privacy Policy</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="location.href='privacy-policy.html'"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+            <span>Privacy Policy</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
         <button
-        class="help-item"
-        onclick="location.href='terms.html'">
-
-            <div class="help-left">
-
-                <i class="fa-solid fa-file-contract"></i>
-
-                <span>Terms & Conditions</span>
-
-            </div>
-
-            <i class="fa-solid fa-angle-right"></i>
-
+          class="help-item"
+          type="button"
+          onclick="location.href='terms-of-service.html'"
+        >
+          <span class="help-left">
+            <i class="fa-solid fa-file-contract" aria-hidden="true"></i>
+            <span>Terms of Service</span>
+          </span>
+          <i class="fa-solid fa-angle-right" aria-hidden="true"></i>
         </button>
 
-    </div>
+      </div>
+    </section>
 
-</section>
-
-<!-- ===========================
-ABOUT HELP CENTER
-=========================== -->
-
-<section class="help-card">
-
-    <div class="section-title">
-
-        <i class="fa-solid fa-circle-info"></i>
-
+    <!-- ABOUT -->
+    <section class="help-card">
+      <div class="section-title">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
         <span>About Help Center</span>
+      </div>
 
-    </div>
-
-    <div class="about-help">
-
+      <div class="tips-list about-help">
         <p>
-
-            The ALBUKHR Help Center provides
-            guidance, answers to common
-            questions, security tips, and
-            support resources for contributors
-            using the ALBUKHR ecosystem.
-
+          The ALBUKHR Help Center provides guidance, answers to common
+          questions, security tips and support resources for users
+          interacting with the ALBUKHR ecosystem.
         </p>
+      </div>
+    </section>
 
-    </div>
+    <!-- FOOTER -->
+    <footer class="help-footer">
+      <img
+        src="images/file_0000000061cc6246adf4801e7ed9ef6c.png"
+        class="footer-logo"
+        alt="ALBUKHR Logo"
+        loading="lazy"
+      >
 
-</section>
+      <h3>ALBUKHR Investment Limited</h3>
 
-<!-- ===========================
-FOOTER
-=========================== -->
+      <p>Community Investment Platform</p>
 
-<footer class="help-footer">
+      <small>
+        ALBUKHR Investment Limited. All rights reserved.
+      </small>
+    </footer>
 
-    <img
-    src="images/file_0000000061cc6246adf4801e7ed9ef6c.png"
-    class="footer-logo"
-    alt="ALBUKHR Logo">
+  </main>
 
-    <h3>
-
-        ALBUKHR Investment Limited
-
-    </h3>
-
-    <p>
-
-        Community Investment Platform
-        Powered by Pi Network
-
-    </p>
-
-    <small>
-
-        © 2024 ALBUKHR Investment Limited.
-        All Rights Reserved.
-
-    </small>
-
-</footer>
-
-</div>
-
-<!-- ===========================
-ALBUKHR APP ALERT
-=========================== -->
-
-<div
-id="appAlert"
-class="app-alert">
-
+  <!-- APP ALERT -->
+  <div
+    id="appAlert"
+    class="app-alert"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="appAlertTitle"
+    aria-describedby="appAlertText"
+    hidden
+  >
     <div class="app-alert-box">
-
-        <h3 id="appAlertTitle">
-
-            Notice
-
-        </h3>
-
-        <p id="appAlertText"></p>
-
-        <button
-        onclick="closeAppAlert()">
-
-            OK
-
-        </button>
-
+      <h3 id="appAlertTitle">Notice</h3>
+      <p id="appAlertText"></p>
+      <button type="button" id="appAlertClose">OK</button>
     </div>
+  </div>
 
-</div>
-
-<!-- ===========================
-SCRIPTS
-=========================== -->
-
-<script src="js/help.js"></script>
-
-<script src="js/app-alert.js"></script>
-
-<script>
-
-function comingSoon(feature){
-
-    if(typeof openAppAlert==="function"){
-
-        openAppAlert(
-
-            "Coming Soon",
-
-            feature +
-            " will be available in a future update."
-
-        );
-
-    }else{
-
-        alert(
-
-            feature +
-            " will be available in a future update."
-
-        );
-
-    }
-
-}
-
-</script>
+  <!-- HELP CENTER BEHAVIOUR -->
+  <script src="js/help.js"></script>
 
 </body>
-
-  </html>
+</html>
