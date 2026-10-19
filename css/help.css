@@ -727,6 +727,45 @@ body{
 
 }
 
+/* Help search status */
+.help-search-status {
+  margin: 10px 2px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #435248;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Consistent hidden-state handling */
+.help-page [hidden] {
+  display: none !important;
+}
+
+/* Improve keyboard access */
+.help-page button:focus-visible,
+.help-page a:focus-visible,
+.help-page input:focus-visible {
+  outline: 3px solid #70bd8b;
+  outline-offset: 3px;
+}
+
+/* FAQ answer spacing */
+.faq-answer {
+  white-space: normal;
+}
+
+/* Respect reduced-motion settings */
+@media (prefers-reduced-motion: reduce) {
+  .help-page *,
+  .help-page *::before,
+  .help-page *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 /* ==========================================
    END OF FILE
 ========================================== */
