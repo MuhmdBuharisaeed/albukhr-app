@@ -1,673 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f7a3d">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="View your ALBUKHR account identity and account-related links.">
+  <title>My Profile | ALBUKHR</title>
 
-<meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>ALBUKHR Profile</title>
-
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/user-profile.css">
-
-<link
-rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/user-profile.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
-
-<body>
-
-<div class="profile-page">
-
-<!-- ===========================
-PROFILE HEADER
-=========================== -->
-
-<header class="profile-header">
-
-<button
-class="back-btn"
-onclick="history.back()">
-
-<i class="fa-solid fa-arrow-left"></i>
-
-</button>
-
-<h2>My Profile</h2>
-
-<button
-class="close-btn"
-onclick="closeProfile()">
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-</header>
-
-<!-- ===========================
-PROFILE HERO
-=========================== -->
-
-<section class="profile-hero">
-
-<div class="avatar-wrapper">
-
-<img
-
-id="profileAvatar"
-
-src="images/albukhr-logo.png"
-
-alt="Profile">
-
-<button class="change-photo">
-
-<i class="fa-solid fa-camera"></i>
-
-</button>
-
-</div>
-
-<div class="hero-details">
-
-<h2 id="fullName">
-
-Loading...
-
-</h2>
-
-<div class="verified-badge">
-
-<i class="fa-solid fa-circle-check"></i>
-
-Verified Contributor
-
-</div>
-
-<p id="email">
-
-loading@email.com
-
-</p>
-
-<div class="contributor-id">
-
-<span>
-
-Contributor ID
-
-</span>
-
-<strong id="contributorID">
-
-ALB-000000
-
-</strong>
-
-<button
-class="copy-btn"
-id="copyContributorID">
-
-<i class="fa-regular fa-copy"></i>
-
-</button>
-
-</div>
-
-</div>
-
-</section>
-
-<!-- ===========================
-PROFILE ACTIONS
-=========================== -->
-
-<section class="hero-actions">
-
-<button
-class="edit-profile-btn">
-
-<i class="fa-solid fa-user-pen"></i>
-
-<span>
-
-Edit Profile
-
-</span>
-
-</button>
-
-    </section>
-
-<!-- ===========================
-ACCOUNT OVERVIEW
-=========================== -->
-
-<section class="profile-card">
-
-    <div class="card-title">
-
-        <i class="fa-solid fa-address-card"></i>
-
-        <span>Account Overview</span>
-
-    </div>
-
-    <div class="profile-info-list">
-
-        <div class="info-row">
-            <span>Account Status</span>
-            <strong id="accountStatus">Active</strong>
+<body class="user-profile-body">
+  <a class="user-profile-skip-link" href="#profileMain">Skip to profile</a>
+
+  <div class="user-profile-page">
+    <header class="profile-header">
+      <button class="profile-header-button" id="profileBack" type="button" aria-label="Go back" title="Go back">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      </button>
+      <div class="profile-header-title">
+        <span class="profile-header-eyebrow">ALBUKHR ECOSYSTEM</span>
+        <h1>My Profile</h1>
+      </div>
+      <a class="profile-header-button" href="index.html" aria-label="Go to ALBUKHR home" title="Home">
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+      </a>
+    </header>
+
+    <main id="profileMain" class="profile-main" aria-describedby="profileIntro">
+      <section class="profile-hero" aria-labelledby="profileDisplayName">
+        <div class="profile-avatar" id="profileAvatar" aria-hidden="true">A</div>
+        <div class="profile-hero-copy">
+          <p class="profile-eyebrow">ACCOUNT PROFILE</p>
+          <h2 id="profileDisplayName">Loading account…</h2>
+          <p id="profileUsername" class="profile-username">Checking authenticated identity</p>
+          <div class="profile-status-line">
+            <span class="profile-status-dot" aria-hidden="true"></span>
+            <span id="profileSessionStatus" aria-live="polite">Checking session</span>
+          </div>
+        </div>
+      </section>
+
+      <p id="profileIntro" class="profile-intro">Your profile shows the ALBUKHR identity confirmed for your current session. Personal, contributor and financial information is shown only when its source is available and verified.</p>
+
+      <section class="profile-card" aria-labelledby="identityTitle">
+        <div class="profile-card-heading">
+          <span class="profile-card-icon" aria-hidden="true"><i class="fa-solid fa-id-card"></i></span>
+          <div>
+            <h2 id="identityTitle">Account identity</h2>
+            <p>Details available from your authenticated ALBUKHR session</p>
+          </div>
         </div>
 
-        <div class="info-row">
-            <span>KYC Status</span>
-            <strong id="kycStatus">Verified</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Membership</span>
-            <strong id="membershipType">Contributor</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Wallet Linked</span>
-            <strong id="walletLinked">Yes</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Total Referrals</span>
-            <strong id="totalReferrals">0</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Referral Bonus</span>
-            <strong id="referralBonus">0.00 π</strong>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-WALLET SUMMARY
-=========================== -->
-
-<section class="profile-card">
-
-    <div class="card-title">
-
-        <i class="fa-solid fa-wallet"></i>
-
-        <span>Wallet Summary</span>
-
-    </div>
-
-    <div class="wallet-grid">
-
-        <div class="wallet-item">
-
-            <span class="wallet-label">
-                Available Pi
-            </span>
-
-            <h2 id="availablePi">
-                0.00 π
-            </h2>
-
-        </div>
-
-        <div class="wallet-item">
-
-            <span class="wallet-label">
-                Staked Pi
-            </span>
-
-            <h2 id="stakedPi">
-                0.00 π
-            </h2>
-
-        </div>
-
-        <div class="wallet-item">
-
-            <span class="wallet-label">
-                Rewards
-            </span>
-
-            <h2 id="rewardPi">
-                0.00 π
-            </h2>
-
-        </div>
-
-        <div class="wallet-item">
-
-            <span class="wallet-label">
-                Total Assets
-            </span>
-
-            <h2 id="totalAssets">
-                0.00 π
-            </h2>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-INVESTMENT STATISTICS
-=========================== -->
-
-<section class="profile-card">
-
-    <div class="card-title">
-
-        <i class="fa-solid fa-chart-column"></i>
-
-        <span>Investment Statistics</span>
-
-    </div>
-
-    <div class="stats-grid">
-
-        <div class="stat-box">
-
-            <i class="fa-solid fa-briefcase"></i>
-
-            <h3 id="activeProjects">0</h3>
-
-            <span>Active Projects</span>
-
-        </div>
-
-        <div class="stat-box">
-
-            <i class="fa-solid fa-chart-line"></i>
-
-            <h3 id="totalInvestments">0.00 π</h3>
-
-            <span>Total Investment</span>
-
-        </div>
-
-        <div class="stat-box">
-
-            <i class="fa-solid fa-coins"></i>
-
-            <h3 id="totalRewards">0.00 π</h3>
-
-            <span>Total Rewards</span>
-
-        </div>
-
-        <div class="stat-box">
-
-            <i class="fa-solid fa-circle-check"></i>
-
-            <h3 id="completedProjects">0</h3>
-
-            <span>Completed Projects</span>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-PERSONAL INFORMATION
-=========================== -->
-
-<section class="profile-card">
-
-    <div class="card-title">
-
-        <i class="fa-solid fa-user"></i>
-
-        <span>Personal Information</span>
-
-    </div>
-
-    <div class="profile-info-list">
-
-        <div class="info-row">
-            <span>Full Name</span>
-            <strong id="profileFullName">Loading...</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Username</span>
-            <strong id="profileUsername">@loading</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Email Address</span>
-            <strong id="profileEmail">loading@email.com</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Phone Number</span>
-            <strong id="profilePhone">Not Added</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Country</span>
-            <strong id="profileCountry">Nigeria</strong>
-        </div>
-
-        <div class="info-row">
-            <span>State</span>
-            <strong id="profileState">Not Available</strong>
-        </div>
-
-        <div class="info-row">
-            <span>City</span>
-            <strong id="profileCity">Not Available</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Date Joined</span>
-            <strong id="joinedDate">Loading...</strong>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-PI WALLET INFORMATION
-=========================== -->
-
-<section class="profile-card">
-
-    <div class="card-title">
-
-        <i class="fa-brands fa-pied-piper"></i>
-
-        <span>Pi Wallet Information</span>
-
-    </div>
-
-    <div class="profile-info-list">
-
-        <div class="info-row">
-
-            <span>Wallet Address</span>
-
-            <strong id="walletAddress">
-                Loading...
-            </strong>
-
-        </div>
-
-        <div class="info-row">
-
-            <span>Wallet Status</span>
-
-            <strong id="walletStatus">
-                Connected
-            </strong>
-
-        </div>
-
-        <div class="info-row">
-
-            <span>Wallet Verification</span>
-
-            <strong id="walletVerification">
-                Verified
-            </strong>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-SECURITY
-=========================== -->
-
-<section class="profile-card">
-
-    <div class="card-title">
-
-        <i class="fa-solid fa-shield-halved"></i>
-
-        <span>Security</span>
-
-    </div>
-
-    <div class="menu-list">
-
-        <div class="menu-item">
-
-            <div class="menu-left">
-
-                <i class="fa-solid fa-mobile-screen-button"></i>
-
-                <span>Two-Factor Authentication</span>
-
+        <div class="profile-info-list">
+          <div class="profile-info-row">
+            <span>ALBUKHR User ID</span>
+            <div class="profile-info-value">
+              <strong id="profileUserId" class="profile-mono">Not available</strong>
+              <button class="profile-copy-button" type="button" data-copy-target="profileUserId" aria-label="Copy ALBUKHR User ID" title="Copy User ID"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
             </div>
-
-            <span class="status-badge success">
-
-                Enabled
-
-            </span>
-
-        </div>
-
-        <div class="menu-item">
-
-            <div class="menu-left">
-
-                <i class="fa-solid fa-fingerprint"></i>
-
-                <span>Biometric Login</span>
-
+          </div>
+          <div class="profile-info-row">
+            <span>Pi username</span>
+            <strong id="profilePiUsername">Not available</strong>
+          </div>
+          <div class="profile-info-row">
+            <span>Pi UID</span>
+            <div class="profile-info-value">
+              <strong id="profilePiUid" class="profile-mono">Not available</strong>
+              <button class="profile-copy-button" type="button" data-copy-target="profilePiUid" aria-label="Copy Pi UID" title="Copy Pi UID"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
             </div>
-
-            <span class="status-badge success">
-
-                Active
-
-            </span>
-
-        </div>
-
-        <div class="menu-item">
-
-            <div class="menu-left">
-
-                <i class="fa-solid fa-wallet"></i>
-
-                <span>Pi Wallet Security</span>
-
+          </div>
+          <div class="profile-info-row">
+            <span>Network</span>
+            <strong id="profileNetwork" class="profile-network-pill">Checking…</strong>
+          </div>
+          <div class="profile-info-row">
+            <span>Wallet address</span>
+            <div class="profile-info-value profile-wallet-value">
+              <strong id="profileWalletAddress" class="profile-mono">Not provided by current session</strong>
+              <button class="profile-copy-button" type="button" data-copy-target="profileWalletAddress" aria-label="Copy wallet address" title="Copy wallet address" disabled><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
             </div>
-
-            <span class="status-badge success">
-
-                Verified
-
-            </span>
-
+          </div>
         </div>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-QUICK ACTIONS
-=========================== -->
-
-<section class="profile-card">
-
-    <div class="card-title">
-
-        <i class="fa-solid fa-bolt"></i>
-
-        <span>Quick Actions</span>
-
-    </div>
-
-    <div class="quick-actions-grid">
-
-        <button
-        class="quick-btn"
-        onclick="location.href='wallet.html'">
-
-            <i class="fa-solid fa-wallet"></i>
-
-            <span>Wallet</span>
-
-        </button>
-
-        <button
-        class="quick-btn"
-        onclick="location.href='explore-projects.html'">
-
-            <i class="fa-solid fa-chart-line"></i>
-
-            <span>Staking</span>
-
-        </button>
-
-        <button
-        class="quick-btn"
-        onclick="location.href='transactions.html'">
-
-            <i class="fa-solid fa-clock-rotate-left"></i>
-
-            <span>Transactions</span>
-
-        </button>
-
-        <button
-        class="quick-btn"
-        onclick="location.href='preferences.html'">
-
-            <i class="fa-solid fa-gear"></i>
-
-            <span>Settings</span>
-
-        </button>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-LOGOUT
-=========================== -->
-
-<section class="logout-section">
-
-    <button
-        class="logout-button"
-        onclick="logoutUser()">
-
-        <i class="fa-solid fa-right-from-bracket"></i>
-
-        <span>Logout</span>
-
-    </button>
-
-</section>
-
-<!-- ===========================
-FOOTER
-=========================== -->
-
-<footer class="profile-footer">
-
-    <img
-        src="images/file_0000000061cc6246adf4801e7ed9ef6c.png"
-        class="footer-logo"
-        alt="ALBUKHR Logo">
-
-    <h4>ALBUKHR Investment Limited</h4>
-
-    <p>
-
-        Community Investment Platform
-        Powered by Pi Network
-
-    </p>
-
-    <small>
-
-        © 2024 ALBUKHR Investment Limited.
-        All Rights Reserved.
-
-    </small>
-
-</footer>
-
-</div>
-
-<!-- ===========================
-SCRIPTS
-=========================== -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src="js/supabase-core.js"></script>
-
-<script src="js/pi-sdk.js"></script>
-
-<script src="js/profile/user-profile.js"></script>
-
-<script>
-
-function closeProfile(){
-
-    history.back();
-
-}
-
-async function logoutUser(){
-
-    const ok = confirm(
-        "Are you sure you want to logout?"
-    );
-
-    if(!ok) return;
-
-    try{
-
-        if(window.Pi && Pi.logout){
-
-            await Pi.logout();
-
-        }
-
-    }catch(err){
-
-        console.log(err);
-
-    }
-
-    localStorage.clear();
-
-    sessionStorage.clear();
-
-    location.replace("index.html");
-
-}
-
-</script>
-
+        <p class="profile-footnote" id="walletFootnote">Wallet details are displayed only when the current authenticated session provides an address. This page does not initiate a wallet connection or transaction.</p>
+      </section>
+
+      <section class="profile-card" aria-labelledby="accountStateTitle">
+        <div class="profile-card-heading">
+          <span class="profile-card-icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
+          <div>
+            <h2 id="accountStateTitle">Session and account access</h2>
+            <p>Current access state, not a KYC or contributor verification result</p>
+          </div>
+        </div>
+        <div class="profile-info-list">
+          <div class="profile-info-row">
+            <span>Session</span>
+            <strong id="profileAuthState" class="profile-value-success">Checking…</strong>
+          </div>
+          <div class="profile-info-row">
+            <span>Environment</span>
+            <strong id="profileEnvironment">Checking…</strong>
+          </div>
+          <div class="profile-info-row">
+            <span>Contributor status</span>
+            <strong id="profileContributorStatus">Not assessed on this page</strong>
+          </div>
+        </div>
+        <p class="profile-footnote">A successful sign-in does not itself mean that KYC, contributor membership, biometric login or two-factor authentication is verified. Those statuses must come from their dedicated ALBUKHR workflows.</p>
+      </section>
+
+      <section class="profile-card" aria-labelledby="shortcutsTitle">
+        <div class="profile-card-heading">
+          <span class="profile-card-icon" aria-hidden="true"><i class="fa-solid fa-compass"></i></span>
+          <div>
+            <h2 id="shortcutsTitle">Your ALBUKHR services</h2>
+            <p>Open the service that contains the details you need</p>
+          </div>
+        </div>
+        <nav class="profile-shortcuts" aria-label="Account shortcuts">
+          <a class="profile-shortcut" href="investor-dashboard.html">
+            <span class="profile-shortcut-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
+            <span><strong>Investments</strong><small>Review investment records and rewards</small></span>
+            <i class="fa-solid fa-chevron-right profile-shortcut-arrow" aria-hidden="true"></i>
+          </a>
+          <a class="profile-shortcut" href="marketplace.html">
+            <span class="profile-shortcut-icon"><i class="fa-solid fa-store" aria-hidden="true"></i></span>
+            <span><strong>Marketplace</strong><small>Browse the available ALBUKHR project marketplace</small></span>
+            <i class="fa-solid fa-chevron-right profile-shortcut-arrow" aria-hidden="true"></i>
+          </a>
+          <a class="profile-shortcut" href="transparency.html">
+            <span class="profile-shortcut-icon"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i></span>
+            <span><strong>Transparency</strong><small>Review ALBUKHR transparency information</small></span>
+            <i class="fa-solid fa-chevron-right profile-shortcut-arrow" aria-hidden="true"></i>
+          </a>
+          <a class="profile-shortcut" href="services.html">
+            <span class="profile-shortcut-icon"><i class="fa-solid fa-compass" aria-hidden="true"></i></span>
+            <span><strong>Services</strong><small>Open available ALBUKHR ecosystem services</small></span>
+            <i class="fa-solid fa-chevron-right profile-shortcut-arrow" aria-hidden="true"></i>
+          </a>
+          <a class="profile-shortcut" href="explore-projects.html">
+            <span class="profile-shortcut-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span>
+            <span><strong>Explore projects</strong><small>Browse projects available in this environment</small></span>
+            <i class="fa-solid fa-chevron-right profile-shortcut-arrow" aria-hidden="true"></i>
+          </a>
+        </nav>
+      </section>
+
+      <section class="profile-card" aria-labelledby="settingsTitle">
+        <div class="profile-card-heading">
+          <span class="profile-card-icon" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
+          <div>
+            <h2 id="settingsTitle">Profile settings and help</h2>
+            <p>Manage preferences or review official guidance</p>
+          </div>
+        </div>
+        <nav class="profile-shortcuts" aria-label="Profile settings links">
+          <a class="profile-shortcut" href="preferences.html">
+            <span class="profile-shortcut-icon"><i class="fa-solid fa-gear" aria-hidden="true"></i></span>
+            <span><strong>Preferences</strong><small>Review available app settings</small></span>
+            <i class="fa-solid fa-chevron-right profile-shortcut-arrow" aria-hidden="true"></i>
+          </a>
+          <a class="profile-shortcut" href="security.html">
+            <span class="profile-shortcut-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+            <span><strong>Security</strong><small>Read account and wallet protection guidance</small></span>
+            <i class="fa-solid fa-chevron-right profile-shortcut-arrow" aria-hidden="true"></i>
+          </a>
+          <a class="profile-shortcut" href="privacy-policy.html">
+            <span class="profile-shortcut-icon"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></span>
+            <span><strong>Privacy policy</strong><small>Review how personal data is handled</small></span>
+            <i class="fa-solid fa-chevron-right profile-shortcut-arrow" aria-hidden="true"></i>
+          </a>
+        </nav>
+      </section>
+
+      <section class="profile-error hidden" id="profileError" role="alert" aria-live="assertive">
+        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        <div><strong>Profile information could not be loaded</strong><p id="profileErrorMessage">Please reload the page or sign in again.</p></div>
+        <button id="profileRetry" type="button" class="profile-secondary-button">Retry</button>
+      </section>
+
+      <section class="profile-signout-card" aria-labelledby="signoutTitle">
+        <div><h2 id="signoutTitle">Sign out</h2><p>Clear the current ALBUKHR in-memory sign-in state on this device.</p></div>
+        <button id="profileLogout" class="profile-logout-button" type="button"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out</button>
+      </section>
+
+      <footer class="profile-footer">
+        <strong>ALBUKHR Investment Limited</strong>
+        <p>Building sustainable industries and connecting digital participation with real-world economic activity.</p>
+        <small>Account information is limited to fields confirmed by the current authentication session.</small>
+      </footer>
+    </main>
+  </div>
+
+  <div id="profileToast" class="profile-toast" role="status" aria-live="polite"></div>
+
+  <!-- Keep script order aligned with the ALBUKHR runtime used by protected pages. -->
+  <script defer src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="js/core/environment-core.js"></script>
+  <script defer src="js/core/supabase-core.js"></script>
+  <script defer src="js/core/pi-auth-core.js"></script>
+  <script defer src="js/core/page-auth-guard.js"></script>
+  <script defer src="js/profile/user-profile.js"></script>
 </body>
-
-  </html>
+</html>
