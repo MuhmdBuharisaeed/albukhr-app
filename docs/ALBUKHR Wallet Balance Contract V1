@@ -1,0 +1,137 @@
+ALBUKHR Wallet Balance Contract V1
+Status: Design specification only — read-only audit/design phase
+Scope: ALBUKHR Mainnet investor Wallet V1
+Date: 20 October 2026
+Production changes: None made
+Pi payments / payouts: Remain disabled unless separately tested and approved
+1. Purpose
+Define one server-authoritative, network-isolated balance response for the ALBUKHR investor Wallet. This is an investment/withdrawal overview, not a custodial wallet and not a live Pi blockchain balance.
+The Wallet must reuse existing ALBUKHR identity, financial records, withdrawal rules, and admin review controls. It must not create a parallel balance table or a browser-side financial ledger.
+2. Current verified integration points
+investor-dashboard.html links to wallet.html; wallet.html is not present on the current albukhr-app/main branch. Older patch-branch copies rely on localStorage and are not suitable for Mainnet reuse.
+js/core/albukhr-api-core.js provides the authenticated Mainnet API client and rejects Testnet use.
+src/financial-gateway.js exposes GET /api/my-stakes?network=mainnet, GET /api/my-withdrawals?network=mainnet, and POST /api/withdrawal-request.
+These routes verify the Pi access token server-side and derive the Pi UID from Pi's verified response. The browser must not be trusted to supply its own pi_uid or account ownership.
+get_my_stakes and get_my_withdrawal_requests are SECURITY DEFINER functions granted to service_role, not direct browser roles. Mainnet financial tables have RLS enabled without public read policies, so Wallet reads must go through the trusted API.
+admin-withdrawals.html uses the secured Finance/Super Admin review process, AAL2 checks, audit RPCs, and database payout safety gates. Wallet V1 must not bypass those controls.
+3. Proposed additive endpoint
+GET /api/my-wallet?network=mainnet
+Request rules
+Requires Authorization: Bearer <Pi access token> through the existing AlbukhrApi client.
+Server validates the Pi token using the existing verifiedPiIdentity path and derives the account from that verified identity.
+The API accepts only mainnet; explicit testnet requests return 403. No cross-network fallback is allowed.
+The client must not submit an identity, amount, balance, wallet address, withdrawal status, or ownership claim as a calculation input.
+The endpoint is read-only. It creates no financial records and does not call Pi payment approval, completion, or payout APIs.
+Server read sources
+get_my_stakes(p_pi_uid, p_network) for authoritative investor positions.
+get_my_withdrawal_requests(p_pi_uid, p_network) for withdrawal request state and deduction history.
+public.users.wallet_address, filtered by the verified UID and network='mainnet', only to report the destination already registered for the existing withdrawal system.
+The response should be explicitly allowlisted. Do not expose raw stakes.*, withdrawal_requests.*, service-role data, or payment secrets. It is acceptable to keep the existing routes unchanged and add this new route in a later implementation.
+4. Balance definitions and formulas
+All amounts are in Pi. Calculations must be decimal-safe on the server and should not round intermediate values for display purposes.
+Lifetime and contractual figures
+total_invested_principal_pi: sum of principal amounts in the verified stake positions returned for this Mainnet account. Do not separately sum investment payment tables, because that risks counting the same investment twice.
+active_principal_recorded_pi: sum of the principal amounts for positions whose status is active or matured.
+recorded_reward_total_pi: sum of recorded reward_amount for non-cancelled positions. This is a contractual/recorded figure, not proof that all rewards are already claimable or liquid.
+Withdrawal deductions
+For one position and one type (capital or reward):
+total_deduction_pi = SUM(requested_amount + fee_amount) for that position/type with request status pending, approved, or paid.
+remaining_recorded_pi = MAX(0, source_amount_pi - total_deduction_pi)
+This preserves the current Mainnet RPC contract: requested_amount/net_amount is the amount intended for the user, the fee is additional, and total balance deduction is requested_amount + fee_amount. Therefore, the UI should label the input as Amount to receive and show Fee and Total deduction separately.
+Rejected and cancelled requests do not reserve or deduct balance. pending and approved requests reserve balance. paid requests remain in the deduction history so a completed withdrawal does not become available again.
+Amount eligible for a new request
+For each position, a new request is currently permitted only if:
+network is Mainnet;
+status is active or matured;
+unlock_at <= as_of;
+the recorded balance minus all applicable pending, approved, and paid deductions is positive; and
+the user has an eligible registered withdrawal destination.
+Then:
+matured_capital_requestable_pi: sum of remaining principal for positions meeting the eligibility checks above, using amount as the source balance.
+matured_reward_requestable_pi: sum of remaining reward for positions meeting the same eligibility checks, using reward_amount as the source balance.
+total_requestable_pi: capital requestable plus reward requestable.
+Important label: total_requestable_pi means eligible to submit a withdrawal request. It does not mean instant cash, an on-chain wallet balance, a guaranteed payout, or a Pi transfer already sent.
+Withdrawal state summaries
+pending_withdrawal_to_user_pi: sum of net_amount (or requested_amount where contract-compatible) for requests in pending or approved status.
+pending_withdrawal_fee_pi: sum of fees for pending or approved requests.
+pending_total_deduction_pi: sum of requested_amount + fee_amount for pending or approved requests.
+withdrawals_paid_to_user_pi: sum of net_amount for paid requests.
+withdrawal_fees_paid_pi: sum of fee_amount for paid requests.
+open_withdrawal_requests_count: count of pending plus approved requests.
+These figures are derived from existing rows; do not create a new wallet ledger to store them.
+5. Known eligibility conflict requiring an explicit policy decision
+The Mainnet database allows the stake status capital_withdrawn, but the current create_my_withdrawal_request RPC accepts only active or matured positions for both capital and reward requests. If a position is marked capital_withdrawn while a reward remains recorded and unwithdrawn, the current withdrawal path may block that reward.
+Wallet V1 must not silently count that reward as requestable. Return an explicit closed_position_reward_review_pi / issue indicator for such cases and exclude it from total_requestable_pi until ALBUKHR approves a consistent settlement rule. Do not change existing rows or RPCs as part of UI work.
+6. Withdrawal destination consistency blocker
+The browser's Pi Auth Core can expose a wallet address from the authenticated Pi SDK session, while the withdrawal RPC reads users.wallet_address from Supabase. The current Mainnet identity gateway calls record_pi_login with p_wallet_address: null, so login alone does not guarantee that the session address is registered in the database.
+V1 must distinguish:
+the address shown by the current authenticated Pi SDK session; and
+the saved withdrawal destination used by the server's existing withdrawal flow.
+The UI should display an explicit missing/mismatch state when they cannot be reconciled. Do not accept a client-submitted address as authoritative and do not imply a withdrawal is ready just because the SDK displays an address. Any change to persist or reconcile addresses requires a separately reviewed server/API/RPC change and tests.
+7. Proposed response schema
+The AlbukhrApi frontend wrapper unwraps the outer data property, so the endpoint should return the existing API envelope { success: true, data: <payload> }.
+Illustrative payload only — amounts are sample values, not live ALBUKHR data:
+{
+  "contract_version": "ALBUKHR_WALLET_BALANCE_V1",
+  "network": "mainnet",
+  "asset": "PI",
+  "as_of": "2026-10-20T00:00:00.000Z",
+  "balance_semantics": "request_eligibility_not_blockchain_balance",
+  "summary": {
+    "total_invested_principal_pi": "250.000",
+    "active_principal_recorded_pi": "150.000",
+    "recorded_reward_total_pi": "18.500",
+    "matured_capital_requestable_pi": "50.000",
+    "matured_reward_requestable_pi": "5.500",
+    "total_requestable_pi": "55.500",
+    "pending_withdrawal_to_user_pi": "10.000",
+    "pending_withdrawal_fee_pi": "0.100",
+    "pending_total_deduction_pi": "10.100",
+    "withdrawals_paid_to_user_pi": "35.000",
+    "withdrawal_fees_paid_pi": "0.350",
+    "closed_position_reward_review_pi": "0.000",
+    "open_withdrawal_requests_count": 1
+  },
+  "withdrawal_destination": {
+    "registered_address": null,
+    "status": "not_registered"
+  },
+  "positions": [],
+  "recent_withdrawals": [],
+  "limitations": [
+    "This is an ALBUKHR investment and withdrawal summary, not a blockchain wallet balance.",
+    "A withdrawal request does not send Pi. A payout remains subject to the existing authorized review and payout safety process."
+  ]
+}
+Position allowlist (suggested)
+Each returned position should contain only:
+stake_id, project_code, status, principal_pi, recorded_reward_pi, started_at, unlock_at, is_matured;
+capital_remaining_recorded_pi, reward_remaining_recorded_pi;
+capital_requestable_pi, reward_requestable_pi;
+capital_open_request_status, reward_open_request_status; and
+any explicit eligibility issue code needed for a blocked position.
+Each recent withdrawal should contain only request ID, stake ID, project code, type, requested amount, fee rate/amount, net amount, status, transaction ID, created/updated timestamps, and network. No private keys, access tokens, service-role secrets, or unneeded user data.
+8. Wallet UI V1 behavior
+Mainnet badge and verified-account status.
+Balance cards with the definitions above; no generic “cash balance” or “Pi wallet balance” label.
+Hide/show balance toggle, loading/error/empty states, and explicit last-updated time.
+Position cards showing project, principal, reward, maturity, requestable amount, and status.
+Recent activity preview with a link to the existing transactions.html.
+Withdrawal call-to-action only links to the existing withdrawal workflow; it does not pay, approve, or directly transfer Pi.
+If the registered withdrawal destination is missing or inconsistent with the current Pi Auth Core session address, show the issue and do not claim that withdrawal is ready.
+No LocalStorage/sessionStorage financial records. UI-only preference state such as hide/show balance may be in memory; it must never affect financial computation.
+9. Implementation gates and tests
+Before implementing the endpoint and page:
+Agree the reward settlement rule for capital_withdrawn positions.
+Review a safe server-side way to compare the authenticated wallet address with the stored withdrawal destination.
+Implement the endpoint as additive code only; no direct browser queries to private financial tables.
+Unit-test the summary builder with synthetic fixtures without writing Mainnet rows.
+Test all status combinations (pending, approved, paid, rejected, cancelled) and ensure fee deduction is never counted twice.
+Test partial withdrawal, full withdrawal, a request in flight, maturity boundaries, missing address, address mismatch, empty account, malformed response, and API failure.
+Verify Mainnet requests fail closed for Testnet and that no Mainnet data appears on Testnet.
+Verify no endpoint starts Pi payment, no duplicate request can create duplicate payout, and manual/A2U safety controls remain unchanged.
+When sample data is not available, rely on unit fixtures and staging tests; do not insert test transactions into Mainnet.
+10. Read-only audit facts and limitations
+A read-only Mainnet query returned no rows for the selected stakes, withdrawal requests, and Core/Internal investment payment grouping at the time checked. Real-account balance reconciliation therefore cannot be demonstrated from current Mainnet records; use synthetic unit fixtures and an isolated test environment.
+Mainnet security advisory output includes broad SECURITY DEFINER function warnings. The wallet endpoint must use only the existing intended service-role path and verified identity; do not broaden browser EXECUTE grants as a workaround.
+No GitHub files, Supabase tables/RPCs/data, Render environment variables, deployments, payments, or withdrawals were changed in preparing this document.
