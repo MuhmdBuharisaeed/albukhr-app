@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f7a3d">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="light">
+  <title>Wallet | ALBUKHR</title>
+  <meta name="description" content="Review your ALBUKHR Mainnet investment and withdrawal overview.">
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/albukhr-ui.css">
+  <link rel="stylesheet" href="css/global-header.css">
+  <link rel="stylesheet" href="css/investor-dashboard.css">
+  <link rel="stylesheet" href="css/investor-dashboard-ui-v6.css">
+  <link rel="stylesheet" href="css/wallet-page.css">
+</head>
+<body class="wallet-page">
+  <header class="header">
+    <div class="header-left"><span class="brand">ALBUKHR</span></div>
+    <div class="header-right"><span class="wallet-network">MAINNET</span></div>
+  </header>
+
+  <main class="wallet-layout">
+    <a class="wallet-back" href="investor-dashboard.html">← Investor Dashboard</a>
+
+    <section class="wallet-hero" aria-labelledby="walletTitle">
+      <div class="wallet-hero-copy">
+        <div class="wallet-kicker">VERIFIED INVESTOR ACCOUNT · MAINNET</div>
+        <h1 id="walletTitle">Your ALBUKHR Wallet</h1>
+        <p>A clear view of your recorded investments, rewards and withdrawal-request eligibility.</p>
+        <span class="wallet-hero-tag">Investment overview · Not a blockchain wallet balance</span>
+      </div>
+      <div class="wallet-hero-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none"><rect x="8" y="16" width="48" height="35" rx="8" stroke="currentColor" stroke-width="3"/><path d="M8 27h48M42 36h7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M18 16V12a5 5 0 0 1 5-5h18a5 5 0 0 1 5 5v4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
+    </section>
+
+    <div id="securityStatus" class="wallet-status" role="status" aria-live="polite">Verifying your Mainnet identity and loading Wallet data…</div>
+
+    <section class="wallet-security-note" aria-label="Wallet information">
+      <span class="wallet-note-icon" aria-hidden="true">✓</span>
+      <p><strong>Server-calculated figures.</strong> Wallet reads existing Mainnet investment and withdrawal records through the trusted ALBUKHR API. Eligible amounts mean a withdrawal request may be submitted; they are not cash, an on-chain balance or a guaranteed payout. This page never sends Pi.</p>
+    </section>
+
+    <section class="wallet-summary" aria-label="Wallet summary">
+      <article class="wallet-summary-card wallet-summary-main">
+        <span class="wallet-summary-label">Eligible to request</span>
+        <strong class="wallet-amount" data-visible-amount="0 Pi" id="totalRequestable">—</strong>
+        <span class="wallet-summary-help">After existing withdrawal deductions and destination checks</span>
+      </article>
+      <article class="wallet-summary-card">
+        <span class="wallet-summary-label">Recorded principal</span>
+        <strong class="wallet-amount" data-visible-amount="0 Pi" id="totalPrincipal">—</strong>
+        <span class="wallet-summary-help">Across returned stake records</span>
+      </article>
+      <article class="wallet-summary-card">
+        <span class="wallet-summary-label">Recorded rewards</span>
+        <strong class="wallet-amount" data-visible-amount="0 Pi" id="recordedRewards">—</strong>
+        <span class="wallet-summary-help">Not all recorded rewards are necessarily requestable</span>
+      </article>
+      <article class="wallet-summary-card">
+        <span class="wallet-summary-label">Open requests</span>
+        <strong id="openRequestsCount">—</strong>
+        <span class="wallet-summary-help">Pending or approved withdrawal requests</span>
+      </article>
+    </section>
+
+    <div class="wallet-toolbar">
+      <div>
+        <h2>Balance details</h2>
+        <p>Amounts are derived from Mainnet records as of the last refresh.</p>
+      </div>
+      <div class="wallet-toolbar-actions">
+        <button id="toggleBalances" class="wallet-button wallet-secondary" type="button" aria-pressed="false">Hide amounts</button>
+        <button id="refreshButton" class="wallet-button wallet-primary" type="button">Refresh</button>
+      </div>
+    </div>
+
+    <section class="wallet-metrics" aria-label="Detailed balance figures">
+      <article class="wallet-metric-card"><span>Active principal recorded</span><strong id="activePrincipal" class="wallet-amount" data-visible-amount="0 Pi">—</strong></article>
+      <article class="wallet-metric-card"><span>Capital eligible for request</span><strong id="capitalRequestable" class="wallet-amount" data-visible-amount="0 Pi">—</strong></article>
+      <article class="wallet-metric-card"><span>Rewards eligible for request</span><strong id="rewardRequestable" class="wallet-amount" data-visible-amount="0 Pi">—</strong></article>
+      <article class="wallet-metric-card"><span>Pending amount to user</span><strong id="pendingToUser" class="wallet-amount" data-visible-amount="0 Pi">—</strong></article>
+      <article class="wallet-metric-card"><span>Pending withdrawal fees</span><strong id="pendingFees" class="wallet-amount" data-visible-amount="0 Pi">—</strong></article>
+      <article class="wallet-metric-card"><span>Total pending deduction</span><strong id="pendingDeduction" class="wallet-amount" data-visible-amount="0 Pi">—</strong></article>
+      <article class="wallet-metric-card"><span>Withdrawals marked paid</span><strong id="paidToUser" class="wallet-amount" data-visible-amount="0 Pi">—</strong></article>
+      <article class="wallet-metric-card"><span>Fees marked paid</span><strong id="paidFees" class="wallet-amount" data-visible-amount="0 Pi">—</strong></article>
+      <article class="wallet-metric-card wallet-metric-warning"><span>Closed-position rewards held for review</span><strong id="reviewRewards" class="wallet-amount" data-visible-amount="0 Pi">—</strong><small>Excluded from requestable rewards until reviewed.</small></article>
+    </section>
+
+    <section class="wallet-section-card" aria-labelledby="destinationTitle">
+      <div class="wallet-section-heading">
+        <div><h2 id="destinationTitle">Withdrawal destination check</h2><p>Wallet compares the saved ALBUKHR destination with the address exposed by your current authenticated Pi SDK session.</p></div>
+        <span id="destinationBadge" class="wallet-badge wallet-badge-neutral">Checking</span>
+      </div>
+      <div class="wallet-address-grid">
+        <div class="wallet-address-item"><span>Current Pi SDK session</span><strong id="sessionAddress">Checking…</strong></div>
+        <div class="wallet-address-item"><span>Saved ALBUKHR destination</span><strong id="registeredAddress">Checking…</strong></div>
+      </div>
+      <p id="destinationMessage" class="wallet-destination-message">Checking whether the addresses match.</p>
+    </section>
+
+    <section class="wallet-section-card" aria-labelledby="positionsTitle">
+      <div class="wallet-section-heading">
+        <div><h2 id="positionsTitle">Investment positions</h2><p>Position-level principal, recorded rewards, maturity and current request eligibility.</p></div>
+        <span id="positionCount" class="wallet-count">—</span>
+      </div>
+      <div id="positionsState" class="wallet-state" role="status" aria-live="polite">Loading positions…</div>
+      <div id="positionsList" class="wallet-position-list"></div>
+    </section>
+
+    <section class="wallet-section-card" aria-labelledby="activityTitle">
+      <div class="wallet-section-heading">
+        <div><h2 id="activityTitle">Recent withdrawal activity</h2><p>Latest withdrawal requests returned by the trusted Mainnet API.</p></div>
+        <a class="wallet-inline-link" href="transactions.html">Full history →</a>
+      </div>
+      <div id="activityState" class="wallet-state" role="status" aria-live="polite">Loading recent withdrawals…</div>
+      <div id="activityList" class="wallet-activity-list"></div>
+    </section>
+
+    <section class="wallet-action-panel" aria-label="Wallet actions">
+      <div><h2>Manage withdrawal requests</h2><p>Requests are processed through ALBUKHR’s existing withdrawal and administrative review controls. This page cannot approve or pay a request.</p></div>
+      <a id="withdrawLink" class="wallet-button wallet-primary wallet-cta" href="withdraw.html">Open withdrawals</a>
+      <p id="withdrawLinkNote" class="wallet-action-note">The destination check must pass before Wallet labels withdrawals as ready.</p>
+    </section>
+
+    <footer class="wallet-footer">
+      <span id="lastUpdated">Last updated: not yet loaded</span>
+      <span>ALBUKHR Mainnet · Read-only overview</span>
+    </footer>
+  </main>
+
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/core/environment-core.js"></script>
+  <script src="js/core/supabase-core.js"></script>
+  <script src="js/core/pi-auth-core.js"></script>
+  <script src="js/core/page-auth-guard.js"></script>
+  <script src="js/core/albukhr-api-core.js"></script>
+  <script src="js/wallet-page.js" defer></script>
+</body>
+</html>
