@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f7a3d">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="light">
+  <title>Transaction History | ALBUKHR</title>
+  <meta name="description" content="Review investment settlements and withdrawal requests on ALBUKHR.">
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/albukhr-ui.css">
+  <link rel="stylesheet" href="css/global-header.css">
+  <link rel="stylesheet" href="css/investor-dashboard.css">
+  <link rel="stylesheet" href="css/investor-dashboard-ui-v6.css">
+  <link rel="stylesheet" href="css/transactions-page.css">
+</head>
+<body class="transactions-page">
+  <header class="header">
+    <div class="header-left"><span class="brand">ALBUKHR</span></div>
+    <div class="header-right"><span class="transactions-network">MAINNET</span></div>
+  </header>
+
+  <main class="transactions-layout">
+    <a class="transactions-back" href="investor-dashboard.html">← Investor Dashboard</a>
+
+    <section class="transactions-hero" aria-labelledby="pageTitle">
+      <div class="transactions-hero-copy">
+        <div class="transactions-kicker">INVESTOR ACCOUNT · MAINNET</div>
+        <h1 id="pageTitle">Transaction History</h1>
+        <p>Review your recorded investments and withdrawal requests in one place.</p>
+      </div>
+      <div class="transactions-hero-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none"><rect x="11" y="8" width="42" height="48" rx="8" stroke="currentColor" stroke-width="3"/><path d="M21 22h22M21 31h22M21 40h13" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="45" cy="44" r="8" fill="currentColor"/><path d="M42 44l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </section>
+
+    <div id="securityStatus" class="transactions-status" role="status" aria-live="polite">Verifying your Mainnet identity…</div>
+
+    <section class="transactions-security-note" aria-label="Transaction history security information">
+      <span class="security-note-icon" aria-hidden="true">✓</span>
+      <p><strong>Verified account records.</strong> This page reads from ALBUKHR’s trusted Mainnet API. It does not initiate payments, approve payments, or send Pi.</p>
+    </section>
+
+    <section class="transactions-summary" aria-label="Transaction summary">
+      <article class="transactions-summary-card"><span class="summary-label">Records shown</span><strong id="summaryCount">—</strong><span class="summary-help">Investments and withdrawals</span></article>
+      <article class="transactions-summary-card"><span class="summary-label">Investment amount</span><strong id="summaryInvested">—</strong><span class="summary-help">Recorded settled investments</span></article>
+      <article class="transactions-summary-card"><span class="summary-label">Withdrawals paid</span><strong id="summaryWithdrawn">—</strong><span class="summary-help">Net amount marked paid</span></article>
+      <article class="transactions-summary-card"><span class="summary-label">Awaiting resolution</span><strong id="summaryPending">—</strong><span class="summary-help">Pending or approved requests</span></article>
+    </section>
+
+    <section class="transactions-toolbar" aria-label="Search and filter transactions">
+      <div class="transactions-search-wrap">
+        <label for="transactionSearch">Search transactions</label>
+        <input id="transactionSearch" type="search" autocomplete="off" placeholder="Project, ID or transaction reference">
+      </div>
+      <div class="transactions-filter-wrap">
+        <label for="typeFilter">Transaction type</label>
+        <select id="typeFilter">
+          <option value="all">All types</option>
+          <option value="investment">Investments</option>
+          <option value="withdrawal">Withdrawals</option>
+        </select>
+      </div>
+      <div class="transactions-filter-wrap">
+        <label for="statusFilter">Status</label>
+        <select id="statusFilter">
+          <option value="all">All statuses</option>
+          <option value="settled">Settled</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="paid">Paid</option>
+          <option value="rejected">Rejected</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <button id="refreshButton" class="transactions-refresh" type="button">Refresh</button>
+    </section>
+
+    <section class="transactions-list-section" aria-labelledby="listTitle">
+      <div class="transactions-list-heading">
+        <div><h2 id="listTitle">Your activity</h2><p id="resultDescription">Loading records from the Mainnet API…</p></div>
+      </div>
+      <div id="transactionsLoading" class="transactions-state" role="status">Loading verified transaction records…</div>
+      <div id="transactionsError" class="transactions-state transactions-state-error" role="alert" hidden>
+        <strong>Transaction history is unavailable.</strong>
+        <p id="transactionsErrorMessage">Please retry after checking your authenticated Mainnet session.</p>
+        <button id="retryButton" class="transactions-refresh" type="button">Try again</button>
+      </div>
+      <div id="transactionsEmpty" class="transactions-state" hidden>
+        <strong>No transactions found</strong>
+        <p id="emptyMessage">No investment settlements or withdrawal requests were returned for this account.</p>
+      </div>
+      <div id="transactionsList" class="transactions-list" aria-live="polite"></div>
+    </section>
+
+    <p class="transactions-disclaimer">This history shows investment records created after successful settlement and withdrawal requests recorded by ALBUKHR. A Pi payment attempt that was cancelled or failed before settlement may not appear here. Rewards shown in your portfolio are not listed as transactions unless there is a separate recorded withdrawal.</p>
+  </main>
+
+  <!-- ALBUKHR DOCK NAV -->
+  <div class="dock-nav">
+    <a href="index.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon" aria-hidden="true"><path d="M3 10L12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+    <a href="investor-dashboard.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M2 20v-1c0-2.3 3-4 7-4s7 1.7 7 4v1z"/><circle cx="18" cy="9" r="2.5"/><path d="M17 15c3 0 5 1.5 5 3.5V20h-4"/></svg><span>Investors</span></a>
+    <a href="transactions.html" class="dock-item active" aria-current="page"><svg viewBox="0 0 24 24" class="dock-icon" aria-hidden="true"><path d="M6 3h9l3 3v15H6zM15 3v4h4M9 11h6M9 14h6M9 17h4"/></svg><span>History</span></a>
+    <a href="transparency.html" class="dock-item"><svg viewBox="0 0 24 24" class="dock-icon" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v4h4M8 11h8M8 14h8"/></svg><span>Transparency</span></a>
+  </div>
+
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/core/environment-core.js"></script>
+  <script src="js/core/supabase-core.js"></script>
+  <script src="js/core/pi-auth-core.js"></script>
+  <script src="js/core/page-auth-guard.js"></script>
+  <script src="js/core/albukhr-api-core.js"></script>
+  <script src="js/transactions-page.js" defer></script>
+</body>
+</html>
