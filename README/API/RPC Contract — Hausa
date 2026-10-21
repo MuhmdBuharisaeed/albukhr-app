@@ -1,0 +1,51 @@
+API/RPC Contract — Hausa
+Ka'idar identity
+Admin console: Supabase Auth identity (auth.uid()) + AAL2 MFA.
+Contributor candidate: API ta tabbatar da Pi access token, ta samo Pi UID daga verified response.
+A tabbatar da mapping tsakanin Pi UID da Supabase Auth UID ta hanyar approved server-side binding; kada browser ya tura pi_uid a matsayin hujja.
+Mainnet admin authorization data daga ALBUKHR Mainnet Supabase kawai.
+Proposed endpoints (ba a aiwatar ba)
+POST /api/admin/contributor-admin/nominations
+Auth: Supabase session, AAL2, active super_admin.
+Body: candidate contributor identifier, proposed narrow permission profile, reason, expiry.
+Server validates candidate exists on Mainnet; logs contributor_admin_nomination_created.
+Returns nomination ID + one-time opaque invitation token (only once); store only hash.
+No role grant occurs.
+GET /api/contributor-admin/application?token=...
+Auth: verified Pi session + valid invitation token.
+Returns minimum data needed for candidate to confirm application and consent.
+No admin role is returned or created.
+POST /api/contributor-admin/application
+Auth: verified Pi session; token is single-use, expiring, revocable.
+Captures profile/consent version and private selfie object reference created via server-approved upload flow.
+Camera-only UI: no file picker. Server cannot assume camera capture alone proves liveness.
+Status becomes submitted_pending_review; no admin access.
+POST /api/admin/contributor-admin/applications/:id/review
+Auth: AAL2 + active super_admin.
+Decision: approve or reject; reason required for rejection.
+Approval alone may mark identity review complete, but role grant is a separate explicit action.
+All reads of sensitive selfie/profile are audited.
+POST /api/admin/contributor-admin/assignments
+Auth: AAL2 + active super_admin.
+Re-verify candidate, application approved, policy consent current, MFA requirement, no conflicting status.
+Grant only contributor_admin; do not accept arbitrary role string.
+Use existing admin_users + admin_role_assignments; atomic transaction and audit.
+Role scope limited to enumerated Contributor tasks; deny finance, treasury, withdrawals, payout, role management, RLS changes, testnet admin access.
+DELETE /api/admin/contributor-admin/assignments/:id
+Auth: AAL2 + active super_admin.
+Set active=false and revoked_at/revoked_by; preserve historical record.
+Audit event in same transaction.
+Revocation must take effect immediately on API/database authorization checks.
+Error semantics
+401: missing/invalid session.
+403: role/AAL2/identity binding insufficient.
+404: invitation/application unavailable (avoid token enumeration).
+409: used/expired/revoked/state conflict.
+422: invalid request or consent missing.
+429: rate limit exceeded.
+Security requirements
+Cache-Control: no-store for identity/application/selfie endpoints.
+Never log raw invitation tokens, selfie bytes, access tokens or full Pi token.
+Avoid returning email, wallet address, Pi UID or selfie URL to roles that do not need it.
+No direct client table writes. RLS remains defense-in-depth; server authorization is mandatory.
+No payment, withdrawal or A2U routes are exposed to this role.
