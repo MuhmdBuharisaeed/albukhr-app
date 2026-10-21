@@ -1,0 +1,15 @@
+ALBUKHR Contributor Admin — Draft V1 (Ba a aiwatar ba)
+Wannan kunshin daftarin review ne kawai. Ba a gudanar da SQL, ba a canza GitHub, Supabase, Render ko production, kuma ba a tura deployment ba.
+Abin da ke ciki
+sql/001_contributor_admin_role_draft.sql: SQL migration da aka tsara don review; kada a gudanar da shi a Mainnet.
+api/CONTRACT_HA.md: kwangilar endpoint/RPC da izini.
+ui/WORKFLOW_HA.md: workflow na Super Admin, nominee, selfie da review.
+tests/SECURITY_TEST_PLAN_HA.md: gwaje-gwajen tsaro da acceptance criteria.
+Muhimman iyakoki
+Kada a ƙara contributor_admin a production enum har sai an binciki duk functions/policies da ke dogaro da enum da kuma tasirin backward compatibility.
+SQL ɗin nan yana da BEGIN/ROLLBACK a matsayin alamar cewa ba executable release ba ne; an bar wasu ƙa'idodin grant/revoke intentionally a matsayin pseudocode/TODO.
+Kada a ɗauki selfie a matsayin hujjar liveness ko tabbatar da wanda mutum yake. A buƙaci review na ɗan Adam da consent; idan ana buƙatar liveness, a zaɓi provider/tsari dabam bayan privacy/security review.
+Ba a yarda da gallery upload ba. Browser getUserMedia({video: {facingMode: "user"}}) ya nuna preview; a ɗauki frame daga live stream. Wannan ba ya hana virtual camera/spoofing shi kaɗai.
+Kada a saka hoton selfie ko raw token a log. Private bucket, short-lived signed URLs, access log, retention/deletion rules, size/type validation da rate limiting dole ne su kasance kafin release.
+Mainnet/App ALBUKHR shi kaɗai ke riƙe admin security records. Testnet ba zai sami admin-login mai zaman kansa ba.
+Ba a yi GitHub commit, Supabase write/DDL, deployment ko payout/payment activation ba.
