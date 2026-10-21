@@ -1,0 +1,27 @@
+UI workflow — Hausa
+A. Super Admin console
+Require fresh AAL2 MFA.
+Pick an existing Mainnet Contributor; show only the minimum verified identity details.
+Select the fixed role Contributor Admin (not a free-form role selector).
+Choose a specific approved permission profile, expiry date and written reason.
+Create a one-time invitation; display token/link once and warn not to forward publicly.
+Review application and consent versions; view selfie only through audited, short-lived private access.
+Record decision + reason. Separate identity review from actual role grant.
+Grant or reject explicitly. Revoke at any time; revocation disables access immediately.
+B. Nominee flow
+Open invitation while signed into the correct ALBUKHR identity.
+Server verifies invitation status, expiry, single-use state and Pi identity.
+Show purpose, what the role can access, what it cannot access, selfie use, retention and deletion/contact policy.
+Obtain affirmative consent before opening camera.
+Request camera access with getUserMedia; show live preview.
+Capture frame from the live video stream. Do not show gallery/file-picker input.
+Allow retake before submit; do not keep local copies longer than necessary.
+Upload via controlled private endpoint/storage path; validate size, MIME, image decode and ownership server-side.
+Submit application. Show “Pending review”; do not show admin dashboard or permissions yet.
+C. Privacy and camera caveats
+Camera-only capture is a UI constraint, not proof against spoofing, virtual cameras or manipulated streams.
+If liveness is a requirement, conduct a separate vendor/privacy/security assessment and explicit consent review.
+Avoid facial recognition/biometric matching unless there is a documented lawful basis, necessity, proportionality and specialist review.
+Set a clear retention period; auto-delete rejected/expired photos after approved period; support deletion requests as policy allows.
+Private bucket only; signed URLs short-lived; never public URLs.
+Do not place selfie in audit log. Audit event should record who accessed it, why, when, and the object reference hash/path only.
