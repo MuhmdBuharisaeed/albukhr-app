@@ -1,0 +1,111 @@
+ALBUKHR Contributor Admin — Read-Only Security Audit
+Audit date: 21 October 2026
+Scope: albu khr-admin (Main branch), albukhr-app (Main branch), albukhr-api (Main branch), Mainnet Supabase (ribpntyqdleytsyktdfb) and limited Testnet schema inventory (vhvkwvngmrlgyzwemttt).
+Mode: Read-only. No files, database rows, policies, environment variables, deployments, or payment settings were changed.
+Executive decision
+Do not enable Contributor Admin appointment yet. ALBUKHR already has the right building blocks—an admin identity registry, role assignments, scoped bindings, MFA/AAL2, invitation tables and audit logging—but the current database does not expose a general admin-role invitation/grant/revoke workflow for the proposed Contributor Admin role. The existing Contributor invitation flow activates a Contributor; it does not appoint an administrator. The current Contributor onboarding page also contains no camera/selfie capture flow.
+The implementation should extend the current Mainnet Admin Auth + albukhr_security authority, not add a second admin system or grant roles from frontend code.
+Evidence-backed findings
+1. Existing Contributor invitation flow is not an admin invitation flow
+albukhr-admin/admin-contributor-invitations.html and js/admin-contributor-invitations.js call create_contributor_invitation, get_active_contributor_invitations, and revoke_contributor_invitation.
+The page requires an active Mainnet Super Admin session and current AAL2 assurance.
+Its invitation is consumed by the existing Pi-authenticated onboarding flow in albukhr-app/contributor-onboarding.html and js/contributor/contributor-onboarding.js, through the API routes /api/contributor/bootstrap, /api/contributor/consent, and /api/contributor/accept.
+That page's steps are policy review, consent, and activation. The inspected files contain no getUserMedia camera capture or selfie-review workflow.
+API src/contributor-gateway.js verifies Pi identity server-side and derives pi_uid from the verified token; the browser does not provide the authoritative UID. Preserve this pattern.
+2. Mainnet has an admin RBAC foundation, but not a general Contributor Admin grant path
+Observed in Mainnet Supabase:
+albukhr_security.admin_users: 6 records, all currently active in the aggregate status count.
+albukhr_security.admin_role_assignments: 6 active, unrevoked assignments — 1 super_admin and 5 core_admin.
+Role enum values currently are super_admin, registry_admin, approval_admin, finance_admin, core_admin, internal_admin, and external_admin. There is no contributor_admin role yet.
+albukhr_security.scoped_admin_bindings: 0 records at audit time.
+albukhr_security.admin_invitation_links: 0 records.
+The admin_invitation_links table exists, but the database function catalog scan found no albukhr_security function referencing that table. It should be treated as an unused/legacy structure until its original intent is confirmed—not as a working role invitation feature.
+The only functions found inserting into admin_role_assignments are accept_core_project_invitation and accept_core_project_invitation_by_id; the inspected path grants core_admin with a Core Project binding. No general-purpose admin role grant/revoke RPC was found in the catalog scan.
+get_my_admin_context() is the current server-authoritative path for returning status, active roles, project scope and Testnet access. Continue to use it as the source of truth.
+3. Database authority is appropriately restricted; do not solve this with direct table writes
+RLS is enabled on the relevant Mainnet admin tables.
+Existing policies expose selected admin metadata to the authenticated owner or Super Admin; the audit log is Super-Admin-readable.
+The authenticated and service-role database clients do not have direct table privileges for the checked admin tables in the inspected privilege snapshot. Current operations rely on carefully controlled SECURITY DEFINER RPCs owned by the database owner.
+Therefore, new grant/revoke behavior must be delivered through dedicated, narrowly scoped RPCs that independently check the session, AAL2, active Super Admin role, role allowlist, target identity, scope, invitation state and audit requirements. Do not add broad table write policies or direct frontend table writes.
+4. Contributor identity and Admin identity are different trust domains
+At the audit snapshot:
+The single Contributor row has an albukhr_user_id link but no auth.users link (contributors.user_id is null).
+Admin authentication and role assignment are based on Supabase Auth auth.uid().
+Contributor onboarding authenticates with Pi and resolves the authoritative public.users.pi_uid on the API side.
+This is a material account-linking gap for this feature. A selected Contributor must not become an administrator simply because they possess an invitation URL, state an email, or submit a selfie. Acceptance must independently prove both (a) the nominated Pi identity and (b) the Supabase Auth identity used to sign into the Admin surface, and bind that proof to the same one-time nomination.
+5. Selfie/camera and private-storage support are not present in the inspected flow
+No selfie/biometric/identity-verification table was found in the relevant Mainnet schema inventory.
+Mainnet currently has two Storage buckets in the inspected result: project-logos (public) and external-project-documents (private). No dedicated private selfie bucket was found.
+Existing Storage object policies are specific to project logos and external project documents. Do not store admin selfies in the public logo bucket or reuse document access rules without a separate design and review.
+A camera-only interface should use navigator.mediaDevices.getUserMedia() and capture from the active video stream, with no file/gallery picker. This ensures the page captures from an active camera stream, but does not by itself prove liveness or match the person to the account.
+6. Testnet requires an additional compatibility check
+The Testnet database contains public.testnet_admin_access_codes and public.testnet_admin_sessions. This audit did not inspect all application/runtime references to those tables, so their current operational role remains unconfirmed. Before implementation, confirm they are an access-gating mechanism consistent with Mainnet authority and do not establish a second independent source of admin roles. New Contributor Admin assignments should remain authoritative in Mainnet.
+Proposed permission matrix (design proposal, not yet implemented)
+Capability
+Super Admin
+Proposed Contributor Admin
+Finance / Approval / project admins
+Select Contributor and issue/revoke admin nomination
+Yes, with AAL2
+No
+No by default
+Approve/decline admin nomination and identity evidence
+Yes
+No; no self-review
+No by default
+View Contributor directory/profile necessary for Contributor operations
+Yes
+Yes, scoped to Contributor operations
+Only where an existing workflow explicitly requires it
+Perform specifically approved Contributor workflow actions
+Yes
+Yes, through named server-side permissions
+Only their existing designated scope
+Grant, change or revoke administrator roles
+Yes
+No
+No
+Read finance, investor balances, withdrawals, treasury or payouts
+Only according to existing Super Admin policy and controls
+No
+Existing role/scope only
+Approve projects or mark projects active
+According to existing governance RPCs
+No, unless separately and explicitly authorized under an existing approval role
+Existing approval role only
+Execute Pi payments/A2U payouts
+Must remain subject to existing financial gates
+No
+Existing financial gates only; no gate changes in this task
+Access Testnet admin functions
+Existing Mainnet-controlled access path only
+No implicit access
+Existing explicit Mainnet-controlled access path only
+The proposed Contributor Admin role must not be a synonym for super_admin, and it must not inherit finance, withdrawal, treasury, payout, project activation, role-management or Testnet privileges.
+Recommended implementation sequence
+Freeze the role contract: define exactly which Contributor actions Contributor Admin may perform; keep identity verification and role approval as separate permissions.
+Resolve account binding: make the nomination target an existing Contributor record and verified Pi UID; require the candidate's authenticated Supabase Auth identity as well, with both identities bound by the same one-time nomination.
+Review the legacy admin_invitation_links design: it has role/scope/token fields but no observed writer RPC and no dedicated binding to a nominated Contributor. Reuse it only if a documented minimal migration can safely add the missing binding and constraints; otherwise propose a separate, clearly named invitation/nomination model. Do not mutate Mainnet during the design phase.
+Prepare a review-only database migration and RPC contract: add contributor_admin only after enumerating dependencies on the enum; implement issue, inspect/list, accept/verify, approve/grant, revoke and audit actions with server-side allowlists and transactional one-time token consumption. Preserve least privilege and avoid direct DML grants.
+Prepare the camera capture and evidence-retention design: explicit consent/purpose; permission-denied and cancelled states; active camera stream only; size/type validation; private storage; short-lived access URLs; limited reviewer access; retention/deletion schedule. Use liveness verification or manual review if the assurance level requires it; do not treat an ordinary selfie as identity proof.
+Test in a non-production environment: valid and mismatched Pi/Auth identities, expired/replayed/revoked invitation, missing AAL2, inactive admin, role/scope tampering, direct table writes, RLS/RPC denial, camera permission denial, gallery bypass attempts, self-review, revocation taking effect immediately, and Mainnet/Testnet isolation.
+Obtain explicit approval before any deployment or Mainnet migration. No payments or payouts should be enabled as part of this feature.
+Important acceptance tests
+A Contributor Admin cannot call role-grant, financial, withdrawal, treasury, project-activation or payout RPCs, even by directly invoking an endpoint.
+An invitation cannot be accepted by a different Pi UID, a different bound Supabase Auth identity, an unverified session, or a session without required AAL2.
+Token consumption is atomic and one-time; expired/revoked/replayed tokens fail closed.
+Revocation removes effective access at the next server authorization check; cached frontend state cannot preserve authority.
+Selfie data is never public, never included in ordinary logs, and cannot be read by Contributors or unrelated admins.
+The Mainnet admin record remains authoritative; Testnet data cannot grant a Mainnet role.
+Files and live schema areas reviewed
+MuhmdBuharisaeed/albukhr-admin/admin-contributor-invitations.html
+MuhmdBuharisaeed/albukhr-admin/js/admin-contributor-invitations.js
+MuhmdBuharisaeed/albukhr-admin/admin-security.html
+MuhmdBuharisaeed/albukhr-admin/js/admin-security.js
+MuhmdBuharisaeed/albukhr-admin/js/core/supabase-admin-auth.js
+MuhmdBuharisaeed/albukhr-app/contributor-onboarding.html
+MuhmdBuharisaeed/albukhr-app/js/contributor/contributor-onboarding.js
+MuhmdBuharisaeed/albukhr-api/src/contributor-gateway.js
+Mainnet albukhr_security admin/contributor tables, relevant RPC definitions and function grants, RLS policies, role enums, Storage buckets and Storage object policies.
+Testnet schema inventory for admin access-code/session table names only.
+Outcome: audit complete for this stage; implementation is not yet authorized or performed. The next deliverable should be a reviewed permission contract and a draft-only migration/API/UI patch, followed by synthetic tests before any live change.
