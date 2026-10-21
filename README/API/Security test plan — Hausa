@@ -1,0 +1,69 @@
+Security test plan — Hausa
+Identity and invitation
+[ ]
+No session => reject.
+[ ]
+AAL1 => reject admin nomination, review, grant and revoke.
+[ ]
+Active non-super-admin => reject all admin management operations.
+[ ]
+Expired, revoked, already-used or malformed token => reject.
+[ ]
+Replay same token concurrently => only one submission accepted.
+[ ]
+Pi UID not bound to Mainnet public.users => reject.
+[ ]
+Pi UID and Supabase Auth UID mismatch/unbound => reject.
+[ ]
+Client-supplied role/user ID cannot override server-derived identity.
+Role scope
+[ ]
+Contributor Admin can only access explicitly allowed contributor queue/tasks.
+[ ]
+Contributor Admin cannot read finance, treasury, investor balances, withdrawal queues or private admin records.
+[ ]
+Contributor Admin cannot call grant/revoke role RPCs or create invitations.
+[ ]
+Contributor Admin cannot become super_admin or alter own role.
+[ ]
+Direct REST/table access is denied by grants/RLS.
+[ ]
+Revocation immediately denies next API/RPC request.
+[ ]
+Core, internal and external scopes remain unchanged.
+[ ]
+Mainnet and Testnet data never mix; Testnet has no independent admin login.
+Selfie and privacy
+[ ]
+No gallery/file input is present in UI.
+[ ]
+Denying camera permission blocks submission.
+[ ]
+No camera device or insecure context blocks capture with clear message.
+[ ]
+Client MIME/size spoofing rejected server-side.
+[ ]
+Oversized/corrupt/non-image upload rejected.
+[ ]
+Private bucket cannot be read by anon or unrelated authenticated user.
+[ ]
+Signed URL expires promptly and cannot be reused beyond expiry.
+[ ]
+No selfie bytes, raw token or auth token in logs.
+[ ]
+Retention/deletion job and deletion audit are tested.
+[ ]
+Camera capture is not falsely described as liveness verification.
+Audit and regression
+[ ]
+Every nomination, profile access, review, grant, revoke and deletion is audited.
+[ ]
+Audit records cannot be updated/deleted by ordinary admin.
+[ ]
+Rejected review requires a reason.
+[ ]
+Existing Core invitation, project-scoped roles, MFA, investor dashboard, treasury, withdrawals and Pi payment gates remain unchanged.
+[ ]
+Unit, API integration, RLS and negative authorization tests pass before release.
+[ ]
+No production data is used for synthetic tests.
