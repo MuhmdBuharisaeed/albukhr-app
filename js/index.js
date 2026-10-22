@@ -132,6 +132,26 @@ window.toggleAssetsVisibility=function(){
 
 window.applyVisibility=applyVisibility;
 
+
+/* -------------------------------------------------------
+   POPULAR PROJECTS — LOADING / EMPTY STATE
+------------------------------------------------------- */
+
+function showPopularProjectsMessage(message) {
+  const container = document.getElementById("popularProjects");
+  if (!container) return;
+
+  container.replaceChildren();
+  container.setAttribute("aria-busy", "false");
+
+  const notice = document.createElement("div");
+  notice.className = "project-loading-error";
+  notice.setAttribute("role", "status");
+  notice.textContent = message;
+
+  container.appendChild(notice);
+}
+
 /* -------------------------------------------------------
    HOME DATA
 ------------------------------------------------------- */
@@ -140,14 +160,15 @@ async function loadHome(){
 
   try{
 
-    if(typeof getAllStakesMerged!=="function"){
+    
+if (typeof getAllStakesMerged !== "function") {
+  console.warn("getAllStakesMerged missing");
 
-      console.warn(
-        "getAllStakesMerged missing"
-      );
+  // Projects can still render from the existing catalog.
+  renderPopular({});
 
-      return;
-    }
+  return;
+}
 
     let stakes=
       await getAllStakesMerged();
@@ -289,14 +310,15 @@ async function loadHome(){
 
     applyVisibility();
 
-  }catch(err){
 
-    console.error(
-      "loadHome error:",
-      err
-    );
+} catch (err) {
+  console.error("loadHome error:", err);
 
-  }
+  // Clear the loading skeleton and show the existing project catalog.
+  // Do not leave the user staring at an endless loading state.
+  renderPopular({});
+}
+
 }
 
 /* =======================================================
@@ -308,14 +330,20 @@ async function loadHome(){
    must still appear even when it has zero staking data.
 ======================================================= */
 
-function renderPopular(globalMap){
 
-  if(typeof PROJECT_CONFIG==="undefined") return;
+function renderPopular(globalMap) {
+  const container = document.getElementById("popularProjects");
+  if (!container) return;
 
-  const container=document.getElementById("popularProjects");
-  if(!container) return;
+  if (typeof PROJECT_CONFIG === "undefined") {
+    showPopularProjectsMessage(
+      "Unable to load projects. Please refresh and try again."
+    );
+    return;
+  }
 
-  container.innerHTML="";
+  container.replaceChildren();
+  container.setAttribute("aria-busy", "false");
 
   /*
     PROJECT_CONFIG = registered frontend projects.
@@ -376,7 +404,15 @@ function renderPopular(globalMap){
 
       container.appendChild(div);
     });
-        }
+
+   
+if (container.children.length === 0) {
+  showPopularProjectsMessage(
+    "No projects are available right now."
+  );
+}
+
+ }
 
 /* =======================================================
    ASSETS
