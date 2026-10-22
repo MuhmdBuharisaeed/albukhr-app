@@ -94,7 +94,110 @@
   display:block;
   margin:0 auto;
 }
+
+
+/* =====================================================
+   ALBUKHR — POPULAR PROJECTS LOADING SKELETON
+   Scoped to Popular Projects only.
+===================================================== */
+
+#popularProjects .project-loading-skeleton {
+  display: flex;
+  gap: 12px;
+  padding: 4px 2px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#popularProjects .skeleton-card {
+  flex: 0 0 145px;
+  min-width: 0;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(20, 130, 77, 0.08);
+  box-shadow: 0 5px 18px rgba(18, 100, 63, 0.06);
+  box-sizing: border-box;
+}
+
+#popularProjects .skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: #e8f0eb;
+  border-radius: 9px;
+}
+
+#popularProjects .skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.85),
+    transparent
+  );
+  animation: albukhrSkeletonShimmer 1.35s ease-in-out infinite;
+}
+
+#popularProjects .skeleton-logo {
+  width: 54px;
+  height: 54px;
+  margin: 2px auto 14px;
+  border-radius: 50%;
+}
+
+#popularProjects .skeleton-line {
+  width: 100%;
+  height: 11px;
+  margin: 9px 0;
+}
+
+#popularProjects .skeleton-line.short {
+  width: 65%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#popularProjects .skeleton-amount {
+  width: 76%;
+  height: 15px;
+  margin: 13px auto 2px;
+}
+
+#popularProjects .project-loading-message {
+  width: 100%;
+  padding: 4px 2px 10px;
+  color: #26744f;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+#popularProjects .project-loading-error {
+  width: 100%;
+  padding: 16px 12px;
+  color: #52645a;
+  font-size: 13px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+@keyframes albukhrSkeletonShimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #popularProjects .skeleton-shimmer::after {
+    animation: none;
+  }
+}
+
 </style>
+  
 </head>
 
 <body data-page="home">
@@ -155,7 +258,39 @@ Welcome to Albukhr Investment Limited — Building sustainable industries &amp; 
 📊 Popular Projects
 </div>
 
-<div class="popular-scroll" id="popularProjects"></div>
+
+<div class="popular-scroll" id="popularProjects"
+     aria-live="polite" aria-busy="true">
+
+  <div class="project-loading-message">
+    Loading projects…
+  </div>
+
+  <div class="project-loading-skeleton" aria-hidden="true">
+
+    <div class="skeleton-card">
+      <div class="skeleton-shimmer skeleton-logo"></div>
+      <div class="skeleton-shimmer skeleton-line"></div>
+      <div class="skeleton-shimmer skeleton-line short"></div>
+      <div class="skeleton-shimmer skeleton-amount"></div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-shimmer skeleton-logo"></div>
+      <div class="skeleton-shimmer skeleton-line"></div>
+      <div class="skeleton-shimmer skeleton-line short"></div>
+      <div class="skeleton-shimmer skeleton-amount"></div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-shimmer skeleton-logo"></div>
+      <div class="skeleton-shimmer skeleton-line"></div>
+      <div class="skeleton-shimmer skeleton-line short"></div>
+      <div class="skeleton-shimmer skeleton-amount"></div>
+    </div>
+
+  </div>
+</div>
 
 </div>
 
