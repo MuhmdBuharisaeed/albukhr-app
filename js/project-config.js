@@ -1,12 +1,13 @@
+
 /* =========================================================
    ALBUKHR — PROJECT CONFIG / LOGO REGISTRY BRIDGE
    File:
    js/project-config.js
 
    Purpose:
-   - Preserve the ALBUKHR 7-project catalog used by the UI.
-   - Remove project emoji/icon identity completely.
-   - Use official project logo_url as the only project identity.
+   - Preserve the six approved legacy catalog projects.
+   - Exclude the unregistered Hauwal Maize Processing project.
+   - Use official project logo_url as project identity.
    - Merge authoritative public registry metadata from Supabase.
    - Automatically accept future registered Core/Internal/External
      projects without editing this file.
@@ -40,14 +41,34 @@
   const RAHEEM_LOGO_URL =
     "https://ribpntyqdleytsyktdfb.supabase.co/storage/v1/object/public/project-logos/projects/25af782e-d91b-467a-9219-3dd45294aaff/logo";
 
+  /*
+   * Explicitly exclude the unregistered Hauwal project.
+   *
+   * This is a UI/catalog exclusion only. It does not delete
+   * database records, investments, or transaction history.
+   *
+   * Match by code, slug, or exact project name so an old
+   * registry row cannot reintroduce this project.
+   */
+  const EXCLUDED_PROJECT_CODES = new Set([
+    "HAUWAL"
+  ]);
+
+  const EXCLUDED_PROJECT_SLUGS = new Set([
+    "hauwal-maize-processing"
+  ]);
+
+  const EXCLUDED_PROJECT_NAMES = new Set([
+    "hauwal maize processing"
+  ]);
+
 
   /* =======================================================
      LEGACY CATALOG
-
-     These entries preserve the existing ALBUKHR ecosystem
-     catalog used by the home page.
-
-     No emoji/icon is used anywhere.
+     
+     Only the six retained legacy projects are defined here.
+     Future registered projects can still enter via Registry.
+     No emoji/icon identity is defined in this catalog.
   ======================================================= */
 
   const BASE_PROJECTS = {
@@ -112,18 +133,6 @@
       logo_url: null
     },
 
-    Hauwal: {
-      title: "Hauwal Maize Processing",
-      desc:
-        "Agro-processing project modernizing maize milling into scalable production.",
-      info:
-        "Hauwal focuses on clean processing, packaging, and food system efficiency.",
-      durations: [30, 60, 90],
-      project_code: "HAUWAL",
-      slug: "hauwal-maize-processing",
-      logo_url: null
-    },
-
     Raheem: {
       title: "Raheem Pharmacy",
       desc:
@@ -179,7 +188,57 @@
     return cleanString(value).toLowerCase();
   }
 
+
+  /* =======================================================
+     EXCLUDED PROJECT CHECK
+  ======================================================= */
+
+  function isExcludedProject(row) {
+
+    if (!row || typeof row !== "object") {
+      return false;
+    }
+
+    const code =
+      normalizeProjectCode(row.project_code);
+
+    const slug =
+      normalizeSlug(row.slug);
+
+    const name =
+      cleanString(row.name).toLowerCase();
+
+    /*
+     * Exact legacy code, plus suffixed variants such as
+     * HAUWAL-6552, are excluded.
+     */
+    if (
+      EXCLUDED_PROJECT_CODES.has(code) ||
+      Array.from(EXCLUDED_PROJECT_CODES).some(function (baseCode) {
+        return code.startsWith(baseCode + "-");
+      })
+    ) {
+      return true;
+    }
+
+    if (EXCLUDED_PROJECT_SLUGS.has(slug)) {
+      return true;
+    }
+
+    if (EXCLUDED_PROJECT_NAMES.has(name)) {
+      return true;
+    }
+
+    return false;
+  }
+
+
+  /* =======================================================
+     REGISTRY ROW NORMALIZATION
+  ======================================================= */
+
   function normalizeRegistryRow(row) {
+
     if (!row || typeof row !== "object") {
       return null;
     }
@@ -217,7 +276,7 @@
 
     const row = normalizeRegistryRow(registryRow);
 
-    if (!row) {
+    if (!row || isExcludedProject(row)) {
       return null;
     }
 
@@ -225,7 +284,9 @@
 
     /* 1. Exact project code */
     if (row.project_code) {
+
       for (const key of keys) {
+
         const cfg = PROJECT_CONFIG[key];
 
         if (
@@ -239,7 +300,9 @@
 
     /* 2. Exact slug */
     if (row.slug) {
+
       for (const key of keys) {
+
         const cfg = PROJECT_CONFIG[key];
 
         if (
@@ -253,7 +316,9 @@
 
     /* 3. Exact name/title */
     if (row.name) {
+
       for (const key of keys) {
+
         const cfg = PROJECT_CONFIG[key];
 
         if (
@@ -282,7 +347,7 @@
 
     const registry = normalizeRegistryRow(row);
 
-    if (!registry) {
+    if (!registry || isExcludedProject(registry)) {
       return null;
     }
 
@@ -334,7 +399,7 @@
 
         /*
          * Official registry logo always wins.
-         * If the registry does not yet expose one, preserve
+         * If the registry does not expose one, preserve
          * an already trusted local official logo.
          */
         logo_url:
@@ -351,6 +416,7 @@
        FUTURE REGISTERED PROJECT
 
        No manual project-config.js edit is required.
+       Excluded projects are rejected before this point.
     ===================================================== */
 
     const key =
@@ -438,6 +504,7 @@
         !core.client ||
         typeof core.rpc !== "function"
       ) {
+
         console.warn(
           "ALBUKHR Project Config: Supabase Core is not ready."
         );
@@ -457,6 +524,7 @@
         network !== "mainnet" &&
         network !== "testnet"
       ) {
+
         console.error(
           "ALBUKHR Project Config: invalid network.",
           network
@@ -497,6 +565,14 @@
 
         data.forEach(function (row) {
 
+          /*
+           * Exclude Hauwal before it can be merged into
+           * PROJECT_CONFIG or emitted to registry listeners.
+           */
+          if (isExcludedProject(row)) {
+            return;
+          }
+
           const key =
             mergeRegistryProject(row);
 
@@ -514,6 +590,7 @@
          * post-registry refresh.
          */
         try {
+
           window.dispatchEvent(
             new CustomEvent(
               "albukhr:project-registry-ready",
@@ -525,12 +602,15 @@
               }
             )
           );
+
         }
         catch (eventError) {
+
           console.warn(
             "ALBUKHR Project Config: registry event failed.",
             eventError
           );
+
         }
 
         return {
@@ -572,11 +652,41 @@
       cleanString(name);
 
     if (!requested) {
+
       return {
         key: null,
         title: "ALBUKHR Project",
         desc: "ALBUKHR Project",
         info: "Project information not available.",
+        durations: DEFAULT_DURATIONS.slice(),
+        logo_url: null,
+        project_code: null,
+        slug: null,
+        project_id: null,
+        project_type: null,
+        core_slot: null,
+        network: null,
+        status: null
+      };
+    }
+
+    /*
+     * Do not return an excluded project from the catalog,
+     * even if a caller asks for its old key/code/slug/name.
+     */
+    if (
+      isExcludedProject({
+        project_code: requested,
+        slug: requested,
+        name: requested
+      })
+    ) {
+
+      return {
+        key: null,
+        title: "ALBUKHR Project",
+        desc: "ALBUKHR Project",
+        info: "Project is not available in the ALBUKHR catalog.",
         durations: DEFAULT_DURATIONS.slice(),
         logo_url: null,
         project_code: null,
@@ -661,6 +771,16 @@
       return null;
     }
 
+    if (
+      isExcludedProject({
+        project_code: value,
+        slug: value,
+        name: value
+      })
+    ) {
+      return null;
+    }
+
     const valueCode =
       normalizeProjectCode(value);
 
@@ -669,6 +789,10 @@
 
     return (
       Object.values(PROJECT_CONFIG).find(function (cfg) {
+
+        if (isExcludedProject(cfg)) {
+          return false;
+        }
 
         return (
           cleanString(cfg.project_id) === value ||
@@ -688,6 +812,16 @@
   ======================================================= */
 
   function getProjectLogo(name) {
+
+    if (
+      isExcludedProject({
+        project_code: name,
+        slug: name,
+        name: name
+      })
+    ) {
+      return null;
+    }
 
     const cfg =
       getProjectConfig(name);
@@ -722,11 +856,34 @@
 
   function isProjectActive(projectOrName) {
 
-    const cfg =
+    let cfg;
+
+    if (
       typeof projectOrName === "object" &&
       projectOrName !== null
-        ? projectOrName
-        : getProjectConfig(projectOrName);
+    ) {
+
+      if (isExcludedProject(projectOrName)) {
+        return false;
+      }
+
+      cfg = projectOrName;
+
+    }
+    else {
+
+      if (
+        isExcludedProject({
+          project_code: projectOrName,
+          slug: projectOrName,
+          name: projectOrName
+        })
+      ) {
+        return false;
+      }
+
+      cfg = getProjectConfig(projectOrName);
+    }
 
     return (
       cleanString(cfg.status).toLowerCase() ===
@@ -760,6 +917,7 @@
       environment &&
       typeof environment.getNetwork === "function"
     ) {
+
       return normalizeNetwork(
         environment.getNetwork()
       );
@@ -781,6 +939,13 @@
     return Object.values(
       PROJECT_CONFIG
     ).filter(function (cfg) {
+
+      /*
+       * Excluded projects are never returned.
+       */
+      if (isExcludedProject(cfg)) {
+        return false;
+      }
 
       /*
        * Legacy catalog entries without registry network
