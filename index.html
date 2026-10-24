@@ -13,70 +13,102 @@
 <link rel="stylesheet" href="css/side-drower.css">
 
 <style>
-.header-right{display:flex;align-items:center;gap:10px}
-.user-box{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;max-width:80px}
-#piUser{font-size:10px;margin-top:2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+/* =====================================================
+   ALBUKHR — HEADER & USER INFO
+===================================================== */
 
-.environment-switcher{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:5px;
-  min-width:68px;
-  height:28px;
-  padding:4px 8px;
-  border:1px solid rgba(255,255,255,.35);
-  border-radius:20px;
-  background:rgba(255,255,255,.10);
-  color:#fff;
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.5px;
-  cursor:pointer;
-  user-select:none;
-  appearance:none;
-  -webkit-appearance:none;
-  transition:background .2s ease,transform .2s ease,border-color .2s ease
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.environment-switcher:hover{
-  background:rgba(255,255,255,.18)
+.user-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  max-width: 80px;
 }
 
-.environment-switcher:active{
-  transform:scale(.95)
+#piUser {
+  font-size: 10px;
+  margin-top: 2px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
 }
 
-.environment-dot{
-  width:7px;
-  height:7px;
-  flex:0 0 7px;
-  border-radius:50%;
-  background:#f0ad00;
-  box-shadow:0 0 0 2px rgba(240,173,0,.15)
+/* =====================================================
+   ALBUKHR — ENVIRONMENT SWITCHER
+===================================================== */
+
+.environment-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 68px;
+  height: 28px;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .10);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    background .2s ease,
+    transform .2s ease,
+    border-color .2s ease;
+  box-sizing: border-box;
 }
 
-#environmentLabel{
-  line-height:1;
-  white-space:nowrap
+.environment-switcher:hover {
+  background: rgba(255, 255, 255, .18);
 }
 
-.environment-switcher.mainnet{
-  border-color:rgba(25,179,107,.55)
+.environment-switcher:active {
+  transform: scale(.95);
 }
 
-.environment-switcher.mainnet .environment-dot{
-  background:#19b36b;
-  box-shadow:0 0 0 2px rgba(25,179,107,.16)
+.environment-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: #f0ad00;
+  box-shadow: 0 0 0 2px rgba(240, 173, 0, .15);
 }
 
-.environment-switcher.testnet{
-  border-color:rgba(240,173,0,.55)
+#environmentLabel {
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.environment-switcher.testnet .environment-dot{
-  background:#f0ad00;
-  box-shadow:0 0 0 2px rgba(240,173,0,.16)
+.environment-switcher.mainnet {
+  border-color: rgba(25, 179, 107, .55);
+}
+
+.environment-switcher.mainnet .environment-dot {
+  background: #19b36b;
+  box-shadow: 0 0 0 2px rgba(25, 179, 107, .16);
+}
+
+.environment-switcher.testnet {
+  border-color: rgba(240, 173, 0, .55);
+}
+
+.environment-switcher.testnet .environment-dot {
+  background: #f0ad00;
+  box-shadow: 0 0 0 2px rgba(240, 173, 0, .16);
 }
 
 /* =====================================================
@@ -97,9 +129,9 @@
   min-width: 0;
   padding: 14px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(20, 130, 77, 0.08);
-  box-shadow: 0 5px 18px rgba(18, 100, 63, 0.06);
+  background: rgba(255, 255, 255, .94);
+  border: 1px solid rgba(20, 130, 77, .08);
+  box-shadow: 0 5px 18px rgba(18, 100, 63, .06);
   box-sizing: border-box;
 }
 
@@ -118,7 +150,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, .85),
     transparent
   );
   animation: albukhrSkeletonShimmer 1.35s ease-in-out infinite;
@@ -156,6 +188,7 @@
   font-size: 12px;
   font-weight: 600;
   text-align: center;
+  box-sizing: border-box;
 }
 
 #popularProjects .project-loading-error {
@@ -179,9 +212,13 @@
   }
 }
 
+/* =====================================================
+   ALBUKHR — UNIFIED ASSET PROJECT LOGOS
+   Same image frame for current and future projects.
+   Does not modify Dock Navigation.
+===================================================== */
 
-/* ALBUKHR — CONSISTENT ASSET PROJECT LOGOS */
-
+/* Asset logo frame */
 .asset-item .asset-icon {
   width: 44px;
   height: 44px;
@@ -190,8 +227,10 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
+/* Asset logo image */
 .asset-item .asset-icon img,
 .asset-item .asset-icon img.project-logo {
   width: 44px !important;
@@ -199,34 +238,48 @@
   max-width: 44px !important;
   max-height: 44px !important;
   object-fit: contain !important;
-  object-position: center !important;
+  object-position: center center !important;
   display: block;
-  flex-shrink: 0;
+  margin: 0 auto;
+  flex: 0 0 44px;
+  box-sizing: border-box;
 }
 
+/* =====================================================
+   ALBUKHR — POPULAR PROJECT LOGO ALIGNMENT
+===================================================== */
+
+/* Center the logo within its existing card area */
 .popular-card .popular-icon {
-  width: 54px;
-  height: 54px;
+  width: 100%;
+  height: 64px;
+  min-width: 0;
+  margin: 0 auto 8px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
+/* Consistent logo size across every popular project */
 .popular-card .popular-icon img,
 .popular-card .popular-icon img.project-logo {
-  width: 44px !important;
-  height: 44px !important;
-  max-width: 44px !important;
-  max-height: 44px !important;
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
   object-fit: contain !important;
-  object-position: center !important;
+  object-position: center center !important;
   display: block;
-  flex-shrink: 0;
+  margin: 0 auto;
+  flex: 0 0 48px;
+  box-sizing: border-box;
 }
-
 </style>
-  
+
 </head>
 
 <body data-page="home">
