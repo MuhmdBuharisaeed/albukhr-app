@@ -79,22 +79,33 @@
   box-shadow:0 0 0 2px rgba(240,173,0,.16)
 }
 
-/* =======================================================
-   RAHEEM PHARMACY — POPULAR CARD LOGO FIX
-   Targeted only to Raheem official project logo.
-   Other project logos remain unchanged.
-======================================================= */
+/* =====================================================
+   ALBUKHR — UNIFIED PROJECT LOGOS
+   Applies to existing and future project cards.
+   Does not modify Dock Navigation.
+===================================================== */
 
-.popular-card .popular-icon img.project-logo[src*="25af782e-d91b-467a-9219-3dd45294aaff"]{
-  width:44px;
-  height:44px;
-  max-width:44px;
-  max-height:44px;
-  object-fit:contain;
-  display:block;
-  margin:0 auto;
+.popular-card .popular-icon {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
+.popular-card .popular-icon img.project-logo {
+  width: 44px !important;
+  height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  display: block;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
 
 /* =====================================================
    ALBUKHR — POPULAR PROJECTS LOADING SKELETON
