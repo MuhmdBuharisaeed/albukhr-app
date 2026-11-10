@@ -11,6 +11,33 @@
     return new URLSearchParams(window.location.search).get("returnTo")==="testnet";
   }
 
+  /*
+   * Only relative paths on the fixed Testnet origin may be restored.
+   * Sensitive credential-like query parameters are never carried over.
+   */
+  function safeTestnetReturnPath(){
+    let raw="/";
+    try{
+      raw=new URLSearchParams(window.location.search).get("testnet_return")||"/";
+    }catch(_){}
+    raw=String(raw||"/").trim();
+    if(!raw||raw.length>2048||raw.charAt(0)!=="/"||raw.indexOf("//")===0||raw.indexOf("\\")!==-1||/^[a-z][a-z0-9+.-]*:/i.test(raw))
+      return "/";
+    try{
+      const destination=new URL(raw,TESTNET_ORIGIN+"/");
+      if(destination.origin!==TESTNET_ORIGIN) return "/";
+      Array.from(destination.searchParams.keys()).forEach((key)=>{
+        if(/access.?code|token|secret|password|authorization|assertion|credential/i.test(key))
+          destination.searchParams.delete(key);
+      });
+      if(/access.?token|token|secret|password|authorization|assertion|credential/i.test(destination.hash))
+        destination.hash="";
+      return destination.pathname+(destination.search?destination.search:"")+(destination.hash?destination.hash:"");
+    }catch(_){
+      return "/";
+    }
+  }
+
   function requireMainnetAuth(){
     if(window.location.origin!==MAINNET_ORIGIN)
       throw new Error("MAINNET_HANDOFF_ORIGIN_INVALID");
@@ -46,7 +73,7 @@
     if(!res.ok||!body||!body.code)
       throw new Error(body?.error||"Testnet access code could not be issued.");
 
-    const destination=new URL(TESTNET_ORIGIN+"/");
+    const destination=new URL(safeTestnetReturnPath(),TESTNET_ORIGIN+"/");
     destination.searchParams.set("access_code",body.code);
     window.location.replace(destination.toString());
     return true;
