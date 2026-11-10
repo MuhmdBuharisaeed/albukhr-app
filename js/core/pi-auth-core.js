@@ -9,6 +9,8 @@
    - Never write Pi identity or login records directly from the browser.
    - Keep Mainnet and Testnet environments strictly separated.
    - Preserve the existing window.AlbukhrPiAuth public API.
+   - Prevent duplicate Pi SDK initialization and duplicate authentication.
+   - Bound SDK, authentication, and trusted API waits with safe timeouts.
 
    Dependencies:
    - Pi SDK
@@ -27,10 +29,79 @@
   const MAINNET = "mainnet";
   const MAINNET_IDENTITY_API = "https://albukhr-api.onrender.com/api/identity";
 
+  // These limits affect how long a caller waits. They do not cancel Pi SDK calls.
+  const PI_INIT_TIMEOUT_MS = 15000;
+  const PI_AUTH_TIMEOUT_MS = 60000;
+  const IDENTITY_API_TIMEOUT_MS = 20000;
+
   let initialized = false;
+  let piInitializationPromise = null;
   let authenticatedUser = null;
   let accessToken = null;
   let authenticationPromise = null;
+  let authenticationGeneration = 0;
+
+  function dispatchAuthStage(stage, message) {
+    try {
+      window.dispatchEvent(new CustomEvent("albukhr:pi-auth-stage", {
+        detail: {
+          stage: String(stage || "unknown"),
+          message: String(message || "")
+        }
+      }));
+    } catch (_) {}
+  }
+
+  function withTimeout(promise, milliseconds, errorCode) {
+    return new Promise(function (resolve, reject) {
+      let settled = false;
+      const timer = window.setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        reject(new Error(errorCode));
+      }, milliseconds);
+
+      Promise.resolve(promise).then(function (value) {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        resolve(value);
+      }, function (error) {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        reject(error);
+      });
+    });
+  }
+
+  async function fetchWithTimeout(url, options, milliseconds, errorCode) {
+    const requestOptions = Object.assign({}, options || {});
+    const AbortControllerCtor = window.AbortController;
+
+    if (typeof AbortControllerCtor === "function") {
+      const controller = new AbortControllerCtor();
+      requestOptions.signal = controller.signal;
+      const timer = window.setTimeout(function () {
+        try { controller.abort(); } catch (_) {}
+      }, milliseconds);
+
+      try {
+        return await fetch(url, requestOptions);
+      } catch (error) {
+        if (controller.signal && controller.signal.aborted) {
+          throw new Error(errorCode);
+        }
+        throw error;
+      } finally {
+        window.clearTimeout(timer);
+      }
+    }
+
+    // Older embedded browsers may not expose AbortController. In that case,
+    // bound the caller's wait while preserving the existing request semantics.
+    return await withTimeout(fetch(url, requestOptions), milliseconds, errorCode);
+  }
 
   function getEnvironmentCore() {
     const environment = window.ALBukhrEnvironment;
@@ -75,33 +146,66 @@
   }
 
   function requirePiSDK() {
+    if (window.__ALBUKHR_PI_SDK_LOAD_ERROR === true) {
+      throw new Error("PI_SDK_SCRIPT_LOAD_FAILED");
+    }
+
     const Pi = window.Pi;
     if (!Pi || typeof Pi.init !== "function" || typeof Pi.authenticate !== "function") {
-      throw new Error("Pi SDK is unavailable. Open ALBUKHR inside Pi Browser.");
+      throw new Error("PI_SDK_UNAVAILABLE");
     }
     return Pi;
   }
 
-  async function initPi() {
-    if (initialized) return true;
+  function initPi() {
+    // Mainnet code must never initialize the Testnet Pi Sandbox SDK.
+    requireMainnet();
+
+    if (initialized) return Promise.resolve(true);
 
     const environment = getEnvironment();
     const Pi = requirePiSDK();
     const network = validateNetwork(environment.getNetwork());
 
-    console.info("Initializing ALBUKHR Pi SDK.", {
-      environment: environment.getName(),
-      network
-    });
+    if (!piInitializationPromise) {
+      console.info("Initializing ALBUKHR Pi SDK.", {
+        environment: environment.getName(),
+        network,
+        sandbox: false
+      });
+      dispatchAuthStage("sdk-initializing", "Initializing the Mainnet Pi SDK…");
 
-    await Pi.init({
-      version: "2.0",
-      sandbox: environment.isTestnet()
-    });
+      /*
+       * Keep this underlying promise until Pi.init() genuinely resolves or
+       * rejects. A caller timeout cannot cancel Pi.init(), so a timeout must
+       * never clear this shared promise and allow a concurrent second call.
+       */
+      piInitializationPromise = Promise.resolve()
+        .then(function () {
+          return Pi.init({
+            version: "2.0",
+            sandbox: false
+          });
+        })
+        .then(function () {
+          initialized = true;
+          console.info("ALBUKHR Pi SDK initialized.", { network });
+          dispatchAuthStage("sdk-initialized", "Pi SDK initialized. Preparing Pi sign-in…");
+          return true;
+        })
+        .catch(function (error) {
+          initialized = false;
+          piInitializationPromise = null;
+          dispatchAuthStage("sdk-init-failed", "Pi SDK initialization failed.");
+          throw error;
+        });
+    }
 
-    initialized = true;
-    console.info("ALBUKHR Pi SDK initialized.", { network });
-    return true;
+    return withTimeout(
+      piInitializationPromise,
+      PI_INIT_TIMEOUT_MS,
+      "PI_SDK_INIT_TIMEOUT"
+    );
   }
 
   function onIncompletePaymentFound(payment) {
@@ -141,7 +245,9 @@
     const token = normalizeText(accessToken);
     if (!token) throw new Error("Pi authentication token is unavailable.");
 
-    const response = await fetch(`${MAINNET_IDENTITY_API}/${action}`, {
+    dispatchAuthStage("identity-verifying", "Pi approved the sign-in. ALBUKHR is verifying your identity…");
+
+    const response = await fetchWithTimeout(`${MAINNET_IDENTITY_API}/${action}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -150,7 +256,7 @@
       credentials: "omit",
       cache: "no-store",
       redirect: "error"
-    });
+    }, IDENTITY_API_TIMEOUT_MS, "ALBUKHR_IDENTITY_API_TIMEOUT");
 
     const payload = await response.json().catch(() => null);
     if (!response.ok || !payload || payload.success !== true) {
@@ -179,7 +285,7 @@
     } catch (recordError) {
       console.warn("Failed login event could not be recorded through the trusted API.", {
         originalError: originalError?.message || String(originalError || ""),
-        recordError: recordError?.message || String(recordError || "")
+        recordError: recordError?.message || String(recordError?.message || "")
       });
       return null;
     }
@@ -222,75 +328,110 @@
     });
   }
 
-  async function authenticate() {
-    if (authenticationPromise) return authenticationPromise;
+  async function runAuthentication(generation) {
+    let piUser = null;
 
-    authenticationPromise = (async function () {
-      let piUser = null;
+    try {
+      dispatchAuthStage("starting", "Starting secure Mainnet Pi authentication…");
+      await initPi();
+      if (generation !== authenticationGeneration) {
+        throw new Error("PI_AUTHENTICATION_CANCELLED");
+      }
 
-      try {
-        await initPi();
-        const Pi = requirePiSDK();
-        const environment = getEnvironment();
-        const network = validateNetwork(environment.getNetwork());
+      const Pi = requirePiSDK();
+      const environment = getEnvironment();
+      const network = validateNetwork(environment.getNetwork());
 
-        console.info("Authenticating ALBUKHR Pi user.", {
-          environment: environment.getName(),
-          network
-        });
+      console.info("Authenticating ALBUKHR Pi user.", {
+        environment: environment.getName(),
+        network
+      });
+      dispatchAuthStage("pi-authenticating", "Pi SDK is ready. Waiting for Pi account approval…");
 
-        const authResult = await Pi.authenticate(
-          ["username", "payments", "wallet_address"],
-          onIncompletePaymentFound
-        );
+      // Pi.authenticate() has no supported cancellation method. The public
+      // caller gets a bounded wait, while this shared operation remains the
+      // single in-flight authentication until the SDK promise settles.
+      const authResult = await Pi.authenticate(
+        ["username", "payments", "wallet_address"],
+        onIncompletePaymentFound
+      );
 
-        if (!authResult) throw new Error("Pi authentication returned no result.");
+      if (generation !== authenticationGeneration) {
+        throw new Error("PI_AUTHENTICATION_CANCELLED");
+      }
+      if (!authResult) throw new Error("Pi authentication returned no result.");
 
-        piUser = normalizePiUser(authResult);
-        accessToken = normalizeText(authResult.accessToken);
-        if (!accessToken) throw new Error("Pi authentication returned no access token.");
+      piUser = normalizePiUser(authResult);
+      accessToken = normalizeText(authResult.accessToken);
+      if (!accessToken) throw new Error("Pi authentication returned no access token.");
 
-        const verified = await recordSuccessfulLogin(piUser);
-        const trustedPiUser = Object.freeze({
-          pi_uid: verified.piUid,
-          username: verified.username,
-          // Wallet address is retained only as an SDK-provided UI value. It is
-          // never sent as proof of identity to the server.
-          wallet_address: piUser.wallet_address
-        });
+      const verified = await recordSuccessfulLogin(piUser);
+      if (generation !== authenticationGeneration) {
+        throw new Error("PI_AUTHENTICATION_CANCELLED");
+      }
 
-        authenticatedUser = buildAuthenticatedUser(verified.userId, trustedPiUser);
+      const trustedPiUser = Object.freeze({
+        pi_uid: verified.piUid,
+        username: verified.username,
+        // Wallet address is retained only as an SDK-provided UI value. It is
+        // never sent as proof of identity to the server.
+        wallet_address: piUser.wallet_address
+      });
 
-        console.info("ALBUKHR authentication successful.", {
-          user_id: authenticatedUser.id,
-          pi_uid: authenticatedUser.pi_uid,
-          username: authenticatedUser.username,
-          network: authenticatedUser.network
-        });
+      authenticatedUser = buildAuthenticatedUser(verified.userId, trustedPiUser);
 
-        window.dispatchEvent(new CustomEvent("albukhr:auth-success", {
-          detail: { user: authenticatedUser }
-        }));
+      console.info("ALBUKHR authentication successful.", {
+        user_id: authenticatedUser.id,
+        pi_uid: authenticatedUser.pi_uid,
+        username: authenticatedUser.username,
+        network: authenticatedUser.network
+      });
 
-        return authenticatedUser;
-      } catch (error) {
+      dispatchAuthStage("complete", "Mainnet Pi authentication completed.");
+      window.dispatchEvent(new CustomEvent("albukhr:auth-success", {
+        detail: { user: authenticatedUser }
+      }));
+
+      return authenticatedUser;
+    } catch (error) {
+      if (generation === authenticationGeneration) {
         if (piUser) await recordFailedLogin(piUser, error);
-
         authenticatedUser = null;
         accessToken = null;
-
-        console.error("ALBUKHR Pi authentication failed.", error);
-        window.dispatchEvent(new CustomEvent("albukhr:auth-failed", {
-          detail: { error }
-        }));
-
-        throw error;
-      } finally {
-        authenticationPromise = null;
+        dispatchAuthStage("failed", "Mainnet Pi authentication did not complete.");
       }
-    })();
 
-    return authenticationPromise;
+      console.error("ALBUKHR Pi authentication failed.", error);
+      window.dispatchEvent(new CustomEvent("albukhr:auth-failed", {
+        detail: { error }
+      }));
+      throw error;
+    }
+  }
+
+  function authenticate() {
+    if (authenticatedUser) return Promise.resolve(authenticatedUser);
+
+    if (!authenticationPromise) {
+      const generation = authenticationGeneration;
+      const attempt = runAuthentication(generation);
+      authenticationPromise = attempt;
+
+      // Do not clear this reference when only a caller timeout fires. The
+      // underlying Pi.authenticate() may still be pending and cannot be
+      // cancelled; retaining it prevents a second concurrent SDK request.
+      attempt.then(function () {
+        if (authenticationPromise === attempt) authenticationPromise = null;
+      }, function () {
+        if (authenticationPromise === attempt) authenticationPromise = null;
+      });
+    }
+
+    return withTimeout(
+      authenticationPromise,
+      PI_AUTH_TIMEOUT_MS,
+      "PI_AUTHENTICATION_TIMEOUT"
+    );
   }
 
   async function ensurePiAuth() {
@@ -345,9 +486,11 @@
   }
 
   function logout() {
+    authenticationGeneration += 1;
     authenticatedUser = null;
     accessToken = null;
-    authenticationPromise = null;
+    // Keep an in-flight SDK authentication promise attached until it settles.
+    // The generation change above prevents a late result from restoring login.
 
     document.documentElement.removeAttribute("data-albukhr-auth");
     window.dispatchEvent(new CustomEvent("albukhr:logout"));
