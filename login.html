@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>ALBUKHR Login</title>
 <meta name="theme-color" content="#087a3e">
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script
+  id="albukhrPiSdk"
+  src="https://sdk.minepi.com/pi-sdk.js"
+  onload="window.__ALBUKHR_PI_SDK_LOAD_ERROR=false;window.dispatchEvent(new CustomEvent('albukhr:pi-sdk-script-loaded'))"
+  onerror="window.__ALBUKHR_PI_SDK_LOAD_ERROR=true;window.dispatchEvent(new CustomEvent('albukhr:pi-sdk-script-error'))"></script>
 <link rel="stylesheet" href="css/login-css/login.css">
 </head>
 <body>
@@ -33,7 +37,7 @@
       <div class="benefit"><div class="benefit-icon">●</div><span>Fast &amp;<br>Easy Access</span></div>
       <div class="benefit"><div class="benefit-icon">↗</div><span>Track Your<br>Investments</span></div>
     </div>
-    <div id="status" class="status" aria-live="polite" aria-atomic="true">Ready to authenticate with Pi</div>
+    <div id="status" class="status" role="status" aria-live="polite" aria-atomic="true">Ready to authenticate with Pi</div>
     <button id="piLoginButton" class="pi-login-button" type="button" onclick="login()">
       <span class="pi-mark">π</span><span class="pi-login-text">Login with Pi</span><span class="pi-arrow">→</span>
     </button>
@@ -61,10 +65,10 @@
   </footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/core/environment-core.js"></script>
-<script src="js/core/supabase-core.js"></script>
-<script src="js/core/pi-auth-core.js"></script>
+<script src="js/core/environment-core.js?v=20260923-mainnet-pi-auth1"></script>
+<script src="js/core/supabase-core.js?v=20260923-mainnet-pi-auth1"></script>
+<script src="js/core/pi-auth-core.js?v=20261110-mainnet-pi-auth-recovery1"></script>
 <script src="js/mainnet-testnet-handoff.js?v=20261110-session-recovery1"></script>
-<script src="js/login.js?v=20261031-owner-proof1"></script>
+<script src="js/login.js?v=20261110-mainnet-pi-auth-recovery1"></script>
 </body>
 </html>
