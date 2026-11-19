@@ -1,4 +1,4 @@
-/* ALBUKHR External Project API Adapter v1
+/* ALBUKHR External Project API Adapter v2
  *
  * Production caller contract for External Project pages.
  *
@@ -8,6 +8,7 @@
  * - Mainnet identity/network are established by ALBUKHR API Core + gateway.
  * - Testnet is deliberately rejected until a trusted Testnet External Project
  *   gateway and schema are provisioned.
+ * - Funding operations use the trusted Mainnet API, not direct Supabase RPC.
  */
 (function (window) {
   "use strict";
@@ -55,6 +56,37 @@
     const output = { ...input };
     delete output.p_pi_uid;
     delete output.p_network;
+    delete output.pi_uid;
+    delete output.network;
+    delete output.owner_user_id;
+    delete output.owner_albukhr_user_id;
+    delete output.applicant_user_id;
+    return output;
+  }
+
+  function fundingPayload(value) {
+    const input = withoutAuthorityFields(value);
+    const allowed = [
+      "business_stage",
+      "funding_model",
+      "funding_purpose",
+      "declared_existing_asset_base",
+      "declared_existing_liquidity",
+      "funding_window_start",
+      "funding_window_end",
+      "operating_cycle_days",
+      "expected_capital_cycle_days",
+      "required_reserve",
+      "contingency_reserve",
+      "notes",
+      "items"
+    ];
+    const output = {};
+    for (const key of allowed) {
+      if (Object.prototype.hasOwnProperty.call(input, key)) {
+        output[key] = input[key];
+      }
+    }
     return output;
   }
 
@@ -206,6 +238,29 @@
       requireMainnet();
       return requireApi().get(
         "/api/external-project/" + encodeURIComponent(id(applicationId)) + "/audit-log"
+      );
+    },
+
+    async getFundingPlan(applicationId) {
+      requireMainnet();
+      return requireApi().get(
+        "/api/external-project/" + encodeURIComponent(id(applicationId)) + "/funding-plan"
+      );
+    },
+
+    async saveFundingPlan(applicationId, payload) {
+      requireMainnet();
+      return requireApi().post(
+        "/api/external-project/" + encodeURIComponent(id(applicationId)) + "/funding-plan",
+        fundingPayload(payload)
+      );
+    },
+
+    async submitFundingPlan(applicationId) {
+      requireMainnet();
+      return requireApi().post(
+        "/api/external-project/" + encodeURIComponent(id(applicationId)) + "/funding-plan/submit",
+        {}
       );
     },
 
