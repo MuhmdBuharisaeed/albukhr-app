@@ -8,6 +8,7 @@
   let busy=false;
   const termsCache=new Map();
   const termsPromises=new Map();
+  let apiCorePromise=null;
 
   function clean(v){return String(v==null?"":v).trim();}
   function normalizeCode(v){return clean(v).toUpperCase();}
@@ -23,6 +24,41 @@
     if(!window.AlbukhrApi||typeof window.AlbukhrApi.post!=="function") throw new Error("ALBUKHR API Core is not loaded.");
     return window.AlbukhrApi;
   }
+
+  /*
+   * The Home page previously called the Mainnet API without loading
+   * js/core/albukhr-api-core.js. Load it only when a user-stakes API
+   * request is actually needed. This keeps public catalog rendering
+   * independent of Pi authentication and avoids changing other pages.
+   */
+  function ensureApiCore(){
+    if(window.AlbukhrApi) return Promise.resolve(window.AlbukhrApi);
+    if(apiCorePromise) return apiCorePromise;
+
+    apiCorePromise=new Promise((resolve,reject)=>{
+      const script=document.createElement("script");
+      script.src="js/core/albukhr-api-core.js";
+      script.async=true;
+      script.setAttribute("data-albukhr-api-core","true");
+      script.onload=()=>{
+        if(window.AlbukhrApi){
+          resolve(window.AlbukhrApi);
+        }else{
+          reject(new Error("ALBUKHR API Core loaded without exposing its client."));
+        }
+      };
+      script.onerror=()=>{
+        reject(new Error("Unable to load ALBUKHR API Core."));
+      };
+      document.head.appendChild(script);
+    }).catch(error=>{
+      apiCorePromise=null;
+      throw error;
+    });
+
+    return apiCorePromise;
+  }
+
   async function auth(){
     if(!window.AlbukhrPiAuth?.ensurePiAuth) throw new Error("ALBUKHR Pi Auth Core is not loaded.");
     const u=await window.AlbukhrPiAuth.ensurePiAuth();
@@ -116,6 +152,7 @@
 
   async function startPiPayment({amount,memo,projectCode:code,duration,termVersionId}={}){
     await auth();
+    await ensureApiCore();
     if(!termVersionId) throw new Error("Accepted staking term version is required.");
     if(!window.Pi?.createPayment) throw new Error("Pi payment API is unavailable. Open ALBUKHR in Pi Browser.");
     return new Promise((resolve,reject)=>{
@@ -152,6 +189,7 @@
     try{
       const input=await validate(project,amount,duration);
       await auth();
+      await ensureApiCore();
       const result=await startPiPayment({amount:input.amount,duration:input.duration,projectCode:input.code,termVersionId:input.term.term_version_id,memo:`ALBUKHR ${input.code} investment`});
       const stake=result?.stake?.stake||result?.stake||result?.data?.stake;
       return {success:true,stake:stake||result};
@@ -162,15 +200,33 @@
   }
 
   async function getAllStakesMerged(){
-    try{await auth();const rows=await api().get("/api/my-stakes?network=mainnet");return Array.isArray(rows)?rows:[];}
-    catch(error){console.warn("ALBUKHR stakes unavailable:",error);return [];}
+    try{
+      await auth();
+      await ensureApiCore();
+      const rows=await api().get("/api/my-stakes?network=mainnet");
+      return Array.isArray(rows)?rows:[];
+    }
+    catch(error){
+      console.warn("ALBUKHR stakes unavailable:",error);
+      return [];
+    }
   }
+
   async function getProjectStakes(project){
     const code=projectCode(project);
     if(!code)return [];
-    try{await auth();const rows=await api().get(`/api/my-stakes?network=mainnet&project_code=${encodeURIComponent(code)}`);return Array.isArray(rows)?rows:[];}
-    catch(error){console.warn("ALBUKHR project stakes unavailable:",error);return [];}
+    try{
+      await auth();
+      await ensureApiCore();
+      const rows=await api().get(`/api/my-stakes?network=mainnet&project_code=${encodeURIComponent(code)}`);
+      return Array.isArray(rows)?rows:[];
+    }
+    catch(error){
+      console.warn("ALBUKHR project stakes unavailable:",error);
+      return [];
+    }
   }
+
   async function getProjectTotals(project){
     const rows=await getProjectStakes(project);
     return rows.reduce((out,row)=>{out.stake+=Number(row.amount)||0;out.reward+=Number(row.reward_amount)||0;return out;},{stake:0,reward:0});
