@@ -254,20 +254,6 @@ async function loadMainnetHome(){
       const config = PROJECT_CONFIG[project];
       if(!config) return;
 
-      const code = String(config.project_code || "").trim().toUpperCase();
-      const slug = String(config.slug || "").trim().toLowerCase();
-      const name = String(config.title || "").trim().toLowerCase();
-
-      /* Do not let an old catalog object reintroduce Hauwal. */
-      if(
-        code === "HAUWAL" ||
-        code.startsWith("HAUWAL-") ||
-        slug === "hauwal-maize-processing" ||
-        name === "hauwal maize processing"
-      ){
-        return;
-      }
-
       if(
         config.network &&
         String(config.network).trim().toLowerCase() !== "mainnet"
