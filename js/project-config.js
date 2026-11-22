@@ -15,6 +15,13 @@
    - Never make APPROVED projects investable; ACTIVE is required.
    - Respect the current ALBUKHR environment/network.
 
+   Mainnet Stage 2:
+   - Mainnet reads its own no-argument aggregate registry RPC.
+   - Testnet continues to use the existing get_public_project_registry
+     RPC with p_network='testnet'; its contract is unchanged.
+   - Global investment metrics are aggregate-only and never expose
+     individual investor identities.
+
    Important:
    This file does NOT render project cards and does NOT replace the
    existing project catalog with the database registry.
@@ -35,6 +42,7 @@
   ======================================================= */
 
   const REGISTRY_RPC = "get_public_project_registry";
+  const MAINNET_REGISTRY_RPC = "get_mainnet_public_project_registry";
 
   const DEFAULT_DURATIONS = Object.freeze([30, 60, 90]);
 
@@ -65,7 +73,7 @@
 
   /* =======================================================
      LEGACY CATALOG
-     
+
      Only the six retained legacy projects are defined here.
      Future registered projects can still enter via Registry.
      No emoji/icon identity is defined in this catalog.
@@ -188,6 +196,30 @@
     return cleanString(value).toLowerCase();
   }
 
+  function finiteNonNegativeNumber(value) {
+    if (value == null || value === "") {
+      return null;
+    }
+
+    const number = Number(value);
+
+    return Number.isFinite(number) && number >= 0
+      ? number
+      : null;
+  }
+
+  function nonNegativeInteger(value) {
+    if (value == null || value === "") {
+      return null;
+    }
+
+    const number = Number(value);
+
+    return Number.isSafeInteger(number) && number >= 0
+      ? number
+      : null;
+  }
+
 
   /* =======================================================
      EXCLUDED PROJECT CHECK
@@ -263,7 +295,11 @@
       core_slot: row.core_slot == null ? null : row.core_slot,
       network: network || null,
       status: status || null,
-      logo_url: cleanString(row.logo_url) || null
+      logo_url: cleanString(row.logo_url) || null,
+      total_invested_pi: finiteNonNegativeNumber(row.total_invested_pi),
+      investor_count: nonNegativeInteger(row.investor_count),
+      investment_metrics_available:
+        row.investment_metrics_available === true
     };
   }
 
@@ -405,7 +441,26 @@
         logo_url:
           registry.logo_url ||
           current.logo_url ||
-          null
+          null,
+
+        /*
+         * Mainnet-only aggregate fields. The Testnet RPC does
+         * not return these, so an existing value is not erased
+         * by a Testnet registry refresh.
+         */
+        total_invested_pi:
+          registry.network === "mainnet"
+            ? registry.total_invested_pi
+            : null,
+
+        investor_count:
+          registry.network === "mainnet"
+            ? registry.investor_count
+            : null,
+
+        investment_metrics_available:
+          registry.network === "mainnet" &&
+          registry.investment_metrics_available === true
       };
 
       return existingKey;
@@ -469,7 +524,16 @@
         registry.status || null,
 
       logo_url:
-        registry.logo_url || null
+        registry.logo_url || null,
+
+      total_invested_pi:
+        registry.total_invested_pi,
+
+      investor_count:
+        registry.investor_count,
+
+      investment_metrics_available:
+        registry.investment_metrics_available === true
 
     };
 
@@ -539,13 +603,39 @@
 
       try {
 
-        const result =
-          await core.rpc(
-            REGISTRY_RPC,
-            {
-              p_network: network
-            }
-          );
+        /*
+         * Critical network boundary:
+         * - Mainnet calls its fixed-network aggregate RPC.
+         * - Testnet retains the existing parameterized registry RPC.
+         * No Mainnet function accepts a browser-provided network value.
+         */
+        let result;
+
+        if (network === "mainnet") {
+          result = await core.rpc(MAINNET_REGISTRY_RPC);
+
+          /*
+           * Safe rollout fallback: until the Mainnet-only aggregate RPC
+           * is installed, retain the existing Mainnet project catalogue.
+           * This fallback has no aggregate statistics and never queries
+           * Testnet. It prevents a missing additive RPC from blanking cards.
+           */
+          if (result && result.error) {
+            console.warn(
+              "ALBUKHR Project Config: Mainnet aggregate registry unavailable; using the existing Mainnet catalogue RPC.",
+              result.error
+            );
+
+            result = await core.rpc(REGISTRY_RPC, {
+              p_network: "mainnet"
+            });
+          }
+        } else {
+          /* Existing Testnet registry route and arguments are unchanged. */
+          result = await core.rpc(REGISTRY_RPC, {
+            p_network: network
+          });
+        }
 
         if (result && result.error) {
           throw result.error;
@@ -570,6 +660,15 @@
            * PROJECT_CONFIG or emitted to registry listeners.
            */
           if (isExcludedProject(row)) {
+            return;
+          }
+
+          /*
+           * Mainnet rows must carry the fixed Mainnet network marker.
+           * Testnet rows must carry the Testnet marker. A wrong-network
+           * row is discarded rather than merged into the active catalog.
+           */
+          if (normalizeNetwork(row && row.network) !== network) {
             return;
           }
 
@@ -630,6 +729,7 @@
 
         return {
           ok: false,
+          network,
           projects: [],
           error
         };
@@ -666,7 +766,10 @@
         project_type: null,
         core_slot: null,
         network: null,
-        status: null
+        status: null,
+        total_invested_pi: null,
+        investor_count: null,
+        investment_metrics_available: false
       };
     }
 
@@ -695,7 +798,10 @@
         project_type: null,
         core_slot: null,
         network: null,
-        status: null
+        status: null,
+        total_invested_pi: null,
+        investor_count: null,
+        investment_metrics_available: false
       };
     }
 
@@ -753,7 +859,10 @@
       project_type: null,
       core_slot: null,
       network: null,
-      status: null
+      status: null,
+      total_invested_pi: null,
+      investor_count: null,
+      investment_metrics_available: false
     };
   }
 
@@ -972,6 +1081,9 @@
 
     registryRpc:
       REGISTRY_RPC,
+
+    mainnetRegistryRpc:
+      MAINNET_REGISTRY_RPC,
 
     baseProjects:
       BASE_PROJECTS,
