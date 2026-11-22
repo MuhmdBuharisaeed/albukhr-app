@@ -1,7 +1,8 @@
-/* ALBUKHR — PROJECT LOGO RENDERER v2
-   Universal 44x44 logo sizing for Popular Projects and Assets.
+/* ALBUKHR — PROJECT LOGO RENDERER v3
+   Universal project logo rendering for Popular Projects and Assets.
    Registry logo_url remains authoritative.
-   No database/SQL changes.
+   Home catalog bootstrap is intentionally independent of Pi authentication.
+   No database/SQL changes. No Dock Navigation changes.
 */
 (function(window, document){
   "use strict";
@@ -55,49 +56,59 @@
     return key ? "project.html?project=" + encodeURIComponent(key) : null;
   }
 
-  function applyLogoSizing(img){
+  function applyLogoSizing(img, size){
     if(!img) return;
-    img.style.width = "44px";
-    img.style.height = "44px";
-    img.style.maxWidth = "44px";
-    img.style.maxHeight = "44px";
-    img.style.minWidth = "44px";
-    img.style.minHeight = "44px";
+    const px = Number(size) === 48 ? 48 : 44;
+    img.style.width = px + "px";
+    img.style.height = px + "px";
+    img.style.maxWidth = px + "px";
+    img.style.maxHeight = px + "px";
+    img.style.minWidth = px + "px";
+    img.style.minHeight = px + "px";
     img.style.objectFit = "contain";
     img.style.objectPosition = "center";
     img.style.display = "block";
     img.style.margin = "0 auto";
-    img.style.flex = "0 0 44px";
+    img.style.flex = "0 0 " + px + "px";
   }
 
-  function renderLogo(container, config, altText){
+  function renderLogo(container, config, altText, options){
     if(!container) return;
 
     const logoUrl = clean(config && config.logo_url);
 
     if(!logoUrl){
-      if(container.innerHTML !== "") container.innerHTML = "";
+      const old = container.querySelector("img.project-logo");
+      if(old) old.remove();
       return;
     }
 
     const existing = container.querySelector("img.project-logo");
-
     if(existing && existing.getAttribute("src") === logoUrl){
-      applyLogoSizing(existing);
+      applyLogoSizing(existing, options && options.size);
       return;
     }
 
-    container.innerHTML =
-      '<img class="project-logo" src="' + escapeHtml(logoUrl) +
-      '" alt="' + escapeHtml(
-        altText || config.title || config.name || "ALBUKHR Project"
-      ) + '" loading="lazy" decoding="async">';
+    const img = document.createElement("img");
+    img.className = "project-logo";
+    img.src = logoUrl;
+    img.alt = altText || config.title || config.name || "ALBUKHR Project";
+    img.width = Number(options && options.size) === 48 ? 48 : 44;
+    img.height = img.width;
+    img.decoding = "async";
+    img.loading = options && options.eager ? "eager" : "lazy";
+    if(options && options.eager) {
+      img.setAttribute("fetchpriority", "high");
+    } else {
+      img.setAttribute("fetchpriority", "low");
+    }
+    img.referrerPolicy = "no-referrer";
 
-    const img = container.querySelector("img.project-logo");
-    applyLogoSizing(img);
+    container.replaceChildren(img);
+    applyLogoSizing(img, options && options.size);
 
     container.setAttribute("data-logo-source","registry");
-    container.setAttribute("data-logo-size","44x44");
+    container.setAttribute("data-logo-size",img.width + "x" + img.height);
   }
 
   function processCard(card, iconSelector, titleSelector){
@@ -113,7 +124,12 @@
     const config = findConfig(title);
     if(!config) return;
 
-    renderLogo(icon, config, title);
+    const isPopular = card.classList.contains("popular-card");
+    const rank = Number(String(card.getAttribute("data-rank") || "").replace("#",""));
+    const eager = isPopular && Number.isFinite(rank) && rank > 0 && rank <= 3;
+    const size = isPopular ? 48 : 44;
+
+    renderLogo(icon, config, title, {eager, size});
 
     const key = stableKey(title);
     const url = projectUrl(title);
@@ -137,10 +153,160 @@
     );
   }
 
+  /* -------------------------------------------------------
+     HOME CATALOG BOOTSTRAP
+     Render the approved catalog before Pi authentication.
+     Authenticated index.js rendering remains authoritative
+     and replaces these temporary cards when user data arrives.
+  ------------------------------------------------------- */
+
+  function getHomeProjects(){
+    const projectApi = window.ALBukhrProjectConfig;
+    let projects = [];
+
+    if(projectApi &&
+       typeof projectApi.getProjectsForCurrentNetwork === "function"){
+      projects = projectApi.getProjectsForCurrentNetwork();
+    } else if(window.PROJECT_CONFIG && typeof window.PROJECT_CONFIG === "object"){
+      projects = Object.values(window.PROJECT_CONFIG);
+    }
+
+    const network = clean(
+      projectApi && typeof projectApi.getCurrentNetwork === "function"
+        ? projectApi.getCurrentNetwork()
+        : window.ALBUKHR_SUPABASE && window.ALBUKHR_SUPABASE.network
+    ).toLowerCase();
+
+    return (Array.isArray(projects) ? projects : [])
+      .filter(cfg => {
+        if(!cfg || !clean(cfg.title)) return false;
+        const projectNetwork = clean(cfg.network).toLowerCase();
+        return !projectNetwork || !network || projectNetwork === network;
+      })
+      .sort((a,b) => {
+        const aSlot = a.core_slot == null ? Number.MAX_SAFE_INTEGER : Number(a.core_slot);
+        const bSlot = b.core_slot == null ? Number.MAX_SAFE_INTEGER : Number(b.core_slot);
+        if(aSlot !== bSlot) return aSlot - bSlot;
+        return clean(a.title).localeCompare(clean(b.title));
+      });
+  }
+
+  function createElement(tag, className, text){
+    const node = document.createElement(tag);
+    if(className) node.className = className;
+    if(text != null) node.textContent = String(text);
+    return node;
+  }
+
+  function createPopularCard(config, rank){
+    const card = createElement("div","popular-card");
+    card.setAttribute("data-catalog-bootstrap","true");
+    card.setAttribute("data-rank","#" + rank);
+
+    const icon = createElement("div","popular-icon");
+    const name = createElement("div","popular-name",config.title);
+    const amount = createElement("div","popular-amount","Loading popularity data…");
+
+    card.append(icon,name,amount);
+    return card;
+  }
+
+  function createAssetCard(config){
+    const card = createElement("div","asset-item");
+    card.setAttribute("data-catalog-bootstrap","true");
+
+    const icon = createElement("div","asset-icon");
+    const left = createElement("div","asset-left");
+    const header = createElement("div","asset-header");
+    const info = createElement("div","asset-info");
+    const name = createElement("div","asset-name",config.title);
+    const stake = createElement("div","asset-stake","Loading your stake data…");
+    const chart = createElement("div","asset-mini-chart");
+    const status = createElement("div","asset-status","Checking account data…");
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS,"svg");
+    svg.setAttribute("viewBox","0 0 120 36");
+    svg.setAttribute("preserveAspectRatio","none");
+
+    const line = document.createElementNS(svgNS,"polyline");
+    line.setAttribute("fill","none");
+    line.setAttribute("stroke","#b8b8b8");
+    line.setAttribute("stroke-width","2.2");
+    line.setAttribute("points","0,28 15,26 30,24 45,22 60,18 75,20 90,14 105,12 120,8");
+
+    svg.appendChild(line);
+    chart.appendChild(svg);
+    info.append(name,stake);
+    header.append(info,chart);
+    left.append(header);
+    card.append(icon,left,status);
+    return card;
+  }
+
+  function canReplaceWithBootstrap(container){
+    if(!container) return false;
+    if(container.children.length === 0) return true;
+    return Array.from(container.children).every(node =>
+      node.classList.contains("project-loading-skeleton") ||
+      node.hasAttribute("data-catalog-bootstrap")
+    );
+  }
+
+  function renderHomeCatalog(){
+    if(!document.body || document.body.getAttribute("data-page") !== "home"){
+      return false;
+    }
+
+    const popular = document.getElementById("popularProjects");
+    const assets = document.getElementById("assetsContainer");
+    if(!popular || !assets) return false;
+
+    const projects = getHomeProjects();
+    if(!projects.length) return false;
+
+    if(canReplaceWithBootstrap(popular)){
+      const popularFragment = document.createDocumentFragment();
+      projects.slice(0,10).forEach((config,index) => {
+        popularFragment.appendChild(createPopularCard(config,index + 1));
+      });
+      popular.replaceChildren(popularFragment);
+      popular.setAttribute("aria-busy","false");
+    }
+
+    if(canReplaceWithBootstrap(assets)){
+      const assetsFragment = document.createDocumentFragment();
+      projects.forEach(config => {
+        assetsFragment.appendChild(createAssetCard(config));
+      });
+      assets.replaceChildren(assetsFragment);
+    }
+
+    processAll();
+    return true;
+  }
+
+  function handleRegistryReady(event){
+    const currentNetwork = clean(
+      window.ALBukhrProjectConfig &&
+      window.ALBukhrProjectConfig.getCurrentNetwork &&
+      window.ALBukhrProjectConfig.getCurrentNetwork()
+    ).toLowerCase();
+
+    const eventNetwork = clean(event && event.detail && event.detail.network).toLowerCase();
+    if(currentNetwork && eventNetwork && currentNetwork !== eventNetwork) return;
+
+    renderHomeCatalog();
+    processAll();
+  }
+
   function handleCardClick(event){
-    const card = event.target.closest(".popular-card, .asset-item");
+    const target = event.target;
+    if(!target || typeof target.closest !== "function") return;
+
+    const card = target.closest(".popular-card, .asset-item");
     if(!card) return;
-    if(event.target.closest("a, button, input, textarea, select")) return;
+    if(target.closest("a, button, input, textarea, select")) return;
 
     const key =
       card.getAttribute("data-project-key") ||
@@ -159,19 +325,22 @@
 
   function init(){
     processAll();
+    renderHomeCatalog();
 
     const popular = document.getElementById("popularProjects");
     const assets = document.getElementById("assetsContainer");
 
     if(typeof MutationObserver === "function"){
-      const observer = new MutationObserver(processAll);
+      const observer = new MutationObserver(() => {
+        processAll();
+      });
       [popular, assets].forEach(target => {
         if(target) observer.observe(target,{childList:true,subtree:true});
       });
     }
 
     window.addEventListener("click",handleCardClick,true);
-    window.addEventListener("albukhr:project-registry-ready",processAll);
+    window.addEventListener("albukhr:project-registry-ready",handleRegistryReady);
     window.addEventListener("albukhr:project-logo-refresh",processAll);
 
     window.setTimeout(processAll,0);
@@ -185,7 +354,10 @@
   }
 
   window.ALBukhrProjectLogoRenderer =
-    Object.freeze({refresh:processAll});
+    Object.freeze({
+      refresh:processAll,
+      renderHomeCatalog
+    });
 
   window.AlbukhrProjectNavigation =
     Object.freeze({
