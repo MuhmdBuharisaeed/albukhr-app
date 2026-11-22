@@ -5,8 +5,9 @@
    js/project-config.js
 
    Purpose:
-   - Preserve the six approved legacy catalog projects.
-   - Exclude the unregistered Hauwal Maize Processing project.
+   - Preserve the existing legacy catalog projects.
+   - Accept all eligible projects returned by the authoritative public registry.
+   - Do not apply project-specific code/name/slug exclusions to registered rows.
    - Use official project logo_url as project identity.
    - Merge authoritative public registry metadata from Supabase.
    - Automatically accept future registered Core/Internal/External
@@ -50,31 +51,16 @@
     "https://ribpntyqdleytsyktdfb.supabase.co/storage/v1/object/public/project-logos/projects/25af782e-d91b-467a-9219-3dd45294aaff/logo";
 
   /*
-   * Explicitly exclude the unregistered Hauwal project.
-   *
-   * This is a UI/catalog exclusion only. It does not delete
-   * database records, investments, or transaction history.
-   *
-   * Match by code, slug, or exact project name so an old
-   * registry row cannot reintroduce this project.
+   * Project inclusion is governed by the authoritative public registry,
+   * its approved/active status rules, and the active network boundary.
+   * No project-specific code, slug, or name exclusion is applied here.
    */
-  const EXCLUDED_PROJECT_CODES = new Set([
-    "HAUWAL"
-  ]);
-
-  const EXCLUDED_PROJECT_SLUGS = new Set([
-    "hauwal-maize-processing"
-  ]);
-
-  const EXCLUDED_PROJECT_NAMES = new Set([
-    "hauwal maize processing"
-  ]);
 
 
   /* =======================================================
      LEGACY CATALOG
 
-     Only the six retained legacy projects are defined here.
+     Existing legacy projects remain defined here.
      Future registered projects can still enter via Registry.
      No emoji/icon identity is defined in this catalog.
   ======================================================= */
@@ -222,45 +208,14 @@
 
 
   /* =======================================================
-     EXCLUDED PROJECT CHECK
+     PROJECT EXCLUSION COMPATIBILITY CHECK
+
+     Retained as a compatibility helper for existing internal
+     call sites. It intentionally excludes no registry project.
   ======================================================= */
 
   function isExcludedProject(row) {
-
-    if (!row || typeof row !== "object") {
-      return false;
-    }
-
-    const code =
-      normalizeProjectCode(row.project_code);
-
-    const slug =
-      normalizeSlug(row.slug);
-
-    const name =
-      cleanString(row.name).toLowerCase();
-
-    /*
-     * Exact legacy code, plus suffixed variants such as
-     * HAUWAL-6552, are excluded.
-     */
-    if (
-      EXCLUDED_PROJECT_CODES.has(code) ||
-      Array.from(EXCLUDED_PROJECT_CODES).some(function (baseCode) {
-        return code.startsWith(baseCode + "-");
-      })
-    ) {
-      return true;
-    }
-
-    if (EXCLUDED_PROJECT_SLUGS.has(slug)) {
-      return true;
-    }
-
-    if (EXCLUDED_PROJECT_NAMES.has(name)) {
-      return true;
-    }
-
+    void row;
     return false;
   }
 
@@ -471,7 +426,8 @@
        FUTURE REGISTERED PROJECT
 
        No manual project-config.js edit is required.
-       Excluded projects are rejected before this point.
+       Public registry eligibility and network checks govern
+       whether a project reaches this point.
     ===================================================== */
 
     const key =
@@ -656,12 +612,9 @@
         data.forEach(function (row) {
 
           /*
-           * Exclude Hauwal before it can be merged into
-           * PROJECT_CONFIG or emitted to registry listeners.
+           * Project eligibility is determined by the authoritative
+           * registry result and the active-network validation below.
            */
-          if (isExcludedProject(row)) {
-            return;
-          }
 
           /*
            * Mainnet rows must carry the fixed Mainnet network marker.
@@ -758,38 +711,6 @@
         title: "ALBUKHR Project",
         desc: "ALBUKHR Project",
         info: "Project information not available.",
-        durations: DEFAULT_DURATIONS.slice(),
-        logo_url: null,
-        project_code: null,
-        slug: null,
-        project_id: null,
-        project_type: null,
-        core_slot: null,
-        network: null,
-        status: null,
-        total_invested_pi: null,
-        investor_count: null,
-        investment_metrics_available: false
-      };
-    }
-
-    /*
-     * Do not return an excluded project from the catalog,
-     * even if a caller asks for its old key/code/slug/name.
-     */
-    if (
-      isExcludedProject({
-        project_code: requested,
-        slug: requested,
-        name: requested
-      })
-    ) {
-
-      return {
-        key: null,
-        title: "ALBUKHR Project",
-        desc: "ALBUKHR Project",
-        info: "Project is not available in the ALBUKHR catalog.",
         durations: DEFAULT_DURATIONS.slice(),
         logo_url: null,
         project_code: null,
@@ -1050,11 +971,9 @@
     ).filter(function (cfg) {
 
       /*
-       * Excluded projects are never returned.
+       * Existing compatibility exclusion helper is intentionally
+       * non-blocking. Network matching remains the active boundary.
        */
-      if (isExcludedProject(cfg)) {
-        return false;
-      }
 
       /*
        * Legacy catalog entries without registry network
