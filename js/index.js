@@ -153,6 +153,271 @@ function showPopularProjectsMessage(message) {
 }
 
 /* -------------------------------------------------------
+   MAINNET HOME DATA HELPERS
+
+   This path is deliberately separate from the existing Testnet
+   loader below. It consumes only the Mainnet public aggregate RPC
+   and the signed-in user's Mainnet-only /api/my-stakes endpoint.
+------------------------------------------------------- */
+
+function getHomeNetwork(){
+  const coreNetwork = String(
+    window.ALBUKHR_SUPABASE?.network || ""
+  ).trim().toLowerCase();
+
+  if(coreNetwork === "mainnet" || coreNetwork === "testnet"){
+    return coreNetwork;
+  }
+
+  const environmentNetwork = String(
+    window.ALBukhrEnvironment?.getNetwork?.() || ""
+  ).trim().toLowerCase();
+
+  return environmentNetwork;
+}
+
+function resolveMainnetStakeProjectKey(stake){
+  if(!stake || typeof stake !== "object") return null;
+
+  const candidates = [
+    stake.project_code,
+    stake.project_id,
+    stake.project,
+    stake.slug
+  ].filter(Boolean);
+
+  const projectConfig = window.ALBukhrProjectConfig;
+
+  for(const candidate of candidates){
+    const match =
+      typeof projectConfig?.find === "function"
+        ? projectConfig.find(candidate)
+        : null;
+
+    if(match && match.key){
+      if(
+        !match.network ||
+        String(match.network).toLowerCase() === "mainnet"
+      ){
+        return match.key;
+      }
+    }
+
+    if(
+      typeof PROJECT_CONFIG !== "undefined" &&
+      PROJECT_CONFIG[candidate]
+    ){
+      const cfg = PROJECT_CONFIG[candidate];
+      if(
+        !cfg.network ||
+        String(cfg.network).toLowerCase() === "mainnet"
+      ){
+        return candidate;
+      }
+    }
+  }
+
+  return null;
+}
+
+async function loadMainnetHome(){
+  const projectConfig = window.ALBukhrProjectConfig;
+
+  /*
+   * Await the same registry promise that project-config.js starts
+   * during page initialization. If the aggregate RPC is unavailable,
+   * project-config.js falls back to the old Mainnet catalogue RPC.
+   */
+  if(typeof projectConfig?.loadRegistry === "function"){
+    let registry = await projectConfig.loadRegistry();
+
+    /* A first call can occur before Supabase Core finishes initializing. */
+    if(!registry?.ok){
+      registry = await projectConfig.loadRegistry({ force:true });
+    }
+
+    if(!registry?.ok){
+      console.warn(
+        "ALBUKHR Mainnet project registry is unavailable; keeping the available catalogue.",
+        registry?.error || null
+      );
+    }
+  }
+
+  const globalMap = {};
+  const userMap = {};
+  let totalStake = 0;
+  let totalReward = 0;
+
+  if(typeof PROJECT_CONFIG !== "undefined"){
+    Object.keys(PROJECT_CONFIG).forEach(project=>{
+      const config = PROJECT_CONFIG[project];
+      if(!config) return;
+
+      const code = String(config.project_code || "").trim().toUpperCase();
+      const slug = String(config.slug || "").trim().toLowerCase();
+      const name = String(config.title || "").trim().toLowerCase();
+
+      /* Do not let an old catalog object reintroduce Hauwal. */
+      if(
+        code === "HAUWAL" ||
+        code.startsWith("HAUWAL-") ||
+        slug === "hauwal-maize-processing" ||
+        name === "hauwal maize processing"
+      ){
+        return;
+      }
+
+      if(
+        config.network &&
+        String(config.network).trim().toLowerCase() !== "mainnet"
+      ){
+        return;
+      }
+
+      const metricsAvailable =
+        config.investment_metrics_available === true;
+
+      globalMap[project] = {
+        total: metricsAvailable
+          ? Math.max(0, Number(config.total_invested_pi) || 0)
+          : 0,
+        investors: metricsAvailable
+          ? Math.max(0, Number(config.investor_count) || 0)
+          : 0,
+        metricsAvailable
+      };
+    });
+  }
+
+  /*
+   * The API Core and staking engine return the authenticated user's
+   * own Mainnet stakes. Raw database fields use project_code and
+   * reward_amount; they do not contain the legacy s.project property.
+   * Keep this mapping local to Home so Investor Dashboard and Unified
+   * Transactions continue receiving the unchanged raw stake contract.
+   */
+  if(typeof getAllStakesMerged === "function"){
+    let stakes = [];
+    let withdrawals = [];
+
+    try{
+      const rows = await getAllStakesMerged();
+      stakes = Array.isArray(rows) ? rows : [];
+    }catch(error){
+      console.warn("ALBUKHR Mainnet personal stakes unavailable:", error);
+    }
+
+    /*
+     * Use the existing authenticated Mainnet withdrawal-history route
+     * to calculate remaining principal/reward. Pending, approved and paid
+     * withdrawals reserve or consume the same amount used by the database
+     * withdrawal validator (requested_amount + fee_amount).
+     */
+    try{
+      if(typeof window.AlbukhrApi?.get === "function"){
+        const rows = await window.AlbukhrApi.get(
+          "/api/my-withdrawals?network=mainnet"
+        );
+        withdrawals = Array.isArray(rows) ? rows : [];
+      }
+    }catch(error){
+      console.warn("ALBUKHR Mainnet withdrawal history unavailable:", error);
+    }
+
+    const withdrawalDeductions = new Map();
+
+    withdrawals.forEach(withdrawal=>{
+      if(!withdrawal || typeof withdrawal !== "object") return;
+      if(String(withdrawal.network || "mainnet").toLowerCase() !== "mainnet") return;
+
+      const status = String(withdrawal.status || "").trim().toLowerCase();
+      if(!["pending", "approved", "paid"].includes(status)) return;
+
+      const stakeId = String(withdrawal.stake_id || "").trim();
+      if(!stakeId) return;
+
+      const type = String(withdrawal.withdrawal_type || "").trim().toLowerCase();
+      if(type !== "capital" && type !== "reward") return;
+
+      const requested = Number(withdrawal.requested_amount) || 0;
+      const fee = Number(withdrawal.fee_amount) || 0;
+      const deduction = Math.max(0, requested + fee);
+
+      if(!withdrawalDeductions.has(stakeId)){
+        withdrawalDeductions.set(stakeId, {capital:0, reward:0});
+      }
+
+      withdrawalDeductions.get(stakeId)[type] += deduction;
+    });
+
+    stakes.forEach(stake=>{
+      if(!stake || typeof stake !== "object") return;
+
+      const recordNetwork = String(stake.network || "mainnet").trim().toLowerCase();
+      if(recordNetwork !== "mainnet") return;
+
+      const status = String(stake.status || "").trim().toLowerCase();
+      if(!["active", "matured", "capital_withdrawn"].includes(status)) return;
+
+      const projectKey = resolveMainnetStakeProjectKey(stake);
+      if(!projectKey || !globalMap[projectKey]) return;
+
+      const amount = Number(stake.amount);
+      if(!Number.isFinite(amount) || amount <= 0) return;
+
+      const deductions = withdrawalDeductions.get(String(stake.id || "")) || {
+        capital:0,
+        reward:0
+      };
+
+      if(status === "active" || status === "matured"){
+        const remainingCapital = Math.max(0, amount - deductions.capital);
+        if(remainingCapital > 0){
+          userMap[projectKey] = (userMap[projectKey] || 0) + remainingCapital;
+          totalStake += remainingCapital;
+        }
+      }
+
+      const reward = Number(
+        stake.reward_amount != null
+          ? stake.reward_amount
+          : stake.reward
+      ) || 0;
+
+      const remainingReward = Math.max(0, reward - deductions.reward);
+      totalReward += remainingReward;
+    });
+  }
+
+  document
+    .getElementById("homeStake")
+    ?.replaceChildren(
+      document.createTextNode(
+        Math.max(0, totalStake).toFixed(2) + " Pi"
+      )
+    );
+
+  document
+    .getElementById("homeReward")
+    ?.replaceChildren(
+      document.createTextNode(
+        Math.max(0, totalReward).toFixed(2) + " Pi"
+      )
+    );
+
+  if(typeof renderPopular === "function"){
+    renderPopular(globalMap);
+  }
+
+  if(typeof renderAssets === "function"){
+    renderAssets(userMap, globalMap);
+  }
+
+  applyVisibility();
+}
+
+/* -------------------------------------------------------
    HOME DATA
 ------------------------------------------------------- */
 
@@ -160,23 +425,33 @@ async function loadHome(){
 
   try{
 
-    
-if (typeof getAllStakesMerged !== "function") {
-  console.warn("getAllStakesMerged missing");
+    /* Mainnet-only Stage 2 path. Testnet remains on its old path. */
+    if(getHomeNetwork() === "mainnet"){
+      await loadMainnetHome();
+      return;
+    }
 
-  // Projects can still render from the existing catalog.
-  renderPopular({});
+    /* -----------------------------------------------------
+       EXISTING TESTNET / LEGACY HOME DATA FLOW
+       Kept unchanged by the Mainnet-only Stage 2 work.
+    ----------------------------------------------------- */
 
-  return;
-}
+    if (typeof getAllStakesMerged !== "function") {
+      console.warn("getAllStakesMerged missing");
 
-    let stakes=
+      // Projects can still render from the existing catalog.
+      renderPopular({});
+
+      return;
+    }
+
+    let stakes =
       await getAllStakesMerged();
 
-    const globalStakes=
-  typeof getGlobalStakes==="function"
-    ? await getGlobalStakes()
-    : [];
+    const globalStakes =
+      typeof getGlobalStakes === "function"
+        ? await getGlobalStakes()
+        : [];
 
     if(!Array.isArray(stakes))
       stakes=[];
@@ -311,25 +586,22 @@ if (typeof getAllStakesMerged !== "function") {
     applyVisibility();
 
 
-} catch (err) {
-  console.error("loadHome error:", err);
+  } catch (err) {
+    console.error("loadHome error:", err);
 
-  // Clear the loading skeleton and show the existing project catalog.
-  // Do not leave the user staring at an endless loading state.
-  renderPopular({});
-}
+    // Clear the loading skeleton and show the existing project catalog.
+    // Do not leave the user staring at an endless loading state.
+    renderPopular({});
+  }
 
 }
 
 /* =======================================================
    POPULAR PROJECTS
-   Minimal fix:
    PROJECT_CONFIG is the project catalog.
-   globalMap only supplies live statistics.
-   Therefore a registered project such as Raheem
-   must still appear even when it has zero staking data.
+   The supplied map contains live/global statistics where available.
+   Registered projects remain visible even when they have no investments.
 ======================================================= */
-
 
 function renderPopular(globalMap) {
   const container = document.getElementById("popularProjects");
@@ -345,13 +617,6 @@ function renderPopular(globalMap) {
   container.replaceChildren();
   container.setAttribute("aria-busy", "false");
 
-  /*
-    PROJECT_CONFIG = registered frontend projects.
-    globalMap = optional live staking statistics.
-
-    A project must not disappear simply because
-    it currently has no staking data.
-  */
   const entries=Object.keys(PROJECT_CONFIG).map(project=>[
     project,
     (globalMap&&globalMap[project])||{
@@ -361,10 +626,27 @@ function renderPopular(globalMap) {
   ]);
 
   entries
-    .sort((a,b)=>
-      (Number(b[1]?.total)||0)-
-      (Number(a[1]?.total)||0)
-    )
+    .sort((a,b)=>{
+      const totalDifference =
+        (Number(b[1]?.total)||0) - (Number(a[1]?.total)||0);
+
+      if(totalDifference !== 0) return totalDifference;
+
+      /* Investor-count tie-breaker is a Mainnet aggregate-only rule. */
+      if(getHomeNetwork() === "mainnet"){
+        const investorDifference =
+          (Number(b[1]?.investors)||0) - (Number(a[1]?.investors)||0);
+        if(investorDifference !== 0) return investorDifference;
+
+        const aSlot = Number(a[0] && PROJECT_CONFIG[a[0]]?.core_slot);
+        const bSlot = Number(b[0] && PROJECT_CONFIG[b[0]]?.core_slot);
+        const safeASlot = Number.isFinite(aSlot) && aSlot > 0 ? aSlot : Number.MAX_SAFE_INTEGER;
+        const safeBSlot = Number.isFinite(bSlot) && bSlot > 0 ? bSlot : Number.MAX_SAFE_INTEGER;
+        if(safeASlot !== safeBSlot) return safeASlot - safeBSlot;
+      }
+
+      return 0;
+    })
     .slice(0,10)
     .forEach(([project,data],index)=>{
 
@@ -382,15 +664,23 @@ function renderPopular(globalMap) {
       );
 
       div.onclick=function(){
-  const projectKey =
-    PROJECT_CONFIG[project]?.slug ||
-    PROJECT_CONFIG[project]?.project_code ||
-    project;
+        const projectKey =
+          PROJECT_CONFIG[project]?.slug ||
+          PROJECT_CONFIG[project]?.project_code ||
+          project;
 
-  window.location.href =
-    "project.html?project="+
-    encodeURIComponent(projectKey);
-};
+        window.location.href =
+          "project.html?project="+
+          encodeURIComponent(projectKey);
+      };
+
+      const amountText = Number(data.total||0).toFixed(2) + " Pi";
+      const metricText = data.metricsAvailable === false
+        ? "Investment metrics unavailable"
+        : data.metricsAvailable === true
+          ? amountText + " · " + (Number(data.investors)||0) + " Investors"
+          : amountText;
+
       div.innerHTML=
         '<div class="popular-icon">'+
         (config.icon||"")+
@@ -399,24 +689,22 @@ function renderPopular(globalMap) {
         config.title+
         '</div>'+
         '<div class="popular-amount">'+
-        Number(data.total||0).toFixed(2)+
-        ' Pi</div>';
+        metricText+
+        '</div>';
 
       container.appendChild(div);
     });
 
-   
-if (container.children.length === 0) {
-  showPopularProjectsMessage(
-    "No projects are available right now."
-  );
+  if (container.children.length === 0) {
+    showPopularProjectsMessage(
+      "No projects are available right now."
+    );
+  }
 }
-
- }
 
 /* =======================================================
    ASSETS
-   Existing behavior preserved.
+   Existing card structure retained.
 ======================================================= */
 
 function renderAssets(userMap,globalMap){
@@ -500,15 +788,15 @@ function renderAssets(userMap,globalMap){
       "asset-item";
 
     div.onclick=function(){
-  const projectKey =
-    item.config?.slug ||
-    item.config?.project_code ||
-    item.name;
+      const projectKey =
+        item.config?.slug ||
+        item.config?.project_code ||
+        item.name;
 
-  window.location.href =
-    "project.html?project="+
-    encodeURIComponent(projectKey);
-};
+      window.location.href =
+        "project.html?project="+
+        encodeURIComponent(projectKey);
+    };
 
     div.innerHTML=
       '<div class="asset-icon">'+
