@@ -37,7 +37,8 @@
     accessToken: null,
     authPromise: null,
     expandedComments: new Set(),
-    commentsByUpdate: new Map(),
+expandedDescriptions: new Set(),
+commentsByUpdate: new Map(),
     commentsLoading: new Set(),
     openReports: new Set(),
     viewerReactions: new Map()
