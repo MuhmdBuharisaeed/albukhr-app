@@ -44,50 +44,95 @@
     </div>
   </header>
 
-  <nav class="top-nav" aria-label="Transparency navigation">
-    <button class="nav-btn active" type="button" aria-current="page">
-      📸 Transparency
-    </button>
-    <button id="refreshFeedBtn" class="nav-btn ghost transparency-refresh-btn" type="button">
-      ↻ Refresh
-    </button>
-  </nav>
+  <!-- Search replaces the former Transparency top button.
+       The compact control drawer contains the hub description, filters and refresh. -->
+  <nav class="top-nav transparency-toolbar" aria-label="Project transparency tools">
+    <label class="transparency-search" for="filterProjectCode">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="10.8" cy="10.8" r="6.8"></circle>
+        <path d="m16 16 5 5"></path>
+      </svg>
+      <input
+        id="filterProjectCode"
+        type="search"
+        placeholder="Search project code"
+        autocomplete="off"
+        aria-label="Search project code"
+      >
+    </label>
 
-  <main class="content">
-    <section class="hero-card">
-      <div class="hero-title">📸 Project Transparency Hub</div>
-      <div class="hero-sub">
+    <button
+      id="transparencyDrawerToggle"
+      class="transparency-drawer-toggle"
+      type="button"
+      aria-label="Open transparency controls"
+      aria-expanded="false"
+      aria-controls="transparencyDrawer"
+      title="Transparency controls"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 6h16M4 12h16M4 18h16"></path>
+        <circle cx="8" cy="6" r="1.6"></circle>
+        <circle cx="15" cy="12" r="1.6"></circle>
+        <circle cx="10" cy="18" r="1.6"></circle>
+      </svg>
+    </button>
+
+    <section
+      id="transparencyDrawer"
+      class="transparency-drawer"
+      aria-labelledby="transparencyDrawerTitle"
+      hidden
+    >
+      <div class="transparency-drawer-heading">
+        <div>
+          <span class="transparency-drawer-eyebrow">PROJECT TRANSPARENCY</span>
+          <h1 id="transparencyDrawerTitle">Project Transparency Hub</h1>
+        </div>
+        <button
+          id="transparencyDrawerClose"
+          class="transparency-drawer-close"
+          type="button"
+          aria-label="Close transparency controls"
+        >×</button>
+      </div>
+
+      <p class="transparency-drawer-description">
         Follow project updates published by ALBUKHR Core, Internal, and External project teams.
         Updates may include project progress, milestone evidence, field activity, infrastructure
         work, and other transparency records shared for trust and accountability across the ecosystem.
+      </p>
+
+      <div class="transparency-drawer-fields">
+        <label class="transparency-drawer-field" for="filterProjectType">
+          <span>Project type</span>
+          <select id="filterProjectType" class="filter-select" aria-label="Filter by project type">
+            <option value="">All project types</option>
+            <option value="core">Core projects</option>
+            <option value="internal">Internal projects</option>
+            <option value="external">External projects</option>
+          </select>
+        </label>
+
+        <label class="transparency-drawer-field" for="filterSort">
+          <span>Sort updates</span>
+          <select id="filterSort" class="filter-select" aria-label="Sort project updates">
+            <option value="latest">Latest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </label>
       </div>
+
+      <button
+        id="refreshFeedBtn"
+        class="filter-btn transparency-drawer-refresh"
+        type="button"
+      >↻ Refresh</button>
     </section>
+  </nav>
 
-    <section class="filter-bar" aria-label="Project update filters">
-      <input
-        id="filterProjectCode"
-        class="filter-input"
-        type="text"
-        placeholder="Filter by project code (optional)"
-        autocomplete="off"
-        aria-label="Filter by project code"
-      >
-
-      <select id="filterProjectType" class="filter-select" aria-label="Filter by project type">
-        <option value="">All project types</option>
-        <option value="core">Core projects</option>
-        <option value="internal">Internal projects</option>
-        <option value="external">External projects</option>
-      </select>
-
-      <select id="filterSort" class="filter-select" aria-label="Sort project updates">
-        <option value="latest">Latest first</option>
-        <option value="oldest">Oldest first</option>
-      </select>
-    </section>
-
+  <main class="content">
     <div class="section-title">Project Updates Feed</div>
-
     <div id="projectFeed" class="loading" aria-live="polite">
       Loading project updates...
     </div>
@@ -148,7 +193,93 @@
 <script src="js/notifications.js"></script>
 <script src="js/projects-engine.js"></script>
 <script src="js/project-updates.js"></script>
+
+<!-- Remove the controller-generated pagination button and its obsolete empty-state wording. -->
+<script>
+(function () {
+  function removeOlderButton() {
+    const button = document.getElementById("loadMoreProjectUpdates");
+    if (button) {
+      button.remove();
+      return true;
+    }
+    return false;
+  }
+
+  removeOlderButton();
+  const buttonObserver = new MutationObserver(function () {
+    if (removeOlderButton()) buttonObserver.disconnect();
+  });
+  buttonObserver.observe(document.body, { childList: true, subtree: true });
+
+  const feed = document.getElementById("projectFeed");
+  if (feed) {
+    const cleanEmptyMessage = function () {
+      feed.querySelectorAll(".empty-feed").forEach(function (item) {
+        if (item.textContent.includes("Load older updates")) {
+          item.textContent = "No updates match these filters. Change the filters to see more results.";
+        }
+      });
+    };
+    cleanEmptyMessage();
+    const messageObserver = new MutationObserver(cleanEmptyMessage);
+    messageObserver.observe(feed, { childList: true, subtree: true, characterData: true });
+  }
+})();
+</script>
+
 <script src="js/transparency.js"></script>
+
+<!-- Compact transparency controls drawer -->
+<script>
+(function () {
+  const toggle = document.getElementById("transparencyDrawerToggle");
+  const drawer = document.getElementById("transparencyDrawer");
+  const closeButton = document.getElementById("transparencyDrawerClose");
+  const toolbar = document.querySelector(".transparency-toolbar");
+  const refresh = document.getElementById("refreshFeedBtn");
+
+  if (!toggle || !drawer || !toolbar) return;
+
+  function setOpen(open) {
+    drawer.hidden = !open;
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.setAttribute("aria-label", open ? "Close transparency controls" : "Open transparency controls");
+    toggle.classList.toggle("is-open", open);
+    if (open) {
+      const firstSelect = drawer.querySelector("select");
+      if (firstSelect) firstSelect.focus({ preventScroll: true });
+    }
+  }
+
+  toggle.addEventListener("click", function () {
+    setOpen(drawer.hidden);
+  });
+
+  closeButton?.addEventListener("click", function () {
+    setOpen(false);
+    toggle.focus();
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!drawer.hidden && !toolbar.contains(event.target)) {
+      setOpen(false);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !drawer.hidden) {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+
+  refresh?.addEventListener("click", function () {
+    setOpen(false);
+    toggle.focus();
+  });
+})();
+</script>
 
 <!-- Existing Dock Navigation scroll behaviour preserved -->
 <script>
