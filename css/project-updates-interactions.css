@@ -1,0 +1,45 @@
+/* ALBUKHR Stage 6D — Public Project Updates interactions */
+.project-feed-status{margin:0 0 12px;padding:11px 14px;border:1px solid #dce9e2;border-radius:12px;background:#fff;color:#60776d;font-size:12px;line-height:1.5}
+.project-feed-status.error{border-color:#e8c2bf;background:#fff8f7;color:#a52821}
+.project-feed-status.success{border-color:#b7ddc6;background:#f4fbf6;color:#087a3e}
+.project-feed-more{display:block;margin:15px auto 24px;min-width:180px}
+.project-update-card{min-width:0}
+.project-code-pill,.update-kind-pill,.project-source-pill{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800;letter-spacing:.2px;background:#f0f4f1;color:#4f665a}
+.update-kind-pill{background:#eaf5ee;color:#087a3e}
+.project-source-pill{background:#f4f5f4;color:#5d6d64}
+.update-image-button{display:block;width:100%;padding:0;border:0;border-radius:16px;margin-top:13px;overflow:hidden;background:#f3f5f4;cursor:zoom-in;text-align:left}
+.update-image-button .timeline-image{margin:0}
+.update-interactions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #edf1ef}
+.interaction-button,.comment-reply-button{border:1px solid #dce9e2;border-radius:999px;background:#fff;color:#087a3e;padding:8px 12px;font-size:11px;font-weight:800;cursor:pointer}
+.interaction-button:hover,.comment-reply-button:hover{background:#f2f8f4}
+.interaction-button.secondary{color:#365a48}
+.interaction-button.quiet{color:#7e514d;border-color:#ead9d7}
+.interaction-button:disabled,.interaction-submit:disabled{opacity:.55;cursor:not-allowed}
+.update-comments-panel,.update-report-panel{margin-top:12px;padding:14px;border:1px solid #dce9e2;border-radius:14px;background:#fbfdfb}
+.update-comments-panel[hidden],.update-report-panel[hidden]{display:none!important}
+.comments-heading,.report-heading{font-size:14px;font-weight:850;color:#073b28;margin:0 0 11px}
+.project-comment-form,.project-report-form{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
+.project-comment-input,.report-details{width:100%;min-height:78px;resize:vertical;border:1px solid #cfded5;border-radius:10px;padding:10px 11px;background:#fff;color:#073b28;font:inherit;font-size:12px;line-height:1.5;box-sizing:border-box}
+.project-comment-input:focus,.report-details:focus,.report-select:focus{outline:2px solid rgba(8,122,62,.16);border-color:#087a3e}
+.project-comment-form-footer,.project-report-footer{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.interaction-hint{font-size:10px;color:#60776d;line-height:1.4}
+.interaction-hint.error{color:#a52821}
+.interaction-hint.success{color:#087a3e}
+.interaction-submit{border:0;border-radius:9px;background:#087a3e;color:#fff;padding:9px 13px;font-size:11px;font-weight:850;cursor:pointer;white-space:nowrap}
+.project-comment-list{display:flex;flex-direction:column;gap:10px}
+.project-comment{padding:11px 12px;border:1px solid #e6eee9;border-radius:11px;background:#fff;min-width:0}
+.project-comment-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.project-comment-head strong{font-size:11px;color:#073b28;overflow-wrap:anywhere}
+.project-comment-head time{font-size:9px;color:#829188;text-align:right}
+.project-comment-text{margin:7px 0 5px;color:#465c50;font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.project-comment-actions{display:flex;justify-content:flex-end}
+.comment-reply-button{padding:5px 9px;font-size:10px}
+.project-reply-host{margin-top:8px}
+.project-comment-children{margin:10px 0 0 12px;padding-left:10px;border-left:2px solid #e2eee6;display:flex;flex-direction:column;gap:9px}
+.comment-loading,.empty-comments{padding:12px;color:#718278;font-size:11px;text-align:center}
+.report-explainer{margin:0 0 12px;color:#61776d;font-size:11px;line-height:1.5}
+.report-select{width:100%;min-height:40px;border:1px solid #cfded5;border-radius:9px;padding:9px 10px;background:#fff;color:#073b28;font:inherit;font-size:12px}
+.interaction-status{padding:10px 12px;border-radius:10px;background:#fff;color:#61776d;font-size:11px}
+.interaction-status.error{background:#fff8f7;color:#a52821}
+@media(max-width:600px){.update-interactions{gap:7px}.interaction-button{padding:8px 10px}.project-comment-children{margin-left:6px;padding-left:8px}.project-comment-form-footer,.project-report-footer{align-items:flex-start;flex-direction:column}.interaction-submit{width:100%}}
+.interaction-button.selected{border-color:#087a3e;background:#eaf5ee;color:#075f31;box-shadow:inset 0 0 0 1px rgba(8,122,62,.12)}
