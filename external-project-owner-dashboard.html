@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#087a3e">
+<title>ALBUKHR — External Project Owner Dashboard</title>
+<link rel="stylesheet" href="css/albukhr-ui.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/global-header.css">
+<link rel="stylesheet" href="css/global-buttons.css">
+<link rel="stylesheet" href="css/external-project-owner-dashboard.css">
+</head>
+<body data-page="external-project-owner-dashboard">
+<header class="header">
+  <div class="header-left"><span class="brand">ALBUKHR</span></div>
+  <div class="header-right"><span class="network-indicator" id="networkIndicator">MAINNET</span></div>
+</header>
+<main class="external-owner-page">
+  <nav class="owner-top-actions" aria-label="External Project navigation">
+    <a href="external-project-dashboard.html">← My External Projects</a>
+    <span class="owner-network-pill">SECURE · MAINNET</span>
+  </nav>
+
+  <section class="owner-hero">
+    <div>
+      <div class="owner-eyebrow">EXTERNAL PROJECT SERVICE</div>
+      <h1 id="projectName">External Project Owner Dashboard</h1>
+      <p id="projectSubtitle">Loading your converted External Project workspace…</p>
+    </div>
+    <span id="projectStatus" class="owner-status-pill">VERIFYING</span>
+  </section>
+
+  <div id="ownerStatus" class="owner-status-message" role="status" aria-live="polite">Verifying Mainnet owner access…</div>
+  <section id="ownerLoading" class="owner-loading">
+    <span class="owner-spinner" aria-hidden="true"></span>
+    <strong>Loading your owner workspace…</strong>
+    <span>Only the authenticated owner of this Mainnet application can access it.</span>
+  </section>
+
+  <section id="ownerError" class="owner-error" hidden>
+    <h2>Owner workspace unavailable</h2>
+    <p id="ownerErrorMessage">The External Project workspace could not be loaded.</p>
+    <a class="owner-button secondary" href="external-project-dashboard.html">Back to External Projects</a>
+  </section>
+
+  <section id="ownerWorkspace" hidden>
+    <section class="owner-summary-grid" aria-label="Project summary">
+      <article class="owner-summary-card"><span>Project Code</span><strong id="projectCode">—</strong></article>
+      <article class="owner-summary-card"><span>Application Status</span><strong id="applicationState">—</strong></article>
+      <article class="owner-summary-card"><span>Funding Request</span><strong id="fundingRequest">—</strong></article>
+    </section>
+
+    <section class="owner-panel">
+      <div class="owner-section-heading">
+        <div><h2>Project Management</h2><p>Access the existing approved workflows for your External Project.</p></div>
+      </div>
+      <div class="owner-action-grid">
+        <a id="fundingLink" class="owner-action-card" href="external-project-funding.html">
+          <span class="owner-action-icon">₱</span><strong>Funding Structure</strong>
+          <span>Review and maintain the itemized funding plan. Submission remains subject to the required owner verification.</span>
+          <b>Open Funding Structure →</b>
+        </a>
+        <a id="detailsLink" class="owner-action-card" href="external-project-detail.html">
+          <span class="owner-action-icon">▤</span><strong>Application, Team & Documents</strong>
+          <span>View application details, registered team members, supporting documents and review history.</span>
+          <b>Open Project Details →</b>
+        </a>
+      </div>
+    </section>
+
+    <section class="owner-panel" id="publisherPanel">
+      <div class="owner-section-heading">
+        <div><h2>Project Updates & Transparency</h2><p>Publish factual progress and milestone updates to the public ALBUKHR Mainnet Transparency Hub.</p></div>
+      </div>
+      <div class="owner-notice">
+        Only the authenticated owner with an active Mainnet publisher grant can publish. The update and evidence image become publicly visible in the Mainnet Transparency Hub. Use only material you are authorised and comfortable to share. Updates are labelled project-provided; publication does not mean ALBUKHR has independently verified the statements or evidence.
+      </div>
+      <form id="ownerUpdateForm" class="owner-update-form">
+        <label>Update type
+          <select id="ownerUpdateKind" required>
+            <option value="progress">Progress update</option>
+            <option value="milestone">Milestone</option>
+          </select>
+        </label>
+        <label>Title <span id="ownerTitleCount">0 / 160</span>
+          <input id="ownerUpdateTitle" type="text" maxlength="160" placeholder="A clear, factual update title" required>
+        </label>
+        <label>Update details <span id="ownerBodyCount">0 / 10,000</span>
+          <textarea id="ownerUpdateBody" rows="7" maxlength="10000" placeholder="Describe the work completed, current progress, or milestone. Do not describe unverified claims as independently verified facts." required></textarea>
+        </label>
+        <label>Evidence image <small>Required · JPEG, PNG or WEBP · Maximum 10 MiB</small>
+          <input id="ownerUpdateImage" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required>
+        </label>
+        <p id="ownerUpdateImageName" class="owner-file-name">No evidence image selected.</p>
+        <button id="publishOwnerUpdateButton" class="owner-button primary" type="submit" disabled>Publish update</button>
+        <p id="ownerPublisherStatus" class="owner-inline-status" aria-live="polite">Checking publisher permission…</p>
+      </form>
+
+      <div class="owner-feed-heading">
+        <div><h3>My published updates</h3><p>Updates currently visible in the public Mainnet Transparency Hub.</p></div>
+        <button id="refreshOwnerFeedButton" class="owner-button secondary small" type="button" disabled>Refresh</button>
+      </div>
+      <p id="ownerFeedStatus" class="owner-inline-status" aria-live="polite">Loading published updates…</p>
+      <div id="ownerUpdateFeed" class="owner-update-feed" aria-live="polite"></div>
+      <button id="loadOlderOwnerUpdatesButton" class="owner-button secondary load-more" type="button" hidden>Load older updates</button>
+    </section>
+
+    <section class="owner-panel owner-financial-locks">
+      <div class="owner-section-heading"><div><h2>Liquidity & Withdrawals</h2><p>Financial operations remain controlled by ALBUKHR's trusted backend.</p></div></div>
+      <article class="owner-lock-card">
+        <strong>Liquidity settlement is not enabled in this Owner Dashboard stage.</strong>
+        <p>The External Project Owner Operations gateway is disabled, and its required Mainnet database procedures have not yet been provisioned. No Pi payment can be started here.</p>
+      </article>
+      <article class="owner-lock-card warning">
+        <strong>Withdrawals remain locked.</strong>
+        <p>Withdrawals require owner AAL2 step-up, eligible-liquidity reservation, separate administrator approval and reconciliation controls. This dashboard does not create or execute A2U payouts.</p>
+      </article>
+    </section>
+
+    <div class="owner-footer-actions">
+      <a class="owner-button secondary" href="external-project-dashboard.html">Back to My External Projects</a>
+      <button id="refreshOwnerWorkspaceButton" class="owner-button primary" type="button">Refresh Workspace</button>
+    </div>
+  </section>
+</main>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/core/environment-core.js"></script>
+<script src="js/core/supabase-core.js"></script>
+<script src="js/core/pi-auth-core.js"></script>
+<script src="js/core/albukhr-api-core.js"></script>
+<script src="js/core/external-project-api.js"></script>
+<script src="js/core/page-auth-guard.js"></script>
+<script src="js/core/environment-switcher.js"></script>
+<script src="js/external-project-owner-dashboard.js?v=20261124-phase-c1"></script>
+</body>
+</html>
