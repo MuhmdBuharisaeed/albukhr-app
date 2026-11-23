@@ -56,12 +56,22 @@
     return node;
   }
 
-  function setFeedMessage(message, kind) {
-    const status = $("feedStatus");
-    if (!status) return;
-    status.textContent = text(message);
-    status.className = "project-feed-status" + (kind ? " " + kind : "");
-  }
+function setFeedMessage(message, kind) {
+  const status = $("feedStatus");
+  if (!status) return;
+
+  const messageText = text(message).trim();
+
+  status.textContent = messageText;
+  status.hidden = !messageText;
+
+  // Ensure hidden status does not occupy space,
+  // even when a stylesheet defines display for this element.
+  status.style.display = messageText ? "" : "none";
+
+  status.className =
+    "project-feed-status" + (kind ? " " + kind : "");
+}
 
   function setMainMessage(message, kind) {
     const feed = $("projectFeed");
