@@ -484,7 +484,12 @@ function setFeedMessage(message, kind) {
       state.cursor = data?.next_cursor || null;
       state.hasMore = data?.has_more === true && Boolean(state.cursor);
       renderFeed();
-      setFeedMessage(state.items.length ? "Project-provided updates from the ALBUKHR Mainnet public feed." : "No published project updates are available yet.");
+      
+setFeedMessage(
+  state.items.length
+    ? "Project-provided updates from the ALBUKHR Mainnet public feed."
+    : ""
+);
     } catch (error) {
       console.error("[ALBUKHR TRANSPARENCY] Feed request failed:", error);
       setFeedMessage(error.message || "Unable to load project updates.", "error");
