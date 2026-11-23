@@ -377,7 +377,73 @@ function setFeedMessage(message, kind) {
       card.appendChild(imageButton);
     }
 
-    card.appendChild(create("p", "timeline-desc", text(item.body)));
+const updateBodyText = text(item.body);
+const updateBodyId = text(item.id);
+
+const bodyNode = create(
+  "p",
+  "timeline-desc",
+  updateBodyText
+);
+
+const bodyNeedsToggle =
+  updateBodyText.length > 180 ||
+  updateBodyText.split(/\r?\n/).length > 3;
+
+if (bodyNeedsToggle) {
+  const bodyExpanded =
+    state.expandedDescriptions.has(updateBodyId);
+
+  const safeBodyId =
+    "update-body-" +
+    updateBodyId.replace(/[^a-zA-Z0-9_-]/g, "");
+
+  bodyNode.id = safeBodyId;
+
+  bodyNode.classList.add(
+    bodyExpanded ? "expanded" : "collapsed"
+  );
+
+  const readMoreButton = create(
+    "button",
+    "read-more",
+    bodyExpanded ? "Show less" : "Read more"
+  );
+
+  readMoreButton.type = "button";
+  readMoreButton.setAttribute("aria-controls", safeBodyId);
+  readMoreButton.setAttribute(
+    "aria-expanded",
+    bodyExpanded ? "true" : "false"
+  );
+
+  readMoreButton.addEventListener("click", () => {
+    const expand =
+      !state.expandedDescriptions.has(updateBodyId);
+
+    if (expand) {
+      state.expandedDescriptions.add(updateBodyId);
+    } else {
+      state.expandedDescriptions.delete(updateBodyId);
+    }
+
+    bodyNode.classList.toggle("collapsed", !expand);
+    bodyNode.classList.toggle("expanded", expand);
+
+    readMoreButton.textContent =
+      expand ? "Show less" : "Read more";
+
+    readMoreButton.setAttribute(
+      "aria-expanded",
+      expand ? "true" : "false"
+    );
+  });
+
+  card.append(bodyNode, readMoreButton);
+} else {
+  card.appendChild(bodyNode);
+}
+
     card.appendChild(create("div", "timeline-time", formatDate(item.published_at)));
 
     const actions = create("div", "update-interactions");
