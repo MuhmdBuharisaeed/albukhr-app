@@ -9,6 +9,7 @@
 
 <link rel="stylesheet" href="css/global-core.css">
 <link rel="stylesheet" href="css/contributor-internal-dashboard.css">
+<link rel="stylesheet" href="css/contributor-internal-updates.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
@@ -59,32 +60,32 @@
     </section>
 
     <section class="panel">
-  <div class="panel-title">
-    <i class="fa-solid fa-file-invoice-dollar"></i>
-    <span>Project Funding Plan</span>
-  </div>
+      <div class="panel-title">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <span>Project Funding Plan</span>
+      </div>
 
-  <p class="panel-copy">
-    Describe what the project actually needs to spend.
-    ALBUKHR calculates the authoritative capital requirement
-    from the itemized plan.
-  </p>
+      <p class="panel-copy">
+        Describe what the project actually needs to spend.
+        ALBUKHR calculates the authoritative capital requirement
+        from the itemized plan.
+      </p>
 
-  <!-- =====================================================
-       FUNDING GUIDE
-       Contributor should read this before completing
-       the Internal Project Funding Plan.
-       ===================================================== -->
-  <a
-    id="fundingGuideButton"
-    class="outline-button"
-    href="contributor-internal-funding-guide.html"
-    aria-label="Read Internal Project Funding and Capital Requirements Guide"
-  >
-    <i class="fa-solid fa-circle-info"></i>
-    <span>Read Funding &amp; Capital Requirements Guide</span>
-  </a>
-      
+      <!-- =====================================================
+           FUNDING GUIDE
+           Contributor should read this before completing
+           the Internal Project Funding Plan.
+           ===================================================== -->
+      <a
+        id="fundingGuideButton"
+        class="outline-button"
+        href="contributor-internal-funding-guide.html"
+        aria-label="Read Internal Project Funding and Capital Requirements Guide"
+      >
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Read Funding &amp; Capital Requirements Guide</span>
+      </a>
+
       <div id="fundingPlanNotice" class="notice info hidden"><i class="fa-solid fa-circle-info"></i><div><strong id="fundingPlanNoticeTitle">Funding Plan Status</strong><span id="fundingPlanNoticeText">—</span></div></div>
 
       <form id="fundingPlanForm" class="funding-form" novalidate>
@@ -124,6 +125,83 @@
         <div class="assessment-row"><span>Assessment Status</span><strong id="assessmentStatus">NOT ASSESSED</strong></div>
         <div class="assessment-row"><span>Readiness Status</span><strong id="assessmentReadiness">NOT READY</strong></div>
         <div id="assessmentReasons" class="assessment-reasons hidden"></div>
+      </div>
+    </section>
+
+    <section class="panel internal-updates-panel" aria-labelledby="internalUpdatesHeading">
+      <div class="panel-title">
+        <i class="fa-solid fa-newspaper"></i>
+        <span id="internalUpdatesHeading">Project Updates &amp; Transparency</span>
+      </div>
+      <p class="panel-copy">
+        Share this Internal Project’s progress and milestones with the ALBUKHR Transparency Hub.
+        Only the authenticated project owner with an active Mainnet publisher grant can publish.
+      </p>
+
+      <form id="internalUpdateForm" class="internal-update-form" novalidate>
+        <div class="internal-update-fields">
+          <label class="internal-update-field" for="internalUpdateKind">
+            <span>Update type</span>
+            <select id="internalUpdateKind" required>
+              <option value="progress">Progress update</option>
+              <option value="milestone">Milestone achieved</option>
+            </select>
+          </label>
+          <label class="internal-update-field" for="internalUpdateTitle">
+            <span>Title <small id="internalUpdateTitleCount">0 / 160</small></span>
+            <input id="internalUpdateTitle" type="text" maxlength="160" required placeholder="A clear, factual update title">
+          </label>
+        </div>
+
+        <label class="internal-update-field" for="internalUpdateBody">
+          <span>Update details <small id="internalUpdateBodyCount">0 / 10,000</small></span>
+          <textarea id="internalUpdateBody" maxlength="10000" rows="6" required placeholder="Describe the work completed, current progress, or milestone. Do not describe unverified claims as independently verified facts."></textarea>
+        </label>
+
+        <div class="internal-update-field">
+          <span>Evidence image <small>Required · JPEG, PNG or WEBP · Maximum 10 MiB</small></span>
+          <label class="internal-update-upload" for="internalUpdateImage">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <strong>Choose one evidence image</strong>
+            <span>The image becomes public with the update. Only upload evidence you are comfortable sharing.</span>
+            <input id="internalUpdateImage" type="file" accept="image/jpeg,image/png,image/webp" required>
+          </label>
+          <div id="internalUpdateImagePreviewWrap" class="internal-update-preview" hidden>
+            <img id="internalUpdateImagePreview" alt="Selected Internal Project update evidence preview">
+            <div class="internal-update-preview-info">
+              <strong id="internalUpdateImageName"></strong>
+              <span id="internalUpdateImageInfo"></span>
+              <button id="removeInternalUpdateImageButton" class="internal-update-text-button" type="button">Remove image</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="internal-update-source-note">
+          <strong>Publication notice</strong>
+          <span>Updates are labelled project-provided. Publication does not mean ALBUKHR has independently verified the statement or evidence.</span>
+        </div>
+
+        <div class="internal-update-form-actions">
+          <span id="internalUpdateStatus" class="internal-update-status" role="status" aria-live="polite">Checking project publisher authorization…</span>
+          <button id="publishInternalUpdateButton" class="primary-button" type="submit" disabled>
+            <i class="fa-solid fa-paper-plane"></i><span>Publish update</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="internal-update-timeline">
+        <div class="internal-update-timeline-heading">
+          <div>
+            <h3>My published updates</h3>
+            <p>Updates currently visible in the public Mainnet Transparency Hub.</p>
+          </div>
+          <button id="refreshInternalUpdateFeedButton" class="small-button" type="button" disabled>
+            <i class="fa-solid fa-rotate"></i><span>Refresh</span>
+          </button>
+        </div>
+        <div id="internalUpdateFeedStatus" class="internal-update-feed-status" role="status" aria-live="polite">Waiting for the project publisher grant check.</div>
+        <div id="internalUpdateFeedList" class="internal-update-feed-list"></div>
+        <button id="loadMoreInternalUpdatesButton" class="outline-button internal-update-load-more" type="button" hidden>Load older updates</button>
       </div>
     </section>
 
