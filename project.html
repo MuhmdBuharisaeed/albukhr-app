@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="css/global-components.css">
 <link rel="stylesheet" href="css/global-style.css">
 <link rel="stylesheet" href="css/app-alert.css">
-<link rel="stylesheet" href="css/project-page.css?v=1">
+<link rel="stylesheet" href="css/project-page.css?v=2">
 </head>
 <body>
 
@@ -18,7 +18,14 @@
   <div class="header-left project-header-left">
     <span id="projectTitle" class="project-header-title">Project</span>
   </div>
-  <div class="header-right project-header-right" onclick="openInfo()">ℹ️</div>
+  <button
+    type="button"
+    class="project-header-right project-info-button"
+    onclick="openInfo()"
+    aria-label="Open full project information"
+    aria-haspopup="dialog"
+    aria-controls="infoModal"
+  >INFOR</button>
 </header>
 
 <div class="fixed-section">
@@ -149,4 +156,4 @@
   </div>
 </div>
 </body>
-        </html>
+</html>
