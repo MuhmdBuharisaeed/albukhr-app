@@ -4,7 +4,13 @@
   const $ = id => document.getElementById(id);
   const esc = v => window.AlbukhrMarketplaceUI?.escapeHTML
     ? window.AlbukhrMarketplaceUI.escapeHTML(v) : String(v ?? "");
-  const state = { projects: [], filtered: [], selected: null, busy: false };
+  const state = {
+    projects: [],
+    filtered: [],
+    selected: null,
+    busy: false,
+    infoReturnFocus: null
+  };
 
   const DEFAULT_DURATIONS = [30, 60, 90, 180, 365, 430];
 
@@ -71,10 +77,14 @@
     const p = active || state.projects[0];
     if (!p) { $("discoverySection").innerHTML = ""; return; }
 
-    const activeNow = String(p.status).toLowerCase() === "active";
+    const code = p.project_code || p.slug || p.id;
     $("discoverySection").innerHTML = `
       <article class="featured-project">
-        <div class="featured-title">Project spotlight</div>
+        <div class="featured-title">
+          <span>Project spotlight</span>
+          <button type="button" class="market-info-btn featured-info-btn"
+            data-project-info="${esc(String(code))}" aria-label="View full information for ${esc(p.name || code)}">INFOR</button>
+        </div>
         <div class="featured-name">${esc(p.name || p.project_code)}</div>
         <div class="featured-desc">${esc(p.description || "Project information is available from the ALBUKHR public registry.")}</div>
         <div class="featured-stats">
@@ -106,7 +116,7 @@
           data-project-code="${esc(String(code))}">
           <div class="project-header">
             <div class="project-icon">${logoHTML(p)}</div>
-            <div style="min-width:0;flex:1">
+            <div class="project-heading-copy" style="min-width:0;flex:1">
               <div class="project-title">${esc(p.name || code)}</div>
               <div class="project-category">${esc(typeLabel(p.project_type))}</div>
               <div class="badge-group">
@@ -115,6 +125,9 @@
               </div>
             </div>
           </div>
+          <button type="button" class="market-info-btn card-info-btn"
+            data-project-info="${esc(String(code))}"
+            aria-label="View full information for ${esc(p.name || code)}">INFOR</button>
           <div class="project-desc">${esc(p.description || "No project description has been published yet.")}</div>
           <div class="project-info">
             <div class="info-box"><span>ROI</span><b>${money(p.roi)}%</b></div>
@@ -163,6 +176,164 @@
       if (Number.isFinite(v) && v > 0) return v;
     }
     return 10;
+  }
+
+  function addDetailRow(container, label, value) {
+    if (value === null || value === undefined || String(value).trim() === "") return;
+    const row = document.createElement("div");
+    row.className = "project-info-detail-row";
+    const key = document.createElement("span");
+    key.className = "project-info-detail-label";
+    key.textContent = label;
+    const content = document.createElement("strong");
+    content.className = "project-info-detail-value";
+    content.textContent = String(value);
+    row.append(key, content);
+    container.appendChild(row);
+  }
+
+  function safePublicLogoUrl(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+    try {
+      const parsed = new URL(raw, window.location.origin);
+      return parsed.protocol === "https:" ? parsed.href : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function openProjectInfo(code, trigger) {
+    const wanted = String(code || "").trim().toLowerCase();
+    const project = state.projects.find(p =>
+      String(p.project_code || "").toLowerCase() === wanted ||
+      String(p.slug || "").toLowerCase() === wanted ||
+      String(p.id || "").toLowerCase() === wanted
+    );
+    if (!project) {
+      showAlert("Project information unavailable", "The selected project could not be found in the current public registry.");
+      return;
+    }
+
+    const modal = $("projectInfoModal");
+    const content = $("projectInfoContent");
+    if (!modal || !content) {
+      showAlert("Project information unavailable", "The project information panel is not available on this page.");
+      return;
+    }
+
+    content.replaceChildren();
+    state.infoReturnFocus = trigger || document.activeElement;
+
+    const intro = document.createElement("div");
+    intro.className = "project-info-intro";
+    const logoUrl = safePublicLogoUrl(project.logo_url);
+    if (logoUrl) {
+      const image = document.createElement("img");
+      image.className = "project-info-logo";
+      image.src = logoUrl;
+      image.alt = `${project.name || project.project_code || "Project"} logo`;
+      image.loading = "lazy";
+      intro.appendChild(image);
+    }
+
+    const identity = document.createElement("div");
+    identity.className = "project-info-identity";
+    const name = document.createElement("h3");
+    name.className = "project-info-name";
+    name.textContent = project.name || project.project_code || "ALBUKHR Project";
+    identity.appendChild(name);
+    if (project.project_code) {
+      const codeText = document.createElement("p");
+      codeText.className = "project-info-code";
+      codeText.textContent = String(project.project_code);
+      identity.appendChild(codeText);
+    }
+    intro.appendChild(identity);
+    content.appendChild(intro);
+
+    const badges = document.createElement("div");
+    badges.className = "project-info-badges";
+    [typeLabel(project.project_type), statusLabel(project.status)].forEach(label => {
+      const badge = document.createElement("span");
+      badge.className = "project-info-badge";
+      badge.textContent = label;
+      badges.appendChild(badge);
+    });
+    content.appendChild(badges);
+
+    const descriptionHeading = document.createElement("h4");
+    descriptionHeading.className = "project-info-section-title";
+    descriptionHeading.textContent = "Project Information";
+    content.appendChild(descriptionHeading);
+
+    const description = document.createElement("p");
+    description.className = "project-info-full-description";
+    description.textContent = String(project.description || "No project description has been published yet.");
+    content.appendChild(description);
+
+    const projectConfig = typeof window.getProjectConfig === "function"
+      ? window.getProjectConfig(project.project_code || project.slug || project.id)
+      : null;
+    const additionalInfo = String(projectConfig?.info || "").trim();
+    if (additionalInfo && additionalInfo !== description.textContent.trim()) {
+      const additionalHeading = document.createElement("h4");
+      additionalHeading.className = "project-info-section-title";
+      additionalHeading.textContent = "Additional Project Information";
+      content.appendChild(additionalHeading);
+      const additionalDescription = document.createElement("p");
+      additionalDescription.className = "project-info-full-description";
+      additionalDescription.textContent = additionalInfo;
+      content.appendChild(additionalDescription);
+    }
+
+    const detailsHeading = document.createElement("h4");
+    detailsHeading.className = "project-info-section-title";
+    detailsHeading.textContent = "Public Registry Details";
+    content.appendChild(detailsHeading);
+
+    const details = document.createElement("div");
+    details.className = "project-info-detail-list";
+    addDetailRow(details, "Project code", project.project_code);
+    addDetailRow(details, "Project type", typeLabel(project.project_type));
+    addDetailRow(details, "Network", String(project.network || "").toUpperCase());
+    addDetailRow(details, "Project status", statusLabel(project.status));
+    if (String(project.project_type || "").toLowerCase() === "core") {
+      addDetailRow(details, "Core project slot", project.core_slot);
+    }
+    if (project.investment_metrics_available === true) {
+      addDetailRow(details, "Verified total invested", `${money(project.total_invested_pi, 7)} Pi`);
+      addDetailRow(details, "Investor count", money(project.investor_count, 0));
+    }
+    if (!details.childElementCount) {
+      const note = document.createElement("p");
+      note.className = "project-info-note";
+      note.textContent = "Additional public registry details are not currently available for this project.";
+      details.appendChild(note);
+    }
+    content.appendChild(details);
+
+    const note = document.createElement("p");
+    note.className = "project-info-note";
+    note.textContent = "This information is provided from the ALBUKHR public project registry. Investment availability and financial terms remain subject to the authoritative project and staking systems.";
+    content.appendChild(note);
+
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("market-info-open");
+    $("closeProjectInfoButton")?.focus();
+  }
+
+  function closeProjectInfo() {
+    const modal = $("projectInfoModal");
+    if (!modal) return;
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("market-info-open");
+    if (state.infoReturnFocus && typeof state.infoReturnFocus.focus === "function") {
+      state.infoReturnFocus.focus();
+    }
+    state.infoReturnFocus = null;
   }
 
   function updatePreview() {
@@ -265,6 +436,14 @@
     $("appAlert").classList.remove("show");
   }
 
+  function handleProjectInfoClick(event) {
+    const button = event.target?.closest?.("[data-project-info]");
+    if (!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+    openProjectInfo(button.getAttribute("data-project-info"), button);
+  }
+
   async function init() {
     renderLoading();
     try {
@@ -287,6 +466,17 @@
   $("sortProjects")?.addEventListener("change", applyFilters);
   $("investAmount")?.addEventListener("input", updatePreview);
   $("investDuration")?.addEventListener("change", updatePreview);
+  $("projectList")?.addEventListener("click", handleProjectInfoClick);
+  $("discoverySection")?.addEventListener("click", handleProjectInfoClick);
+  $("closeProjectInfoButton")?.addEventListener("click", closeProjectInfo);
+  $("projectInfoModal")?.addEventListener("click", event => {
+    if (event.target === $("projectInfoModal")) closeProjectInfo();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && $("projectInfoModal")?.classList.contains("show")) {
+      closeProjectInfo();
+    }
+  });
   $("investModal")?.addEventListener("click", e => {
     if (e.target === $("investModal")) closeInvestModal();
   });
@@ -297,6 +487,8 @@
   window.openInvestModal = openInvestModal;
   window.closeInvestModal = closeInvestModal;
   window.confirmInvestment = confirmInvestment;
+  window.openProjectInfo = openProjectInfo;
+  window.closeProjectInfo = closeProjectInfo;
   window.closeAppAlert = closeAppAlert;
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
