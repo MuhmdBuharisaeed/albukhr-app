@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="css/global-components.css">
 <link rel="stylesheet" href="css/global-style.css">
 <link rel="stylesheet" href="css/app-alert.css">
-<link rel="stylesheet" href="css/project-page.css?v=2">
+<link rel="stylesheet" href="css/project-page.css?v=3">
 </head>
 <body>
 
@@ -86,11 +86,49 @@
   </div>
 </div>
 
-<div class="modal" id="infoModal">
-  <div class="modal-box">
-    <h3 id="infoTitle"></h3>
-    <p id="infoText"></p>
-    <button class="btn secondary" onclick="closeInfo()">Close</button>
+<div id="infoModal" class="project-info-modal" role="dialog" aria-modal="true"
+  aria-hidden="true" aria-labelledby="infoTitle">
+  <div class="project-info-modal-panel">
+    <div class="project-info-modal-header">
+      <h2 id="infoTitle">Project Information</h2>
+      <button type="button" id="closeInfoButton" class="project-info-close"
+        aria-label="Close project information">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="infoContent" class="project-info-modal-content">
+      <div class="project-info-intro">
+        <img id="infoProjectLogo" class="project-info-logo" alt="Project logo" hidden>
+        <div class="project-info-identity">
+          <h3 id="infoProjectName" class="project-info-name">ALBUKHR Project</h3>
+          <p id="infoProjectCode" class="project-info-code"></p>
+        </div>
+      </div>
+
+      <div class="project-info-badges">
+        <span id="infoProjectType" class="project-info-badge">Project</span>
+        <span id="infoProjectStatus" class="project-info-badge">Status unavailable</span>
+      </div>
+
+      <h4 class="project-info-section-title">Project Overview</h4>
+      <p id="infoText" class="project-info-full-description"></p>
+
+      <h4 class="project-info-section-title">Public Registry Details</h4>
+      <div id="infoProjectDetails" class="project-info-detail-list"></div>
+
+      <p class="project-info-note">
+        This information is provided from the ALBUKHR public project registry.
+        Investment availability and financial terms remain subject to the
+        authoritative project and staking systems.
+      </p>
+    </div>
+
+    <div class="project-info-modal-footer">
+      <button type="button" class="project-info-close-secondary" onclick="closeInfo()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -145,7 +183,7 @@
 <script src="js/albukhr-transaction-engine.js"></script>
 <script src="js/project-treasury.js"></script>
 <script src="js/app-alert.js"></script>
-<script src="js/project.js?v=2"></script>
+<script src="js/project.js?v=3"></script>
 <script src="js/project-header-identity.js?v=1"></script>
   
 <div id="appAlert" class="app-alert">
