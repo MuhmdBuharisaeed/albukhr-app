@@ -9,7 +9,7 @@
 
 .project-header-left{
   min-width:0;
-  max-width:calc(100% - 54px);
+  max-width:calc(100% - 84px);
   flex:1 1 auto;
   overflow:hidden;
   display:flex;
@@ -40,18 +40,65 @@
 }
 
 .project-header-right{
-  flex:0 0 40px;
-  width:40px;
-  height:40px;
+  flex:0 0 68px;
+  width:68px;
+  min-width:68px;
+  height:36px;
   margin-left:10px;
   display:flex;
   align-items:center;
   justify-content:center;
+}
+
+.project-info-button{
+  box-sizing:border-box;
+  padding:0 10px;
+  border:1px solid rgba(255,255,255,.88);
+  border-radius:10px;
+  background:linear-gradient(180deg,#ffffff 0%,#f1fff7 100%);
+  color:#0f7a3d;
+  box-shadow:0 3px 9px rgba(0,0,0,.17);
+  font-family:inherit;
+  font-size:12px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.55px;
+  white-space:nowrap;
   cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+}
+
+.project-info-button:hover{
+  background:#ffffff;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+}
+
+.project-info-button:active{
+  transform:translateY(1px);
+  box-shadow:0 1px 4px rgba(0,0,0,.16);
+}
+
+.project-info-button:focus-visible{
+  outline:2px solid #ffffff;
+  outline-offset:3px;
+}
+
+/* Keep the preview short; the existing INFOR modal retains full copy. */
+#projectDescription.short-info{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  line-clamp:3;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.6;
 }
 
 @media(max-width:380px){
   .project-page-header{padding:0 12px}
   .project-header-title{font-size:18px}
-  .project-header-right{margin-left:6px}
+  .project-header-left{max-width:calc(100% - 80px)}
+  .project-header-right{flex-basis:66px;width:66px;min-width:66px;margin-left:6px}
+  .project-info-button{font-size:11px;letter-spacing:.45px}
 }
