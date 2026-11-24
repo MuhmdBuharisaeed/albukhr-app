@@ -11,6 +11,8 @@
    - No LocalStorage
    - No browser-authoritative financial ledger
    - Preserves existing project.html DOM/CSS contract
+   - Mainnet public registry description fills the Project Information UI
+   - Testnet data path is not changed
 ========================================================= */
 (function(window, document){
   "use strict";
@@ -25,6 +27,7 @@
   let resolvedProjectKey = "";
   let currentProject = null;
   let currentStakingTerms = [];
+  let mainnetPublicRegistryPromise = null;
 
   const $ = id => document.getElementById(id);
   function clean(v){ return String(v == null ? "" : v).trim(); }
@@ -74,6 +77,79 @@
     return findInConfig();
   }
 
+  function registryRowMatchesProject(row, project){
+    if(!row || typeof row !== "object" || !project) return false;
+    const projectKeys = [
+      project.project_id,
+      project.project_code,
+      project.slug,
+      project.title,
+      project.name,
+      resolvedProjectKey,
+      requestedProject
+    ].map(value => clean(value).toLowerCase()).filter(Boolean);
+    const rowKeys = [row.id, row.project_code, row.slug, row.name]
+      .map(value => clean(value).toLowerCase()).filter(Boolean);
+    return rowKeys.some(value => projectKeys.includes(value));
+  }
+
+  async function loadMainnetPublicProjectDescription(project){
+    /*
+     * Security boundary: this is intentionally Mainnet-only.
+     * Testnet continues to use its existing project-config registry path.
+     * The RPC itself is fixed to Mainnet and accepts no browser network arg.
+     */
+    if(!isMainnet()) return project;
+    if(clean(project?.network || network()).toLowerCase() !== "mainnet") return project;
+
+    const core = window.ALBUKHR_SUPABASE;
+    if(!core || typeof core.rpc !== "function") return project;
+    if(clean(core.network || network()).toLowerCase() !== "mainnet") return project;
+
+    try{
+      if(!mainnetPublicRegistryPromise){
+        mainnetPublicRegistryPromise = (async function(){
+          const result = await core.rpc("get_mainnet_public_project_registry");
+          if(result?.error) throw result.error;
+
+          let rows = result?.data;
+          if(typeof rows === "string"){
+            try{ rows = JSON.parse(rows); }catch(_){ rows = null; }
+          }
+          if(Array.isArray(rows)) return rows;
+          if(Array.isArray(rows?.projects)) return rows.projects;
+          return [];
+        })();
+      }
+
+      const rows = await mainnetPublicRegistryPromise;
+      const registryRow = rows.find(row =>
+        clean(row?.network).toLowerCase() === "mainnet" &&
+        registryRowMatchesProject(row, project)
+      );
+      const description = clean(registryRow?.description);
+      if(!description) return project;
+
+      /*
+       * `description` is returned by the approved Mainnet public registry.
+       * Use it for both the three-line preview (`desc`) and the INFOR modal
+       * (`info`). Never read private external application or reviewer fields.
+       */
+      return {
+        ...project,
+        description,
+        desc: description,
+        info: description,
+        public_registry_description: description
+      };
+    }catch(error){
+      /* Keep the page usable with its existing catalogue fallback. */
+      mainnetPublicRegistryPromise = null;
+      console.warn("ALBUKHR public project description load:", error);
+      return project;
+    }
+  }
+
   async function resolveProject(){
     resolvedProjectKey=await resolveProjectKey();
     if(!resolvedProjectKey) throw new Error("Project could not be identified from the page URL.");
@@ -86,6 +162,7 @@
         if(meta) project={...cfg,...meta};
       }
     }catch(_){ }
+    project = await loadMainnetPublicProjectDescription(project);
     currentProject={...project,network:clean(project.network||network()).toLowerCase(),status:clean(project.status).toLowerCase()};
     return currentProject;
   }
