@@ -95,6 +95,25 @@
   </div>
 </div>
 
+<div id="projectInfoModal" class="project-info-modal" role="dialog" aria-modal="true"
+  aria-hidden="true" aria-labelledby="projectInfoModalTitle">
+  <div class="project-info-modal-panel">
+    <div class="project-info-modal-header">
+      <h2 id="projectInfoModalTitle">Project Information</h2>
+      <button type="button" id="closeProjectInfoButton" class="project-info-close"
+        aria-label="Close project information">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
+    </div>
+    <div id="projectInfoContent" class="project-info-modal-content"></div>
+    <div class="project-info-modal-footer">
+      <button type="button" class="project-info-close-secondary" onclick="closeProjectInfo()">Close</button>
+    </div>
+  </div>
+</div>
+
 <div id="appAlert" class="app-alert" role="alertdialog" aria-modal="true" aria-labelledby="appAlertTitle">
   <div class="app-alert-box">
     <div class="app-alert-header">
