@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/global-buttons.css">
 <link rel="stylesheet" href="css/external-project-detail.css">
 <link rel="stylesheet" href="css/external-project-logo.css?v=20261008-logo-1">
+<link rel="stylesheet" href="css/external-project-owner-amendments.css?v=20261124-amendments-v1">
 <style>
 .team-editor,.document-uploader{margin-top:16px;padding:16px;border:1px solid rgba(15,122,61,.15);border-radius:14px}
 .team-editor-list{display:grid;gap:12px}.team-editor-row{padding:14px;border:1px solid rgba(15,122,61,.12);border-radius:12px}
@@ -59,6 +60,29 @@
 </section>
 
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Project Team</h2><p>Team members associated with this application.</p></div></div><div id="projectTeam" class="detail-list"></div><div id="teamEditor" class="team-editor" hidden><div class="detail-section-heading"><div><h3>Manage Team</h3><p>At least one team member is required before submission.</p></div></div><div id="teamEditorList" class="team-editor-list"></div><div class="team-editor-actions"><button id="addTeamMemberButton" class="secondary-action" type="button">Add Team Member</button><button id="saveTeamButton" class="primary-action" type="button">Save Team</button></div><div id="teamEditorStatus" class="form-status" aria-live="polite"></div></div></section>
+<section class="detail-section" id="ownerAmendmentsPanel" hidden>
+  <div class="detail-section-heading"><div><h2>Owner &amp; Team Change Requests</h2><p>Available after approval. Requested changes require ALBUKHR administrator approval before they are applied.</p></div></div>
+  <div class="owner-notice">This workflow does not change the authenticated Pi account, project ownership, owner IDs, project identity, logo, documents or funding terms. Owner contact changes are limited to Contact Email and Contact Phone. The primary contact name can be amended through a Project Team request.</div>
+  <section class="owner-amendment-subpanel">
+    <h3>Owner Contact Details</h3><p>Request a correction to the project's owner contact email or phone.</p>
+    <label>Contact Email<input id="ownerContactEmail" type="email" maxlength="254" required></label>
+    <label>Contact Phone<input id="ownerContactPhone" type="tel" maxlength="40"></label>
+    <label>Reason for change<textarea id="ownerContactAmendmentReason" rows="3" maxlength="2000" placeholder="Explain why these owner contact details need to change."></textarea></label>
+    <p id="ownerContactPendingNote" class="owner-inline-status active" hidden>A contact amendment is already awaiting ALBUKHR review.</p>
+    <button id="submitOwnerContactAmendment" class="owner-button primary" type="button">Request Contact Change</button>
+  </section>
+  <section class="owner-amendment-subpanel">
+    <div class="owner-amendment-heading"><div><h3>Project Team</h3><p>Add, remove or edit team members, roles, contact details and the primary contact.</p></div><button id="addOwnerAmendmentTeamMember" class="owner-button secondary small" type="button">Add Team Member</button></div>
+    <p class="owner-amendment-help">This is the complete proposed team list. Keep every existing member who should remain; removed rows are omitted only if ALBUKHR approves the request.</p>
+    <div id="ownerAmendmentTeamList" class="owner-amend-team-list"></div>
+    <label>Reason for team change<textarea id="ownerTeamAmendmentReason" rows="3" maxlength="2000" placeholder="Explain the team changes and why they are required."></textarea></label>
+    <p id="ownerTeamPendingNote" class="owner-inline-status active" hidden>A team amendment is already awaiting ALBUKHR review.</p>
+    <button id="submitOwnerTeamAmendment" class="owner-button primary" type="button">Request Team Change</button>
+  </section>
+  <div class="owner-feed-heading"><div><h3>Amendment Request History</h3><p>Track submitted, approved and rejected requests.</p></div><button id="refreshOwnerAmendmentHistory" class="owner-button secondary small" type="button">Refresh</button></div>
+  <div id="ownerAmendmentHistory" class="owner-amendment-history"></div>
+  <p id="ownerAmendmentsStatus" class="owner-inline-status" role="status" aria-live="polite">Verifying owner amendment access…</p>
+</section>
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Documents</h2><p>Supporting documents registered with the application.</p></div></div><div id="projectDocuments" class="detail-list"></div><div id="documentUploader" class="document-uploader"><div class="detail-section-heading"><div><h3>Upload Supporting Document</h3><p>Documents are stored privately and registered through the secure applicant workflow.</p></div></div><form id="externalProjectDocumentForm"><div class="document-uploader-grid"><label>Document Type<select id="externalProjectDocumentType" required><option value="business_registration">Business Registration</option><option value="project_proposal">Project Proposal</option><option value="business_plan">Business Plan</option><option value="financial_statement">Financial Statement</option><option value="identity_document">Identity Document</option><option value="ownership_document">Ownership Document</option><option value="other">Other</option></select></label><label>Document File<input id="externalProjectDocumentUpload" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp" required></label></div><p class="document-uploader-note">Accepted formats: PDF, PNG, JPG/JPEG and WEBP. Maximum size: 10 MB.</p><div class="document-uploader-actions"><button id="externalProjectDocumentSubmitButton" class="primary-action" type="submit">Upload Document</button></div><div id="externalProjectDocumentStatus" class="form-status" aria-live="polite"></div></form><p id="externalProjectDocumentReadonlyNote" class="document-uploader-note" hidden>Documents are locked after the application leaves the draft/revision state.</p></div></section>
 <section class="detail-section"><div class="detail-section-heading"><div><h2>Review History</h2><p>Review and approval activity recorded for this application.</p></div></div><div id="reviewHistory" class="detail-list detail-history"></div></section>
 <section class="detail-actions"><button id="fundingWorkspaceButton" class="secondary-action" type="button" hidden>Open Funding Structure</button><button id="editApplicationButton" class="secondary-action" type="button" hidden>Continue Editing</button><button id="submitApplicationButton" class="primary-action" type="button" hidden>Submit Application</button><button id="dashboardButton" class="ghost-action" type="button">Back to Dashboard</button></section>
@@ -77,5 +101,6 @@
 <script src="js/external-project-team-editor-visibility-fix.js?v=20261008-1"></script>
 <script src="js/external-project-detail-document-integration.js?v=20261008-3"></script>
 <script src="js/external-project-logo-integration.js?v=20261008-logo-1"></script>
+<script src="js/external-project-owner-amendments.js?v=20261124-amendments-v1"></script>
 </body>
 </html>
