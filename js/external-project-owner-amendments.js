@@ -7,7 +7,14 @@
 
   const MAINNET = "mainnet";
   const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  const state = { applicationId: "", application: null, team: [], requests: [], saving: false };
+  const state = {
+    applicationId: "",
+    application: null,
+    team: [],
+    requests: [],
+    saving: false,
+    workspaceReady: false
+  };
   const $ = (id) => document.getElementById(id);
 
   function clean(value) { return String(value == null ? "" : value).trim(); }
@@ -115,9 +122,20 @@
     }
     return list;
   }
+  function setWorkspaceControls(ready) {
+    state.workspaceReady = Boolean(ready);
+    const panel = $("ownerAmendmentsPanel");
+    if (!panel) return;
+    panel.querySelectorAll("input, textarea, button").forEach((control) => {
+      if (control.id === "refreshOwnerAmendmentHistory") return;
+      control.disabled = !state.workspaceReady || state.saving;
+    });
+  }
+
   function renderRequests() {
     const host = $("ownerAmendmentHistory");
     if (!host) return;
+    setWorkspaceControls(state.workspaceReady);
     host.replaceChildren();
 
     if (!state.requests.length) {
@@ -155,10 +173,24 @@
     const pendingTypes = new Set(state.requests.filter((r) => r.status === "pending").map((r) => r.request_type));
     const contactSubmit = $("submitOwnerContactAmendment");
     const teamSubmit = $("submitOwnerTeamAmendment");
-    if (contactSubmit) contactSubmit.disabled = pendingTypes.has("owner_contact") || state.saving;
-    if (teamSubmit) teamSubmit.disabled = pendingTypes.has("project_team") || state.saving;
+    if (contactSubmit) contactSubmit.disabled = !state.workspaceReady || pendingTypes.has("owner_contact") || state.saving;
+    if (teamSubmit) teamSubmit.disabled = !state.workspaceReady || pendingTypes.has("project_team") || state.saving;
     $("ownerContactPendingNote").hidden = !pendingTypes.has("owner_contact");
     $("ownerTeamPendingNote").hidden = !pendingTypes.has("project_team");
+
+    const addButton = $("addOwnerAmendmentTeamMember");
+    if (addButton) addButton.disabled = !state.workspaceReady || pendingTypes.has("project_team") || state.saving;
+    if (pendingTypes.has("owner_contact")) {
+      $("ownerContactEmail").disabled = true;
+      $("ownerContactPhone").disabled = true;
+      $("ownerContactAmendmentReason").disabled = true;
+    }
+    if (pendingTypes.has("project_team")) {
+      $("ownerAmendmentTeamList").querySelectorAll("input, textarea, button").forEach((control) => {
+        control.disabled = true;
+      });
+      $("ownerTeamAmendmentReason").disabled = true;
+    }
   }
   async function loadWorkspace() {
     requireMainnet();
@@ -183,12 +215,13 @@
     $("ownerContactPhone").value = state.application.contact_phone || "";
     $("ownerAmendmentTeamList").replaceChildren();
     state.team.forEach(addTeamRow);
+    setWorkspaceControls(true);
     renderRequests();
     $("ownerAmendmentsPanel").hidden = false;
     setStatus("Owner contact and team amendment workspace loaded. Changes require Admin approval.", "success");
   }
   async function submitRequest(type) {
-    if (state.saving) return;
+    if (state.saving || !state.workspaceReady) return;
     try {
       requireMainnet();
       const reasonId = type === "owner_contact" ? "ownerContactAmendmentReason" : "ownerTeamAmendmentReason";
@@ -212,7 +245,9 @@
         reason,
         requested_values: requestedValues
       });
-      if (result?.success === false) throw new Error(result.message || "An amendment request could not be created.");
+      if (!result || result.success !== true) {
+        throw new Error(result?.message || "The amendment request was not confirmed by the server.");
+      }
       $(reasonId).value = "";
       const refreshed = await api().get("/api/external-project/" + encodeURIComponent(state.applicationId) + "/amendments");
       state.requests = asRows(refreshed?.requests);
@@ -253,7 +288,8 @@
         return;
       }
       panel.hidden = false;
-      setStatus(error?.message || "Owner amendment workspace is unavailable.", "error");
+      setWorkspaceControls(false);
+      setStatus(error?.message || "Owner amendment workspace is unavailable. Submission remains disabled until verification succeeds.", "error");
     }
   }
 
