@@ -195,14 +195,81 @@
     return currentStakingTerms;
   }
 
+  function projectTypeLabel(value){
+    const type=clean(value).toLowerCase();
+    if(type==="core")return "Core Project";
+    if(type==="internal")return "Internal Project";
+    if(type==="external")return "External Project";
+    return "ALBUKHR Project";
+  }
+
+  function appendInfoDetail(container,label,value){
+    const text=clean(value);
+    if(!container||!text)return;
+    const row=document.createElement("div");
+    row.className="project-info-detail-row";
+    const name=document.createElement("span");
+    name.className="project-info-detail-label";
+    name.textContent=label;
+    const detail=document.createElement("strong");
+    detail.className="project-info-detail-value";
+    detail.textContent=text;
+    row.appendChild(name);
+    row.appendChild(detail);
+    container.appendChild(row);
+  }
+
+  function renderProjectInfo(project,title,info){
+    if($("infoTitle"))$("infoTitle").textContent="Project Information";
+    if($("infoProjectName"))$("infoProjectName").textContent=title;
+    if($("infoProjectCode"))$("infoProjectCode").textContent=clean(project.project_code);
+    if($("infoProjectType"))$("infoProjectType").textContent=projectTypeLabel(project.project_type);
+    if($("infoProjectStatus"))$("infoProjectStatus").textContent=clean(project.status).toUpperCase()||"STATUS UNAVAILABLE";
+    if($("infoText"))$("infoText").textContent=info||clean(project.desc)||"No public project description is available yet.";
+
+    const logo=$("infoProjectLogo");
+    const logoUrl=clean(project.logo_url);
+    if(logo){
+      if(/^https:\/\//i.test(logoUrl)){
+        logo.src=logoUrl;
+        logo.alt=`${title} logo`;
+        logo.hidden=false;
+      }else{
+        logo.removeAttribute("src");
+        logo.hidden=true;
+      }
+    }
+
+    const details=$("infoProjectDetails");
+    if(details){
+      details.replaceChildren();
+      appendInfoDetail(details,"Project code",project.project_code);
+      appendInfoDetail(details,"Project type",projectTypeLabel(project.project_type));
+      appendInfoDetail(details,"Network",clean(project.network).toUpperCase());
+      appendInfoDetail(details,"Project status",clean(project.status).toUpperCase());
+      if(project.project_type==="core"&&project.core_slot!=null){
+        appendInfoDetail(details,"Core project slot",project.core_slot);
+      }
+      if(project.investment_metrics_available===true){
+        appendInfoDetail(details,"Verified total invested",`${(Number(project.total_invested_pi)||0).toFixed(7)} Pi`);
+        appendInfoDetail(details,"Investor count",String(Number(project.investor_count)||0));
+      }
+      if(!details.childElementCount){
+        const note=document.createElement("p");
+        note.className="project-info-note";
+        note.textContent="Additional public registry details are not currently available for this project.";
+        details.appendChild(note);
+      }
+    }
+  }
+
   function applyProjectUI(project){
     const title=clean(project.title||project.name)||"ALBUKHR Project",desc=clean(project.desc),info=clean(project.info),status=clean(project.status).toLowerCase();
     if($("txTitle"))$("txTitle").innerText=`${title} Transactions`;
     document.title=`${title} • ALBUKHR`;
     if($("projectTitle"))$("projectTitle").innerText=title;
     if($("projectDescription"))$("projectDescription").innerText=desc;
-    if($("infoTitle"))$("infoTitle").innerText=`About ${title}`;
-    if($("infoText"))$("infoText").innerText=info;
+    renderProjectInfo(project,title,info);
     if($("stakeTitle"))$("stakeTitle").innerText=`Stake in ${title}`;
     const statusText=$("stakeStatus");
     if(statusText){
@@ -236,8 +303,25 @@
   }
   function closeModal(){if($("stakeModal"))$("stakeModal").style.display="none";}
   function closeSuccess(){if($("successModal"))$("successModal").style.display="none";}
-  function openInfo(){if($("infoModal"))$("infoModal").style.display="flex";}
-  function closeInfo(){if($("infoModal"))$("infoModal").style.display="none";}
+  let infoReturnFocus=null;
+  function openInfo(){
+    const modal=$("infoModal");
+    if(!modal)return;
+    infoReturnFocus=document.activeElement;
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden","false");
+    document.body.classList.add("market-info-open");
+    $("closeInfoButton")?.focus();
+  }
+  function closeInfo(){
+    const modal=$("infoModal");
+    if(!modal)return;
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden","true");
+    document.body.classList.remove("market-info-open");
+    if(infoReturnFocus&&typeof infoReturnFocus.focus==="function")infoReturnFocus.focus();
+    infoReturnFocus=null;
+  }
   async function openWithdrawModal(){alertUser("Withdrawal Unavailable","Reward withdrawals are not enabled until the authoritative rewards/withdrawal contract is deployed.");}
   function closeWithdraw(){if($("withdrawModal"))$("withdrawModal").style.display="none";}
   async function openCapitalModal(){alertUser("Capital Withdrawal Unavailable","Capital withdrawals are not enabled until the authoritative withdrawal contract is deployed.");}
@@ -281,6 +365,16 @@
       }
     }catch(e){console.warn("ALBUKHR Project load:",e);if($("stakeStatus"))$("stakeStatus").innerText="Project data could not be loaded.";}
   }
+
+  const infoCloseButton=$("closeInfoButton");
+  if(infoCloseButton&&typeof infoCloseButton.addEventListener==="function"){
+    infoCloseButton.addEventListener("click",closeInfo);
+  }
+  const infoModalElement=$("infoModal");
+  if(infoModalElement&&typeof infoModalElement.addEventListener==="function"){
+    infoModalElement.addEventListener("click",event=>{if(event.target===infoModalElement)closeInfo();});
+  }
+  document.addEventListener("keydown",event=>{if(event.key==="Escape"&&$("infoModal")?.classList.contains("show"))closeInfo();});
 
   window.manualRefresh=load;window.openModal=openModal;window.closeModal=closeModal;window.closeSuccess=closeSuccess;window.openInfo=openInfo;window.closeInfo=closeInfo;window.openWithdrawModal=openWithdrawModal;window.closeWithdraw=closeWithdraw;window.openCapitalModal=openCapitalModal;window.closeCapitalModal=closeCapitalModal;window.confirmStake=confirmStake;window.confirmWithdraw=confirmWithdraw;window.confirmCapitalWithdraw=confirmCapitalWithdraw;
   window.AlbukhrProjectPage={load,resolveProject};
