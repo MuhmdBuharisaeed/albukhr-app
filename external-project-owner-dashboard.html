@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/global-header.css">
 <link rel="stylesheet" href="css/global-buttons.css">
 <link rel="stylesheet" href="css/external-project-owner-dashboard.css">
+<link rel="stylesheet" href="css/external-project-owner-amendments.css">
 </head>
 <body data-page="external-project-owner-dashboard">
 <header class="header">
@@ -67,6 +68,47 @@
           <b>Open Project Details →</b>
         </a>
       </div>
+    </section>
+
+    <section class="owner-panel" id="ownerAmendmentsPanel" hidden>
+      <div class="owner-section-heading">
+        <div>
+          <h2>Owner &amp; Team Change Requests</h2>
+          <p>Request corrections to your contact details or project team. Nothing changes until an authorized ALBUKHR administrator approves the request.</p>
+        </div>
+      </div>
+      <div class="owner-notice">
+        This workflow does not change the authenticated Pi account, legal ownership, project owner IDs, project identity, logo, documents or funding terms. Your Pi identity remains the canonical project owner. The owner contact fields available here are Contact Email and Contact Phone; the primary contact name can be amended through the Project Team request.
+      </div>
+
+      <section class="owner-amendment-subpanel">
+        <h3>Owner Contact Details</h3>
+        <p>Submit a request to correct the project's owner contact email or phone.</p>
+        <label>Contact Email<input id="ownerContactEmail" type="email" maxlength="254" required></label>
+        <label>Contact Phone<input id="ownerContactPhone" type="tel" maxlength="40"></label>
+        <label>Reason for change<textarea id="ownerContactAmendmentReason" rows="3" maxlength="2000" placeholder="Explain why these owner contact details need to change."></textarea></label>
+        <p id="ownerContactPendingNote" class="owner-inline-status active" hidden>A contact amendment is already awaiting ALBUKHR review.</p>
+        <button id="submitOwnerContactAmendment" class="owner-button primary" type="button">Request Contact Change</button>
+      </section>
+
+      <section class="owner-amendment-subpanel">
+        <div class="owner-amendment-heading">
+          <div><h3>Project Team</h3><p>Add, remove or edit team members, roles, contact details and the primary contact.</p></div>
+          <button id="addOwnerAmendmentTeamMember" class="owner-button secondary small" type="button">Add Team Member</button>
+        </div>
+        <p class="owner-amendment-help">This is the complete proposed team list. Keep every existing member who should remain; removed rows are omitted only if ALBUKHR approves the request.</p>
+        <div id="ownerAmendmentTeamList" class="owner-amend-team-list"></div>
+        <label>Reason for team change<textarea id="ownerTeamAmendmentReason" rows="3" maxlength="2000" placeholder="Explain the team changes and why they are required."></textarea></label>
+        <p id="ownerTeamPendingNote" class="owner-inline-status active" hidden>A team amendment is already awaiting ALBUKHR review.</p>
+        <button id="submitOwnerTeamAmendment" class="owner-button primary" type="button">Request Team Change</button>
+      </section>
+
+      <div class="owner-feed-heading">
+        <div><h3>Amendment Request History</h3><p>Track submitted, approved and rejected requests.</p></div>
+        <button id="refreshOwnerAmendmentHistory" class="owner-button secondary small" type="button">Refresh</button>
+      </div>
+      <div id="ownerAmendmentHistory" class="owner-amendment-history"></div>
+      <p id="ownerAmendmentsStatus" class="owner-inline-status" role="status" aria-live="polite">Verifying owner amendment access…</p>
     </section>
 
     <section class="owner-panel" id="publisherPanel">
@@ -135,5 +177,6 @@
 <script src="js/core/page-auth-guard.js"></script>
 <script src="js/core/environment-switcher.js"></script>
 <script src="js/external-project-owner-dashboard.js?v=20261124-phase-c1"></script>
+<script src="js/external-project-owner-amendments.js?v=20261124-amendments-v1"></script>
 </body>
 </html>
