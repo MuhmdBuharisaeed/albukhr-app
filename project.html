@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="css/global-components.css">
 <link rel="stylesheet" href="css/global-style.css">
 <link rel="stylesheet" href="css/app-alert.css">
-<link rel="stylesheet" href="css/project-page.css?v=3">
+<link rel="stylesheet" href="css/project-page.css?v=4">
 </head>
 <body>
 
@@ -28,7 +28,7 @@
   >INFOR</button>
 </header>
 
-<div class="fixed-section">
+<div class="fixed-section project-page-content">
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
@@ -52,15 +52,13 @@
     <button class="btn capital-btn" onclick="openCapitalModal()">🏦 Withdraw Capital</button>
   </div>
 
-  <div class="scroll-area">
-    <div class="scroll-area">
-      <div class="tx-header">
-        <h3 id="txTitle">Transaction History</h3>
-        <button id="refreshBtn" class="refresh-btn" onclick="manualRefresh()">🔄 Refresh</button>
-      </div>
-      <div id="projectHistory"></div>
+  <section class="project-transactions" aria-labelledby="txTitle">
+    <div class="tx-header">
+      <h3 id="txTitle">Transaction History</h3>
+      <button id="refreshBtn" class="refresh-btn" onclick="manualRefresh()">🔄 Refresh</button>
     </div>
-  </div>
+    <div id="projectHistory"></div>
+  </section>
 </div>
 
 <div class="modal" id="stakeModal">
@@ -194,4 +192,4 @@
   </div>
 </div>
 </body>
-        </html>
+</html>
