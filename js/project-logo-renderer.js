@@ -1,16 +1,26 @@
-/* ALBUKHR — PROJECT LOGO RENDERER v4
+/* ALBUKHR — PROJECT LOGO RENDERER v4.1
    Universal project logo rendering for Popular Projects and Assets.
    Registry logo_url remains authoritative.
    Home catalog bootstrap is intentionally independent of Pi authentication.
    - Popular cards display the first word only while preserving full identity.
+   - Mainnet Asset cards display the first project word only.
+   - Mainnet Asset status is compacted without reducing the project-name area.
    - All Popular Project logos use one shared frame and image size.
-   - Asset stake bootstrap no longer displays a loading placeholder.
+   - Asset stake bootstrap does not display a stake placeholder.
    No database/SQL changes. No Dock Navigation changes.
 */
 (function(window, document){
   "use strict";
 
   function clean(v){ return String(v == null ? "" : v).trim(); }
+
+  function currentNetwork(){
+    const projectApi = window.ALBukhrProjectConfig;
+    const network = projectApi && typeof projectApi.getCurrentNetwork === "function"
+      ? projectApi.getCurrentNetwork()
+      : window.ALBUKHR_SUPABASE && window.ALBUKHR_SUPABASE.network;
+    return clean(network).toLowerCase();
+  }
 
   function escapeHtml(v){
     return String(v == null ? "" : v)
@@ -159,8 +169,10 @@
     if(!icon || !titleNode) return;
 
     const isPopular = card.classList.contains("popular-card");
+    const isAsset = card.classList.contains("asset-item");
+    const isMainnetAsset = isAsset && currentNetwork() === "mainnet";
     const visibleTitle = clean(titleNode.textContent);
-    const storedFullName = isPopular
+    const storedFullName = (isPopular || (isAsset && card.hasAttribute("data-mainnet-compact")))
       ? clean(card.getAttribute("data-project-full-name"))
       : "";
     const lookupName = storedFullName || visibleTitle;
@@ -187,6 +199,31 @@
       }
 
       applyPopularIconFrame(icon);
+    }
+
+    if(isAsset && isMainnetAsset){
+      /*
+       * Mainnet-only compact title. Keep the authoritative full project
+       * identity on the card so logo resolution, accessibility and click
+       * navigation never depend on the shortened visible label.
+       */
+      const shortName = firstProjectWord(fullName).toUpperCase();
+      card.setAttribute("data-project-full-name",fullName);
+      card.setAttribute("data-mainnet-compact","true");
+      card.setAttribute("aria-label",fullName);
+      titleNode.setAttribute("title",fullName);
+      titleNode.setAttribute("aria-label",fullName);
+      if(visibleTitle !== shortName){
+        titleNode.textContent = shortName;
+      }
+    } else if(isAsset && card.hasAttribute("data-mainnet-compact")){
+      /* Restore the original Testnet/full-name presentation after a switch. */
+      titleNode.textContent = fullName;
+      card.removeAttribute("data-mainnet-compact");
+      card.removeAttribute("data-project-full-name");
+      card.removeAttribute("aria-label");
+      titleNode.removeAttribute("title");
+      titleNode.removeAttribute("aria-label");
     }
 
     renderLogo(icon, config, fullName, {eager, size});
@@ -285,7 +322,7 @@
     const header = createElement("div","asset-header");
     const info = createElement("div","asset-info");
     const name = createElement("div","asset-name",config.title);
-    /* Keep the target for real data, but do not show a loading placeholder. */
+    /* Keep the target for real data, but do not show a stake placeholder. */
     const stake = createElement("div","asset-stake","");
     stake.hidden = true;
     const chart = createElement("div","asset-mini-chart");
@@ -354,14 +391,9 @@
   }
 
   function handleRegistryReady(event){
-    const currentNetwork = clean(
-      window.ALBukhrProjectConfig &&
-      window.ALBukhrProjectConfig.getCurrentNetwork &&
-      window.ALBukhrProjectConfig.getCurrentNetwork()
-    ).toLowerCase();
-
+    const network = currentNetwork();
     const eventNetwork = clean(event && event.detail && event.detail.network).toLowerCase();
-    if(currentNetwork && eventNetwork && currentNetwork !== eventNetwork) return;
+    if(network && eventNetwork && network !== eventNetwork) return;
 
     renderHomeCatalog();
     processAll();
