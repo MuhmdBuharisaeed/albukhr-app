@@ -1,7 +1,10 @@
-/* ALBUKHR — PROJECT LOGO RENDERER v3
+/* ALBUKHR — PROJECT LOGO RENDERER v4
    Universal project logo rendering for Popular Projects and Assets.
    Registry logo_url remains authoritative.
    Home catalog bootstrap is intentionally independent of Pi authentication.
+   - Popular cards display the first word only while preserving full identity.
+   - All Popular Project logos use one shared frame and image size.
+   - Asset stake bootstrap no longer displays a loading placeholder.
    No database/SQL changes. No Dock Navigation changes.
 */
 (function(window, document){
@@ -56,6 +59,42 @@
     return key ? "project.html?project=" + encodeURIComponent(key) : null;
   }
 
+  function firstProjectWord(value){
+    const fullName = clean(value);
+    if(!fullName) return "";
+    return fullName.split(/\s+/)[0];
+  }
+
+  function applyPopularIconFrame(container){
+    if(!container) return;
+
+    /*
+     * One shared 54×54 frame for every Popular Project logo.
+     * This prevents external/core logos from rendering with
+     * different frame dimensions or alignment.
+     */
+    Object.assign(container.style,{
+      display:"flex",
+      alignItems:"center",
+      justifyContent:"center",
+      width:"54px",
+      height:"54px",
+      minWidth:"54px",
+      minHeight:"54px",
+      maxWidth:"54px",
+      maxHeight:"54px",
+      flex:"0 0 54px",
+      margin:"0 auto 10px",
+      padding:"0",
+      overflow:"hidden",
+      boxSizing:"border-box",
+      border:"1px solid #e1eee5",
+      borderRadius:"15px",
+      background:"#fff",
+      textAlign:"center"
+    });
+  }
+
   function applyLogoSizing(img, size){
     if(!img) return;
     const px = Number(size) === 48 ? 48 : 44;
@@ -70,6 +109,7 @@
     img.style.display = "block";
     img.style.margin = "0 auto";
     img.style.flex = "0 0 " + px + "px";
+    img.style.boxSizing = "border-box";
   }
 
   function renderLogo(container, config, altText, options){
@@ -118,21 +158,42 @@
     const titleNode = card.querySelector(titleSelector);
     if(!icon || !titleNode) return;
 
-    const title = clean(titleNode.textContent);
-    if(!title) return;
+    const isPopular = card.classList.contains("popular-card");
+    const visibleTitle = clean(titleNode.textContent);
+    const storedFullName = isPopular
+      ? clean(card.getAttribute("data-project-full-name"))
+      : "";
+    const lookupName = storedFullName || visibleTitle;
+    if(!lookupName) return;
 
-    const config = findConfig(title);
+    /* Resolve config against the full name before changing visible text. */
+    const config = findConfig(lookupName) || findConfig(visibleTitle);
     if(!config) return;
 
-    const isPopular = card.classList.contains("popular-card");
+    const fullName = clean(config.title || config.name || lookupName);
     const rank = Number(String(card.getAttribute("data-rank") || "").replace("#",""));
     const eager = isPopular && Number.isFinite(rank) && rank > 0 && rank <= 3;
     const size = isPopular ? 48 : 44;
 
-    renderLogo(icon, config, title, {eager, size});
+    if(isPopular){
+      card.setAttribute("data-project-full-name",fullName);
+      card.setAttribute("aria-label",fullName);
+      titleNode.setAttribute("title",fullName);
+      titleNode.setAttribute("aria-label",fullName);
 
-    const key = stableKey(title);
-    const url = projectUrl(title);
+      const shortName = firstProjectWord(fullName);
+      if(visibleTitle !== shortName){
+        titleNode.textContent = shortName;
+      }
+
+      applyPopularIconFrame(icon);
+    }
+
+    renderLogo(icon, config, fullName, {eager, size});
+
+    /* Keep stable identifiers intact for card navigation. */
+    const key = stableKey(fullName);
+    const url = projectUrl(fullName);
 
     if(key) card.setAttribute("data-project-key",key);
     if(clean(config.project_code))
@@ -202,11 +263,15 @@
     const card = createElement("div","popular-card");
     card.setAttribute("data-catalog-bootstrap","true");
     card.setAttribute("data-rank","#" + rank);
+    card.setAttribute("data-project-full-name",clean(config.title));
 
     const icon = createElement("div","popular-icon");
-    const name = createElement("div","popular-name",config.title);
+    const name = createElement("div","popular-name",firstProjectWord(config.title));
+    name.setAttribute("title",clean(config.title));
+    name.setAttribute("aria-label",clean(config.title));
     const amount = createElement("div","popular-amount","Loading popularity data…");
 
+    card.setAttribute("aria-label",clean(config.title));
     card.append(icon,name,amount);
     return card;
   }
@@ -220,7 +285,9 @@
     const header = createElement("div","asset-header");
     const info = createElement("div","asset-info");
     const name = createElement("div","asset-name",config.title);
-    const stake = createElement("div","asset-stake","Loading your stake data…");
+    /* Keep the target for real data, but do not show a loading placeholder. */
+    const stake = createElement("div","asset-stake","");
+    stake.hidden = true;
     const chart = createElement("div","asset-mini-chart");
     const status = createElement("div","asset-status","Checking account data…");
 
@@ -313,6 +380,7 @@
       card.getAttribute("data-project-code") ||
       card.getAttribute("data-project-slug") ||
       card.getAttribute("data-project-id") ||
+      card.getAttribute("data-project-full-name") ||
       clean(card.querySelector(".popular-name, .asset-name")?.textContent);
 
     const url = projectUrl(key);
