@@ -265,7 +265,7 @@
 
   function applyProjectUI(project){
     const title=clean(project.title||project.name)||"ALBUKHR Project",desc=clean(project.desc),info=clean(project.info),status=clean(project.status).toLowerCase();
-    if($("txTitle"))$("txTitle").innerText=`${title} Transactions`;
+    if($("txTitle"))$("txTitle").innerText="Transactions";
     document.title=`${title} • ALBUKHR`;
     if($("projectTitle"))$("projectTitle").innerText=title;
     if($("projectDescription"))$("projectDescription").innerText=desc;
