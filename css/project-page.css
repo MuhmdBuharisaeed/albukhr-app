@@ -84,15 +84,36 @@
   outline-offset:3px;
 }
 
-/* Keep the preview short; the existing INFOR modal retains full copy. */
+/* Keep the preview to exactly three visible lines, including in older mobile WebViews. */
 #projectDescription.short-info{
   display:-webkit-box;
   -webkit-box-orient:vertical;
   -webkit-line-clamp:3;
   line-clamp:3;
+  height:calc(4.8em + 28px);
+  max-height:calc(4.8em + 28px);
+  min-height:calc(4.8em + 28px);
+  box-sizing:border-box;
+  padding:14px;
   overflow:hidden;
+  white-space:normal;
   text-overflow:ellipsis;
   line-height:1.6;
+}
+
+/* Project status is separate from the Your Stake card and sits above both stats. */
+.project-stake-status{
+  display:block;
+  margin:0 2px 9px;
+  color:#707a73;
+  font-size:11px;
+  font-style:italic;
+  font-weight:500;
+  line-height:1.35;
+  text-align:center;
+}
+.project-stake-status:empty{
+  display:none;
 }
 
 @media(max-width:380px){
