@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/user-profile.css">
 <link rel="stylesheet" href="css/contributor.css">
+<link rel="stylesheet" href="css/contributor-profile-accordion.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="js/core/environment-core.js" defer></script>
@@ -67,12 +68,20 @@
   </div>
 </section>
 
-<section id="profilePanel" class="profile-card">
-  <div class="card-title">
-    <i class="fa-solid fa-address-card"></i>
-    <span>Contributor Registration Profile</span>
-    <span id="profileStatusBadge" class="status-badge success contributor-inline-badge">INCOMPLETE</span>
-  </div>
+<section id="profilePanel" class="profile-card contributor-profile-accordion">
+  <details id="contributorProfileDetails" class="contributor-profile-details">
+    <summary class="contributor-profile-summary">
+      <span class="contributor-profile-summary-main">
+        <span class="card-title contributor-profile-card-title">
+          <i class="fa-solid fa-address-card"></i>
+          <span>Contributor Registration Profile</span>
+          <span id="profileStatusBadge" class="status-badge success contributor-inline-badge">INCOMPLETE</span>
+        </span>
+        <span class="contributor-profile-summary-hint">Tap to view or update your registration details</span>
+      </span>
+      <span class="contributor-profile-chevron" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
+    </summary>
+    <div class="contributor-profile-content">
 
   <div class="contributor-highlight">
     <i class="fa-solid fa-shield-halved"></i>
@@ -126,6 +135,8 @@
   </form>
 
   <p id="profileStatus" class="contributor-status-text" aria-live="polite"></p>
+    </div>
+  </details>
 </section>
 
 <section id="createPanel" class="profile-card hidden">
@@ -223,7 +234,7 @@
   <p class="contributor-copy">Contributor status and project entitlements are controlled by ALBUKHR authentication, database authorization, governance review and project-registration rules. This page does not grant administrative privileges.</p>
 </section>
 <section class="logout-section"><button id="signOutButton" class="logout-button" type="button"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button></section>
-<footer class="profile-footer"><img src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" class="footer-logo" alt="ALBUKHR Logo"><h4>ALBUKHR Investment Limited</h4><p>Community Investment Platform<br>Powered by Pi Network</p><small>© 2024 ALBUKHR Investment Limited. All Rights Reserved.</small></footer>
+<footer class="profile-footer"><img src="images/file_0000000061cc6246adf4801e7ed9ef6c.png" class="footer-logo" alt="ALBUKHR Logo"><h4>ALBUKHR Investment Limited</h4><p>Community Investment Platform<br>Powered by Pi Network</p><small>© 2026 ALBUKHR Investment Limited. All Rights Reserved.</small></footer>
 </div>
 
 </body>
