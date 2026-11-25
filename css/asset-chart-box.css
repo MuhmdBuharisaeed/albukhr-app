@@ -99,3 +99,39 @@
     display:block;
     margin:0 auto;
 }
+
+/* =======================================================
+   ALBUKHR MAINNET ASSET CARD — COMPACT ACCOUNT STATUS
+   The status label no longer competes with the project title
+   for horizontal space. Testnet cards keep their old layout.
+======================================================= */
+
+.asset-item[data-mainnet-compact="true"]{
+    position:relative;
+    padding-bottom:28px;
+}
+
+.asset-item[data-mainnet-compact="true"] > .asset-left{
+    flex:1 1 0%;
+    min-width:0;
+    align-self:flex-start;
+}
+
+.asset-item[data-mainnet-compact="true"] > .asset-status{
+    position:absolute;
+    left:80px;
+    right:16px;
+    bottom:9px;
+    display:block;
+    min-width:0;
+    max-width:calc(100% - 96px);
+    margin:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:9px;
+    line-height:1.2;
+    font-weight:500;
+    text-align:left;
+    justify-content:flex-start;
+}
