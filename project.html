@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="css/global-components.css">
 <link rel="stylesheet" href="css/global-style.css">
 <link rel="stylesheet" href="css/app-alert.css">
-<link rel="stylesheet" href="css/project-page.css?v=4">
+<link rel="stylesheet" href="css/project-page.css?v=5">
 </head>
 <body>
 
@@ -29,11 +29,12 @@
 </header>
 
 <div class="fixed-section project-page-content">
+  <div id="stakeStatus" class="project-stake-status" aria-live="polite"></div>
+
   <div class="stats">
     <div class="stat-card">
       <span>Your Stake</span>
       <strong id="aStake">0.00 Pi</strong>
-      <div id="stakeStatus" style="font-size:12px;color:#666;margin-top:4px"></div>
     </div>
     <div class="stat-card">
       <span>Your Reward</span>
@@ -54,7 +55,7 @@
 
   <section class="project-transactions" aria-labelledby="txTitle">
     <div class="tx-header">
-      <h3 id="txTitle">Transaction History</h3>
+      <h3 id="txTitle">Transactions</h3>
       <button id="refreshBtn" class="refresh-btn" onclick="manualRefresh()">🔄 Refresh</button>
     </div>
     <div id="projectHistory"></div>
@@ -181,7 +182,7 @@
 <script src="js/albukhr-transaction-engine.js"></script>
 <script src="js/project-treasury.js"></script>
 <script src="js/app-alert.js"></script>
-<script src="js/project.js?v=3"></script>
+<script src="js/project.js?v=4"></script>
 <script src="js/project-header-identity.js?v=1"></script>
   
 <div id="appAlert" class="app-alert">
@@ -192,4 +193,4 @@
   </div>
 </div>
 </body>
-</html>
+        </html>
