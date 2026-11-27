@@ -19,9 +19,7 @@
   function db() {
     const core = window.ALBUKHR_SUPABASE;
     const client = core?.client || core;
-    if (!client || typeof client.rpc !== "function") {
-      throw new Error("ALBUKHR Supabase Core is unavailable.");
-    }
+    if (!client || typeof client.rpc !== "function") throw new Error("ALBUKHR Supabase Core is unavailable.");
     return client;
   }
 
@@ -30,29 +28,21 @@
     const activeOnly = options.activeOnly === true;
     const n = network();
     const now = Date.now();
-
     if (!force && cacheNetwork === n && now - cacheAt < CACHE_MS) {
       return cache.filter(p => !activeOnly || norm(p.status) === "active").map(p => ({...p}));
     }
-
     const { data, error } = await db().rpc("get_public_project_registry", { p_network: n });
     if (error) throw error;
-
     cache = arr(data).filter(p => norm(p.network) === n);
     cacheNetwork = n;
     cacheAt = now;
-
-    return cache
-      .filter(p => !activeOnly || norm(p.status) === "active")
-      .map(p => ({...p}));
+    return cache.filter(p => !activeOnly || norm(p.status) === "active").map(p => ({...p}));
   }
 
   async function getProject(code) {
     const q = norm(code);
     if (!q) return null;
-    return (await getProjects()).find(p =>
-      norm(p.project_code) === q || norm(p.slug) === q || norm(p.id) === q
-    ) || null;
+    return (await getProjects()).find(p => norm(p.project_code) === q || norm(p.slug) === q || norm(p.id) === q) || null;
   }
 
   function metrics(p) {
@@ -73,21 +63,15 @@
     const p = await getProject(code);
     return p ? metrics(p) : null;
   }
-
-  async function getMarketMetrics() {
-    return (await getProjects()).map(metrics);
-  }
-
+  async function getMarketMetrics() { return (await getProjects()).map(metrics); }
   async function getMarketLeaderboard(sort = "default") {
-    const list = await getMarketMetrics();
-    const key = norm(sort);
+    const list = await getMarketMetrics(), key = norm(sort);
     if (key === "liquidity") list.sort((a,b) => b.liquidity - a.liquidity);
     else if (key === "investors") list.sort((a,b) => b.investors - a.investors);
     else if (key === "roi") list.sort((a,b) => b.roi - a.roi);
     else list.sort((a,b) => String(a.title).localeCompare(String(b.title)));
     return list;
   }
-
   async function getMarketSummary() {
     const list = await getMarketMetrics();
     return {
@@ -97,15 +81,11 @@
       averageROI: list.length ? list.reduce((s,p) => s + Number(p.roi || 0), 0) / list.length : 0
     };
   }
-
   async function searchMarketProjects(keyword = "") {
-    const q = norm(keyword);
-    const list = await getMarketMetrics();
+    const q = norm(keyword), list = await getMarketMetrics();
     if (!q) return list;
-    return list.filter(p => [p.project_code,p.name,p.slug,p.project_type,p.description]
-      .some(v => norm(v).includes(q)));
+    return list.filter(p => [p.project_code,p.name,p.slug,p.project_type,p.description].some(v => norm(v).includes(q)));
   }
-
   async function refreshMarketRanking() {
     cache = [];
     cacheNetwork = null;
@@ -117,29 +97,16 @@
     if (!payload.project) throw new Error("Project is required.");
     const p = await getProject(payload.project);
     if (!p) throw new Error("Project not found in the current network.");
-    if (norm(p.status) !== "active") {
-      throw new Error("This project is not ACTIVE and cannot accept investment yet.");
-    }
-
+    if (norm(p.status) !== "active") throw new Error("This project is not ACTIVE and cannot accept investment yet.");
     const amount = Number(payload.amount);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      throw new Error("Investment amount must be greater than zero.");
-    }
-
+    if (!Number.isFinite(amount) || amount <= 0) throw new Error("Investment amount must be greater than zero.");
     const currentNetwork = network();
-    if (payload.network && norm(payload.network) !== currentNetwork) {
-      throw new Error("Network mismatch.");
-    }
+    if (payload.network && norm(payload.network) !== currentNetwork) throw new Error("Network mismatch.");
 
-    if (!window.AlbukhrStaking || typeof window.AlbukhrStaking.addStake !== "function") {
-      throw new Error("ALBUKHR staking engine is unavailable.");
-    }
-
-    return window.AlbukhrStaking.addStake({
-      project: p.project_code,
-      amount,
-      duration: Number(payload.duration)
-    });
+    // The marketplace card has no exact-offer acceptance panel. Never start a
+    // Pi payment from here. Investors must use project.html, where the current
+    // published term and Standard v1.0 are displayed and explicitly accepted.
+    throw new Error("To invest, open this project's detail page, review the exact published offer and accept the ALBUKHR Financial Governance Standard first.");
   }
 
   window.AlbukhrMarketplace = Object.freeze({
