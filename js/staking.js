@@ -3,7 +3,8 @@
   "use strict";
   if(window.AlbukhrStaking) return;
 
-  const DURATIONS=[30,60,90,180,365,430];
+  // Legacy 60/430 remain readable; new governed offers may use 730/1095.
+  const DURATIONS=[30,60,90,180,365,430,730,1095];
   const TERMS_RPC="get_public_core_staking_terms_v2";
   let busy=false;
   const termsCache=new Map();
@@ -25,37 +26,19 @@
     return window.AlbukhrApi;
   }
 
-  /*
-   * The Home page previously called the Mainnet API without loading
-   * js/core/albukhr-api-core.js. Load it only when a user-stakes API
-   * request is actually needed. This keeps public catalog rendering
-   * independent of Pi authentication and avoids changing other pages.
-   */
+  /* Load the Mainnet API client only when an authenticated user read/payment needs it. */
   function ensureApiCore(){
     if(window.AlbukhrApi) return Promise.resolve(window.AlbukhrApi);
     if(apiCorePromise) return apiCorePromise;
-
     apiCorePromise=new Promise((resolve,reject)=>{
       const script=document.createElement("script");
       script.src="js/core/albukhr-api-core.js";
       script.async=true;
       script.setAttribute("data-albukhr-api-core","true");
-      script.onload=()=>{
-        if(window.AlbukhrApi){
-          resolve(window.AlbukhrApi);
-        }else{
-          reject(new Error("ALBUKHR API Core loaded without exposing its client."));
-        }
-      };
-      script.onerror=()=>{
-        reject(new Error("Unable to load ALBUKHR API Core."));
-      };
+      script.onload=()=>window.AlbukhrApi?resolve(window.AlbukhrApi):reject(new Error("ALBUKHR API Core loaded without exposing its client."));
+      script.onerror=()=>reject(new Error("Unable to load ALBUKHR API Core."));
       document.head.appendChild(script);
-    }).catch(error=>{
-      apiCorePromise=null;
-      throw error;
-    });
-
+    }).catch(error=>{apiCorePromise=null;throw error;});
     return apiCorePromise;
   }
 
@@ -110,7 +93,6 @@
     const key=`mainnet:${id}`;
     if(!force&&termsCache.has(key)) return termsCache.get(key);
     if(!force&&termsPromises.has(key)) return termsPromises.get(key);
-
     const promise=(async()=>{
       const c=core();
       const result=await c.rpc(TERMS_RPC,{p_project_id:id,p_network:"mainnet"});
@@ -122,7 +104,7 @@
       if(normalizeCode(data.project_code)!==code) throw new Error("Staking contract project code mismatch.");
       const terms=Array.isArray(data.terms)?data.terms.map(normalizeTerm).filter(Boolean):[];
       const unique=new Map();
-      terms.forEach(t=>{if(!t.term_version_id) return; if(!unique.has(t.duration_days)) unique.set(t.duration_days,t);});
+      terms.forEach(t=>{if(!t.term_version_id) return;if(!unique.has(t.duration_days)) unique.set(t.duration_days,t);});
       const normalized=Object.freeze(Array.from(unique.values()).sort((a,b)=>a.duration_days-b.duration_days));
       termsCache.set(key,normalized);
       return normalized;
@@ -141,6 +123,7 @@
     if(!code) throw new Error("Authoritative project code is unavailable.");
     const a=Number(amount),d=Number(duration);
     if(!Number.isFinite(a)||a<=0) throw new Error("Stake amount must be greater than zero.");
+    if(!Number.isInteger(d)||!DURATIONS.includes(d)) throw new Error("Selected staking duration is not supported.");
     const terms=await getStakingTerms(project);
     const term=terms.find(t=>t.duration_days===d);
     if(!term) throw new Error("Selected staking duration is not published for this project.");
@@ -162,19 +145,12 @@
       try{
         window.Pi.createPayment({amount:Number(amount),memo:memo||`ALBUKHR ${code} investment`,metadata},{
           onReadyForServerApproval:async paymentId=>{
-            try{
-              await api().post("/api/pi-payment-approve",{
-                payment_id:paymentId,project_code:code,amount:Number(amount),duration:Number(duration),term_version_id:termVersionId
-              });
-            }catch(error){done(reject,error);}
+            try{await api().post("/api/pi-payment-approve",{payment_id:paymentId,project_code:code,amount:Number(amount),duration:Number(duration),term_version_id:termVersionId});}
+            catch(error){done(reject,error);}
           },
           onReadyForServerCompletion:async(paymentId,txid)=>{
-            try{
-              const result=await api().post("/api/pi-payment-complete",{
-                payment_id:paymentId,txid,project_code:code,amount:Number(amount),duration:Number(duration),term_version_id:termVersionId
-              });
-              done(resolve,result);
-            }catch(error){done(reject,error);}
+            try{const result=await api().post("/api/pi-payment-complete",{payment_id:paymentId,txid,project_code:code,amount:Number(amount),duration:Number(duration),term_version_id:termVersionId});done(resolve,result);}
+            catch(error){done(reject,error);}
           },
           onCancel:()=>done(reject,new Error("Pi payment cancelled.")),
           onError:error=>done(reject,new Error(error?.message||"Pi payment failed."))
@@ -193,49 +169,24 @@
       const result=await startPiPayment({amount:input.amount,duration:input.duration,projectCode:input.code,termVersionId:input.term.term_version_id,memo:`ALBUKHR ${input.code} investment`});
       const stake=result?.stake?.stake||result?.stake||result?.data?.stake;
       return {success:true,stake:stake||result};
-    }catch(error){
-      console.error("ALBUKHR STAKING:",error);
-      return {error:error?.message||"Investment failed."};
-    }finally{busy=false;}
+    }catch(error){console.error("ALBUKHR STAKING:",error);return {error:error?.message||"Investment failed."};}
+    finally{busy=false;}
   }
 
   async function getAllStakesMerged(){
-    try{
-      await auth();
-      await ensureApiCore();
-      const rows=await api().get("/api/my-stakes?network=mainnet");
-      return Array.isArray(rows)?rows:[];
-    }
-    catch(error){
-      console.warn("ALBUKHR stakes unavailable:",error);
-      return [];
-    }
+    try{await auth();await ensureApiCore();const rows=await api().get("/api/my-stakes?network=mainnet");return Array.isArray(rows)?rows:[];}
+    catch(error){console.warn("ALBUKHR stakes unavailable:",error);return [];}
   }
-
   async function getProjectStakes(project){
-    const code=projectCode(project);
-    if(!code)return [];
-    try{
-      await auth();
-      await ensureApiCore();
-      const rows=await api().get(`/api/my-stakes?network=mainnet&project_code=${encodeURIComponent(code)}`);
-      return Array.isArray(rows)?rows:[];
-    }
-    catch(error){
-      console.warn("ALBUKHR project stakes unavailable:",error);
-      return [];
-    }
+    const code=projectCode(project);if(!code)return [];
+    try{await auth();await ensureApiCore();const rows=await api().get(`/api/my-stakes?network=mainnet&project_code=${encodeURIComponent(code)}`);return Array.isArray(rows)?rows:[];}
+    catch(error){console.warn("ALBUKHR project stakes unavailable:",error);return [];}
   }
-
   async function getProjectTotals(project){
     const rows=await getProjectStakes(project);
     return rows.reduce((out,row)=>{out.stake+=Number(row.amount)||0;out.reward+=Number(row.reward_amount)||0;return out;},{stake:0,reward:0});
   }
-  function getMinStake(project,duration){
-    const terms=cachedTerms(project),exact=duration==null?null:getTerm(project,duration);
-    if(exact)return exact.min_stake;
-    return terms.length?Math.min(...terms.map(t=>t.min_stake)):0;
-  }
+  function getMinStake(project,duration){const terms=cachedTerms(project),exact=duration==null?null:getTerm(project,duration);if(exact)return exact.min_stake;return terms.length?Math.min(...terms.map(t=>t.min_stake)):0;}
   function getRewardRate(project,duration){const term=getTerm(project,duration);return term&&term.reward_rate!=null?Number(term.reward_rate):0;}
 
   window.AlbukhrStaking=Object.freeze({addStake,startPiPayment,getStakingTerms,getTerm,getAllStakesMerged,getProjectStakes,getProjectTotals,getMinStake,getRewardRate});
